@@ -1,0 +1,5 @@
+start java -classpath build org.tmotte.klonk.lock.LockTest test\dink
+start java -classpath build org.tmotte.klonk.lock.LockTest test\dink
+start java -classpath build org.tmotte.klonk.lock.LockTest test\dink
+start java -classpath build org.tmotte.klonk.lock.LockTest test\dink
+start java -classpath build org.tmotte.klonk.lock.LockTest test\dink

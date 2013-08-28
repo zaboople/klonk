@@ -1,0 +1,1 @@
+export CLASSPATH="build"

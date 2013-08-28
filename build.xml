@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<project name="klonk" basedir="." default="help">
+
+  <!--**********-->
+  <!--PROPERTIES-->
+  <!--**********-->
+  
+  <!--Properties: arbitrary environment prefix:-->
+  <property environment="env"/>
+  
+  <!--Properties: directories:-->
+  <property file="build.properties"/>
+  <property name="java.dir" value="java"/>
+  <property name="build.dir" value="build"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="appname" value="klonk"/>
+  <property name="version" value="${VERSION.KLONK}"/>
+  <property name="appname.version" value="${appname}.${version}"/>
+  <property name="icon.png" value="${build.dir}/org/tmotte/klonk/windows/app.png"/>
+  <property name="icon.ico" value="${lib.dir}/app.ico"/>
+  
+  <path id="classpath">
+    <fileset dir="${lib.dir}" includes="*.jar"/>
+  </path>
+  
+  
+  <!--**************-->
+  <!--TARGETS: HELP -->
+  <!--**************-->
+
+  <target name="help">
+    <echo>
+  clean:         
+    Deletes all generated classes etc.
+  config.prod,config.test:
+    One of these two targets must be run first when building from scratch. 
+    These copy either of two .png files into the build directory; the application will use the file
+    as its window icon. This way it's easier to tell whether it's a test or production build, especially
+    when I am using the application in one window and testing changes in another.
+  compile:
+    Compile all Java files to ./build. Also does a few things with text file resources concerned with
+    help screens.
+  jar:
+    Compiles and creates dist/${appname}.jar file from contents of ./build. This is an executable
+    jar, so double-clicking it should start the application if your java environment is properly 
+    configured.
+  exe:
+    Generates a windows executable using jsmoothgen. To use this target, you will need to download
+    jsmoothgen, then edit the build.exe.properties in this directory and set it up to point to the correct
+    directory of your jsmooth install. The actual build is controlled by build.exe.xml.
+    
+    Note that the windows executable will *still* require a Java installation; it only makes 
+    application startup a little more straightforward (especially mapping file types to the 
+    executable). Also consider using the jar target, however.
+  dist:
+    Creates source zip &amp; binaries zip in dist directory.
+    </echo>
+  </target>
+
+  <!--****************-->
+  <!--TARGETS: CLEAN  -->
+  <!--****************-->
+
+  <target name="clean" description="Clean output directories">
+    <delete dir="javadoc"/>
+    <delete dir ="${build.dir}"/>
+    <delete dir ="${dist.dir}"/>
+    <delete file="${appname}.jar"/>          
+    <delete>
+      <fileset dir="." includes="*.pdf"/>
+    </delete>
+  </target>
+
+  <!--****************-->
+  <!--TARGETS: CONFIG -->
+  <!--****************-->
+  
+  <target name="config.test">
+    <copy file="lib/apptest.png" tofile="${icon.png}" overwrite="true"/>
+  </target>
+  <target name="config.prod">
+    <copy file="lib/app.png" tofile="${icon.png}"  overwrite="true"/>
+  </target>
+  
+  <!--****************-->
+  <!--TARGETS: BUILD  -->
+  <!--****************-->
+
+  <target name="compile" description="Compile main source tree java files">
+
+    <!--Need to select & copy icon file:-->
+    <available file="${icon.png}" property="haspng"/>
+    <fail unless="haspng"
+          message="Need to run config.prod or config.test target first before compile"/>
+
+    <!--Compile:-->    
+    <javac destdir="${build.dir}" 
+          debug="true" 
+          failonerror="true"
+          deprecation="on">
+      <compilerarg value="-Xlint:unchecked"/>
+      <src path="${java.dir}"/>
+      <classpath refid="classpath"/>
+    </javac>
+    
+    <!--Copies the help.txt & about.txt file:-->
+    <copy todir="${build.dir}">
+      <fileset dir="${java.dir}" includes="**/*.txt"/>
+    </copy>
+    <!--Version number & license for about screen-->
+    <copy tofile="${build.dir}/org/tmotte/klonk/windows/popup/About-Version-Number.txt" 
+          file="build.properties"/>
+    <copy tofile="${build.dir}/org/tmotte/klonk/windows/popup/About-License.html" 
+          file="license.html"/>
+  </target>
+
+  <target name="javadoc" description="JavaDoc">
+    <mkdir dir="javadoc"/>
+    <javadoc sourcepath="java" access="public" destdir="javadoc" packagenames="org.**,com.**">
+      <classpath refid="classpath"/>
+      <fileset dir="java">
+        <include name="**/*.java"/>
+      </fileset>
+    </javadoc>
+  </target>
+
+ 
+  <target name="jar" depends="compile">
+    <mkdir dir ="${dist.dir}"/>
+    <jar basedir="./build" destfile="dist/${appname}.jar">
+      <manifest>
+        <attribute name="Built-By" value="Mr Motte" />
+        <attribute name="Main-Class" value="org.tmotte.klonk.Klonk" />
+
+        <!-- Finally, use the generated libs path 
+        <attribute name="Class-Path" value="${libs.project}" />-->
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="exe" depends="jar">
+    <mkdir dir ="${dist.dir}/bin"/>
+    <subant target="exe">
+      <fileset dir="." includes="build.exe.xml"/>
+    </subant>
+  </target>
+  
+
+  <!-- ********************* -->
+  <!-- TARGETS: DISTRIBUTION -->
+  <!-- ********************* -->
+
+  
+  <target name="dist" depends="_dist.src,_dist.bin,_dist.site">
+    
+  </target>
+
+  <target name="_dist.site" depends="_dist.src,_dist.bin">
+    <mkdir dir ="${dist.dir}/site"/>
+    <copy todir="${dist.dir}/site">
+      <fileset dir="${dist.dir}">
+        <include name="*.zip"/>
+      </fileset>
+    </copy>    
+    <copy file="license.html"     todir="${dist.dir}/site"/>
+    <copy file="build.properties" todir="${dist.dir}/site"/>
+  </target>
+  
+  <target name="_dist.bin" depends="config.prod,jar,exe">
+    <mkdir dir ="${dist.dir}/bin"/>
+    <mkdir dir ="${dist.dir}/bin"/>
+    <copy file="lib/Klonk.bat"    todir="${dist.dir}/bin"/>
+    <copy file="dist/klonk.jar"   tofile="${dist.dir}/bin/${appname.version}.jar"/>
+    <zip destfile="${dist.dir}/${appname.version}.zip">
+      <zipfileset dir="${dist.dir}/bin" prefix="${appname.version}"
+                  excludes=".git/**/*,.git"/>
+    </zip>
+    <!--Cleanup:-->
+    <delete file="dist/klonk.jar"/>
+  </target>
+  
+  <target name="_dist.src" depends="clean">
+    <mkdir dir ="${dist.dir}"/>
+    <zip destfile="dist/${appname.version}.src.zip">
+      <zipfileset dir="." prefix="${appname.version}.src"/>
+    </zip>
+  </target>
+  
+</project>
