@@ -173,8 +173,7 @@
     <copy file="lib/Klonk.bat"    todir="${dist.dir}/bin"/>
     <copy file="dist/klonk.jar"   tofile="${dist.dir}/bin/${appname.version}.jar"/>
     <zip destfile="${dist.dir}/${appname.version}.zip">
-      <zipfileset dir="${dist.dir}/bin" prefix="${appname.version}"
-                  excludes=".git/**/*,.git"/>
+      <zipfileset dir="${dist.dir}/bin" prefix="${appname.version}"/>
     </zip>
     <!--Cleanup:-->
     <delete file="dist/klonk.jar"/>
@@ -183,7 +182,8 @@
   <target name="_dist.src" depends="clean">
     <mkdir dir ="${dist.dir}"/>
     <zip destfile="dist/${appname.version}.src.zip">
-      <zipfileset dir="." prefix="${appname.version}.src"/>
+      <zipfileset dir="." prefix="${appname.version}.src"
+                  excludes=".git/**/*,.git"/>
     </zip>
   </target>
   
