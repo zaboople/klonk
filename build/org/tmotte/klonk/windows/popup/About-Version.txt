@@ -1,1 +1,0 @@
-Klonk version $version © 2013 Troy Motte.
