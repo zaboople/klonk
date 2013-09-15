@@ -557,7 +557,7 @@ public class Klonk {
     }
 
     // 4. Context
-    Kontext context=Kontext.getProduction(
+    Kontext context=Kontext.getForApplication(
       home, log,
       new StatusNotifier() {
         public @Override void showStatus(String msg) {layout.showStatus(msg);}

@@ -28,7 +28,7 @@ public class Kontext {
   public Image iconImage, iconImageFindReplace;
   public CurrFileGetter currFileGetter;
   
-  public static Kontext getProduction(KHome home, Fail fail, StatusNotifier status, CurrFileGetter getter){
+  public static Kontext getForApplication(KHome home, Fail fail, StatusNotifier status, CurrFileGetter getter){
     return new Kontext(home, new JFrame("Klonk"), fail, status, getter);
   }
   public static Kontext getForUnitTest() {
@@ -69,6 +69,8 @@ public class Kontext {
       }
     );
   }
+  
+  
   private Kontext(KHome home, JFrame mainFrame, Fail fail, StatusNotifier status, CurrFileGetter getter){
     try {
       javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());    
@@ -85,6 +87,11 @@ public class Kontext {
     iconImage=getIcon("org/tmotte/klonk/windows/app.png");
     iconImageFindReplace=getIcon("org/tmotte/klonk/windows/app-find-replace.png");
   }
+  
+  ////////////////
+  // UTILITIES: //
+  ////////////////
+  
   private Image getIcon(String filename) {
     URL url=getClass().getClassLoader().getResource(filename);
     ImageIcon ii=new ImageIcon(url);
