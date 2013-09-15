@@ -8,8 +8,17 @@ import java.util.regex.Pattern;
 //FIXME find multiple spaces tabs
 public class ShellCommandParser {
   static Pattern delimiterPattern=Pattern.compile("(\"|'|\\p{Blank})");
+  static String currFileMarker="[$1]";
+  public static boolean referencesCurrFile(String cmd) {
+    return currFileMarker.indexOf(currFileMarker)!=-1;
+  }
   public static List<String> parse(String cmd) {
+    return parse(cmd, null);
+  }
+  public static List<String> parse(String cmd, String currFileName) {
     List<String> results=new LinkedList<>();
+    if (referencesCurrFile(cmd) & currFileName!=null)
+      cmd=cmd.replace(currFileMarker, currFileName);
 
     //Maybe it's just one big command that references a real file, spaces or no spaces -
     //like C:\program files\booger hooger\foo.exe:
@@ -75,7 +84,11 @@ public class ShellCommandParser {
   public static void main(String[] args) {
     //I tested a lot with this thing:
     //   C:\Program Files\ATI Technologies\ATI Control Panel\atiprbxx.exe
-    List<String> result=parse(args[0]);
+    String 
+      command=args[0],
+      currFileName=args.length>1
+        ?args[1] :null;
+    List<String> result=parse(args[0], currFileName);
     for (String s: result)
       System.out.println("-->"+s);
   }

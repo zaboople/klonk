@@ -25,17 +25,13 @@ public class Kontext {
   public StatusNotifier status;
   public KHome home;
   public KPersist persist;
-  public Image iconImage;
+  public Image iconImage, iconImageFindReplace;
+  public CurrFileGetter currFileGetter;
   
-  public static Kontext getProduction(KHome home, Fail fail, StatusNotifier status){
-    return new Kontext(home, new JFrame("Klonk"), fail, status);
+  public static Kontext getProduction(KHome home, Fail fail, StatusNotifier status, CurrFileGetter getter){
+    return new Kontext(home, new JFrame("Klonk"), fail, status, getter);
   }
   public static Kontext getForUnitTest() {
-    try {
-      javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());    
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
 
     //Create frame that can die off on ESC or when unit test tells it
     //to die via JFrame.dispose()
@@ -67,18 +63,31 @@ public class Kontext {
         public void showStatus(String msg) {
           System.out.println("Status: "+msg);
         }
+      },
+      new CurrFileGetter(){
+        public String getFile(){return "-none-";}
       }
     );
   }
-  private Kontext(KHome home, JFrame mainFrame, Fail fail, StatusNotifier status){
+  private Kontext(KHome home, JFrame mainFrame, Fail fail, StatusNotifier status, CurrFileGetter getter){
+    try {
+      javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());    
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
     this.home=home;
     this.mainFrame=mainFrame;
     this.fail=fail;
     this.status=status;
+    this.currFileGetter=getter;
     this.persist=new KPersist(home, fail);
     this.popups=new Popups(this);
-    URL url=getClass().getClassLoader().getResource("org/tmotte/klonk/windows/app.png");
+    iconImage=getIcon("org/tmotte/klonk/windows/app.png");
+    iconImageFindReplace=getIcon("org/tmotte/klonk/windows/app-find-replace.png");
+  }
+  private Image getIcon(String filename) {
+    URL url=getClass().getClassLoader().getResource(filename);
     ImageIcon ii=new ImageIcon(url);
-    iconImage=ii.getImage();
+    return ii.getImage();
   }
 }

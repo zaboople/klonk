@@ -1,30 +1,8 @@
--F5 instead of Ctrl-E?
-
--Maybe a more sophisticated version of find/replace, where I break up the String? It is pretty slow on an 8MB file.
-  -Loop thru 20000 characters at a time, appending last searchFor.length() from previous to first. 
-  -This becomes even trickier with regex, but Matcher does have the ability to tell you that the end of a string is a partial match.
-  
--How about dual-window mode. Only two windows, that's it.
-
-
--Long term problems
-    
-  -Weird background bugs
-    -OK I tried this new thing with =Xshare:off, hoping it prevents processes from messing with each other
-    -Do you see that doo doo where java says it's starting up with mixed mode "sharing"? 
-    -Mostly when it runs two at once.
-    -Changing menu item titles on show seemed to screw up the menu, but that was before lunch. It broke both the production AND test menus, in fact, which is crazy. 
-    -Noticed that the menu was acting up, chewing up text. Maybe it was because the menu was going off screen with long file names. Maybe I should put ellipsis on the long file names. Worth considering. Also, 15 is too many to sift thru.
-    -Might have been the background goofup in Kalert. Using setOpaque(false) was better.
-    -Watch out for system.out.println's. That may be freaking out the exe.
-    -Exe?
-      -Consider jexepack, which costs $100 or you get an alert everytime you open it.
-    -Currently running off of a .bat. That seems to work. I made a shortcut with a .ico and that seems to work when I copy it. but it needs a readme to indicate that the shortcut will only work if you first double-click it with klonk.bat in the same directory, so it can update itself. No wait, shortcut icon dies after reboot.
-  
-  -Slow scrolling:
-    -Too many key listeners?
-    -Noticed that it seems to slow down with a lot of windows open. Hmph. Don't tell me I have to resort to... oh gawd no. Not recreating jtextareas when I switch windows. Horrors.
-
+-Current
+  -Maybe a more sophisticated version of find/replace, where I break up the String? It is pretty slow on an 8MB file.
+    -Loop thru 20000 characters at a time, appending last searchFor.length() from previous to first. 
+    -This becomes even trickier with regex, but Matcher does have the ability to tell you that the end of a string is a partial match.
+  -How about dual-window mode. Only two windows, that's it.
 
 
 -Maybe  
@@ -32,10 +10,27 @@
   -Undo
     -Undo to last save?
     -You could have undostep include whether selection is forwards or backwards. Just a boolean.
-  -I need that resizer in the lower right.
-  -Runtime.getRuntime().addShutdownHook()
+  -I need a big fat resizer in the lower right.
   -Selected text color, selected background color
   -Indents & Tabs, Fonts should only enable ok button when something changes.
     -Also should show message when ok is clicked.
 
   
+
+-Long term problems
+  -Can't delete a directory in windows until closing Klonk. Well, it only happened once. Dunno.
+    
+  -Weird background bugs
+    -OK I tried this new thing with =Xshare:off, hoping it prevents processes from messing with each other
+    -Do you see that doo doo where java says it's starting up with mixed mode "sharing"? 
+    -Mostly when it runs two at once.
+    -Watch out for system.out.println's. That may be freaking out the exe.
+    -Exe?
+      -Consider jexepack, which costs $100 or you get an alert everytime you open it.
+  
+  -Slow scrolling:
+    -Too many key listeners?
+    -Noticed that it seems to slow down with a lot of windows open. Hmph. Don't tell me I have to resort to... oh gawd no. Not recreating jtextareas when I switch windows. Horrors.
+
+
+

@@ -19,6 +19,7 @@
   <property name="appname.version" value="${appname}.${version}"/>
   <property name="icon.png" value="${build.dir}/org/tmotte/klonk/windows/app.png"/>
   <property name="icon.ico" value="${lib.dir}/app.ico"/>
+  <property name="iconFR.png" value="${build.dir}/org/tmotte/klonk/windows/app-find-replace.png"/>
   
   <path id="classpath">
     <fileset dir="${lib.dir}" includes="*.jar"/>
@@ -77,10 +78,12 @@
   <!--****************-->
   
   <target name="config.test">
-    <copy file="lib/apptest.png" tofile="${icon.png}" overwrite="true"/>
+    <copy file="lib/apptest.png"              tofile="${icon.png}" overwrite="true"/>
+    <copy file="lib/apptest-find-replace.png" tofile="${iconFR.png}" overwrite="true"/>
   </target>
   <target name="config.prod">
-    <copy file="lib/app.png" tofile="${icon.png}"  overwrite="true"/>
+    <copy file="lib/app.png"              tofile="${icon.png}"  overwrite="true"/>
+    <copy file="lib/app-find-replace.png" tofile="${iconFR.png}"  overwrite="true"/>
   </target>
   
   <!--****************-->

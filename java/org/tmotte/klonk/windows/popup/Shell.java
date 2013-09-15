@@ -5,39 +5,14 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.LinkedList;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JWindow;
-import javax.swing.ListModel;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import org.tmotte.common.text.StringChunker;
 import org.tmotte.common.swang.Fail;
@@ -46,15 +21,19 @@ import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
 import org.tmotte.klonk.config.FontOptions;
 import org.tmotte.klonk.config.Kontext;
+import org.tmotte.klonk.config.KPersist;
+import org.tmotte.klonk.config.CurrFileGetter;
 import org.tmotte.klonk.edit.MyTextArea;
 
 public class Shell {
   private JFrame parentFrame;
   private Fail fail;
   private Popups popups;
+  private KPersist persist;
+  private CurrFileGetter currFileGetter;
 
   private boolean shownBefore=false;
-  private List<String> persistedFiles;
+  private List<String> persistedFiles=new LinkedList<>();
   private int maxRecent=1;
 
   private JFrame win;
@@ -64,13 +43,14 @@ public class Shell {
   private DefaultComboBoxModel<String> jcbPreviousData=new DefaultComboBoxModel<>();
   private Font fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
 
-  public Shell(JFrame parentFrame, Fail fail, Popups popups, Image img,
-               List<String> persistedFiles, int maxRecent) {
+  public Shell(JFrame parentFrame, Fail fail, Popups popups, Image img, KPersist persist, CurrFileGetter cfGetter) {
     this.parentFrame=parentFrame;
     this.fail=fail;
     this.popups=popups;
-    this.persistedFiles=persistedFiles;
-    this.maxRecent=maxRecent;
+    this.persist=persist;
+    this.currFileGetter=cfGetter;
+    persist.getCommands(persistedFiles);
+    this.maxRecent=persist.maxRecent;
     create(img);
     layout(); 
     listen();
@@ -147,6 +127,7 @@ public class Shell {
     int size=lm.getSize();
     for (int i=0; i<size; i++)
       names.add(lm.getElementAt(i));
+    persist.setCommands(names);
   }
   private void saveCommand(String cmd) {
     int index=getIndexOf(cmd);
@@ -201,7 +182,10 @@ public class Shell {
       //touch any Swing component whatsoever. Leave that for process() & done().
       kill=false;
       try {
-        List<String> commands=ShellCommandParser.parse(input);
+        String currFile=ShellCommandParser.referencesCurrFile(input) 
+          ?currFileGetter.getFile()
+          :null;
+        List<String> commands=ShellCommandParser.parse(input, currFile);
         for (int i=0; i<commands.size(); i++)
           if (i==0)
             publish("Command: "+commands.get(i));
@@ -258,7 +242,7 @@ public class Shell {
            bStart="<b>",
            bEnd="</b>";
 
-    win=new JFrame("Run batch program:");
+    win=new JFrame("Klonk: Run batch program:");
     win.setIconImage(img);
 
     btnSelectFile=new JButton("File...");
@@ -460,25 +444,14 @@ public class Shell {
       public void run() {
         final Kontext context=Kontext.getForUnitTest();
         
-        //Get persisted batch commands:
-        final List<String> files=new java.util.ArrayList<>();
-        context.persist.getCommands(files);
-        
         //Show the window:
         Shell pop=new Shell(
-          context.mainFrame, context.fail, context.popups, context.iconImage,
-          files, context.persist.maxRecent
+          context.mainFrame, context.fail, context.popups, 
+          context.iconImage, context.persist, context.currFileGetter
         );
         pop.setFont(context.persist.getFontAndColors());
         pop.show();
                 
-        //Save the persisted batch commands:
-        pop.win.addWindowListener(new WindowAdapter() {
-          public void windowDeactivated(WindowEvent e){
-            context.persist.setCommands(files);
-            context.persist.save();
-          }
-        });
       }
     });  
   }

@@ -125,8 +125,8 @@ public class Popups {
   public void showLineDelimiters(LineDelimiterOptions k, LineDelimiterListener k2){
     getLineDelimiters().show(k, k2);
   }
-  public void showShell(List<String> recentCommands, int maxRecent) {
-    getShell(recentCommands, maxRecent).show();
+  public void showShell() {
+    getShell().show();
   }
   
   // FILE DIALOGS: //
@@ -244,11 +244,11 @@ public class Popups {
     }
     return findAndReplace;
   }
-  private Shell getShell(List<String> recentCommands, int maxRecent) {
+  private Shell getShell() {
     if (shell==null) {
       shell=new Shell(
-        context.mainFrame, context.fail, context.popups, context.iconImage,
-        recentCommands, maxRecent
+        context.mainFrame, context.fail, context.popups, 
+        context.iconImageFindReplace, context.persist, context.currFileGetter
       );
       shell.setFont(fontOptions);
     }

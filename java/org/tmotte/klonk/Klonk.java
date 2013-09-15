@@ -29,6 +29,7 @@ import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.LineDelimiterOptions;
 import org.tmotte.klonk.config.TabAndIndentOptions;
+import org.tmotte.klonk.config.CurrFileGetter;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.io.FileListen;
@@ -52,13 +53,13 @@ public class Klonk {
   //The most essential stuff:
   private FileListen fileListen;
   private KLog log;
-  private KHome home;
   
   //Main GUI components:
   private LinkedList<Editor> editors;
   private MainLayout layout;
   private Menus menus;
   private Popups popups;
+  private boolean anyUnsaved=false;
   
   //Configuration stuff:
   private KPersist persist;
@@ -67,47 +68,19 @@ public class Klonk {
                   fastUndos=true;
   private static int maxRecent=15;
   private ArrayList<String> 
-    recentDirs, recentFiles, favoriteFiles, favoriteDirs, recentCommands;
+    recentDirs, recentFiles, favoriteFiles, favoriteDirs;
   private TabAndIndentOptions taio;
   private FontOptions fontOptions;
   
  
-  private AppCloseListener myAppCloseListener=new AppCloseListener() {
-    public void tryClose() {tryExitSystem();}
-  };
-  
-
   /////////////////////
   //                 //
   // PUBLIC METHODS: //
   //                 //
   /////////////////////
 
-
-  //////////
-  // RUN: //
-  //////////
-  
   public static void main(final String[] args) {
-    final Klonk klonk=new Klonk();
-    //Don't bother starting swing if we're going to exit immediately;
-    if (!klonk.initializeAndCheck(args)){
-      if (klonk.home.ready)
-        klonk.log.log("Klonk is handing off to another process.");
-      System.exit(0);
-      return;
-    }
-    //Start up swing:
-    klonk.startup(args);
-  }
-  public KHome getHome() {
-    return home;
-  }
-  public boolean isAnythingSelected() {
-    return editors.get(0).isAnythingSelected();
-  }
-  public void doLoadFile(File file) {
-    loadFile(file);
+    new Klonk().boot(args);
   }
 
   //////////////////////
@@ -116,6 +89,14 @@ public class Klonk {
   //                  //
   //////////////////////
 
+  /** Used by the Menus class */
+  boolean isAnythingSelected() {
+    return editors.get(0).isAnythingSelected();
+  }
+  /** Used by both Editor & Menus */
+  public void doLoadFile(File file) {
+    loadFile(file);
+  }
 
   ////////////////
   // FILE MENU: //
@@ -425,7 +406,7 @@ public class Klonk {
   ////////////////////
   
   public void doShell() {
-    popups.showShell(recentCommands, persist.maxRecent);
+    popups.showShell();
   }
 
   //////////////////
@@ -457,6 +438,8 @@ public class Klonk {
     for (Editor e: editors)
       e.setFont(fontOptions);
     popups.setFontAndColors(fontOptions);
+    persist.setFontAndColors(fontOptions);
+    persist.save();
   }
   
   public void doFavorites() {
@@ -545,10 +528,9 @@ public class Klonk {
   // STARTUP/SHUTDOWN: //
   ///////////////////////
 
-  private boolean initializeAndCheck(String[] args) {
-
-    //First, do the absolute minimum setup, which is 
-    //to get our home directory and start logging:
+  private void boot(String[] args) {
+  
+    // 1. Figure out our home directory:
     String homeDir=KHome.nameIt(System.getProperty("user.home"), "klonk");
     for (int i=0; i<args.length; i++)
       if (args[i].equals("-home") && i<args.length-1){
@@ -556,26 +538,45 @@ public class Klonk {
         homeDir=args[++i].trim();
         args[i]=null;
       }
-    home=new KHome(homeDir);
+    KHome home=new KHome(homeDir);
     if (!home.ready)
-      return false;
+      return;
+    
+    // 2. Get our PID & a log:
     String pid=ManagementFactory.getRuntimeMXBean().getName();
     pid=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
     log=new KLog(home, pid);
 
-    //Second, set up our file listener and check 
-    //and see if we can obtain our mutex:
+    // 3. Set up our file listener and check 
+    //    and see if we can obtain our mutex:
     fileListen=new FileListen(this, log, pid, home);
-    return fileListen.lockOrSignal(args);
+    if (!fileListen.lockOrSignal(args)) {
+      log.log("Klonk is handing off to another process.");
+      System.exit(0);
+      return;
+    }
+
+    // 4. Context
+    Kontext context=Kontext.getProduction(
+      home, log,
+      new StatusNotifier() {
+        public @Override void showStatus(String msg) {layout.showStatus(msg);}
+      }
+      ,
+      new CurrFileGetter() {
+        public String getFile() {
+          File file=editors.getFirst().file;
+          return file==null ?null :getFullPath(file);
+        }
+      }
+    );
+    
+    //5. Start up swing:
+    startSwing(args, context);
   }
   
-  private void startup(final String[] args) {
+  private void startSwing(final String[] args, final Kontext context) {
     log.log("Starting up swing...");
-    try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());    
-    } catch (Exception e) {
-      log.log(e);
-    }
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
 
@@ -587,17 +588,16 @@ public class Klonk {
             }
           }
         );
-
-        //Bootstrap menus, layout so we can get our context object:
-        
-        //Context
-        Kontext context=Kontext.getProduction(
-          home, log,
-          new StatusNotifier() {public @Override void showStatus(String msg) {layout.showStatus(msg);}}
-        );
+       
         persist=context.persist;
         menus=new Menus(Klonk.this, log);
-        layout=new MainLayout(context.mainFrame, menus.getMenuBar(), myAppCloseListener, context.iconImage);
+        layout=new MainLayout(
+          context.mainFrame, menus.getMenuBar(), 
+          new AppCloseListener() {
+            public void tryClose() {tryExitSystem();}
+          }, 
+          context.iconImage
+        );
         
         //Now follow through on layout:
         layout.show(
@@ -614,9 +614,7 @@ public class Klonk {
         recentFiles   =new ArrayList<>(persist.maxRecent);
         favoriteFiles =new ArrayList<>(persist.maxRecent);
         favoriteDirs  =new ArrayList<>(persist.maxRecent);
-        recentCommands=new ArrayList<>(persist.maxRecent);
-        persist.getFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs)
-               .getCommands(recentCommands);
+        persist.getFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs);
         wordWrap=persist.getWordWrap();
         fastUndos=persist.getFastUndos();
         defaultLineBreaker=persist.getDefaultLineDelimiter();
@@ -638,6 +636,7 @@ public class Klonk {
         //async. It will look for files that appeared while we
         //were starting up:
         fileListen.startDirectoryListener();
+        //Files to load as command-line arguments:
         loadFiles(args);
         
       }
@@ -655,8 +654,6 @@ public class Klonk {
     else
       persist.setWindowMaximized(true);
     persist.setFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs)
-           .setCommands(recentCommands)
-           .setFontAndColors(fontOptions)
            .save();
     fileListen.removeLock();
     layout.dispose();
@@ -730,6 +727,7 @@ public class Klonk {
       return false;
     }
     fileIsSaved(e, file, oldFile, newFile);
+    persist.checkSave();
     return true;
   }
   private File showFileSaveDialog(File f, File dir) {
@@ -981,12 +979,26 @@ public class Klonk {
     if (!e.unsavedChanges)
       showStabilityChange(e, true);
   }
-  private void showStabilityChange(Editor e, boolean unsavedChanges) {
-    e.unsavedChanges=unsavedChanges;
-    layout.showChange(unsavedChanges);
+  private void showStabilityChange(Editor editor, boolean unsavedChanges) {
+    editor.unsavedChanges=unsavedChanges;
+    showStabilityChange(unsavedChanges);
+  }
+  private void showStabilityChange(boolean unsavedChangesThis) {
+    layout.showChangeThis(unsavedChangesThis);
+    if (unsavedChangesThis) {
+      if (!anyUnsaved)
+        layout.showChangeAny(anyUnsaved=true);
+      return;
+    }
+    else 
+    if (anyUnsaved) 
+      for (Editor ed: editors)
+        if (ed.unsavedChanges)
+          return;
+    layout.showChangeAny(anyUnsaved=false);
   }
   private void editorChange(Editor e) {
-    layout.showChange(e.unsavedChanges);
+    showStabilityChange(e.unsavedChanges);
     layout.showTitle(e.title);
     menus.showHasMarks(e.hasMarks());
     showCaretPos(e);

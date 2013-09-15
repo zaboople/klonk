@@ -19,9 +19,11 @@ public class KPersist {
   private File file;
   private Properties properties=new Properties();
   private Fail failer;
+  private boolean hasChanges=false;
   
   public int winLeft=-1, winTop=-1, winHeight=-1, winWidth=-1;
   public boolean brandNew=true;
+  
   
   public KPersist(KHome home, Fail failer) {
     this.failer=failer;
@@ -157,7 +159,9 @@ public class KPersist {
   // RECENT FILES & DIRECTORIES: //
 
   public KPersist setCommands(List<String> recentCommands){
-    return setFiles(recentCommands, "File.Batch.", maxRecent);
+    setFiles(recentCommands, "File.Batch.", maxRecent);
+    hasChanges=true;
+    return this;
   }
   public KPersist getCommands(List<String> recentCommands){
     return getFiles(recentCommands, "File.Batch.", maxRecent);
@@ -199,9 +203,17 @@ public class KPersist {
   // SAVE: //
   ///////////
 
+  /** This is for when we do lazy save, because some things change too quickly to 
+      be constantly saving.*/
+  public KPersist checkSave() {
+    if (hasChanges)
+      save();
+    return this;
+  }
   public KPersist save() {
     try (FileOutputStream fos=new FileOutputStream(file);) {
       properties.store(fos, "You are permitted to sort this file");
+      hasChanges=false;
     } catch (Exception e) {
       failer.fail(e); 
     }

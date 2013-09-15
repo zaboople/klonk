@@ -52,6 +52,7 @@ public class MainLayout {
                  lblMsg=new JLabel(),
                  lblMsgBad=new JLabel();
   private JPanel pnlEditor=new JPanel(), 
+                 pnlSaveThisAlert=new JPanel(),
                  pnlSaveAlert=new JPanel(),
                  pnlCapsLock=new JPanel(),
                  pStatus=new JPanel();
@@ -114,8 +115,11 @@ public class MainLayout {
   public void showTitle(String title) {
     frame.setTitle("Klonk: "+title);
   }
-  public void showChange(boolean chg) {
-    pnlSaveAlert.setBackground(chg ?Color.RED :noChangeColor);
+  public void showChangeThis(boolean chg) {
+    pnlSaveThisAlert.setBackground(chg ?Color.RED :noChangeColor);
+  }
+  public void showChangeAny(boolean chg) {
+    pnlSaveAlert.setBackground(chg ?Color.BLUE :noChangeColor);
   }
   
   public void showStatus(String msg) {
@@ -200,17 +204,19 @@ public class MainLayout {
   }
   private JPanel makeTopPanel(){
     JPanel blah=new JPanel();
-    noChangeColor=pnlSaveAlert.getBackground();
+    noChangeColor=pnlSaveThisAlert.getBackground();
     Dimension prefer=new Dimension(15,2);
+    pnlSaveThisAlert.setPreferredSize(prefer);
     pnlSaveAlert.setPreferredSize(prefer);
-    pnlSaveAlert.setMinimumSize(prefer);
-    pnlSaveAlert.setMaximumSize(prefer);
 
     GridBug gb=new GridBug(blah);
     gb.fill=gb.VERTICAL;
-    gb.weightXY(1).gridXY(0);
+    gb.weightXY(0).gridXY(0);
     gb.anchor=gb.WEST;
-    gb.add(pnlSaveAlert);
+    gb.add(pnlSaveThisAlert);
+    gb.weightx=1; //Last in line gets the 1 always
+    gb.gridx++;
+    gb.addX(pnlSaveAlert);
     
     return blah;
   }
