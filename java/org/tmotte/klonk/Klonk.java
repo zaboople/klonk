@@ -1,7 +1,7 @@
 package org.tmotte.klonk;
-import java.awt.Graphics;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
@@ -18,18 +18,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import javax.swing.SwingUtilities;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.DelimitedString;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.Kontext;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
+import org.tmotte.klonk.config.Kontext;
 import org.tmotte.klonk.config.LineDelimiterOptions;
 import org.tmotte.klonk.config.TabAndIndentOptions;
-import org.tmotte.klonk.config.CurrFileGetter;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.io.FileListen;
@@ -39,6 +38,7 @@ import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.StatusNotifier; 
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups; 
+import org.tmotte.klonk.windows.popup.ShellCurrFileGet;
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
 
 public class Klonk {
@@ -63,7 +63,7 @@ public class Klonk {
   
   //Configuration stuff:
   private KPersist persist;
-  private int defaultLineBreaker;
+  private String defaultLineBreaker;
   private boolean wordWrap=false,
                   fastUndos=true;
   private static int maxRecent=15;
@@ -462,11 +462,11 @@ public class Klonk {
     popups.showLineDelimiters(k, kld);
   }
   private LineDelimiterListener kld=new LineDelimiterListener() {
-    public void setDefault(int defaultDelim) {
+    public void setDefault(String defaultDelim) {
       persist.setDefaultLineDelimiter(defaultDelim);
       persist.save();
     }
-    public void setThis(int lineB) {
+    public void setThis(String lineB) {
       Editor e=editors.get(0);
       e.lineBreaker=lineB;
       if (e.file!=null)
@@ -563,7 +563,7 @@ public class Klonk {
         public @Override void showStatus(String msg) {layout.showStatus(msg);}
       }
       ,
-      new CurrFileGetter() {
+      new ShellCurrFileGet() {
         public String getFile() {
           File file=editors.getFirst().file;
           return file==null ?null :getFullPath(file);

@@ -16,7 +16,6 @@ import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.LineDelimiterOptions;
 import org.tmotte.klonk.config.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
-import org.tmotte.klonk.windows.StatusNotifier;
 
 public class Popups {
 
@@ -258,7 +257,12 @@ public class Popups {
   ///////////////////////////////////////////
   // PRIVATE getX() LESS FREQUENTLY USED:  //
   ///////////////////////////////////////////
-
+  
+  private KAlert getKAlert() {
+    if (kAlert==null)
+      kAlert=new KAlert(context.mainFrame);
+    return kAlert;
+  }
   private Help getHelp() {
     if (help==null){
       help=new Help(context.mainFrame, context.fail, context.home.getUserHome());

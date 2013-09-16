@@ -114,15 +114,15 @@ public class KPersist {
 
   // LINE DELIMITERS: //
 
-  public int getDefaultLineDelimiter() {
+  public String getDefaultLineDelimiter() {
     String s=properties.getProperty("DefaultLineDelimiter");
     if (s==null)          
-      return LineDelimiterOptions.CRLF;
+      return LineDelimiterOptions.CRLFs;
     else
-      return LineDelimiterOptions.translate(s, failer);
+      return LineDelimiterOptions.translateFromReadable(s);
   }
-  public KPersist setDefaultLineDelimiter(int option) {
-    String s=LineDelimiterOptions.translate(option, failer);
+  public KPersist setDefaultLineDelimiter(String option) {
+    String s=LineDelimiterOptions.translateToReadable(option);
     set("DefaultLineDelimiter", s);
     return this;
   }

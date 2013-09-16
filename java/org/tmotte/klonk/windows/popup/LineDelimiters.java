@@ -38,11 +38,7 @@ class LineDelimiters {
 
   private JDialog win;
   private JFrame parentFrame;
-  private String[] jcOptions={
-    LineDelimiterOptions.translate(0),
-    LineDelimiterOptions.translate(1),
-    LineDelimiterOptions.translate(2),
-  };
+  private String[] jcOptions=getOptions();
   private JComboBox<String> jcbDefault=new JComboBox<String>(jcOptions),
                             jcbThis=new JComboBox<String>(jcOptions);
   private JButton   btnDefault=new JButton("Set"),
@@ -85,19 +81,23 @@ class LineDelimiters {
     win.toFront();
     jcbDefault.requestFocus();
   }
-  private int getSelectedOption(int o) {
-    //This is technically unnecessary but I didn't
-    //want to assume option order is the same
-    //as the constants:
-    if (o==LineDelimiterOptions.CR)
+  private static int getSelectedOption(String option) {
+    if (option.equals(LineDelimiterOptions.CRs))
       return 0;
     else
-    if (o==LineDelimiterOptions.LF)
+    if (option.equals(LineDelimiterOptions.LFs))
       return 1;
     else
-    if (o==LineDelimiterOptions.CRLF)
+    if (option.equals(LineDelimiterOptions.CRLFs))
       return 2;
-    throw new RuntimeException("I don't know what to do with: "+o);
+    throw new RuntimeException("I don't know what to do with: <"+option+">");
+  }
+  private static String[] getOptions() {
+    return new String[]{
+      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.CRs),
+      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.LFs),
+      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.CRLFs),
+    };
   }
 
 
@@ -106,13 +106,13 @@ class LineDelimiters {
   //////////////////////
 
   private void clickSetDefault() {
-    options.setDefault(jcbDefault.getSelectedItem().toString(), failer);
+    options.setDefault(jcbDefault.getSelectedItem().toString());
     btnDefault.setEnabled(false);
     jcbDefault.requestFocus();
     listener.setDefault(options.defaultOption);
   }
   private void clickSetThis() {
-    options.setThisFile(jcbThis.getSelectedItem().toString(), failer);
+    options.setThisFile(jcbThis.getSelectedItem().toString());
     btnThis.setEnabled(false);
     jcbThis.requestFocus();
     listener.setThis(options.thisFile);
@@ -248,8 +248,8 @@ class LineDelimiters {
         k.show(
           kdo,
           new LineDelimiterListener(){
-            public void setDefault(int i) {System.out.println("Default "+i);}
-            public void setThis(int i)    {System.out.println("This "+i);   }
+            public void setDefault(String i) {System.out.println("Default "+i);}
+            public void setThis(String i)    {System.out.println("This "+i);   }
           }
         );
         context.mainFrame.dispose();

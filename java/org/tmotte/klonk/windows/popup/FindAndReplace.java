@@ -35,6 +35,7 @@ import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.Position;
 import javax.swing.text.Segment;
+import org.tmotte.common.swang.Alerter;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
@@ -43,7 +44,7 @@ import org.tmotte.klonk.config.FontOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.StatusNotifier;
 
-public class FindAndReplace {
+class FindAndReplace {
 
   //Display components:
   JDialog win;
@@ -216,7 +217,7 @@ public class FindAndReplace {
           }
       }
     } catch (Exception e) {
-      fail.fail(e);//This may be a problem if FindAndReplace becomes a JDialog - a popup and another popup.
+      fail.fail(e);
     }
   }
   

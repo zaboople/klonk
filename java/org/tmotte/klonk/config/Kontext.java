@@ -17,6 +17,7 @@ import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.windows.StatusNotifier;
 import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.klonk.windows.popup.ShellCurrFileGet;
 
 public class Kontext {
   public JFrame mainFrame;
@@ -26,9 +27,14 @@ public class Kontext {
   public KHome home;
   public KPersist persist;
   public Image iconImage, iconImageFindReplace;
-  public CurrFileGetter currFileGetter;
+  public ShellCurrFileGet currFileGetter;
   
-  public static Kontext getForApplication(KHome home, Fail fail, StatusNotifier status, CurrFileGetter getter){
+  public static Kontext getForApplication(
+      KHome home, 
+      Fail fail, 
+      StatusNotifier status, 
+      ShellCurrFileGet getter
+    ){
     return new Kontext(home, new JFrame("Klonk"), fail, status, getter);
   }
   public static Kontext getForUnitTest() {
@@ -64,14 +70,14 @@ public class Kontext {
           System.out.println("Status: "+msg);
         }
       },
-      new CurrFileGetter(){
+      new ShellCurrFileGet(){
         public String getFile(){return "-none-";}
       }
     );
   }
   
   
-  private Kontext(KHome home, JFrame mainFrame, Fail fail, StatusNotifier status, CurrFileGetter getter){
+  private Kontext(KHome home, JFrame mainFrame, Fail fail, StatusNotifier status, ShellCurrFileGet getter){
     try {
       javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());    
     } catch (Exception e) {

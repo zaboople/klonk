@@ -1,13 +1,9 @@
 package org.tmotte.klonk.config;
-import org.tmotte.common.swang.Fail;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 
 public class LineDelimiterOptions {
-
-
-  public final static int CR=0, LF=1, CRLF=2;
 
 
   public final static String 
@@ -17,110 +13,61 @@ public class LineDelimiterOptions {
   public final static Pattern pattern=Pattern.compile("([\\r][\\n]|[\\r]|[\\n])");
 
 
-  public int defaultOption=CRLF;
-  public int thisFile=CRLF;
+  public String defaultOption=CRLFs,
+                thisFile=CRLFs;
   
-  public LineDelimiterOptions setDefault(String s, Fail failer) {
-    defaultOption=translate(s, failer);
+  public LineDelimiterOptions setDefault(String s) {
+    defaultOption=translateFromReadable(s);
     return this;
   }
-  public LineDelimiterOptions setThisFile(String s, Fail failer) {
-    thisFile=translate(s, failer);
+  public LineDelimiterOptions setThisFile(String s) {
+    thisFile=translateFromReadable(s);
     return this;
   }
   
-  public LineDelimiterOptions setDefault(int i, Fail failer) {
-    defaultOption=check(i, failer);
-    return this;
-  }
-  public LineDelimiterOptions setThisFile(int i, Fail failer) {
-    thisFile=check(i, failer);
-    return this;
-  }
 
-  public static int detect(String s) {
+  public static String detect(String s) {
     Matcher m=pattern.matcher(s);
-    if (m.find()){
-      int i=translateActual(
-        s.substring(m.start(), m.end())
-      );
-      return i;
-    }
-    return -1;
+    if (m.find())
+      return s.substring(m.start(), m.end());
+    return null;
   }
   
   ////////////////
   // TRANSLATE: //
   ////////////////
   
-  public static int translateActual(String s) {
-    if (s==null)         return fail(null, "Null input");
+  public static String translateFromReadable(String s) {
+    if (s==null)            fail("Null input");
     else
-    if (s.equals(CRs))   return CR;
+    if (s.equals("CR"))     return CRs;
     else
-    if (s.equals(CRLFs)) return CRLF;
+    if (s.equals("CR-LF"))  return CRLFs;
     else
-    if (s.equals(LFs))   return LF;
-    else 				return fail(null, "Invalid input: "+s);
+    if (s.equals("LF"))     return LFs;
+    else                    fail("Invalid input: "+s);
+    return null;
   }
-  public static String translateActual(int i) {
-    switch (i) {
-      case CR:   return CRs;
-      case CRLF: return CRLFs;
-      case LF:   return LFs;
-      default:   return failActual(null, i);
-    }
-  }
-  
-  
-  public static int translate(String s) {
-    return translate(s, null);
-  }
-  public static String translate(int i) {
-    return translate(i, null);
-  }
-  public static int translate(String s, Fail failer) {
-    if (s==null)            return fail(failer, "Null input");
+  public static String translateToReadable(String s) {
+    if (s==null)
+      fail("Received null");
     else
-    if (s.equals("CR"))     return CR;
+    if (s.equals(CRs))  return "CR";
     else
-    if (s.equals("CR-LF"))  return CRLF;
+    if (s.equals(CRLFs))return "CR-LF";
     else
-    if (s.equals("LF"))     return LF;
-    else                    return fail(failer, "Invalid input: "+s);
-  }
-  public static String translate(int i, Fail failer) {
-    switch (i) {
-      case CR:   return "CR";
-      case CRLF: return "CR-LF";
-      case LF:   return "LF";
-      default:   return fail(failer, i);
-    }
+    if (s.equals(LFs))  return "LF";
+    else
+      fail("Invalid translation from actual: "+s);
+    return null;
   }
   
   /////////////
   // ERRORS: //
   /////////////
   
-  private static int check(int i, Fail failer) {
-    if (i<CRLF || i>CR)
-      return fail(failer, "Invalid numeric input: "+i);
-    return i;
-  }
-  private static int fail(Fail failer, String error) {
-    if (failer!=null)
-      failer.fail(new RuntimeException(error));
-    else
-      throw new RuntimeException(error);
-    return CRLF;
-  }
-  private static String fail(Fail failer, int i) {
-    fail(failer, "Invalid delimiter option: "+i);
-    return "CR-LF";
-  }
-  private static String failActual(Fail failer, int i) {
-    fail(failer, "Invalid delimiter option: "+i);
-    return CRLFs;
+  private static void fail(String error) {
+    throw new RuntimeException(error);
   }
   
   
@@ -142,8 +89,8 @@ public class LineDelimiterOptions {
       while (m.find(i))
         System.out.print(
           s.substring(i, m.start())+
-          translate(
-            translateActual(
+          translateFromReadable(
+            translateToReadable(
               s.substring(m.start(), i=m.end())
             )
           )

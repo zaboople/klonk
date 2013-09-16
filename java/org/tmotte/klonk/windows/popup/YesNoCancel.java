@@ -27,7 +27,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import java.awt.FocusTraversalPolicy;
 
-public class YesNoCancel {
+class YesNoCancel {
   private int yesOrNoOrCancel=-1;
   private JDialog win;
   private JLabel msgLabel;

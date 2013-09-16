@@ -42,7 +42,7 @@ public class KFileIO {
     //Initialize:
     doc.remove(0, doc.getLength());
     char[] readBuffer=new char[bufSize];
-    int delimiter=-1;
+    String delimiter=null;
     StringChunker ch=new StringChunker().setRegex(k.pattern);
     StringBuilder buffBuffer=new StringBuilder(bufSize+1024);
     int charsRead=0,
@@ -67,12 +67,12 @@ public class KFileIO {
         //if we can determine our delimiter:
         boolean badBreak=endsWithCR && s.startsWith(k.LFs);
         endsWithCR=s.endsWith(k.CRs);
-        if (delimiter==-1){
+        if (delimiter==null){
           if (badBreak)
-            delimiter=k.CRLF;
+            delimiter=k.CRLFs;
           else
           if (endsWithCR)
-            delimiter=LineDelimiterOptions.CR;
+            delimiter=LineDelimiterOptions.CRs;
           else
             delimiter=LineDelimiterOptions.detect(s);
         }
@@ -163,20 +163,17 @@ public class KFileIO {
     
   public static void save(
       JTextArea jta, File file, 
-      int lineBreaker, String encoding, boolean needsBOM
+      String lineBreaker, String encoding, boolean needsBOM
     ) throws Exception {
     save(jta.getDocument(), file, lineBreaker, encoding, needsBOM);
   }
   public static void save(
-      Document doc, File file, int lineBreaker, String encoding, boolean needsBOM
+      Document doc, File file, String lineBreaker, String encoding, boolean needsBOM
     ) throws Exception {
     //Note that we do a lot of silliness with linebreaks even though normally
     //the editor will have LF's everywhere. Not sure however what it will do in
     //copy/paste operation, so we're being extra careful, and anyhow, it's fast enough.
-    final String breakString=k.translateActual(lineBreaker);
-    final boolean isCRLF=lineBreaker==k.CRLF,
-                  isCR  =lineBreaker==k.CR,
-                  isLF  =lineBreaker==k.LF;
+    final boolean isCRLF=lineBreaker.equals(k.CRLFs);
     int docLen=doc.getLength();
     StringChunker ch=new StringChunker().setRegex(k.pattern);
     try (
@@ -214,7 +211,7 @@ public class KFileIO {
           String upTo=ch.getUpTo();
           if (upTo!=null)
             pw.append(upTo);
-          pw.append(breakString);
+          pw.append(lineBreaker);
         }
         if (!ch.finished())
           pw.append(ch.getRest());

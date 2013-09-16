@@ -1,4 +1,4 @@
-package org.tmotte.klonk.windows.popup;
+package org.tmotte.common.swang;
 public interface Alerter {
   public void show(String message);
 }

@@ -5,8 +5,7 @@ import java.util.LinkedList;
 import org.tmotte.common.text.StringChunker;
 import java.util.regex.Pattern;
 
-//FIXME find multiple spaces tabs
-public class ShellCommandParser {
+class ShellCommandParser {
   static Pattern delimiterPattern=Pattern.compile("(\"|'|\\p{Blank})");
   static String currFileMarker="[$1]";
   public static boolean referencesCurrFile(String cmd) {

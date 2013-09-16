@@ -47,7 +47,7 @@ import org.tmotte.klonk.config.FontOptions;
 import org.tmotte.klonk.config.Kontext;
 import org.tmotte.klonk.edit.MyTextArea;
 
-public class FontPicker {
+class FontPicker {
 
   /////////////////////////
   // INSTANCE VARIABLES: //

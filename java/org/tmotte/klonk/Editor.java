@@ -39,7 +39,6 @@ import org.tmotte.klonk.edit.Spaceable;
 import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.io.FileMetaData;
 import org.tmotte.klonk.io.KFileIO;
-import org.tmotte.klonk.windows.popup.FindAndReplace;
 
 public class Editor {
 
@@ -54,8 +53,8 @@ public class Editor {
   Path path;
   boolean used=false, unsavedChanges=false;
   String title="Untitled";
-  
-  int lineBreaker;
+  String lineBreaker;
+
   private String encoding=FileMetaData.UTF8;
   private boolean encodingNeedsBOM=false;
   
@@ -65,7 +64,7 @@ public class Editor {
 
   public Editor(
       Klonk klonk, Fail fail, UndoListener undoL, 
-      int lineBreaker, boolean wordWrap
+      String lineBreaker, boolean wordWrap
     ) {
     this.klonk=klonk;
     this.fail=fail;
@@ -212,7 +211,7 @@ public class Editor {
   public void doLowerCase(){
     replaceSelection(jta.getSelectedText().toLowerCase());
   }
-  public void loadFile(File file, int defaultLineBreaker) throws Exception {
+  public void loadFile(File file, String defaultLineBreaker) throws Exception {
     doLoadFile(file, defaultLineBreaker);
   }
   public void saveFile(File file) throws Exception {
@@ -636,7 +635,7 @@ public class Editor {
   ////////////////
 
 
-  private void doLoadFile(File file, int defaultLineBreaker) throws Exception {
+  private void doLoadFile(File file, String defaultLineBreaker) throws Exception {
     jta.setSuppressUndo(true);
     jta.getDocument().removeDocumentListener(docListener);
     try {
@@ -644,7 +643,7 @@ public class Editor {
       encoding=res.encoding;
       encodingNeedsBOM=res.encodingNeedsBOM;
       lineBreaker=res.delimiter;
-      if (lineBreaker==-1)
+      if (lineBreaker==null)
         lineBreaker=defaultLineBreaker;
       setTabsOrSpaces(res.hasTabs ?TabAndIndentOptions.INDENT_TABS 
                                   :TabAndIndentOptions.INDENT_SPACES);
