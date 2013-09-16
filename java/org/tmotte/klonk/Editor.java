@@ -69,7 +69,7 @@ public class Editor {
     this.klonk=klonk;
     this.fail=fail;
     this.lineBreaker=lineBreaker;
-    jta=new MyTextArea(fail);
+    jta=new MyTextArea();
     jta.setDragEnabled(true);
     jta.makeVerticalScrollable();
     jta.addUndoListener(undoL);

@@ -30,7 +30,6 @@ import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.common.swang.KeyMapper;
 
@@ -40,7 +39,6 @@ public class MyTextArea extends JTextArea {
   // INSTANCE DATA: //
   ////////////////////
 
-  private Fail fail;
 
   //GUI components:
   private JPopupMenu menu=new JPopupMenu();
@@ -68,8 +66,7 @@ public class MyTextArea extends JTextArea {
   // CONSTRUCTORS: //
   ///////////////////
   
-  public MyTextArea(Fail fail) {
-    this.fail=fail;
+  public MyTextArea() {
     addMenus();
     addListeners();
     //Removing these keystrokes because they mess up undo, and I wanted one of my menus 
@@ -322,7 +319,7 @@ public class MyTextArea extends JTextArea {
         int start=de.getOffset(), len=de.getLength();
         undos.doAdd(start, len, getText(start, len), forceDoubleUp);
       } catch (Exception e) {
-        fail.fail(e);
+        throw new RuntimeException(e);
       }
     }
     int incr=0;
@@ -339,11 +336,11 @@ public class MyTextArea extends JTextArea {
           );
         undos.doRemove(start, len, preUndoSelected, forceDoubleUp);
       } catch (Exception e) {
-        fail.fail(e);
+        throw new RuntimeException(e);
       }
     }
     public void changedUpdate(DocumentEvent e) {
-      fail.fail(new RuntimeException("Didn't expect a changedUpdate "+e));
+      throw new RuntimeException(new RuntimeException("Didn't expect a changedUpdate "+e));
     }
   }  
 
@@ -469,7 +466,7 @@ public class MyTextArea extends JTextArea {
         }
 
       } catch (Exception ex) {
-        fail.fail(ex);
+        throw new RuntimeException(ex);
       }
     }
   }
@@ -504,7 +501,7 @@ public class MyTextArea extends JTextArea {
       else
       if (s==mnuSelectAll) selectAll();
       else
-        fail.fail(new RuntimeException("Unexpected: "+s));
+        throw new RuntimeException("Unexpected: "+s);
     }
   };
 
@@ -565,7 +562,7 @@ public class MyTextArea extends JTextArea {
         jsb.setValue(jsb.getValue()+offFromTop-edgeLimit);
 
     } catch (Exception e) {
-      fail.fail(e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -709,7 +706,7 @@ public class MyTextArea extends JTextArea {
           moveCaretPosition(forwards ?endSel   :startSel);
       }
     } catch (Exception e) {
-      fail.fail(e);
+      throw new RuntimeException(e);
     }
   }
   private int getTabOffBy(int spaceCount) {
@@ -753,7 +750,7 @@ public class MyTextArea extends JTextArea {
         newText.append(t);
       replaceRange(newText.toString(), start, end);
     } catch (Exception e) {
-      fail.fail(e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -776,7 +773,7 @@ public class MyTextArea extends JTextArea {
       }
       setSelected(sel);
     } catch (Exception e) {
-      fail.fail(e);
+      throw new RuntimeException(e);
     }
   }
   private void setSelected(String text) {

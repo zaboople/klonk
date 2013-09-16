@@ -149,7 +149,7 @@ class Favorites {
     btnCancel.setMnemonic(KeyEvent.VK_C);
   }
   private MyTextArea getMTA(){
-    MyTextArea mta=new MyTextArea(fail);
+    MyTextArea mta=new MyTextArea();
     mta.setRows(7);
     mta.setColumns(60);
     mta.setLineWrap(false);

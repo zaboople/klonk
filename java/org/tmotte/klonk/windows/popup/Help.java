@@ -77,7 +77,7 @@ class Help {
   private void create() {
     win=new JDialog(parentFrame, true);
     
-    mta=new MyTextArea(fail);
+    mta=new MyTextArea();
     mtaContainer=mta.makeVerticalScrollable();
     mta.setEditable(false);
     mta.setLineWrap(true);

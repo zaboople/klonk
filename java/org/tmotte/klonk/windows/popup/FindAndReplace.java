@@ -217,7 +217,7 @@ class FindAndReplace {
           }
       }
     } catch (Exception e) {
-      fail.fail(e);
+      throw new RuntimeException(e);
     }
   }
   
@@ -432,7 +432,7 @@ class FindAndReplace {
 
   }
   private MyTextArea makeTextArea() {
-    MyTextArea mta=new MyTextArea(fail); 
+    MyTextArea mta=new MyTextArea(); 
     mta.setRows(3);//This doesn't work right because we set the font different.
     mta.setLineWrap(false);
     mta.setWrapStyleWord(false);

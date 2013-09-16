@@ -201,7 +201,7 @@ class FontPicker {
     //This eliminates the preview so we can customize:
     colorChooser.setPreviewPanel(new JPanel());
     
-    mta=new MyTextArea(fail); 
+    mta=new MyTextArea(); 
     mta.setRows(4);//This doesn't work right because we set the font different.
     mta.setLineWrap(false);
     mta.setWrapStyleWord(false);
