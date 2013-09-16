@@ -147,7 +147,7 @@ class FindAndReplace {
     enableReplace();
     mtaFind.requestFocusInWindow();
     //Do all the rectangle/point/dimension stuff:
-    Popups.position(parentFrame, win, everShown);
+    Positioner.set(parentFrame, win, everShown);
     everShown|=true;
   }
   private void show() {

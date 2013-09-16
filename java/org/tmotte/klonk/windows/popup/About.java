@@ -54,7 +54,7 @@ class About {
   }
 
   public void show() {
-    Popups.position(parentFrame, win);
+    Positioner.set(parentFrame, win);
     btnOK.requestFocusInWindow();
     win.pack();
     win.setVisible(true);

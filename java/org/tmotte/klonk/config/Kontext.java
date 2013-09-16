@@ -19,7 +19,13 @@ import org.tmotte.klonk.windows.StatusNotifier;
 import org.tmotte.klonk.windows.popup.Popups;
 import org.tmotte.klonk.windows.popup.ShellCurrFileGet;
 
+/** 
+ * This class implements our framework-free IoC/DI (inversion of control/dependency injection) stuff. 
+ * It is roughly analogous to Spring's "Application Context". 
+ * In the future this may get split into Kontext & KontextKreator but for now it's maintainable enough as is.
+ */
 public class Kontext {
+
   public JFrame mainFrame;
   public Fail fail;
   public Popups popups;
@@ -87,11 +93,14 @@ public class Kontext {
     this.mainFrame=mainFrame;
     this.fail=fail;
     this.status=status;
-    this.currFileGetter=getter;
-    this.persist=new KPersist(home, fail);
-    this.popups=new Popups(this);
-    iconImage=getIcon("org/tmotte/klonk/windows/app.png");
+    persist=new KPersist(home, fail);
+    iconImage           =getIcon("org/tmotte/klonk/windows/app.png");
     iconImageFindReplace=getIcon("org/tmotte/klonk/windows/app-find-replace.png");
+
+    //This is an IoC sublayer, more info in its javadoc:
+    popups=new Popups(
+      mainFrame, home, fail, persist, status, getter, iconImageFindReplace
+    );
   }
   
   ////////////////

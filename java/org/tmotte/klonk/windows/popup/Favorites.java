@@ -77,7 +77,7 @@ class Favorites {
     load(mtaDirs,  dirs);
     if (!mtaFiles.hasFocus() && !mtaDirs.hasFocus())
       mtaFiles.requestFocusInWindow();
-    Popups.position(parentFrame, win, false);
+    Positioner.set(parentFrame, win, false);
     win.setVisible(true);
     win.toFront();
     if (result){

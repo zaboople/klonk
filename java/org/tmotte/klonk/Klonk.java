@@ -458,7 +458,7 @@ public class Klonk {
   public void doLineDelimiters(){
     LineDelimiterOptions k=new LineDelimiterOptions();
     k.defaultOption=persist.getDefaultLineDelimiter();
-    k.thisFile=editors.get(0).lineBreaker;
+    k.thisFile=editors.get(0).getLineBreaker();
     popups.showLineDelimiters(k, kld);
   }
   private LineDelimiterListener kld=new LineDelimiterListener() {
@@ -468,7 +468,7 @@ public class Klonk {
     }
     public void setThis(String lineB) {
       Editor e=editors.get(0);
-      e.lineBreaker=lineB;
+      e.setLineBreaker(lineB);
       if (e.file!=null)
         fileSave(false);
     }

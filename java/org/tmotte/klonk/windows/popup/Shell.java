@@ -61,7 +61,7 @@ class Shell {
   public void show() {
     if (!jcbPrevious.hasFocus() && !mtaOutput.hasFocus())
       jcbPrevious.requestFocusInWindow();
-    Popups.position(parentFrame, win, shownBefore);
+    Positioner.set(parentFrame, win, shownBefore);
     shownBefore=true;
     win.setVisible(true);
     win.toFront();

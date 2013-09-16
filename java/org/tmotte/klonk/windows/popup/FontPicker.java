@@ -151,7 +151,7 @@ class FontPicker {
     mta.setBackground(fontOptions.getBackgroundColor());
     mta.setCaretColor(fontOptions.getCaretColor());
   
-    Popups.position(parentFrame, win, false);
+    Positioner.set(parentFrame, win, false);
   }
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {

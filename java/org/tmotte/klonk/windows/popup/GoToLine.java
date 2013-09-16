@@ -68,7 +68,7 @@ class GoToLine {
       jtfRow.moveCaretPosition(s.length());
     }
     win.pack();
-    Popups.position(parentFrame, win, false);
+    Positioner.set(parentFrame, win, false);
 
     result=-1;
     badEntry=true;

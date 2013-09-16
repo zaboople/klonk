@@ -42,22 +42,25 @@ import org.tmotte.klonk.io.KFileIO;
 
 public class Editor {
 
+  //Dependencies:
   private Klonk klonk;
   private Fail fail;
 
+  //Purely private:
   private MyTextArea jta;
   private MyDocumentListener docListener=new MyDocumentListener();
   private List<Integer> marks;
+  private String encoding=FileMetaData.UTF8;
+  private boolean encodingNeedsBOM=false;
+  private String lineBreaker;
 
+  //Only used by Klonk:
   File file;
   Path path;
   boolean used=false, unsavedChanges=false;
   String title="Untitled";
-  String lineBreaker;
 
-  private String encoding=FileMetaData.UTF8;
-  private boolean encodingNeedsBOM=false;
-  
+ 
   /////////////////////////
   // Construct & Config: //
   /////////////////////////
@@ -100,6 +103,12 @@ public class Editor {
     jta.setForeground(options.getColor());
     jta.setBackground(options.getBackgroundColor());
     jta.setCaretColor(options.getCaretColor());
+  }
+  public void setLineBreaker(String lb) {
+    this.lineBreaker=lb;
+  }
+  public String getLineBreaker() {
+    return lineBreaker;
   }
   
   ////////////
