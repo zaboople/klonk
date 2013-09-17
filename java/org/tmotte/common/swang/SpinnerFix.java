@@ -19,6 +19,7 @@ import org.tmotte.common.swang.Radios;
 
 /** By default JSpinner tends to take up excessive space. This allows you to re-fit it to contain a given String.*/
 public class SpinnerFix {
+
   public static void fix(JSpinner jsp, Window containerWindow, String toFit) {
     //Required to get the component to size itself and obtain a graphics object:
     containerWindow.pack();

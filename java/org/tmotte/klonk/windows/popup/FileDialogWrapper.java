@@ -14,10 +14,12 @@ import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.FontOptions;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.config.Kontext;
-import org.tmotte.klonk.edit.MyTextArea;
-import org.tmotte.klonk.windows.StatusNotifier;
 
+/** 
+ * The FileDialog/JFileChooser classes already do most of the work, so this just does a minimal 
+ * bit of upkeep and whatnot. It used to be in the Popups class, but at the risk of earning the title
+ * of Wrapper/Facade/Factory Abuser, I moved it down here so Popups could be more focused on its primary task.
+ */
 class FileDialogWrapper {
 
   private JFrame mainFrame;
@@ -30,7 +32,7 @@ class FileDialogWrapper {
 
   File show(boolean forSave, File startFile, File startDir) {
     if (true) {
-      //File chooser sucks but not as bad as it used to when in native mode:
+      //JFileChooser sucks but not as bad when used in native mode:
       if (fileChooser==null)
         fileChooser=new JFileChooser();
       if (startFile!=null){
@@ -56,8 +58,8 @@ class FileDialogWrapper {
       try {
         //Unused; Broken on MS Windows XP. If you do "save as" and the old file
         //name is longer than the new one, the last characters from the old
-        //file get appended to the new one. I tried everything and it was
-        //unfixable.
+        //file get appended to the new one - very likely a null terminated string
+        //problem. I tried everything and it was unfixable.
         if (fileDialog==null)
           fileDialog=new FileDialog(mainFrame);
         FileDialog fd=fileDialog;

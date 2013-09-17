@@ -22,6 +22,7 @@ import org.tmotte.common.text.StackTracer;
 import org.tmotte.klonk.config.FontOptions;
 import org.tmotte.klonk.config.Kontext;
 import org.tmotte.klonk.config.KPersist;
+import org.tmotte.klonk.config.Getter;
 import org.tmotte.klonk.edit.MyTextArea;
 
 class Shell {
@@ -29,7 +30,7 @@ class Shell {
   private Fail fail;
   private Popups popups;
   private KPersist persist;
-  private ShellCurrFileGet currFileGetter;
+  private Getter<String> currFileGetter;
 
   private boolean shownBefore=false;
   private List<String> persistedFiles=new LinkedList<>();
@@ -42,7 +43,7 @@ class Shell {
   private DefaultComboBoxModel<String> jcbPreviousData=new DefaultComboBoxModel<>();
   private Font fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
 
-  public Shell(JFrame parentFrame, Fail fail, Popups popups, Image img, KPersist persist, ShellCurrFileGet cfGetter) {
+  public Shell(JFrame parentFrame, Fail fail, Popups popups, Image img, KPersist persist, Getter<String> cfGetter) {
     this.parentFrame=parentFrame;
     this.fail=fail;
     this.popups=popups;
@@ -182,7 +183,7 @@ class Shell {
       kill=false;
       try {
         String currFile=ShellCommandParser.referencesCurrFile(input) 
-          ?currFileGetter.getFile()
+          ?currFileGetter.get()
           :null;
         List<String> commands=ShellCommandParser.parse(input, currFile);
         for (int i=0; i<commands.size(); i++)

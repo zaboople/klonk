@@ -10,13 +10,15 @@ import java.util.List;
 import javax.swing.JFrame;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.FontOptions;
+import org.tmotte.klonk.config.Getter;
+import org.tmotte.klonk.config.Setter;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.Kontext;
 import org.tmotte.klonk.config.LineDelimiterOptions;
 import org.tmotte.klonk.config.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
-import org.tmotte.klonk.windows.StatusNotifier;
+
 
 /**
  * This is essentially a sublayer in our DI/IoC setup. It is initialized by Kontext, the
@@ -53,8 +55,8 @@ public class Popups {
   private KHome home;
   private Fail fail;
   private KPersist persist;
-  private StatusNotifier status;
-  private ShellCurrFileGet currFileGetter;
+  private Setter<String> statusBar;
+  private Getter<String> currFileGetter;
   private Image iconImageFindReplace;    
   
   ///////////////////////////////////////
@@ -63,10 +65,10 @@ public class Popups {
   
   public Popups(
       JFrame mainFrame, KHome home, Fail fail, KPersist persist, 
-      StatusNotifier status, ShellCurrFileGet currFileGetter, Image iconImageFindReplace
+      Setter<String> statusBar, Getter<String> currFileGetter, Image iconImageFindReplace
     ) {
     this.mainFrame=mainFrame;
-    this.status=status;
+    this.statusBar=statusBar;
     this.fail=fail;
     this.persist=persist;
     this.currFileGetter=currFileGetter;
@@ -140,10 +142,10 @@ public class Popups {
     GoToLine gtl=getGoToLine();
     int i=gtl.show();
     if (i==-1)
-      status.showStatus("Go to line cancelled.");
+      statusBar.set("Go to line cancelled.");
     else
     if (!target.goToLine(i-1))
-      status.showStatus("Line number "+i+" is out of range");
+      statusBar.set("Line number "+i+" is out of range");
   }
   public void showLineDelimiters(LineDelimiterOptions k, LineDelimiterListener k2){
     getLineDelimiters().show(k, k2);
@@ -151,8 +153,6 @@ public class Popups {
   public void showShell() {
     getShell().show();
   }
-  
-  // FILE DIALOGS: //
   
   public File showFileDialog(boolean forSave) {
     return showFileDialog(forSave, null);
@@ -184,7 +184,9 @@ public class Popups {
   private FindAndReplace getFindAndReplace() {
     if (findAndReplace==null){
       findAndReplace=new FindAndReplace(
-        mainFrame, fail, getAlerter(), status
+        mainFrame, fail, 
+        new Setter<String>(){public void set(String s) {alert(s);}}, 
+        statusBar
       );
       findAndReplace.setFont(fontOptions);
     }

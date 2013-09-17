@@ -21,12 +21,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.JWindow;
 import org.tmotte.common.swang.Fail;
-import org.tmotte.common.swang.Alerter;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
 
-class KAlert implements Alerter, Fail {
+/**
+ * Always has one button - OK - and a message. Can display
+ * larger, more complex messages unlike YesNoCancel.
+ */
+class KAlert implements Fail {
 
   private JDialog win;
   private JLabel msgLabel=new JLabel();
@@ -67,7 +70,9 @@ class KAlert implements Alerter, Fail {
     gb.addY(ok);
     msgLabel.setVisible(false);
   }
-
+  public void set(String message){
+    show(message);
+  }
   public void show(String message) {
     errorLabel.setSize(new Dimension(0,0));
     errorLabel.setPreferredSize(null);

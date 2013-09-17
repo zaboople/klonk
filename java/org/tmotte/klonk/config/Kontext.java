@@ -15,9 +15,7 @@ import javax.swing.Action;
 import javax.swing.JFrame;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Fail;
-import org.tmotte.klonk.windows.StatusNotifier;
 import org.tmotte.klonk.windows.popup.Popups;
-import org.tmotte.klonk.windows.popup.ShellCurrFileGet;
 
 /** 
  * This class implements our framework-free IoC/DI (inversion of control/dependency injection) stuff. 
@@ -29,19 +27,20 @@ public class Kontext {
   public JFrame mainFrame;
   public Fail fail;
   public Popups popups;
-  public StatusNotifier status;
+  public Setter<String> status;
   public KHome home;
   public KPersist persist;
-  public Image iconImage, iconImageFindReplace;
-  public ShellCurrFileGet currFileGetter;
+  public Image iconImage, 
+               iconImageFindReplace;//I want to make this a "Getter" but no, no. No I don't. Fail fast. Sigh.
+  public Getter<String> currFileGetter;
   
   public static Kontext getForApplication(
       KHome home, 
       Fail fail, 
-      StatusNotifier status, 
-      ShellCurrFileGet getter
+      Setter<String> status, 
+      Getter<String> currFileGetter
     ){
-    return new Kontext(home, new JFrame("Klonk"), fail, status, getter);
+    return new Kontext(home, new JFrame("Klonk"), fail, status, currFileGetter);
   }
   public static Kontext getForUnitTest() {
 
@@ -62,7 +61,9 @@ public class Kontext {
     k.setVisible(true);
     k.toFront();
 
-    //Finally return context object with the frame:
+    //Return context with this frame, as well
+    //as home set for our test directory instead
+    //of the usual:
     return new Kontext(
       new KHome("./test/home"),
       k,
@@ -71,19 +72,21 @@ public class Kontext {
           t.printStackTrace();
         }
       },
-      new StatusNotifier(){
-        public void showStatus(String msg) {
+      new Setter<String>(){
+        public void set(String msg) {
           System.out.println("Status: "+msg);
         }
       },
-      new ShellCurrFileGet(){
-        public String getFile(){return "-none-";}
+      new Getter<String>(){
+        public String get(){return "-none-";}
       }
     );
   }
   
   
-  private Kontext(KHome home, JFrame mainFrame, Fail fail, StatusNotifier status, ShellCurrFileGet getter){
+  private Kontext(
+      KHome home, JFrame mainFrame, Fail fail, Setter<String> status, Getter<String> currFileGetter
+    ){
     try {
       javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());    
     } catch (Exception e) {
@@ -99,7 +102,7 @@ public class Kontext {
 
     //This is an IoC sublayer, more info in its javadoc:
     popups=new Popups(
-      mainFrame, home, fail, persist, status, getter, iconImageFindReplace
+      mainFrame, home, fail, persist, status, currFileGetter, iconImageFindReplace
     );
   }
   

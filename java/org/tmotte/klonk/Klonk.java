@@ -24,10 +24,12 @@ import javax.swing.UIManager;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.DelimitedString;
 import org.tmotte.klonk.config.FontOptions;
+import org.tmotte.klonk.config.Getter;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.Kontext;
 import org.tmotte.klonk.config.LineDelimiterOptions;
+import org.tmotte.klonk.config.Setter;
 import org.tmotte.klonk.config.TabAndIndentOptions;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
@@ -35,10 +37,8 @@ import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.Printing;
 import org.tmotte.klonk.windows.AppCloseListener; 
 import org.tmotte.klonk.windows.MainLayout; 
-import org.tmotte.klonk.windows.StatusNotifier; 
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups; 
-import org.tmotte.klonk.windows.popup.ShellCurrFileGet;
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
 
 public class Klonk {
@@ -559,12 +559,14 @@ public class Klonk {
     // 4. Context
     Kontext context=Kontext.getForApplication(
       home, log,
-      new StatusNotifier() {
-        public @Override void showStatus(String msg) {layout.showStatus(msg);}
+      //This is the statusNotifier:
+      new Setter<String>() {
+        public @Override void set(String msg) {layout.showStatus(msg);}
       }
       ,
-      new ShellCurrFileGet() {
-        public String getFile() {
+      //This is the currFileGetter:
+      new Getter<String>() {
+        public String get() {
           File file=editors.getFirst().file;
           return file==null ?null :getFullPath(file);
         }

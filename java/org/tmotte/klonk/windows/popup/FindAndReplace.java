@@ -35,14 +35,15 @@ import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.Position;
 import javax.swing.text.Segment;
-import org.tmotte.common.swang.Alerter;
+import org.tmotte.klonk.config.Setter;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.FontOptions;
+import org.tmotte.klonk.config.Setter;
 import org.tmotte.klonk.edit.MyTextArea;
-import org.tmotte.klonk.windows.StatusNotifier;
+
 
 class FindAndReplace {
 
@@ -56,10 +57,10 @@ class FindAndReplace {
           btnCancel=new JButton();
   JLabel lblFind;
   
-  //Other windows:
+  //Other windows. Yes we technically violate our singleton sort-of-a-rule here, creating
+  //extra instances of YesNoCancel
   JFrame parentFrame;
-  Alerter alerter;
-  YesNoCancel popupYesNo, popupYesNoCancel;
+  YesNoCancel popupAskReplace, popupAskReplaceAll;
   
   //Blah:
   Fail fail;
@@ -69,8 +70,9 @@ class FindAndReplace {
   //Other state
   boolean skipReplace=false;
   
-  //This is so we can send updates back to the main window ourselves:
-  StatusNotifier status;
+  //This is so we can send updates back to the main window ourselves, as well
+  //as to an alert popup:
+  Setter<String> statusBar, alerter;
   
   //Note that these are transient (so to speak) and require single-threaded
   //behavior from the class. 
@@ -83,9 +85,9 @@ class FindAndReplace {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public FindAndReplace(JFrame parentFrame, Fail fail, Alerter alerter, StatusNotifier status) {
+  public FindAndReplace(JFrame parentFrame, Fail fail, Setter<String> alerter, Setter<String> statusBar) {
     this.parentFrame=parentFrame;
-    this.status=status;
+    this.statusBar=statusBar;
     this.fail=fail;
     this.alerter=alerter;
     create();
@@ -113,7 +115,7 @@ class FindAndReplace {
     setupForShow(mta, replace);
     show();
     while (finder.lastError!=null) {
-      alerter.show(finder.lastError);
+      alerter.set(finder.lastError);
       show();
     }
   }
@@ -126,7 +128,7 @@ class FindAndReplace {
       //This could technically happen after a failure where user slaps ESC
       //and doesn't fix their mistake, then does a repeat
       if (finder.lastError!=null){
-        alerter.show(finder.lastError);
+        alerter.set(finder.lastError);
         show();
       }
     }
@@ -172,7 +174,7 @@ class FindAndReplace {
       skipReplace&=replaceOn;
       String searchFor=mtaFind.getText();
       boolean foundOnce=false;
-      if (replaceAll && !getYesNoReplaceAllWindow().show().isYes())
+      if (replaceAll && !getAskReplaceAllWindow().show().isYes())
         return;
       boolean mustConfirmReplace=!replaceAll && chkConfirmReplace.isSelected();
       boolean findAgain=true;
@@ -188,7 +190,7 @@ class FindAndReplace {
           .setReplace(replaceOn, mtaReplace.getText())
           .find(searchFor, forwards, chkCase.isSelected(), chkRegex.isSelected());
         if (!found) {
-          if (!foundOnce) status.showStatus("Not found");
+          if (!foundOnce) statusBar.set("Not found");
           return;
         }
         foundOnce|=true;
@@ -202,12 +204,12 @@ class FindAndReplace {
           target.setCaretPosition(pos);
           target.moveCaretPosition(endPos);
         }
-        status.showStatus("Found at file position: "+(pos));
+        statusBar.set("Found at file position: "+(pos));
         if (replaceOn)
           if (!mustConfirmReplace  || confirmReplace(pos, endPos)) {
             String replacement=finder.replaceResult;
             target.betterReplaceRange(replacement, pos, endPos);
-            status.showStatus("Replaced");
+            statusBar.set("Replaced");
             if (replaceAll)
               offset=pos + (forwards ?replacement.length()  :0);
             else
@@ -353,7 +355,7 @@ class FindAndReplace {
   
   
   private boolean confirmReplace(int startPos, int endPos) throws Exception {
-    YesNoCancel asker=getYesNoWindow();
+    YesNoCancel asker=getAskReplaceWindow();
     Point caretPoint=target.getVisualCaretPosition();
     Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();    
     int top, left;
@@ -438,20 +440,20 @@ class FindAndReplace {
     mta.setWrapStyleWord(false);
     return mta;
   }
-  private YesNoCancel getYesNoWindow() {
-    if (popupYesNo==null) {
-      popupYesNo=new YesNoCancel(parentFrame, false);
-      popupYesNo.setMessage("Replace selection?");
-      popupYesNo.setupForFindReplace();
+  private YesNoCancel getAskReplaceWindow() {
+    if (popupAskReplace==null) {
+      popupAskReplace=new YesNoCancel(parentFrame, false);
+      popupAskReplace.setMessage("Replace selection?");
+      popupAskReplace.setupForFindReplace();
     }
-    return popupYesNo;
+    return popupAskReplace;
   }
-  private YesNoCancel getYesNoReplaceAllWindow() {
-    if (popupYesNoCancel==null) {
-      popupYesNoCancel=new YesNoCancel(parentFrame, false);
-      popupYesNoCancel.setMessage("Replace all now?");
+  private YesNoCancel getAskReplaceAllWindow() {
+    if (popupAskReplaceAll==null) {
+      popupAskReplaceAll=new YesNoCancel(parentFrame, false);
+      popupAskReplaceAll.setMessage("Replace all now?");
     }
-    return popupYesNoCancel;
+    return popupAskReplaceAll;
   }
   
   /////////////
