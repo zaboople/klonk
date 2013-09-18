@@ -21,20 +21,19 @@ import java.nio.file.WatchService;
 import java.util.LinkedList;
 import java.util.List;
 import org.tmotte.klonk.KLog;
-import org.tmotte.klonk.Klonk;
 import org.tmotte.klonk.config.KHome;
+import org.tmotte.klonk.config.Setter;
 
 public class FileListen {
  
-  Klonk klonk;
+  Setter<List<String>> fileReceiver;
   KLog log;
   KHome homeWatch;
   Locker locker;
   File seizeFile;
   String pidName;
   
-  public FileListen(Klonk klonk, KLog klog, String pid, KHome home) {
-    this.klonk=klonk;
+  public FileListen(KLog klog, String pid, KHome home) {
     this.log=klog;
     this.pidName=pid;
     this.homeWatch=home.mkdir("watch");
@@ -44,6 +43,9 @@ public class FileListen {
     log.log("FileListen.lockOrSignal()...");
     locker=new Locker(seizeFile, log);
     return locker.lock() || makePID(fileNames);
+  }
+  public void setFileReceiver(Setter<List<String>> fileReceiver) {
+    this.fileReceiver=fileReceiver;
   }
   public void removeLock() {
     try {deleteOldPIDFiles();}
@@ -69,8 +71,8 @@ public class FileListen {
       log.log("FileListen.makePID(): I am going to write the pid...");
       File pidFile=homeWatch.nameFile("DO-NOT-TOUCH---"+pidName);
       FileOutputStream os=new FileOutputStream(pidFile);
-      FileLock locker=os.getChannel().lock();
-      if (locker==null) {
+      FileLock flocker=os.getChannel().lock();
+      if (flocker==null) {
         log.log("FileListen.makePID(): Could not get lock");
         return false;
       }
@@ -82,7 +84,7 @@ public class FileListen {
         }
       pw.flush();
       os.flush();
-      locker.release();//This must happen before close or an error 
+      flocker.release();//This must happen before close or an error 
       pw.close();
       pidFile.renameTo(homeWatch.nameFile(pidName));
     } catch (Exception e) {
@@ -159,9 +161,9 @@ public class FileListen {
       }
     }
     if (files.size()>0) {
-      log.log("FileListen: telling Klonk to load from listener....");
-      klonk.doLoadFromListener(files);
-      log.log("FileListen: told Klonk to load from listener.");
+      log.log("FileListen: telling File Receiver to load from listener....");
+      fileReceiver.set(files);
+      log.log("FileListen: told File Receiver to load from listener.");
     }
   }
 

@@ -670,7 +670,7 @@ public class Menus {
         else {
           Editor e=switchMenuToEditor.get(s);
           if (e==null)
-            failer.fail(new RuntimeException("Menus.switchListener(): Dammit!"));
+            failer.fail(new RuntimeException("Menus.switchListener(): Null editor in hash"));
           klonk.doSwitch(e);
         }
       }

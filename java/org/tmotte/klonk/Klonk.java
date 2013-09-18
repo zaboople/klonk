@@ -2,6 +2,7 @@ package org.tmotte.klonk;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
@@ -11,17 +12,15 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import org.tmotte.common.swang.KeyMapper;
+import org.tmotte.common.swang.Fail;
 import org.tmotte.common.text.DelimitedString;
 import org.tmotte.klonk.config.FontOptions;
 import org.tmotte.klonk.config.Getter;
@@ -52,7 +51,7 @@ public class Klonk {
 
   //The most essential stuff:
   private FileListen fileListen;
-  private KLog log;
+  private Fail fail;
   
   //Main GUI components:
   private LinkedList<Editor> editors;
@@ -72,17 +71,90 @@ public class Klonk {
   private TabAndIndentOptions taio;
   private FontOptions fontOptions;
   
- 
-  /////////////////////
-  //                 //
-  // PUBLIC METHODS: //
-  //                 //
-  /////////////////////
-
   public static void main(final String[] args) {
-    new Klonk().boot(args);
+    //This will call back to our constructor & then startSwing()
+    Kontext.bootApplication(args);
+  }
+  public Klonk(Fail fail, FileListen fileListen) {
+    this.fail=fail;
+    this.fileListen=fileListen;//FIXME this only has a single event to invoke.....
+  }
+  public void startSwing(
+      final String[] args, final KPersist persist, final JFrame mainFrame,
+      final Image iconImage, final Popups popups
+    ) {
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        Klonk.this.persist=persist;
+        menus=new Menus(Klonk.this, fail);
+        layout=new MainLayout(
+          mainFrame, menus.getMenuBar(), 
+          new AppCloseListener() {
+            public void tryClose() {tryExitSystem();}
+          }, 
+          iconImage
+        );
+        
+        //Now follow through on layout:
+        layout.show(
+          persist.getWindowBounds(
+            new java.awt.Rectangle(10, 10, 300, 300)
+          ),
+          persist.getWindowMaximized()
+        );
+        Klonk.this.popups=popups;
+        
+        //More persistence stuff:
+        recentDirs    =new ArrayList<>(persist.maxRecent);
+        recentFiles   =new ArrayList<>(persist.maxRecent);
+        favoriteFiles =new ArrayList<>(persist.maxRecent);
+        favoriteDirs  =new ArrayList<>(persist.maxRecent);
+        persist.getFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs);
+        wordWrap=persist.getWordWrap();
+        fastUndos=persist.getFastUndos();
+        defaultLineBreaker=persist.getDefaultLineDelimiter();
+        taio=persist.getTabAndIndentOptions();
+        fontOptions=persist.getFontAndColors();
+
+        //Popups and menu stuff, uses persistence above:
+        popups.setFontAndColors(fontOptions);
+        menus.setMaxRecent(persist.maxRecent)
+             .setFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs)
+             .setFastUndos(fastUndos)
+             .setWordWrap(wordWrap);
+
+        //Create a blank editor:
+        editors=new LinkedList<>();
+        newEditor();
+        
+        //Load files. This should come last because it will feed us files
+        //async. It will look for files that appeared while we
+        //were starting up:
+        fileListen.startDirectoryListener();
+        //Files to load as command-line arguments:
+        loadFiles(args);
+        
+      }
+    });  
   }
 
+  private void tryExitSystem() {
+    while (editors.size()>0)
+      if (!fileCloseLastFirst(true))
+        return;
+    if (!layout.isMaximized()) {
+      persist.setWindowBounds(layout.getMainWindowBounds());
+      persist.setWindowMaximized(false);
+    }
+    else
+      persist.setWindowMaximized(true);
+    persist.setFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs)
+           .save();
+    fileListen.removeLock();
+    layout.dispose();
+    System.exit(0);
+  }
+ 
   //////////////////////
   //                  //
   //   MENU EVENTS:   //
@@ -157,7 +229,7 @@ public class Klonk {
         "explorer "+editors.get(0).file.getParent()
       );
     } catch (Exception e) {
-      log.fail(e);
+      fail.fail(e);
     }
   }
   
@@ -489,6 +561,7 @@ public class Klonk {
   ////////////////////
   // EDITOR EVENTS: //
   ////////////////////
+
   public void doCapsLock() {
     capsLock();
   }
@@ -498,7 +571,12 @@ public class Klonk {
   public void doEditorChanged(Editor e) {
     editorUnstable(e);
   }
-  public void doLoadFromListener(final List<String> fileNames) {
+  
+  //////////////////////////////
+  // VARIOUS EXTERNAL EVENTS: //
+  //////////////////////////////
+
+  public void doLoadAsync(final List<String> fileNames) {
     //Do nothing in the doInBackground() thread, since it is not
     //a GUI thread. Do it all in done(), which is sync'd to GUI events,
     //IE EventDispatch.
@@ -508,13 +586,19 @@ public class Klonk {
         try {
           loadFiles(fileNames);
         } catch (Exception e) {
-          log.fail(e);
+          fail.fail(e);
         }
         fileNames.clear();
       }
     }.execute();
   }
-
+  public void showStatus(String status) {
+    layout.showStatus(status);
+  }
+  public String getCurrentFileName() {
+    File file=editors.getFirst().file;
+    return file==null ?null :getFullPath(file);
+  }
 
   ///////////////////////
   //                   //
@@ -523,144 +607,6 @@ public class Klonk {
   ///////////////////////
 
 
-
-  ///////////////////////
-  // STARTUP/SHUTDOWN: //
-  ///////////////////////
-
-  private void boot(String[] args) {
-  
-    // 1. Figure out our home directory:
-    String homeDir=KHome.nameIt(System.getProperty("user.home"), "klonk");
-    for (int i=0; i<args.length; i++)
-      if (args[i].equals("-home") && i<args.length-1){
-        args[i]=null;
-        homeDir=args[++i].trim();
-        args[i]=null;
-      }
-    KHome home=new KHome(homeDir);
-    if (!home.ready)
-      return;
-    
-    // 2. Get our PID & a log:
-    String pid=ManagementFactory.getRuntimeMXBean().getName();
-    pid=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
-    log=new KLog(home, pid);
-
-    // 3. Set up our file listener and check 
-    //    and see if we can obtain our mutex:
-    fileListen=new FileListen(this, log, pid, home);
-    if (!fileListen.lockOrSignal(args)) {
-      log.log("Klonk is handing off to another process.");
-      System.exit(0);
-      return;
-    }
-
-    // 4. Context
-    Kontext context=Kontext.getForApplication(
-      home, log,
-      //This is the statusNotifier:
-      new Setter<String>() {
-        public @Override void set(String msg) {layout.showStatus(msg);}
-      }
-      ,
-      //This is the currFileGetter:
-      new Getter<String>() {
-        public String get() {
-          File file=editors.getFirst().file;
-          return file==null ?null :getFullPath(file);
-        }
-      }
-    );
-    
-    //5. Start up swing:
-    startSwing(args, context);
-  }
-  
-  private void startSwing(final String[] args, final Kontext context) {
-    log.log("Starting up swing...");
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-
-        //It is helpful to do this as soon as possible:
-        Thread.setDefaultUncaughtExceptionHandler( 
-          new Thread.UncaughtExceptionHandler() {
-            public void uncaughtException(Thread t, Throwable e){
-              log.fail(e);
-            }
-          }
-        );
-       
-        persist=context.persist;
-        menus=new Menus(Klonk.this, log);
-        layout=new MainLayout(
-          context.mainFrame, menus.getMenuBar(), 
-          new AppCloseListener() {
-            public void tryClose() {tryExitSystem();}
-          }, 
-          context.iconImage
-        );
-        
-        //Now follow through on layout:
-        layout.show(
-          persist.getWindowBounds(
-            new java.awt.Rectangle(10, 10, 300, 300)
-          ),
-          persist.getWindowMaximized()
-        );
-        popups=context.popups;
-        log.setFailPopup(popups.getFailPopup());
-
-        //More persistence stuff:
-        recentDirs    =new ArrayList<>(persist.maxRecent);
-        recentFiles   =new ArrayList<>(persist.maxRecent);
-        favoriteFiles =new ArrayList<>(persist.maxRecent);
-        favoriteDirs  =new ArrayList<>(persist.maxRecent);
-        persist.getFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs);
-        wordWrap=persist.getWordWrap();
-        fastUndos=persist.getFastUndos();
-        defaultLineBreaker=persist.getDefaultLineDelimiter();
-        taio=persist.getTabAndIndentOptions();
-        fontOptions=persist.getFontAndColors();
-
-        //Popups and menu stuff, uses persistence above:
-        popups.setFontAndColors(fontOptions);
-        menus.setMaxRecent(persist.maxRecent)
-             .setFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs)
-             .setFastUndos(fastUndos)
-             .setWordWrap(wordWrap);
-
-        //Create a blank editor:
-        editors=new LinkedList<>();
-        newEditor();
-        
-        //Load files. This should come last because it will feed us files
-        //async. It will look for files that appeared while we
-        //were starting up:
-        fileListen.startDirectoryListener();
-        //Files to load as command-line arguments:
-        loadFiles(args);
-        
-      }
-    });  
-  }
-  
-  private void tryExitSystem() {
-    while (editors.size()>0)
-      if (!fileCloseLastFirst(true))
-        return;
-    if (!layout.isMaximized()) {
-      persist.setWindowBounds(layout.getMainWindowBounds());
-      persist.setWindowMaximized(false);
-    }
-    else
-      persist.setWindowMaximized(true);
-    persist.setFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs)
-           .save();
-    fileListen.removeLock();
-    layout.dispose();
-    System.exit(0);
-  }
 
   ////////////
   // MARKS: //
@@ -724,7 +670,7 @@ public class Klonk {
       showStatus("Saving...");
       e.saveFile(file);
     } catch (Exception ex) {
-      log.fail(ex);
+      fail.fail(ex);
       showStatusBad("Save failed.");
       return false;
     }
@@ -820,7 +766,6 @@ public class Klonk {
   }
   /** Makes sure file isn't already loaded, and finds an editor to load it into: **/
   private void loadFile(File file) {
-    log.log("Klonk.loadFile() "+file);
     layout.toFront();
     if (!file.exists()){
       popups.alert("No such file: "+file);
@@ -847,7 +792,7 @@ public class Klonk {
         toUse=newEditor();
       loadFile(toUse, file);
     } catch (Exception e) {
-      log.fail(e);
+      fail.fail(e);
     }
   }
   private boolean loadFile(Editor e, File file) {
@@ -855,7 +800,7 @@ public class Klonk {
       showStatus("Loading: "+file+"...");
       e.loadFile(file, defaultLineBreaker);
     } catch (Exception ex) {
-      log.fail(ex);
+      fail.fail(ex);
       showStatusBad("Load failed");
       return false;
     }
@@ -875,7 +820,7 @@ public class Klonk {
   }
   private Editor newEditor(){
     Editor e=new Editor(
-      this, log, myUndoListener, this.defaultLineBreaker, wordWrap
+      this, fail, myUndoListener, this.defaultLineBreaker, wordWrap
     ); 
     e.setFastUndos(fastUndos);
     e.title=getUnusedTitle(editors);
@@ -916,9 +861,6 @@ public class Klonk {
   ///////////////////
 
 
-  private void showStatus(String status) {
-    layout.showStatus(status);
-  }
   private void showStatusBad(String status) {
     layout.showStatus(status, true);
   }
@@ -1067,7 +1009,7 @@ public class Klonk {
     try {
       return file.getCanonicalPath();
     } catch (Exception e) {
-      log.fail(e);
+      fail.fail(e);
       return null;
     }
   }

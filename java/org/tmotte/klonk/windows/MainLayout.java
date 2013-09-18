@@ -207,7 +207,11 @@ public class MainLayout {
     noChangeColor=pnlSaveThisAlert.getBackground();
     Dimension prefer=new Dimension(15,2);
     pnlSaveThisAlert.setPreferredSize(prefer);
+    pnlSaveThisAlert.setMaximumSize(prefer);
+    pnlSaveThisAlert.setMinimumSize(prefer);
     pnlSaveAlert.setPreferredSize(prefer);
+    pnlSaveAlert.setMaximumSize(prefer);
+    pnlSaveAlert.setMinimumSize(prefer);    
 
     GridBug gb=new GridBug(blah);
     gb.fill=gb.VERTICAL;
