@@ -1,13 +1,7 @@
 package org.tmotte.klonk.windows.popup;
-import org.tmotte.klonk.config.Kontext;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -15,6 +9,11 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.InputStream;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -32,6 +31,7 @@ import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.FontOptions;
+import org.tmotte.klonk.config.PopupContext;
 import org.tmotte.klonk.edit.MyTextArea;
 
 class Help {
@@ -134,13 +134,13 @@ class Help {
   public static void main(String[] args) throws Exception{
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Kontext context=Kontext.getForUnitTest();
+        PopupContext context=PopupContext.getForUnitTest();
         Help help=new Help(
           context.mainFrame, 
           context.fail,
           context.home.getUserHome()
         );
-        help.setFont(new FontOptions());
+        help.setFont(context.persist.getFontAndColors());
         help.show();
         context.mainFrame.dispose();
       }

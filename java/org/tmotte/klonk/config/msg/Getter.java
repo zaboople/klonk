@@ -1,4 +1,4 @@
-package org.tmotte.klonk.config;
+package org.tmotte.klonk.config.msg;
 
 /** 
  * OK I lied. We're not framework-free. There's this thing. Worse yet, I'm seriously considering "Setter". 

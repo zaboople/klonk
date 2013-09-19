@@ -32,7 +32,7 @@ import org.tmotte.common.io.Loader;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.config.Kontext;
+import org.tmotte.klonk.config.PopupContext;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.config.FontOptions;
 
@@ -290,7 +290,7 @@ class Favorites {
   public static void main(String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Kontext context=Kontext.getForUnitTest();
+        PopupContext context=PopupContext.getForUnitTest();
         List<String> files=new java.util.ArrayList<>(),
                      dirs =new java.util.ArrayList<>();
         files.add("aaaaa");

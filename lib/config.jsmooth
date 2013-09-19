@@ -15,7 +15,7 @@
   
   <initialMemoryHeap>-1</initialMemoryHeap>
   <jarLocation>..\dist\klonk.jar</jarLocation>
-  <mainClassName>org.tmotte.klonk.Klonk</mainClassName>
+  <mainClassName>org.tmotte.klonk.config.Boot</mainClassName>
   <maximumMemoryHeap>-1</maximumMemoryHeap>
   <maximumVersion></maximumVersion>
   <minimumVersion></minimumVersion>

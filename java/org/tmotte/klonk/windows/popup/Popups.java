@@ -10,23 +10,19 @@ import java.util.List;
 import javax.swing.JFrame;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.Getter;
-import org.tmotte.klonk.config.Setter;
+import org.tmotte.klonk.config.msg.Getter;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.config.Kontext;
+import org.tmotte.klonk.config.PopupContext;
 import org.tmotte.klonk.config.LineDelimiterOptions;
 import org.tmotte.klonk.config.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 
 
 /**
- * This is essentially a sublayer in our DI/IoC setup. It is initialized by Kontext, the
- * primary layer. Arguably it should go in the same package, but all the dialog classes are package-private 
- * and would need to be public - might just go ahead & do that, however... language limitations...
- * <br>
- * Another excuse/reason for separation is that here the DI is lazy, to save a little boot time. This 
- * means it isn't "fail-fast", but its not a big problem since we aren't using runtime reflection/meta-programming/etc. 
+ * This is a sort of sublayer in our DI/IoC setup. Boot creates PopupContext creates Popups. Among other things, 
+ * Popups is separated because it does lazy initialization.
  */
 public class Popups {
 
@@ -47,9 +43,6 @@ public class Popups {
   private FontPicker fontPicker;
   private Favorites favorites;
 
-  //Other components:
-  private FontOptions fontOptions; //FIXME DI?
-
   //DI resources:
   private JFrame mainFrame;
   private KHome home;
@@ -58,6 +51,9 @@ public class Popups {
   private Setter<String> statusBar;
   private Getter<String> currFileGetter;
   private Image iconImageFindReplace;    
+
+  //Other components. Well at least it's just this one:
+  private FontOptions fontOptions; 
   
   ///////////////////////////////////////
   // INITIALIZATION AND CONFIGURATION: //

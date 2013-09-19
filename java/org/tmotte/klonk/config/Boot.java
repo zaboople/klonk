@@ -26,14 +26,19 @@ import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.windows.popup.Popups;
 
 /** 
- * This class implements our framework-free IoC/DI (inversion of control/dependency injection) stuff. 
- * In the future this may get split into Kontext & KontextKreator but for now it's maintainable enough as is.
+ * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) thing. 
  */
-public class Kontext {
+public class Boot {
+
+  public static void main(String[] args) {
+    bootApplication(args);
+  }
 
   public static void bootApplication(String[] args){
-  
-    // 1. Do the preliminary setup:
+
+    /*
+      1. Do the preliminary setup:
+    */
     
     // Figure out our home directory:
     String homeDir=KHome.nameIt(System.getProperty("user.home"), "klonk");
@@ -71,7 +76,12 @@ public class Kontext {
     );
     initLookFeel();
     
-    // 2. Now we make the whole crazy pile of things that talk to things:
+    
+    /* 
+       2. Now make the whole crazy pile of things that talk to things. Regrettably
+          there are some cyclical dependencies, and down within Klonk there is 
+          some not-so-loose coupling, but this will do:
+    */
     final KPersist persist=new KPersist(home, log);
     final Klonk klonk=new Klonk(
       log, persist,
@@ -81,7 +91,6 @@ public class Kontext {
       }
     );
     final Image iconImage=getIcon("org/tmotte/klonk/windows/app.png", klonk.getClass());
-
     PopupContext context=new PopupContext(
       home, log, new JFrame("Klonk"), persist,
       new Setter<String>() {
@@ -95,12 +104,12 @@ public class Kontext {
     );    
 
     
-    //3. Boot into swing...
+    //3. Boot into swing:
     log.log("Starting up swing...");
     klonk.startSwing(args, context.mainFrame, context.popups, iconImage);
     
     
-    //4. Now listen for files from other app instances:
+    //4. Listen for files from other app instances:
     fileListen.startDirectoryListener(
       new Setter<List<String>>(){
         public @Override void set(List<String> files) 

@@ -15,14 +15,14 @@ import org.tmotte.common.swang.Fail;
 
 public class KPersist {
   public static int maxRecent=15;
+  public static int maxFavorite=50;
 
   private File file;
   private Properties properties=new Properties();
   private Fail failer;
   private boolean hasChanges=false;
-  
-  public int winLeft=-1, winTop=-1, winHeight=-1, winWidth=-1;
-  public boolean brandNew=true;
+
+  private List<String> recentFilesCache, recentDirsCache, favoriteFilesCache, favoriteDirsCache;
   
   
   public KPersist(KHome home, Fail failer) {
@@ -166,29 +166,36 @@ public class KPersist {
   public KPersist getCommands(List<String> recentCommands){
     return getFiles(recentCommands, "File.Batch.", maxRecent);
   }
-  public KPersist setFiles(
+  
+  public void getFiles(
       List<String> recentFiles, 
       List<String> recentDirs,
       List<String> faveFiles, 
       List<String> faveDirs
     ) {
-    return setFiles(recentFiles, "File.RecentFiles.", maxRecent)
-          .setFiles(recentDirs,  "File.RecentDirs.",  maxRecent)
-          .setFiles(faveFiles,   "File.Favorite.Files.", 50)
-          .setFiles(faveDirs ,   "File.Favorite.Dirs.",  50);
+    getFiles(recentFiles,  "File.RecentFiles.", maxRecent);
+    getFiles(faveFiles,    "File.Favorite.Files.", maxFavorite);
+    getFiles(recentDirs,   "File.RecentDirs." , maxRecent);
+    getFiles(faveDirs,     "File.Favorite.Dirs." , maxFavorite);
   }
-  public KPersist getFiles(
-      List<String> recentFiles, 
-      List<String> recentDirs,
-      List<String> faveFiles, 
-      List<String> faveDirs
-    ) {
-    return getFiles(recentFiles,  "File.RecentFiles.", maxRecent)
-          .getFiles(recentDirs,   "File.RecentDirs." , maxRecent)
-          .getFiles(faveFiles,    "File.Favorite.Files.", 50)
-          .getFiles(faveDirs,     "File.Favorite.Dirs." , 50)
-          ;
+  public void setRecentFiles(List<String> files) {
+    recentFilesCache=files;
+    hasChanges=true;
   }
+  public void setFavoriteFiles(List<String> files) {
+    favoriteFilesCache=files;
+    hasChanges=true;
+  }
+  public void setRecentDirs(List<String> dirs) {
+    recentDirsCache=dirs;
+    hasChanges=true;
+  }
+  public void setFavoriteDirs(List<String> dirs) {
+    favoriteDirsCache=dirs;
+    hasChanges=true;
+  }
+
+
 
   // FAST UNDOS: //
   
@@ -210,21 +217,35 @@ public class KPersist {
       save();
     return this;
   }
-  public KPersist save() {
+  public void save() {
+    
+    // 1. Check the file caches and make properties:
+    setFiles(recentFilesCache,   "File.RecentFiles.",    maxRecent);
+    setFiles(recentDirsCache,    "File.RecentDirs.",     maxRecent);
+    setFiles(favoriteFilesCache, "File.Favorite.Files.", maxFavorite);
+    setFiles(favoriteDirsCache,  "File.Favorite.Dirs.",  maxFavorite);
+    recentFilesCache=null;
+    recentDirsCache=null;
+    favoriteFilesCache=null;
+    favoriteDirsCache=null;
+    
+    // 2. Save everything
     try (FileOutputStream fos=new FileOutputStream(file);) {
       properties.store(fos, "You are permitted to sort this file");
       hasChanges=false;
     } catch (Exception e) {
       failer.fail(e); 
     }
-    return this;
+    
   }
   
   //////////////////////
   // PRIVATE METHODS: //
   //////////////////////
 
-  private KPersist setFiles(List<String> files, String name, int max) {
+  private void setFiles(List<String> files, String name, int max) {
+    if (files==null)
+      return;
     int len=files.size();
     int maxlen=max==-1 
       ?len 
@@ -233,7 +254,7 @@ public class KPersist {
       set(name+i, files.get(i));
     for (int i=maxlen; i<max; i++) 
       properties.remove(name+i);
-    return this;
+    return;
   }
   private KPersist getFiles(List<String> files, String name, int max) {
     for (int i=0; i<max; i++){

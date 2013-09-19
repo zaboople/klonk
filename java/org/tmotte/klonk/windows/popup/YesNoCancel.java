@@ -239,14 +239,10 @@ class YesNoCancel {
     final String message=args[1];
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        try {
-          JFrame frame=new JFrame("Klonk");
-          YesNoCancel ky=new YesNoCancel(frame, doCancel);
-          System.out.println(ky.show(message));
-          frame.dispose();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+        JFrame frame=new JFrame("Klonk");
+        YesNoCancel ky=new YesNoCancel(frame, doCancel);
+        System.out.println(ky.show(message));
+        frame.dispose();
       }
     });  
   }

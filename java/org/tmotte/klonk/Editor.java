@@ -40,6 +40,8 @@ import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.io.FileMetaData;
 import org.tmotte.klonk.io.KFileIO;
 
+
+/** Enhances MyTextArea with secondary editing features. Also adds file-specific information. */
 public class Editor {
 
   //Dependencies:
@@ -73,7 +75,7 @@ public class Editor {
     this.fail=fail;
     this.lineBreaker=lineBreaker;
     jta=new MyTextArea();
-    jta.setDragEnabled(true);
+    jta.setDragEnabled(false);
     jta.makeVerticalScrollable();
     jta.addUndoListener(undoL);
     setWordWrap(wordWrap);

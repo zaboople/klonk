@@ -44,7 +44,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.Kontext;
+import org.tmotte.klonk.config.PopupContext;
 import org.tmotte.klonk.edit.MyTextArea;
 
 class FontPicker {
@@ -513,7 +513,7 @@ class FontPicker {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          Kontext context=Kontext.getForUnitTest();
+          PopupContext context=PopupContext.getForUnitTest();
           FontPicker pop=new FontPicker(
             context.mainFrame, context.fail, context.popups
           );

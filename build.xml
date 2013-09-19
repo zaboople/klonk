@@ -134,7 +134,7 @@
     <jar basedir="./build" destfile="dist/${appname}.jar">
       <manifest>
         <attribute name="Built-By" value="Mr Motte" />
-        <attribute name="Main-Class" value="org.tmotte.klonk.Klonk" />
+        <attribute name="Main-Class" value="org.tmotte.klonk.config.Boot" />
 
         <!-- Finally, use the generated libs path 
         <attribute name="Class-Path" value="${libs.project}" />-->

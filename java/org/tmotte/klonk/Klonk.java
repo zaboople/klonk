@@ -23,22 +23,20 @@ import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.text.DelimitedString;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.Getter;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.config.Kontext;
 import org.tmotte.klonk.config.LineDelimiterOptions;
-import org.tmotte.klonk.config.Setter;
+import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.TabAndIndentOptions;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
-import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.Printing;
-import org.tmotte.klonk.windows.AppCloseListener; 
 import org.tmotte.klonk.windows.MainLayout; 
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups; 
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
+
+/** Refer to org.tmotte.klonk.config.Boot for application startup */
 
 public class Klonk {
 
@@ -49,9 +47,6 @@ public class Klonk {
   //                 //
   /////////////////////
 
-  //The most essential stuff:
-  private FileListen fileListen;
-  private Fail fail;
   
   //Main GUI components:
   private LinkedList<Editor> editors;
@@ -62,6 +57,8 @@ public class Klonk {
   
   //Configuration stuff:
   private KPersist persist;
+  private Fail fail;
+  private Doer lockRemover;
   private String defaultLineBreaker;
   private boolean wordWrap=false,
                   fastUndos=true;
@@ -71,31 +68,31 @@ public class Klonk {
   private TabAndIndentOptions taio;
   private FontOptions fontOptions;
   
-  public static void main(final String[] args) {
-    //This will call back to our constructor & then startSwing()
-    Kontext.bootApplication(args);
-  }
-  public Klonk(Fail fail, FileListen fileListen) {
+  public Klonk(Fail fail, final KPersist persist, Doer lockRemover) {
     this.fail=fail;
-    this.fileListen=fileListen;//FIXME this only has a single event to invoke.....
+    this.lockRemover=lockRemover;
+    this.persist=persist;
   }
   public void startSwing(
-      final String[] args, final KPersist persist, final JFrame mainFrame,
-      final Image iconImage, final Popups popups
+      final String[] args, final JFrame mainFrame, final Popups popups, final Image iconImage
     ) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Klonk.this.persist=persist;
+      
+        //This could be done by the Boot class but it doesn't
+        //make sense to given the number of dependencies:
         menus=new Menus(Klonk.this, fail);
         layout=new MainLayout(
-          mainFrame, menus.getMenuBar(), 
-          new AppCloseListener() {
-            public void tryClose() {tryExitSystem();}
+          mainFrame, 
+          new Doer() {
+            //This is the application close listener:
+            public @Override void doIt() {tryExitSystem();}
           }, 
           iconImage
         );
+        mainFrame.setJMenuBar(menus.getMenuBar());
         
-        //Now follow through on layout:
+        //Follow through on layout:
         layout.show(
           persist.getWindowBounds(
             new java.awt.Rectangle(10, 10, 300, 300)
@@ -107,8 +104,8 @@ public class Klonk {
         //More persistence stuff:
         recentDirs    =new ArrayList<>(persist.maxRecent);
         recentFiles   =new ArrayList<>(persist.maxRecent);
-        favoriteFiles =new ArrayList<>(persist.maxRecent);
-        favoriteDirs  =new ArrayList<>(persist.maxRecent);
+        favoriteFiles =new ArrayList<>(persist.maxFavorite);
+        favoriteDirs  =new ArrayList<>(persist.maxFavorite);
         persist.getFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs);
         wordWrap=persist.getWordWrap();
         fastUndos=persist.getFastUndos();
@@ -127,10 +124,6 @@ public class Klonk {
         editors=new LinkedList<>();
         newEditor();
         
-        //Load files. This should come last because it will feed us files
-        //async. It will look for files that appeared while we
-        //were starting up:
-        fileListen.startDirectoryListener();
         //Files to load as command-line arguments:
         loadFiles(args);
         
@@ -148,9 +141,8 @@ public class Klonk {
     }
     else
       persist.setWindowMaximized(true);
-    persist.setFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs)
-           .save();
-    fileListen.removeLock();
+    persist.save();
+    lockRemover.doIt();
     layout.dispose();
     System.exit(0);
   }
@@ -249,6 +241,8 @@ public class Klonk {
     String s=getFullPath(ed.file.getParentFile());
     favoriteDirs.add(s);
     menus.setFavoriteDirs(favoriteDirs);
+    persist.setFavoriteDirs(favoriteDirs);
+    persist.save();
     showStatus("\""+s+"\" added to favorite directories.");
   }
   public void doAddCurrentToFaveFiles(){
@@ -256,6 +250,8 @@ public class Klonk {
     String s=getFullPath(ed.file);
     favoriteFiles.add(s);
     menus.setFavoriteFiles(favoriteFiles);
+    persist.setFavoriteFiles(favoriteFiles);
+    persist.save();
     showStatus("\""+s+"\" added to favorite files.");
   }
 
@@ -520,6 +516,9 @@ public class Klonk {
     else {
       menus.setFavoriteFiles(favoriteFiles);
       menus.setFavoriteDirs(favoriteDirs);
+      persist.setFavoriteFiles(favoriteFiles);
+      persist.setFavoriteDirs(favoriteDirs);
+      persist.save();
       showStatus("Changes to favorite files/directories saved");
     }
   }
@@ -593,7 +592,7 @@ public class Klonk {
     }.execute();
   }
   public void showStatus(String status) {
-    layout.showStatus(status);
+    showStatus(status, false);
   }
   public String getCurrentFileName() {
     File file=editors.getFirst().file;
@@ -973,6 +972,7 @@ public class Klonk {
     recentFiles.add(0, path);
     if (recentFiles.size()>persist.maxRecent)
       recentFiles.remove(recentFiles.size()-1);
+    persist.setRecentFiles(recentFiles);
     menus.setRecentFiles(recentFiles);
     File f=file.getParentFile();
     addToRecentDirectories(file);
@@ -983,6 +983,7 @@ public class Klonk {
     if (i>-1) {
       recentFiles.remove(i);
       menus.setRecentFiles(recentFiles);
+      persist.setRecentFiles(recentFiles);
     }
     addToRecentDirectories(file);  
   }
@@ -998,6 +999,7 @@ public class Klonk {
       recentDirs.remove(recentDirs.size()-1);
     recentDirs.add(0, path);
     menus.setRecentDirs(recentDirs);
+    persist.setRecentDirs(recentDirs);
   }
 
 

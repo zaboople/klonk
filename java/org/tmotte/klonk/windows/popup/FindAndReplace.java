@@ -1,7 +1,4 @@
 package org.tmotte.klonk.windows.popup;
-import java.util.regex.PatternSyntaxException;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -19,6 +16,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -35,13 +35,12 @@ import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.Position;
 import javax.swing.text.Segment;
-import org.tmotte.klonk.config.Setter;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.Setter;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.edit.MyTextArea;
 
 

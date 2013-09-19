@@ -36,7 +36,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.TabAndIndentOptions;
-import org.tmotte.klonk.config.Kontext;
+import org.tmotte.klonk.config.PopupContext;
 
 class TabsAndIndents {
 
@@ -329,19 +329,14 @@ class TabsAndIndents {
   public static void main(String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        try {
-          Kontext context=Kontext.getForUnitTest();
-          TabsAndIndents tai=new TabsAndIndents(
-            context.mainFrame, context.fail
-          );
-          TabAndIndentOptions ti=new TabAndIndentOptions();
-          ti.indentionMode=ti.INDENT_TABS;
-          ti.indentionModeDefault=ti.INDENT_SPACES;
-          tai.show(ti);
-          context.mainFrame.dispose();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+        PopupContext context=PopupContext.getForUnitTest();
+        TabsAndIndents tai=new TabsAndIndents(
+          context.mainFrame, context.fail
+        );
+        TabAndIndentOptions ti=new TabAndIndentOptions();
+        ti.indentionMode=ti.INDENT_TABS;
+        ti.indentionModeDefault=ti.INDENT_SPACES;
+        tai.show(ti);
       }
     });  
   }

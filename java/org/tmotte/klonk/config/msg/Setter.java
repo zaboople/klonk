@@ -1,4 +1,4 @@
-package org.tmotte.klonk.config;
+package org.tmotte.klonk.config.msg;
 
 /** 
  * As per Getter, I'm a liar, and now I'm even worse. The world's most evil 2-interface framework is born. 

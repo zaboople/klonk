@@ -29,7 +29,7 @@ import javax.swing.JWindow;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.config.Kontext;
+import org.tmotte.klonk.config.PopupContext;
 import org.tmotte.klonk.config.LineDelimiterOptions;
 
 class LineDelimiters {
@@ -242,17 +242,16 @@ class LineDelimiters {
   public static void main(String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Kontext context=Kontext.getForUnitTest();
+        PopupContext context=PopupContext.getForUnitTest();
         LineDelimiterOptions kdo=new LineDelimiterOptions();
         LineDelimiters k=new LineDelimiters(context.mainFrame, context.fail);
         k.show(
           kdo,
-          new LineDelimiterListener(){
+          new LineDelimiterListener(){ //FIXME dependencies
             public void setDefault(String i) {System.out.println("Default "+i);}
             public void setThis(String i)    {System.out.println("This "+i);   }
           }
         );
-        context.mainFrame.dispose();
       }
     });  
 

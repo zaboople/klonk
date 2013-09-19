@@ -20,9 +20,9 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.Kontext;
+import org.tmotte.klonk.config.PopupContext;
 import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.config.Getter;
+import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.edit.MyTextArea;
 
 class Shell {
@@ -442,12 +442,12 @@ class Shell {
   public static void main(String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        final Kontext context=Kontext.getForUnitTest();
+        final PopupContext context=PopupContext.getForUnitTest();
         
         //Show the window:
         Shell pop=new Shell(
           context.mainFrame, context.fail, context.popups, 
-          context.iconImage, context.persist, context.currFileGetter
+          context.iconImageFindReplace, context.persist, context.currentFileGetter
         );
         pop.setFont(context.persist.getFontAndColors());
         pop.show();

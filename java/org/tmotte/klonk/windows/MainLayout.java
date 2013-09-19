@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import org.tmotte.klonk.config.KHome;
+import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 
@@ -44,7 +45,7 @@ public class MainLayout {
   //Core stuff:
   private JFrame frame;
   private Fail failer;
-  private AppCloseListener appListener;
+  private Doer appCloseListener;
   
   //Main editor window components:
   private JLabel lblRow=new JLabel(), 
@@ -63,12 +64,12 @@ public class MainLayout {
   private boolean hasStatus=false;
   
 
-  public MainLayout(JFrame frame, JMenuBar bar, AppCloseListener appListener, Image iconImage){
+  public MainLayout(JFrame frame, Doer appCloseListener, Image iconImage){
     this.frame=frame;
     doEvents();
-    layout(bar);
+    layout();
     frame.setIconImage(iconImage);
-    this.appListener=appListener;
+    this.appCloseListener=appCloseListener;
   }
   public void show(Rectangle rect, boolean maximized) {
     //Set location:
@@ -160,7 +161,7 @@ public class MainLayout {
     frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);  
     frame.addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e){
-        appListener.tryClose();
+        appCloseListener.doIt();
       }
     });
   }
@@ -168,11 +169,9 @@ public class MainLayout {
   /**
    * @param rect The boundaries of the main window.
    */
-  private void layout(JMenuBar menus) {
+  private void layout() {
   
-    //Menus:
-    frame.setJMenuBar(menus);
-
+    
     //Set up editor panel:
     editorGB.gridXY(0).weightXY(1);
     editorGB.fill=editorGB.BOTH;

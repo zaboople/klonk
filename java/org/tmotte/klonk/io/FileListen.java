@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.tmotte.klonk.KLog;
 import org.tmotte.klonk.config.KHome;
-import org.tmotte.klonk.config.Setter;
+import org.tmotte.klonk.config.msg.Setter;
 
 public class FileListen {
  
@@ -44,9 +44,6 @@ public class FileListen {
     locker=new Locker(seizeFile, log);
     return locker.lock() || makePID(fileNames);
   }
-  public void setFileReceiver(Setter<List<String>> fileReceiver) {
-    this.fileReceiver=fileReceiver;
-  }
   public void removeLock() {
     try {deleteOldPIDFiles();}
     catch (Exception e) {
@@ -54,7 +51,8 @@ public class FileListen {
     }
     locker.unlock();
   }
-  public boolean startDirectoryListener(){
+  public boolean startDirectoryListener(Setter<List<String>> fileReceiver){
+    this.fileReceiver=fileReceiver;
     log.log("FileListen.startDirectoryListener()...");
     Thread thread=new Thread(new Listener());
     thread.setDaemon(true);

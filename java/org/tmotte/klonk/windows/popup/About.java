@@ -30,7 +30,7 @@ import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
-import org.tmotte.klonk.config.Kontext;
+import org.tmotte.klonk.config.PopupContext;
 
 class About {
 
@@ -148,7 +148,7 @@ class About {
   public static void main(String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Kontext context=Kontext.getForUnitTest();
+        PopupContext context=PopupContext.getForUnitTest();
         new About(context.mainFrame, context.fail).show();
         context.mainFrame.dispose();
       }

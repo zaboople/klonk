@@ -30,7 +30,7 @@ import org.tmotte.common.io.Loader;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.config.Kontext;
+import org.tmotte.klonk.config.PopupContext;
 
 class GoToLine {
 
@@ -195,7 +195,7 @@ class GoToLine {
   public static void main(String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Kontext context=Kontext.getForUnitTest();
+        PopupContext context=PopupContext.getForUnitTest();
         GoToLine pop=new GoToLine(
           context.mainFrame, 
           context.fail,
