@@ -26,7 +26,9 @@ import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.windows.popup.Popups;
 
 /** 
- * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) thing. 
+ * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) architecture. Boot
+ * can either assemble the full array of components for a complete application, and boot it; or it can assemble
+ * a minimal set that will support unit testing, primarily for the different dialog windows.
  */
 public class Boot {
 

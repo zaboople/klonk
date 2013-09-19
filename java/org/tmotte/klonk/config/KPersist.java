@@ -22,8 +22,7 @@ public class KPersist {
   private Fail failer;
   private boolean hasChanges=false;
 
-  private List<String> recentFilesCache, recentDirsCache, favoriteFilesCache, favoriteDirsCache;
-  
+  private List<String> recentFilesCache, recentDirsCache;
   
   public KPersist(KHome home, Fail failer) {
     this.failer=failer;
@@ -90,9 +89,8 @@ public class KPersist {
   public TabAndIndentOptions getTabAndIndentOptions(){
     TabAndIndentOptions taio=new TabAndIndentOptions();
     taio.indentOnHardReturn=getBoolean("Indent.OnHardReturn", true);
-    taio.tabIndentsLine=getBoolean("Indent.TabIndentsLine", true);
+    taio.tabIndentsLine    =getBoolean("Indent.TabIndentsLine", true);
     String temp=get("Indent.DefaultMode", "SPACES");
-
     if ("TABS".equals(temp))
       taio.indentionModeDefault=taio.INDENT_TABS;
     else
@@ -182,17 +180,15 @@ public class KPersist {
     recentFilesCache=files;
     hasChanges=true;
   }
-  public void setFavoriteFiles(List<String> files) {
-    favoriteFilesCache=files;
-    hasChanges=true;
-  }
   public void setRecentDirs(List<String> dirs) {
     recentDirsCache=dirs;
     hasChanges=true;
   }
+  public void setFavoriteFiles(List<String> files) {
+    setFiles(files, "File.Favorite.Files.", maxFavorite);
+  }
   public void setFavoriteDirs(List<String> dirs) {
-    favoriteDirsCache=dirs;
-    hasChanges=true;
+    setFiles(dirs,  "File.Favorite.Dirs.",  maxFavorite);
   }
 
 
@@ -220,14 +216,14 @@ public class KPersist {
   public void save() {
     
     // 1. Check the file caches and make properties:
-    setFiles(recentFilesCache,   "File.RecentFiles.",    maxRecent);
-    setFiles(recentDirsCache,    "File.RecentDirs.",     maxRecent);
-    setFiles(favoriteFilesCache, "File.Favorite.Files.", maxFavorite);
-    setFiles(favoriteDirsCache,  "File.Favorite.Dirs.",  maxFavorite);
-    recentFilesCache=null;
-    recentDirsCache=null;
-    favoriteFilesCache=null;
-    favoriteDirsCache=null;
+    if (recentFilesCache!=null) {
+      setFiles(recentFilesCache,   "File.RecentFiles.",    maxRecent);
+      recentFilesCache=null;
+    }
+    if (recentDirsCache!=null) {
+      setFiles(recentDirsCache,    "File.RecentDirs.",     maxRecent);
+      recentDirsCache=null;
+    }
     
     // 2. Save everything
     try (FileOutputStream fos=new FileOutputStream(file);) {
@@ -244,8 +240,6 @@ public class KPersist {
   //////////////////////
 
   private void setFiles(List<String> files, String name, int max) {
-    if (files==null)
-      return;
     int len=files.size();
     int maxlen=max==-1 
       ?len 
