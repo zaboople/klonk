@@ -74,7 +74,7 @@ public class Klonk {
     this.persist=persist;
   }
   public void startSwing(
-      final String[] args, final JFrame mainFrame, final Popups popups, final Image iconImage
+      final String[] args, final JFrame mainFrame, final Popups popups
     ) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
@@ -87,8 +87,7 @@ public class Klonk {
           new Doer() {
             //This is the application close listener:
             public @Override void doIt() {tryExitSystem();}
-          }, 
-          iconImage
+          }
         );
         mainFrame.setJMenuBar(menus.getMenuBar());
         
@@ -327,16 +326,16 @@ public class Klonk {
   // MARK MENU: //
   ////////////////
   
-  public void doMarkSet() {
+  public boolean doMarkSet() {
     Editor e=editors.getFirst();
     int i=e.doSetMark();
     if (i!=-1){
       showStatus("Mark set");
-      menus.showHasMarks(true);
       markStatus.go(i, e.getMarkCount(), true);
     }
     else
       showStatusBad("Mark already set at this position");
+    return i!=-1;
   }
   public void doMarkGoToPrevious() {
     Editor e=editors.getFirst();
@@ -354,19 +353,16 @@ public class Klonk {
     else
       showStatusBad("Cursor is after last mark.");
   }
-  public void doMarkClearCurrent() {
+  public boolean doMarkClearCurrent() {
     int i=editors.getFirst().doMarkClearCurrent();
     if (i==-1)
       showStatusBad("Cursor is not on a set mark.");
-    else {
-      if (i==0)
-        menus.showHasMarks(false);
+    else 
       showStatus("Mark cleared; "+i+" marks left.");
-    }
+    return i==0;
   }
   public void doMarkClearAll() {
     editors.getFirst().doClearMarks();
-    menus.showHasMarks(false);
     showStatus("All marks cleared");
   }
   //These two methods are for the menus

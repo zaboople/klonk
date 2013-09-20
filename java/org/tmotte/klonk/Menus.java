@@ -644,15 +644,24 @@ public class Menus {
     markItemListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
-        if (s==markSet)          klonk.doMarkSet();
+        if (s==markSet) {
+          if (klonk.doMarkSet()) 
+            showHasMarks(true);
+        }
         else
         if (s==markGoToPrevious) klonk.doMarkGoToPrevious();
         else
         if (s==markGoToNext)     klonk.doMarkGoToNext();
         else
-        if (s==markClearCurrent) klonk.doMarkClearCurrent();
+        if (s==markClearCurrent) {
+          if (klonk.doMarkClearCurrent()) 
+            showHasMarks(false);
+        }
         else
-        if (s==markClearAll)     klonk.doMarkClearAll();
+        if (s==markClearAll) {    
+          klonk.doMarkClearAll();
+          showHasMarks(false);
+        }
         else
           throw new RuntimeException("What");
       }

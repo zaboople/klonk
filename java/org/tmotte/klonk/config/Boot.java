@@ -50,7 +50,7 @@ public class Boot {
         homeDir=args[++i].trim();
         args[i]=null;
       }
-    final KHome home=new KHome(homeDir);
+    KHome home=new KHome(homeDir);
     if (!home.ready)
       return;
 
@@ -92,9 +92,10 @@ public class Boot {
           {fileListen.removeLock();}
       }
     );
-    final Image iconImage=getIcon("org/tmotte/klonk/windows/app.png", klonk.getClass());
+    JFrame frame=new JFrame("Klonk");
+    frame.setIconImage(getIcon("org/tmotte/klonk/windows/app.png", klonk.getClass()));
     PopupContext context=new PopupContext(
-      home, log, new JFrame("Klonk"), persist,
+      home, log, frame, persist,
       new Setter<String>() {
         public @Override void set(String msg) 
           {klonk.showStatus(msg);}
@@ -108,7 +109,7 @@ public class Boot {
     
     //3. Boot into swing:
     log.log("Starting up swing...");
-    klonk.startSwing(args, context.mainFrame, context.popups, iconImage);
+    klonk.startSwing(args, context.mainFrame, context.popups);
     
     
     //4. Listen for files from other app instances:

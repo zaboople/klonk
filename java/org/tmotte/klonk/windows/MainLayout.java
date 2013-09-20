@@ -64,11 +64,10 @@ public class MainLayout {
   private boolean hasStatus=false;
   
 
-  public MainLayout(JFrame frame, Doer appCloseListener, Image iconImage){
+  public MainLayout(JFrame frame, Doer appCloseListener){
     this.frame=frame;
     doEvents();
     layout();
-    frame.setIconImage(iconImage);
     this.appCloseListener=appCloseListener;
   }
   public void show(Rectangle rect, boolean maximized) {
