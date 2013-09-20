@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -26,9 +27,9 @@ public class Menus {
   //Various instance variables:
   private Fail failer;
   private final Klonk klonk;
+  private LinkedList<Editor> editors;
   private Map<JMenuItem,Editor> switchMenuToEditor=new Hashtable<>();
   private MenuUtils mu=new MenuUtils();
-  private int maxRecent;
 
   //Visual component instances:
   private JMenuBar bar=new JMenuBar();
@@ -66,73 +67,16 @@ public class Menus {
   // INITIALIZATION: //
   /////////////////////
   
-  public Menus(final Klonk klonk, Fail failer) {
+  public Menus(final Klonk klonk, LinkedList<Editor> editors, Fail failer) {
     this.klonk=klonk;
+    this.editors=editors;
     this.failer=failer;
     create();
-  }
-  public Menus setMaxRecent(int i) {
-    maxRecent=i;
-    return this;
   }
   public JMenuBar getMenuBar() {
     return bar;
   }
 
-  //////////////////
-  // SWITCH MENU: //
-  //////////////////
-  
-  public void setSwitchMenu(List<Editor> startList) {
-    switcher.removeAll();
-    switchMenuToEditor.clear();
-    int easyLen=3;
-    
-    //Build first menu, a quick-list of recent files:
-    for (int i=0; i<Math.min(easyLen, startList.size()); i++) {
-      Editor e=startList.get(i);
-      JMenuItem j=i==0
-        ?mu.doMenuItemCheckbox(e.title, switchListener)   
-        :mu.doMenuItem(
-          e.title, switchListener, -1, 
-          i==1 ?KeyMapper.key(KeyEvent.VK_F12,0) :null
-        );
-      switchMenuToEditor.put(j, e);
-      switcher.add(j);
-    }
-    
-    //Build second menu, a longer sorter list of all files you have open:
-    if (startList.size()>easyLen){
-      switcher.addSeparator();
-      Editor first=startList.get(0);
-      List<Editor> list=new ArrayList<Editor>(startList.size());
-      for (Editor e: startList)
-        list.add(e);
-      Collections.sort(list, switchSorter);
-      for (int i=0; i<list.size(); i++) {
-        Editor e=list.get(i);
-        JMenuItem j=e==first
-          ?mu.doMenuItemCheckbox(e.title, switchListener)   
-          :mu.doMenuItem(e.title, switchListener);
-        switchMenuToEditor.put(j, e);
-        switcher.add(j);
-      }
-    }
-    
-    //Build third menu, which swaps current for the other:
-    if (startList.size()>1){
-      switcher.addSeparator();
-      switcher.add(switchFrontToBack);
-      switcher.add(switchBackToFront);
-    }
-    
-    fileCloseOthers.setEnabled(startList.size()>1);
-  }
-  private static Comparator<Editor> switchSorter=new Comparator<Editor> () {
-    public int compare(Editor e1, Editor e2) {
-      return e1.title.compareTo(e2.title);
-    }
-  };
 
   /////////////////////////////////////////////
   // RECENT & FAVORITE FILES/DIRS SAVE/OPEN: //
@@ -161,15 +105,6 @@ public class Menus {
     setRecent(startList, fileSaveToRecentDir,   saveToListener);
   }
 
-  public void showHasFile(boolean has) {
-    if (fileDocDirWindows!=null)
-      fileDocDirWindows.setEnabled(has);
-    fileFaveAddFile.setEnabled(has);
-    fileFaveAddDir.setEnabled(has);
-    fileClipboardDoc.setEnabled(has);
-    fileClipboardDocDir.setEnabled(has);
-    fileOpenFromDocDir.setEnabled(has);
-  }
   public Menus setFastUndos(boolean fast) {
     undoFast.setState(fast);
     return this;
@@ -178,13 +113,13 @@ public class Menus {
     optionWordWrap.setState(w);
     return this;
   }
-  public Menus showHasMarks(boolean has) {
-    markGoToPrevious.setEnabled(has);
-    markGoToNext.setEnabled(has);
-    markClearCurrent.setEnabled(has);
-    markClearAll.setEnabled(has);
-    return this;
+  public void editorChange() {
+    Editor e=editors.getFirst();
+    showHasMarks(e.hasMarks());
+    showHasFile(e.file!=null);
+    setSwitchMenu();
   }
+  
 
   //////////////////////
   //                  //
@@ -192,7 +127,22 @@ public class Menus {
   //                  //
   //////////////////////
 
+  private void showHasFile(boolean has) {
+    if (fileDocDirWindows!=null)
+      fileDocDirWindows.setEnabled(has);
+    fileFaveAddFile.setEnabled(has);
+    fileFaveAddDir.setEnabled(has);
+    fileClipboardDoc.setEnabled(has);
+    fileClipboardDocDir.setEnabled(has);
+    fileOpenFromDocDir.setEnabled(has);
+  }
 
+  private void showHasMarks(boolean has) {
+    markGoToPrevious.setEnabled(has);
+    markGoToNext.setEnabled(has);
+    markClearCurrent.setEnabled(has);
+    markClearAll.setEnabled(has);
+  }
   private void setRecent(List<String> startList, JMenu menuX, Action listener) {
     menuX.removeAll();
     menuX.setEnabled(startList.size()>0);
@@ -232,6 +182,61 @@ public class Menus {
     else
       menuX.setEnabled(menuX.getItemCount()>0);
   }
+
+  //////////////////
+  // SWITCH MENU: //
+  //////////////////
+  
+  private void setSwitchMenu() {
+    switcher.removeAll();
+    switchMenuToEditor.clear();
+    int easyLen=3;
+    
+    //Build first menu, a quick-list of recent files:
+    for (int i=0; i<Math.min(easyLen, editors.size()); i++) {
+      Editor e=editors.get(i);
+      JMenuItem j=i==0
+        ?mu.doMenuItemCheckbox(e.title, switchListener)   
+        :mu.doMenuItem(
+          e.title, switchListener, -1, 
+          i==1 ?KeyMapper.key(KeyEvent.VK_F12,0) :null
+        );
+      switchMenuToEditor.put(j, e);
+      switcher.add(j);
+    }
+    
+    //Build second menu, a longer sorted list of remaining files you have open:
+    if (editors.size()>easyLen){
+      switcher.addSeparator();
+      Editor first=editors.getFirst();
+      List<Editor> list=new ArrayList<Editor>(editors.size());
+      for (Editor e: editors)
+        list.add(e);
+      Collections.sort(list, switchSorter);
+      for (int i=0; i<list.size(); i++) {
+        Editor e=list.get(i);
+        JMenuItem j=e==first
+          ?mu.doMenuItemCheckbox(e.title, switchListener)   
+          :mu.doMenuItem(e.title, switchListener);
+        switchMenuToEditor.put(j, e);
+        switcher.add(j);
+      }
+    }
+    
+    //Build third menu, which swaps current for the other:
+    if (editors.size()>1){
+      switcher.addSeparator();
+      switcher.add(switchFrontToBack);
+      switcher.add(switchBackToFront);
+    }
+    
+    fileCloseOthers.setEnabled(editors.size()>1);
+  }
+  private static Comparator<Editor> switchSorter=new Comparator<Editor> () {
+    public int compare(Editor e1, Editor e2) {
+      return e1.title.compareTo(e2.title);
+    }
+  };
 
   ///////////////////////////
   // CREATE/LAYOUT/LISTEN: //

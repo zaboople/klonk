@@ -42,7 +42,7 @@ public class Boot {
       1. Do the preliminary setup:
     */
     
-    // Figure out our home directory:
+    // KHome:
     String homeDir=KHome.nameIt(System.getProperty("user.home"), "klonk");
     for (int i=0; i<args.length; i++)
       if (args[i].equals("-home") && i<args.length-1){
@@ -54,13 +54,12 @@ public class Boot {
     if (!home.ready)
       return;
 
-    // Get our PID & a log:
+    // KLog:
     String pid=ManagementFactory.getRuntimeMXBean().getName();
     pid=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
     final KLog log=new KLog(home, pid);
     
-    // Set up our file listener and check 
-    // and see if we can obtain our mutex:
+    // FileListen:
     final FileListen fileListen=new FileListen(log, pid, home);
     if (!fileListen.lockOrSignal(args)) {
       log.log("Klonk is handing off to another process.");

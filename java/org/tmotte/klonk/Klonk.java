@@ -78,10 +78,15 @@ public class Klonk {
     ) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-      
+
+        Klonk.this.popups=popups;
+        //This will be used everywhere and shared. Should probably be a custom class:
+        editors=new LinkedList<>();
+	      
         //This could be done by the Boot class but it doesn't
         //make sense to given the number of dependencies:
-        menus=new Menus(Klonk.this, fail);
+        menus=new Menus(Klonk.this, editors, fail);
+        mainFrame.setJMenuBar(menus.getMenuBar());
         layout=new MainLayout(
           mainFrame, 
           new Doer() {
@@ -89,16 +94,12 @@ public class Klonk {
             public @Override void doIt() {tryExitSystem();}
           }
         );
-        mainFrame.setJMenuBar(menus.getMenuBar());
-        
-        //Follow through on layout:
         layout.show(
           persist.getWindowBounds(
             new java.awt.Rectangle(10, 10, 300, 300)
           ),
           persist.getWindowMaximized()
         );
-        Klonk.this.popups=popups;
         
         //More persistence stuff:
         recentDirs    =new ArrayList<>(persist.maxRecent);
@@ -114,13 +115,11 @@ public class Klonk {
 
         //Popups and menu stuff, uses persistence above:
         popups.setFontAndColors(fontOptions);
-        menus.setMaxRecent(persist.maxRecent)
-             .setFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs)
+        menus.setFiles(recentFiles, recentDirs, favoriteFiles, favoriteDirs)
              .setFastUndos(fastUndos)
              .setWordWrap(wordWrap);
 
         //Create a blank editor:
-        editors=new LinkedList<>();
         newEditor();
         
         //Files to load as command-line arguments:
@@ -939,10 +938,8 @@ public class Klonk {
   private void editorChange(Editor e) {
     showStabilityChange(e.unsavedChanges);
     layout.showTitle(e.title);
-    menus.showHasMarks(e.hasMarks());
     showCaretPos(e);
-    menus.showHasFile(e.file!=null);
-    menus.setSwitchMenu(editors);
+    menus.editorChange();
   }
   
   
