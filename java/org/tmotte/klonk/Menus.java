@@ -654,9 +654,11 @@ public class Menus {
             showHasMarks(true);
         }
         else
-        if (s==markGoToPrevious) klonk.doMarkGoToPrevious();
+        if (s==markGoToPrevious) 
+          klonk.doMarkGoToPrevious();
         else
-        if (s==markGoToNext)     klonk.doMarkGoToNext();
+        if (s==markGoToNext)     
+          klonk.doMarkGoToNext();
         else
         if (s==markClearCurrent) {
           if (klonk.doMarkClearCurrent()) 

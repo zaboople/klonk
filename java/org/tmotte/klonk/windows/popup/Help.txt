@@ -129,9 +129,9 @@ Note that a file named Klonk.properties is stored in this directory. You can mod
 
 When you you exit Klonk it will stop and ask you to save any files that have unsaved changes. You will also notice that Klonk shows a small red bar at the upper left if the current file has unsaved changes, and/or an adjoining blue bar if this or another file has unsaved changes.
 
-However, many folks are used to hitting the power-off/restart button on their workstation and waiting to see which applications throw up alert windows to warn about unsaved changes. Unfortunately the Java runtime doesn't have any facility for "hooking" a shutdown message and telling the operating system to wait. Thus Klonk will briefly flash a popup warning about unsaved changes and then get killed by the OS before you have a chance to do anything.
+However, many folks are used to hitting the power-off/restart button on their workstation and waiting to see which applications throw up alert windows to warn about unsaved changes. Unfortunately the Java runtime doesn't have any facility for "hooking" a shutdown message and telling the operating system to wait. Thus Klonk will briefly flash a popup warning about unsaved changes and then get killed by the OS before you have a chance to do anything. 
 
-Also, when the OS kills it, Klonk won't get a chance to save its configuration first. Most configuration options are saved as soon as you change them, but a few things that change rapidly are not (such as window position & size). This won't cause data corruption/loss/etc., but doing a clean exit guarantees the app returns to the exact same configuration after restart.
+Also, when the OS kills it, Klonk won't get a chance to save its configuration first. Most configuration options are saved as soon as you change them, but a few things that change rapidly are not (mainly window position & size). This won't cause data corruption/loss/etc., but doing a clean exit guarantees the app returns to the exact same configuration after restart.
 
 
 **THE STATUS BAR**

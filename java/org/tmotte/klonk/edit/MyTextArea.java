@@ -137,11 +137,14 @@ public class MyTextArea extends JTextArea {
   
   public JScrollPane makeVerticalScrollable(){
     jsp=new JScrollPane(this);
-    //This is a very critical piece. The vertical scrollbar can be very slow or fast
-    //based on this number. I tried 25 before 64, and it was utterly horrible. So powers of 2 
-    //seem to work. May depend on screen resolution.
-    jsp.getVerticalScrollBar().setUnitIncrement(64);
     jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    //Powers of 2 seem to be the best unit increment here:
+    JScrollBar jsb=jsp.getVerticalScrollBar();
+    jsb.setUnitIncrement(16);
+    //Default scroll mode is the "BLIT" scroll mode, which doesn't seem to be as fast.
+    JViewport jvp=jsp.getViewport();
+    jvp.setScrollMode(jvp.SIMPLE_SCROLL_MODE);
+    
     return jsp;
   }
   public boolean isAnythingSelected() {
