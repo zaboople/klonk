@@ -80,6 +80,8 @@ public class Popups {
       findAndReplace.setFont(fontOptions);
     if (favorites!=null)
       favorites.setFont(fontOptions);
+    if (shell!=null)
+      shell.setFont(fontOptions);
   }
 
   ///////////////////////////
