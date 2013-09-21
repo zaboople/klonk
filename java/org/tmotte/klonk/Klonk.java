@@ -231,8 +231,7 @@ public class Klonk {
   
   // FAVORITES: //
   public void doAddCurrentToFaveDirs(){
-    Editor ed=editors.getFirst();
-    String s=getFullPath(ed.file.getParentFile());
+    String s=getFullPath(editors.getFirst().file.getParentFile());
     favoriteDirs.add(s);
     menus.setFavoriteDirs(favoriteDirs);
     persist.setFavoriteDirs(favoriteDirs);
@@ -240,8 +239,7 @@ public class Klonk {
     showStatus("\""+s+"\" added to favorite directories.");
   }
   public void doAddCurrentToFaveFiles(){
-    Editor ed=editors.getFirst();
-    String s=getFullPath(ed.file);
+    String s=getFullPath(editors.getFirst().file);
     favoriteFiles.add(s);
     menus.setFavoriteFiles(favoriteFiles);
     persist.setFavoriteFiles(favoriteFiles);
