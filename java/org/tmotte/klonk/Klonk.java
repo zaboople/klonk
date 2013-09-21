@@ -82,7 +82,7 @@ public class Klonk {
         Klonk.this.popups=popups;
         //This will be used everywhere and shared. Should probably be a custom class:
         editors=new LinkedList<>();
-	      
+      
         //This could be done by the Boot class but it doesn't
         //make sense to given the number of dependencies:
         menus=new Menus(Klonk.this, editors, fail);
@@ -151,10 +151,6 @@ public class Klonk {
   //                  //
   //////////////////////
 
-  /** Used by the Menus class */
-  boolean isAnythingSelected() {
-    return editors.get(0).isAnythingSelected();
-  }
   /** Used by both Editor & Menus */
   public void doLoadFile(File file) {
     loadFile(file);
@@ -216,7 +212,7 @@ public class Klonk {
   public void doDocumentDirectoryMSWindows() {
     try{
       Runtime.getRuntime().exec(
-        "explorer "+editors.get(0).file.getParent()
+        "explorer "+editors.getFirst().file.getParent()
       );
     } catch (Exception e) {
       fail.fail(e);
@@ -225,11 +221,11 @@ public class Klonk {
   
   // FILE-CLIPBOARD: //
   public void doClipboardDoc() {
-    Editor e=editors.get(0);
+    Editor e=editors.getFirst();
     toClipboard(e.file.getAbsolutePath());
   }
   public void doClipboardDocDir() {
-    Editor e=editors.get(0);
+    Editor e=editors.getFirst();
     toClipboard(e.file.getParentFile().getAbsolutePath());
   }
   
@@ -256,7 +252,7 @@ public class Klonk {
   // FILE OPEN FROM/SAVE TO: //
   public void doOpenFromDocDir() {
     File file;
-    if ((file=popups.showFileDialogForDir(false, editors.get(0).file.getParentFile()))!=null)
+    if ((file=popups.showFileDialogForDir(false, editors.getFirst().file.getParentFile()))!=null)
       loadFile(file);
   }
   public void doOpenFrom(String dir) {
@@ -277,7 +273,7 @@ public class Klonk {
     if ((
       file=showFileSaveDialog(null, new File(dir)) 
       )!=null)
-      fileSave(editors.get(0), file, true);
+      fileSave(editors.getFirst(), file, true);
   }
   public void doFileExit() {
     tryExitSystem();
@@ -364,19 +360,11 @@ public class Klonk {
     editors.getFirst().doClearMarks();
     showStatus("All marks cleared");
   }
-  //These two methods are for the menus
-  int getPreviousMark() {
-    return editors.getFirst().getPreviousMark();
-  }
-  int getMarkCount() {
-    return editors.getFirst().getMarkCount();
-  }
   
-
-
   ////////////////
   // UNDO MENU: //
   ////////////////
+
   public void doUndo(){
     editors.getFirst().undo();
   }
@@ -384,11 +372,11 @@ public class Klonk {
     editors.getFirst().redo();
   }
   public void doUndoToBeginning() {
-    editors.get(0).undoToBeginning();
+    editors.getFirst().undoToBeginning();
     showStatus("Undone to beginning");
   }
   public void doRedoToEnd() {
-    editors.get(0).redoToEnd();
+    editors.getFirst().redoToEnd();
     showStatus("Redone to end");
   }
   public void doUndoFast() {
@@ -485,9 +473,9 @@ public class Klonk {
   }
 
   public void doTabsAndIndents(){
-    taio.indentionMode=editors.get(0).getTabsOrSpaces();
+    taio.indentionMode=editors.getFirst().getTabsOrSpaces();
     if (popups.showTabAndIndentOptions(taio)){
-      editors.get(0).setTabsOrSpaces(taio.indentionMode);
+      editors.getFirst().setTabsOrSpaces(taio.indentionMode);
       for (Editor e: editors)
         e.setTabAndIndentOptions(taio);
       persist.setTabAndIndentOptions(taio);
@@ -524,7 +512,7 @@ public class Klonk {
   public void doLineDelimiters(){
     LineDelimiterOptions k=new LineDelimiterOptions();
     k.defaultOption=persist.getDefaultLineDelimiter();
-    k.thisFile=editors.get(0).getLineBreaker();
+    k.thisFile=editors.getFirst().getLineBreaker();
     popups.showLineDelimiters(k, kld);
   }
   private LineDelimiterListener kld=new LineDelimiterListener() {
@@ -533,9 +521,9 @@ public class Klonk {
       persist.save();
     }
     public void setThis(String lineB) {
-      Editor e=editors.get(0);
+      Editor e=editors.getFirst();
       e.setLineBreaker(lineB);
-      if (e.file!=null)
+      if (e.file!=null && !e.unsavedChanges)
         fileSave(false);
     }
   };
@@ -631,12 +619,39 @@ public class Klonk {
     showStatus("Copied to clipboard: "+name);
   }
 
+  ///////////////////
+  // WINDOW STATE: //
+  ///////////////////
+
+
+  private void showStatusBad(String status) {
+    layout.showStatus(status, true);
+  }
+  private void showStatus(String status, boolean bad) {
+    layout.showStatus(status, bad);
+  }
+
+  //////////////////
+  // CARET STATE: //
+  //////////////////
+
+  private void editorCaretMoved(Editor e, int caretPos) {
+    showCaretPos(e, caretPos);
+    layout.showNoStatus();
+  }
+  private void showCaretPos(Editor e) {
+    showCaretPos(e, e.getCaretPos());
+  }
+  private void showCaretPos(Editor e, int caretPos) {
+    int rowPos=e.getRow(caretPos);
+    layout.showRowColumn(rowPos+1, caretPos-e.getRowOffset(rowPos));
+  }
   ////////////////
   // FILE SAVE: //
   ////////////////
 
   private boolean fileSave(boolean forceNewFile) {
-    Editor e=editors.get(0);
+    Editor e=editors.getFirst();
     
     //1. Get file:
     boolean newFile=true;
@@ -715,7 +730,7 @@ public class Klonk {
   }
 
   private boolean fileClose(boolean forExit) {
-    Editor e=editors.get(0);
+    Editor e=editors.getFirst();
     if (e.unsavedChanges) {
       YesNoCancelAnswer result=popups.askYesNoCancel("Save changes to: "+e.title+"?");
       if (result.isYes()){
@@ -732,7 +747,7 @@ public class Klonk {
     editors.remove(0);
     showStatus("Closed: "+e.title);
     if (editors.size()>0)
-      setEditor(editors.get(0));
+      setEditor(editors.getFirst());
     else
     if (!forExit)
       newEditor();
@@ -850,17 +865,12 @@ public class Klonk {
     return false;
   }
 
-  ///////////////////
-  // WINDOW STATE: //
-  ///////////////////
 
 
-  private void showStatusBad(String status) {
-    layout.showStatus(status, true);
-  }
-  private void showStatus(String status, boolean bad) {
-    layout.showStatus(status, bad);
-  }
+  //////////////////////////////
+  // ULTRA COMPLICATED STATE: //
+  //////////////////////////////
+
   private UndoListener myUndoListener=new UndoListener() {
     public void happened(UndoEvent ue) {
       if (ue.isNoMoreUndos)
@@ -869,22 +879,11 @@ public class Klonk {
       if (ue.isNoMoreRedos)
         showStatusBad("No more redos.");
       else
-      if (ue.isUndoSaveStable){
-        editorStable(editors.get(0));
-      }
+      if (ue.isUndoSaveStable)
+        editorStable(editors.getFirst());
     }
   };
-  private void editorCaretMoved(Editor e, int caretPos) {
-    showCaretPos(e, caretPos);
-    layout.showNoStatus();
-  }
-  private void showCaretPos(Editor e) {
-    showCaretPos(e, e.getCaretPos());
-  }
-  private void showCaretPos(Editor e, int caretPos) {
-    int rowPos=e.getRow(caretPos);
-    layout.showRowColumn(rowPos+1, caretPos-e.getRowOffset(rowPos));
-  }
+
   private void fileIsSaved(Editor e, File file, File oldFile, boolean newFile) {
     if (newFile){
       editorFileChange(e, file);

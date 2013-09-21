@@ -781,7 +781,7 @@ public class Menus {
       public void menuCanceled(MenuEvent e){}
       public void menuDeselected(MenuEvent e){}
       public void menuSelected(MenuEvent e){
-        boolean selected=klonk.isAnythingSelected();
+        boolean selected=editors.getFirst().isAnythingSelected();
         selectUpperCase.setEnabled(selected);
         selectLowerCase.setEnabled(selected);
         selectSortLines.setEnabled(selected);
@@ -794,8 +794,8 @@ public class Menus {
       public void menuCanceled(MenuEvent e){}
       public void menuDeselected(MenuEvent e){}
       public void menuSelected(MenuEvent e){
-        int prev=klonk.getPreviousMark(),
-            count=klonk.getMarkCount();
+        int prev=editors.getFirst().getPreviousMark(),
+            count=editors.getFirst().getMarkCount();
         if (count==0){
           markGoToPrevious.setText("Go to previous mark");
           markGoToNext.setText("Go to next mark");
