@@ -20,9 +20,9 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.LinkedList;
 import java.util.List;
-import org.tmotte.klonk.KLog;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.Doer;
 
 public class FileListen {
  
@@ -43,6 +43,11 @@ public class FileListen {
     log.log("FileListen.lockOrSignal()...");
     locker=new Locker(seizeFile, log);
     return locker.lock() || makePID(fileNames);
+  }
+  public Doer getLockRemover() {
+    return new Doer(){
+      public @Override void doIt() {removeLock();}
+    };
   }
   public void removeLock() {
     try {deleteOldPIDFiles();}

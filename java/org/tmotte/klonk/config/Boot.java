@@ -16,13 +16,26 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import org.tmotte.common.swang.Fail;
-import org.tmotte.klonk.KLog;
-import org.tmotte.klonk.Klonk;
+import org.tmotte.klonk.Menus;
+import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.StatusUpdate;
+import org.tmotte.klonk.controller.CtrlFileOther;
+import org.tmotte.klonk.controller.CtrlMain;
+import org.tmotte.klonk.controller.CtrlMarks;
+import org.tmotte.klonk.controller.CtrlOptions;
+import org.tmotte.klonk.controller.CtrlOther;
+import org.tmotte.klonk.controller.CtrlSearch;
+import org.tmotte.klonk.controller.CtrlSelection;
+import org.tmotte.klonk.controller.CtrlUndo;
+import org.tmotte.klonk.controller.Favorites;
 import org.tmotte.klonk.io.FileListen;
+import org.tmotte.klonk.io.KLog;
+import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.Popups;
 
 /** 
@@ -36,11 +49,9 @@ public class Boot {
     bootApplication(args);
   }
 
-  public static void bootApplication(String[] args){
+  public static void bootApplication(final String[] args){
 
-    /*
-      1. Do the preliminary setup:
-    */
+    /* 1. Do the preliminary setup: */
     
     // KHome:
     String homeDir=KHome.nameIt(System.getProperty("user.home"), "klonk");
@@ -50,7 +61,7 @@ public class Boot {
         homeDir=args[++i].trim();
         args[i]=null;
       }
-    KHome home=new KHome(homeDir);
+    final KHome home=new KHome(homeDir);
     if (!home.ready)
       return;
 
@@ -78,46 +89,77 @@ public class Boot {
     initLookFeel();
     
     
-    /* 
-       2. Now make the whole crazy pile of things that talk to things. Regrettably
-          there are some cyclical dependencies, and down within Klonk there is 
-          some not-so-loose coupling, but this will do:
-    */
-    final KPersist persist=new KPersist(home, log);
-    final Klonk klonk=new Klonk(
-      log, persist,
-      new Doer(){
-        public @Override void doIt() 
-          {fileListen.removeLock();}
+    /* 2. Now get all the swing details going: */
+    
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        startSwing(args, home, log, fileListen);
       }
-    );
-    JFrame frame=new JFrame("Klonk");
-    frame.setIconImage(getIcon("org/tmotte/klonk/windows/app.png", klonk.getClass()));
-    PopupContext context=new PopupContext(
-      home, log, frame, persist,
-      new Setter<String>() {
-        public @Override void set(String msg) 
-          {klonk.showStatus(msg);}
-      }, 
-      new Getter<String>() {
-        public @Override String get() 
-          {return klonk.getCurrentFileName();}
-      }
-    );    
+    });
+  }
 
-    
-    //3. Boot into swing:
-    log.log("Starting up swing...");
-    klonk.startSwing(args, context.mainFrame, context.popups);
-    
-    
-    //4. Listen for files from other app instances:
-    fileListen.startDirectoryListener(
-      new Setter<List<String>>(){
-        public @Override void set(List<String> files) 
-          {klonk.doLoadAsync(files);}
-      }
+  private static void startSwing(String[] args, KHome home, KLog log, FileListen fileListen) {
+    //Persist:
+    final KPersist persist=new KPersist(home, log);
+
+    //Main controller. 
+    final CtrlMain ctrlMain=new CtrlMain(log, persist, fileListen.getLockRemover());
+    Editors editors=ctrlMain.getEditors();
+
+    //Main Frame:
+    JFrame frame=new JFrame("Klonk");
+    frame.setIconImage(getIcon("org/tmotte/klonk/windows/app.png", Boot.class));
+
+    //Layout; display starts here:
+    final MainLayout layout=new MainLayout(frame, ctrlMain.getAppCloseListener());
+    layout.show(
+      persist.getWindowBounds(
+        new java.awt.Rectangle(10, 10, 300, 300)
+      ),
+      persist.getWindowMaximized()
     );
+    StatusUpdate statusBar=new StatusUpdate(){ 
+      public void show(String s)    {layout.showStatus(s, false); }
+      public void showBad(String s) {layout.showStatus(s, true);}
+    };
+
+    //Popups:
+    Popups popups=new PopupContext(
+        home, log, frame, persist, statusBar, ctrlMain.getCurrFileNameGetter()
+      ).popups;
+
+    //Menus & Controllers & JMenuBar:
+    final Menus menus=new Menus(editors, log);
+    menus.setFastUndos(persist.getFastUndos())
+        .setWordWrap(persist.getWordWrap());
+    Favorites favorites=new Favorites(
+      persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
+    );
+    menus.setControllers(
+       ctrlMain
+      ,new CtrlMarks    (editors, statusBar)
+      ,new CtrlSelection(editors, popups, statusBar)
+      ,new CtrlUndo     (editors, popups, statusBar, persist)
+      ,new CtrlSearch   (editors, popups)
+      ,new CtrlOptions  (editors, popups, statusBar, persist, favorites, ctrlMain.getLineDelimiterListener())
+      ,new CtrlFileOther(editors, statusBar, favorites)
+      ,new CtrlOther    (popups)
+    );
+    frame.setJMenuBar(menus.getMenuBar());
+
+    //Now we loop back to ctrlMain to fill in its circular dependencies:
+    //(Menus currently has access to ctrlMain, so it could that part itself:)
+    ctrlMain.setLayout(layout, statusBar);
+    ctrlMain.setPopups(popups);
+    ctrlMain.setListeners(
+      menus.getEditorSwitchListener(),
+      menus.getRecentFileListener(),
+      menus.getRecentDirListener()
+    );
+    ctrlMain.begin(args);
+
+    //Starts thread to listen for other instances:
+    fileListen.startDirectoryListener(ctrlMain.getFileReceiver());
   }
   
   
@@ -149,10 +191,11 @@ public class Boot {
     return new PopupContext(
       home, log, frame, 
       new KPersist(home, log), 
-      new Setter<String>(){
-        public void set(String msg) {
-          System.out.println("Status: "+msg);
-        }
+      new StatusUpdate(){
+        public void show(String msg) 
+          {System.out.println(msg);}
+        public void showBad(String msg) 
+          {System.out.println("***"+msg+"***");}
       },
       new Getter<String>(){
         public String get(){return "-none-";}

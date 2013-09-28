@@ -188,7 +188,6 @@ public class MainLayout {
     gb.fill=gb.BOTH;
     gb.weightXY(1)
       .addY(pnlEditor);
-    pnlEditor.setBackground(Color.GREEN);
 
     //Status panel:
     gb.fill=gb.HORIZONTAL;

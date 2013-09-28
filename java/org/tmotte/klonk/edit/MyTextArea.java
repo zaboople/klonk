@@ -363,14 +363,12 @@ public class MyTextArea extends JTextArea {
       //This will cause an undo error!
       try {
         final int code=e.getKeyCode();
-
-        //FIXME remove z's call to setSelected if this works ok.
         setSelected(code==e.VK_DELETE, 
                     code==e.VK_BACK_SPACE || 
                         (code==e.VK_H && KeyMapper.ctrlPressed(e.getModifiersEx()))
                       );        
 
-        if (code==e.VK_RIGHT) {
+         if (code==e.VK_RIGHT) {
 
           //ARROW RIGHT:
           int mods=e.getModifiersEx();

@@ -1,4 +1,5 @@
 package org.tmotte.klonk;
+import java.awt.Toolkit;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
@@ -37,6 +38,7 @@ import org.tmotte.klonk.config.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.edit.Spaceable;
 import org.tmotte.klonk.edit.UndoListener;
+import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.io.FileMetaData;
 import org.tmotte.klonk.io.KFileIO;
 
@@ -45,7 +47,7 @@ import org.tmotte.klonk.io.KFileIO;
 public class Editor {
 
   //Dependencies:
-  private Klonk klonk;
+  private EditorListener editListener;
   private Fail fail;
 
   //Purely private:
@@ -55,12 +57,11 @@ public class Editor {
   private String encoding=FileMetaData.UTF8;
   private boolean encodingNeedsBOM=false;
   private String lineBreaker;
-
-  //Only used by Klonk:
-  File file;
-  Path path;
-  boolean used=false, unsavedChanges=false;
-  String title="Untitled";
+  private boolean used=false;
+  private boolean unsavedChanges=false;
+  private String title="Untitled";
+  private File file;
+  private Path path;
 
  
   /////////////////////////
@@ -68,16 +69,17 @@ public class Editor {
   /////////////////////////
 
   public Editor(
-      Klonk klonk, Fail fail, UndoListener undoL, 
+      EditorListener editListener, Fail fail, UndoListener undoL, 
       String lineBreaker, boolean wordWrap
     ) {
-    this.klonk=klonk;
+    this.editListener=editListener;
     this.fail=fail;
     this.lineBreaker=lineBreaker;
     jta=new MyTextArea();
     jta.setDragEnabled(false);
     jta.makeVerticalScrollable();
     jta.addUndoListener(undoL);
+    jta.addUndoListener(myUndoListener);
     setWordWrap(wordWrap);
     setEvents();
   }
@@ -111,6 +113,12 @@ public class Editor {
   }
   public String getLineBreaker() {
     return lineBreaker;
+  }
+  public String getTitle() {
+    return title;
+  }
+  public void setTitle(String s) {
+    title=s;
   }
   
   ////////////
@@ -216,6 +224,19 @@ public class Editor {
   // Other public methods: //
   ///////////////////////////
 
+  public File getFile() {
+    return file;
+  }
+  public boolean sameFile(File file) {
+    return path!=null && path.equals(file.toPath().toAbsolutePath());
+  }
+  public boolean isUsed() {
+    return used;
+  }
+  public boolean hasUnsavedChanges() {
+    return unsavedChanges;
+  }
+  
   public void doUpperCase(){
     replaceSelection(jta.getSelectedText().toUpperCase());
   }
@@ -528,6 +549,7 @@ public class Editor {
     return last<s.length() ?s.substring(0, last) :s;
   }
   
+ 
   
   //ETC: //
   
@@ -557,7 +579,7 @@ public class Editor {
     //row & column, for one thing:
     jta.addCaretListener(new CaretListener(){
       public void caretUpdate(CaretEvent e) {
-        klonk.doCaretMoved(Editor.this, e.getDot());
+        editListener.doCaretMoved(Editor.this, e.getDot());
       }
     });
     
@@ -566,7 +588,7 @@ public class Editor {
 
     //Caps lock detection
     Action caps=new AbstractAction() {
-      public void actionPerformed(ActionEvent ae) {klonk.doCapsLock();}
+      public void actionPerformed(ActionEvent ae) {checkCapsLock();}
     };
     KeyMapper.accel(jta, "EditorCapsLock1", caps, KeyEvent.VK_CAPS_LOCK);
     //Oh heck, let's handle these too:
@@ -581,15 +603,16 @@ public class Editor {
     //That's enough. Stop pressing weird buttons.
                 
     
+
+    //This is because there's a bug in capslock detection, such that
+    //we have to check a second time after receiving focus because it
+    //doesn't pick up. I even tried sending artificial key events
+    //to "stimulate" the system, SwingUtilities.invokeLater(), etc.
+    //Note that myKeyListener will remove itself after
+    //its first invocation:
     jta.addFocusListener(new FocusAdapter(){
       public void focusGained(FocusEvent e){
-        klonk.doCapsLock();
-        //This is because there's a bug in capslock detection, such that
-        //we have to check a second time after receiving focus because it
-        //doesn't pick up. I even tried sending artificial key events
-        //to "stimulate" the system, SwingUtilities.invokeLater(), etc.
-        //Note that myKeyListener will remove itself after
-        //its first invocation.
+        checkCapsLock();
         jta.addKeyListener(myKeyListener);
       }
     });
@@ -599,46 +622,71 @@ public class Editor {
       jta, "EditorCtrlW", 
       new AbstractAction() {
         public void actionPerformed(ActionEvent ae) {
-          klonk.doFileClose();
+          editListener.closeEditor();
         }
       },
       KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK
     );
-
   }
+  private KeyListener myKeyListener=new KeyAdapter() {
+    public void keyReleased(KeyEvent e){
+      checkCapsLock();
+      jta.removeKeyListener(myKeyListener);
+    }
+  };
 
+  private void checkCapsLock() {
+    boolean state=Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK); 
+    editListener.doCapsLock(state);
+  }
   private DropTarget myDropTarget=new DropTarget() {
     public synchronized void drop(DropTargetDropEvent evt) {
       try {
         evt.acceptDrop(DnDConstants.ACTION_COPY);
         List droppedFiles=(List)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
         for (Object file : droppedFiles) 
-          klonk.doLoadFile((File)file);
+          editListener.fileDropped((File)file);
       } catch (Exception ex) {
         fail.fail(ex);
       }
     }
   };
-  private KeyListener myKeyListener=new KeyAdapter() {
-    public void keyReleased(KeyEvent e){
-      klonk.doCapsLock();
-      jta.removeKeyListener(myKeyListener);
-    }
-  };
+
+
+  /////////////////////////////////////////////////////////////////////////
+  // NOTE: MyDocumentListener always gets invoked before myUndoListener. // 
+  //       This affects the used & unsavedChanges variables.             //
+  /////////////////////////////////////////////////////////////////////////
+
   private class MyDocumentListener implements DocumentListener {
     public void insertUpdate(DocumentEvent de) {
+      unsavedChanges=true;
+      used|=true;
       updateMarks(de.getOffset(), de.getLength(), true);
-      klonk.doEditorChanged(Editor.this);
+      editListener.doEditorChanged(Editor.this);
     }
     public void removeUpdate(DocumentEvent de) {
+      unsavedChanges=true;
+      used|=true;
       updateMarks(de.getOffset(), de.getLength(), false);
-      klonk.doEditorChanged(Editor.this);
+      editListener.doEditorChanged(Editor.this);
     }
     public void changedUpdate(DocumentEvent e) {
-      klonk.doEditorChanged(Editor.this);
+      unsavedChanges=true;
+      editListener.doEditorChanged(Editor.this);
     }
   }   
-
+  private UndoListener myUndoListener=new UndoListener() {
+    public void happened(UndoEvent ue) {
+      if (unsavedChanges==ue.isUndoSaveStable) {
+        unsavedChanges=!ue.isUndoSaveStable;
+        editListener.doEditorChanged(Editor.this);
+      }
+      if ((ue.isNoMoreUndos || ue.isUndoSaveStable) && file==null && jta.getLineCount()==1 && "".equals(jta.getText())){
+        used=false;
+      }
+    }
+  };
 
 
   ////////////////
@@ -662,12 +710,27 @@ public class Editor {
       jta.setSuppressUndo(false);
       jta.getDocument().addDocumentListener(docListener);
     }
+    used|=true;
+    setFile(file);
+    unsavedChanges=false;
     jta.setCaretPosition(0);
   }
-  private void doSaveFile(File file) throws Exception {
-    KFileIO.save(jta, file, lineBreaker, encoding, encodingNeedsBOM);
+  private void doSaveFile(File saveToFile) throws Exception {
+    used|=true;
+    KFileIO.save(jta, saveToFile, lineBreaker, encoding, encodingNeedsBOM);
+    if (saveToFile!=file) 
+      setFile(saveToFile);
+    unsavedChanges=false;
     jta.setSaved();
   }
-
+  private void setFile(File newFile) {
+    file=newFile;
+    path=file.toPath().toAbsolutePath();
+    try {
+      title=file.getCanonicalPath();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
   
 }

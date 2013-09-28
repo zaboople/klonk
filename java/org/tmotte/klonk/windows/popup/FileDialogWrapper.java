@@ -13,7 +13,6 @@ import javax.swing.JFrame;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.FontOptions;
 import org.tmotte.klonk.config.KHome;
-import org.tmotte.klonk.config.KPersist;
 
 /** 
  * The FileDialog/JFileChooser classes already do most of the work, so this just does a minimal 

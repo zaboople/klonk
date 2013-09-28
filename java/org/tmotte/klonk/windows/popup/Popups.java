@@ -6,12 +6,14 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.io.File;
-import java.util.List;
+import java.util.Collection;
 import javax.swing.JFrame;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.FontOptions;
+import org.tmotte.klonk.config.PopupContext;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.PopupContext;
@@ -48,7 +50,7 @@ public class Popups {
   private KHome home;
   private Fail fail;
   private KPersist persist;
-  private Setter<String> statusBar;
+  private StatusUpdate statusBar;
   private Getter<String> currFileGetter;
   private Image iconImageFindReplace;    
 
@@ -59,17 +61,14 @@ public class Popups {
   // INITIALIZATION AND CONFIGURATION: //
   ///////////////////////////////////////
   
-  public Popups(
-      JFrame mainFrame, KHome home, Fail fail, KPersist persist, 
-      Setter<String> statusBar, Getter<String> currFileGetter, Image iconImageFindReplace
-    ) {
-    this.mainFrame=mainFrame;
-    this.statusBar=statusBar;
-    this.fail=fail;
-    this.persist=persist;
+  public Popups(PopupContext context, Getter<String> currFileGetter) {
+    this.mainFrame=context.mainFrame;
+    this.statusBar=context.statusBar;
+    this.fail=context.fail;
+    this.persist=context.persist;
+    this.home=context.home;
+    this.iconImageFindReplace=context.iconImageFindReplace;
     this.currFileGetter=currFileGetter;
-    this.home=home;
-    this.iconImageFindReplace=iconImageFindReplace;
   }
 
   public void setFontAndColors(FontOptions fo) {
@@ -123,7 +122,7 @@ public class Popups {
     return getFontPicker().show(fontOptions);
   }
   
-  public boolean showFavorites(List<String> favoriteFiles, List<String> favoriteDirs) {
+  public boolean showFavorites(Collection<String> favoriteFiles, Collection<String> favoriteDirs) {
     return getFavorites().show(favoriteFiles, favoriteDirs);
   }
 
@@ -140,10 +139,10 @@ public class Popups {
     GoToLine gtl=getGoToLine();
     int i=gtl.show();
     if (i==-1)
-      statusBar.set("Go to line cancelled.");
+      statusBar.showBad("Go to line cancelled.");
     else
     if (!target.goToLine(i-1))
-      statusBar.set("Line number "+i+" is out of range");
+      statusBar.showBad("Line number "+i+" is out of range"); //FIXME needs StatusUpdater here to red out the message
   }
   public void showLineDelimiters(LineDelimiterOptions k, LineDelimiterListener k2){
     getLineDelimiters().show(k, k2);

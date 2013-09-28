@@ -13,7 +13,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.util.LinkedList;
 import java.util.List;
-import org.tmotte.klonk.KLog;
 
 class Locker {
   private File lockFile;

@@ -1,5 +1,4 @@
 package org.tmotte.klonk.io;
-import org.tmotte.klonk.KLog;
 
 public class LockTest {
   public static void main(String[] args) throws Exception {

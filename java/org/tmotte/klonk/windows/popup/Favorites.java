@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Collection;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -71,7 +72,7 @@ class Favorites {
     //Makes the mta assert its designated row count:
     win.pack();
   }
-  public boolean show(List<String> files, List<String> dirs) {
+  public boolean show(Collection<String> files, Collection<String> dirs) {
     result=false;
     load(mtaFiles, files);
     load(mtaDirs,  dirs);
@@ -98,7 +99,7 @@ class Favorites {
     win.setVisible(false);  
     result=action;
   }
-  private void load(MyTextArea mta, List<String> names) {
+  private void load(MyTextArea mta, Collection<String> names) {
     boolean first=true;
     mta.reset();
     for (String name: names) {
@@ -109,7 +110,7 @@ class Favorites {
       mta.append(name);
     }
   }
-  private void save(MyTextArea mta, List<String> names) {
+  private void save(MyTextArea mta, Collection<String> names) {
     boolean first=true;
     names.clear();
     try {

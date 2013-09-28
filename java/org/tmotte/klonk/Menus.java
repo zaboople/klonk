@@ -1,35 +1,56 @@
 package org.tmotte.klonk;
-import javax.swing.Action;
-import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
+import org.tmotte.klonk.config.msg.Editors;
+import org.tmotte.klonk.config.msg.Doer;
+import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.controller.CtrlMain;
+import org.tmotte.klonk.controller.CtrlFileOther;
+import org.tmotte.klonk.controller.CtrlMarks;
+import org.tmotte.klonk.controller.CtrlOptions;
+import org.tmotte.klonk.controller.CtrlOther;
+import org.tmotte.klonk.controller.CtrlSearch;
+import org.tmotte.klonk.controller.CtrlSelection;
+import org.tmotte.klonk.controller.CtrlUndo;
 
 public class Menus {
 
   //Various instance variables:
   private Fail failer;
-  private final Klonk klonk;
-  private LinkedList<Editor> editors;
+  private Editors editors;
   private Map<JMenuItem,Editor> switchMenuToEditor=new Hashtable<>();
   private MenuUtils mu=new MenuUtils();
+  
+  //Controllers:
+  private CtrlMain ctrlMain;
+  private CtrlMarks ctrlMarks;
+  private CtrlSelection ctrlSelection;
+  private CtrlUndo ctrlUndo;
+  private CtrlSearch ctrlSearch;  
+  private CtrlOptions ctrlOptions;  
+  private CtrlFileOther ctrlFileOther;    
+  private CtrlOther ctrlOther;      
 
   //Visual component instances:
   private JMenuBar bar=new JMenuBar();
@@ -67,33 +88,74 @@ public class Menus {
   // INITIALIZATION: //
   /////////////////////
   
-  public Menus(final Klonk klonk, LinkedList<Editor> editors, Fail failer) {
-    this.klonk=klonk;
+  public Menus(Editors editors, Fail failer) {
     this.editors=editors;
     this.failer=failer;
     create();
   }
+  public void setControllers(
+       CtrlMain ctrlMain
+      ,CtrlMarks ctrlMarks
+      ,CtrlSelection ctrlSelection
+      ,CtrlUndo ctrlUndo  
+      ,CtrlSearch ctrlSearch
+      ,CtrlOptions ctrlOptions
+      ,CtrlFileOther ctrlFileOther
+      ,CtrlOther ctrlOther
+    ){
+    this.ctrlMain=ctrlMain;
+    this.ctrlMarks=ctrlMarks;
+    this.ctrlSelection=ctrlSelection;
+    this.ctrlUndo=ctrlUndo;
+    this.ctrlSearch=ctrlSearch;
+    this.ctrlOptions=ctrlOptions;
+    this.ctrlFileOther=ctrlFileOther;    
+    this.ctrlOther=ctrlOther;    
+  }
   public JMenuBar getMenuBar() {
     return bar;
   }
+  public Doer getEditorSwitchListener() {
+    return new Doer() {
+      public void doIt() {editorChange();}
+    };  
+  }
+  public Setter<List<String>> getRecentFileListener() {
+    return new Setter<List<String>>(){ 
+      public void set(List<String> files) {setRecentFiles(files);}
+    };
+  }
+  public Setter<List<String>> getRecentDirListener() {
+    return new Setter<List<String>>(){ 
+      public void set(List<String> dirs){setRecentDirs(dirs);}
+    };
+  }
+  public Setter<List<String>> getFavoriteFileListener() {
+    return new Setter<List<String>>(){ 
+      public void set(List<String> files) {setFavoriteFiles(files);}
+    };
+  }
+  public Setter<List<String>> getFavoriteDirListener() {
+    return new Setter<List<String>>(){ 
+      public void set(List<String> dirs){setFavoriteDirs(dirs);}
+    };
+  }
+  
 
 
   /////////////////////////////////////////////
   // RECENT & FAVORITE FILES/DIRS SAVE/OPEN: //
   /////////////////////////////////////////////
 
-  public Menus setFiles(List<String> recentFiles, List<String> recentDirs, 
-                        List<String> favoriteFiles, List<String> favoriteDirs) {
-    setRecentFiles(recentFiles);
-    setRecentDirs(recentDirs);
+  public Menus setFavorites(Collection<String> favoriteFiles, Collection<String> favoriteDirs) {
     setFavoriteFiles(favoriteFiles);
     setFavoriteDirs(favoriteDirs);
     return this;
   }
-  public void setFavoriteFiles(List<String> startList) {
+  public void setFavoriteFiles(Collection<String> startList) {
     setFavorites(startList, fileFave, reopenListener, 2);
   }
-  public void setFavoriteDirs(List<String> startList) {
+  public void setFavoriteDirs(Collection<String> startList) {
     setFavorites(startList, fileOpenFromFave, openFromListener, 0);
     setFavorites(startList, fileSaveToFave,   saveToListener, 0);
   }
@@ -116,7 +178,7 @@ public class Menus {
   public void editorChange() {
     Editor e=editors.getFirst();
     showHasMarks(e.hasMarks());
-    showHasFile(e.file!=null);
+    showHasFile(e.getFile()!=null);
     setSwitchMenu();
   }
   
@@ -135,6 +197,7 @@ public class Menus {
     fileClipboardDoc.setEnabled(has);
     fileClipboardDocDir.setEnabled(has);
     fileOpenFromDocDir.setEnabled(has);
+    fileSaveToDocDir.setEnabled(has);
   }
 
   private void showHasMarks(boolean has) {
@@ -155,7 +218,7 @@ public class Menus {
     //Build second menu, a longer sorter list of all files you have open:
     if (startList.size()>easyLen){
       menuX.addSeparator();
-      List<String> list=new ArrayList<String>(startList.size());
+      List<String> list=new ArrayList<>(startList.size());
       for (String s: startList)
         list.add(s);
       Collections.sort(list);
@@ -163,7 +226,7 @@ public class Menus {
         menuX.add(mu.doMenuItem(s, listener));
     }
   }
-  private void setFavorites(List<String> startList, JMenu menuX, Action listener, int skipLast) {
+  private void setFavorites(Collection<String> startList, JMenu menuX, Action listener, int skipLast) {
     JMenuItem[] skipped=new JMenuItem[skipLast];
     {
       int count=menuX.getItemCount();
@@ -193,31 +256,32 @@ public class Menus {
     int easyLen=3;
     
     //Build first menu, a quick-list of recent files:
-    for (int i=0; i<Math.min(easyLen, editors.size()); i++) {
-      Editor e=editors.get(i);
+    int i=-1, emin=Math.min(easyLen, editors.size());
+    for (Editor e: editors.forEach()){
+      ++i;
+      if (i>=emin) break;
       JMenuItem j=i==0
-        ?mu.doMenuItemCheckbox(e.title, switchListener)   
+        ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)   
         :mu.doMenuItem(
-          e.title, switchListener, -1, 
+          e.getTitle(), switchListener, -1, 
           i==1 ?KeyMapper.key(KeyEvent.VK_F12,0) :null
         );
       switchMenuToEditor.put(j, e);
       switcher.add(j);
     }
     
-    //Build second menu, a longer sorted list of remaining files you have open:
-    if (editors.size()>easyLen){
+    //Build second menu, a longer sorted list of all files:
+    if (editors.size()>emin){
       switcher.addSeparator();
       Editor first=editors.getFirst();
-      List<Editor> list=new ArrayList<Editor>(editors.size());
-      for (Editor e: editors)
+      List<Editor> list=new ArrayList<>(editors.size());
+      for (Editor e: editors.forEach())
         list.add(e);
       Collections.sort(list, switchSorter);
-      for (int i=0; i<list.size(); i++) {
-        Editor e=list.get(i);
+      for (Editor e: list) {
         JMenuItem j=e==first
-          ?mu.doMenuItemCheckbox(e.title, switchListener)   
-          :mu.doMenuItem(e.title, switchListener);
+          ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)   
+          :mu.doMenuItem(e.getTitle(), switchListener);
         switchMenuToEditor.put(j, e);
         switcher.add(j);
       }
@@ -234,7 +298,7 @@ public class Menus {
   }
   private static Comparator<Editor> switchSorter=new Comparator<Editor> () {
     public int compare(Editor e1, Editor e2) {
-      return e1.title.compareTo(e2.title);
+      return e1.getTitle().compareTo(e2.getTitle());
     }
   };
 
@@ -569,37 +633,37 @@ public class Menus {
     fileListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
-        if (s==fileOpen)         klonk.doFileOpenDialog();
+        if (s==fileOpen)         ctrlMain.doFileOpenDialog();
         else
-        if (s==fileNew)          klonk.doNew();
+        if (s==fileNew)          ctrlMain.doNew();
         else
-        if (s==fileSave)         klonk.doSave();
+        if (s==fileSave)         ctrlMain.doSave();
         else
-        if (s==fileSaveAs)       klonk.doSave(true);
+        if (s==fileSaveAs)       ctrlMain.doSave(true);
         else
-        if (s==fileClose)        klonk.doFileClose();
+        if (s==fileClose)        ctrlMain.doFileClose();
         else
-        if (s==fileCloseOthers)  klonk.doFileCloseOthers();
+        if (s==fileCloseOthers)  ctrlMain.doFileCloseOthers();
         else
-        if (s==fileCloseAll)     klonk.doFileCloseAll();
+        if (s==fileCloseAll)     ctrlMain.doFileCloseAll();
         else
-        if (s==filePrint)        klonk.doPrint();
+        if (s==filePrint)            ctrlFileOther.doPrint();
         else
-        if (s==fileDocDirWindows)    klonk.doDocumentDirectoryMSWindows();
+        if (s==fileDocDirWindows)    ctrlFileOther.doDocumentDirectoryMSWindows();
         else
-        if (s==fileClipboardDoc)     klonk.doClipboardDoc();
+        if (s==fileClipboardDoc)     ctrlFileOther.doClipboardDoc();
         else
-        if (s==fileClipboardDocDir)  klonk.doClipboardDocDir();
+        if (s==fileClipboardDocDir)  ctrlFileOther.doClipboardDocDir();
         else
-        if (s==fileOpenFromDocDir)   klonk.doOpenFromDocDir();
+        if (s==fileOpenFromDocDir)   ctrlMain.doOpenFromDocDir();
         else
-        if (s==fileSaveToDocDir)     klonk.doSaveToDocDir();
+        if (s==fileSaveToDocDir)     ctrlMain.doSaveToDocDir();
         else
-        if (s==fileFaveAddDir)       klonk.doAddCurrentToFaveDirs();
+        if (s==fileFaveAddDir)       ctrlFileOther.doAddCurrentToFaveDirs();
         else
-        if (s==fileFaveAddFile)      klonk.doAddCurrentToFaveFiles();
+        if (s==fileFaveAddFile)      ctrlFileOther.doAddCurrentToFaveFiles();
         else
-        if (s==fileExit)             klonk.doFileExit();
+        if (s==fileExit)             ctrlMain.doFileExit();
         else
           throw new RuntimeException("Invalid file event "+event);
       }
@@ -610,21 +674,21 @@ public class Menus {
     reopenListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         JMenuItem s=(JMenuItem) event.getSource();
-        klonk.doLoadFile(s.getText());
+        ctrlMain.doLoadFile(s.getText());
       }
     }
     ,
     openFromListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         JMenuItem s=(JMenuItem) event.getSource();
-        klonk.doOpenFrom(s.getText());
+        ctrlMain.doOpenFrom(s.getText());
       }
     }
     ,
     saveToListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         JMenuItem s=(JMenuItem) event.getSource();
-        klonk.doSaveTo(s.getText());
+        ctrlMain.doSaveTo(s.getText());
       }
     }
     ,
@@ -632,15 +696,15 @@ public class Menus {
     searchListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
-        if (s==searchRepeat)          klonk.doSearchRepeat();
+        if (s==searchRepeat)          ctrlSearch.doSearchRepeat();
         else
-        if (s==searchFind)            klonk.doSearchFind();
+        if (s==searchFind)            ctrlSearch.doSearchFind();
         else
-        if (s==searchReplace)         klonk.doSearchReplace();
+        if (s==searchReplace)         ctrlSearch.doSearchReplace();
         else
-        if (s==searchRepeatBackwards) klonk.doSearchRepeatBackwards();
+        if (s==searchRepeatBackwards) ctrlSearch.doSearchRepeatBackwards();
         else
-        if (s==searchGoToLine)        klonk.doSearchGoToLine();
+        if (s==searchGoToLine)        ctrlSearch.doSearchGoToLine();
         else
           throw new RuntimeException("What");
       }
@@ -650,23 +714,23 @@ public class Menus {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
         if (s==markSet) {
-          if (klonk.doMarkSet()) 
+          if (ctrlMarks.doMarkSet()) 
             showHasMarks(true);
         }
         else
         if (s==markGoToPrevious) 
-          klonk.doMarkGoToPrevious();
+          ctrlMarks.doMarkGoToPrevious();
         else
         if (s==markGoToNext)     
-          klonk.doMarkGoToNext();
+          ctrlMarks.doMarkGoToNext();
         else
         if (s==markClearCurrent) {
-          if (klonk.doMarkClearCurrent()) 
+          if (ctrlMarks.doMarkClearCurrent()) 
             showHasMarks(false);
         }
         else
         if (s==markClearAll) {    
-          klonk.doMarkClearAll();
+          ctrlMarks.doMarkClearAll();
           showHasMarks(false);
         }
         else
@@ -679,15 +743,15 @@ public class Menus {
         JMenuItem s=(JMenuItem) event.getSource();
         //Two things can happen, send go back or pick a file:
         if (s==switchBackToFront)
-          klonk.doSendBackToFront();
+          ctrlMain.doSendBackToFront();
         else
         if (s==switchFrontToBack)
-          klonk.doSendFrontToBack();
+          ctrlMain.doSendFrontToBack();
         else {
           Editor e=switchMenuToEditor.get(s);
           if (e==null)
             failer.fail(new RuntimeException("Menus.switchListener(): Null editor in hash"));
-          klonk.doSwitch(e);
+          ctrlMain.doSwitch(e);
         }
       }
     }
@@ -695,56 +759,56 @@ public class Menus {
     undoItemListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
-        if (s==undoUndo)        klonk.doUndo();
+        if (s==undoUndo)        ctrlUndo.doUndo();
         else
-        if (s==undoRedo)        klonk.doRedo();
+        if (s==undoRedo)        ctrlUndo.doRedo();
         else
-        if (s==undoFast)        klonk.doUndoFast();
+        if (s==undoFast)        ctrlUndo.doUndoFast();
         else
-        if (s==undoToBeginning) klonk.doUndoToBeginning();
+        if (s==undoToBeginning) ctrlUndo.doUndoToBeginning();
         else
-        if (s==undoRedoToEnd)   klonk.doRedoToEnd();
+        if (s==undoRedoToEnd)   ctrlUndo.doRedoToEnd();
         else
-        if (s==undoClearUndos)  klonk.doClearUndos();
+        if (s==undoClearUndos)  ctrlUndo.doClearUndos();
         else
-        if (s==undoClearRedos)  klonk.doClearRedos();
+        if (s==undoClearRedos)  ctrlUndo.doClearRedos();
         else
-        if (s==undoClearBoth)   klonk.doClearUndosAndRedos();
+        if (s==undoClearBoth)   ctrlUndo.doClearUndosAndRedos();
       }
     }
     ,
     selectionItemListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
-        if (s==selectUpperCase)             klonk.doWeirdUpperCase();
+        if (s==selectUpperCase)             ctrlSelection.doWeirdUpperCase();
         else
-        if (s==selectLowerCase)             klonk.doWeirdLowerCase();
+        if (s==selectLowerCase)             ctrlSelection.doWeirdLowerCase();
         else
-        if (s==selectSortLines)             klonk.doWeirdSortLines();
+        if (s==selectSortLines)             ctrlSelection.doWeirdSortLines();
         else
-        if (s==selectGetSelectionSize)      klonk.doWeirdSelectionSize();
+        if (s==selectGetSelectionSize)      ctrlSelection.doWeirdSelectionSize();
         else
-        if (s==selectGetAsciiValues)        klonk.doWeirdAsciiValues();
+        if (s==selectGetAsciiValues)        ctrlSelection.doWeirdAsciiValues();
       }
     }
     , 
     alignItemListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
-        if (s==weirdInsertToAlign)         klonk.doWeirdInsertToAlign(true);
+        if (s==weirdInsertToAlign)         editors.getFirst().doInsertToAlign(true);
         else
-        if (s==weirdInsertToAlignBelow)    klonk.doWeirdInsertToAlign(false);
+        if (s==weirdInsertToAlignBelow)    editors.getFirst().doInsertToAlign(false);
         else
-        if (s==weirdBackspaceToAlign)      klonk.doWeirdBackspaceToAlign(true);
+        if (s==weirdBackspaceToAlign)      editors.getFirst().doBackspaceToAlign(true);
         else
-        if (s==weirdBackspaceToAlignBelow) klonk.doWeirdBackspaceToAlign(false);
+        if (s==weirdBackspaceToAlignBelow) editors.getFirst().doBackspaceToAlign(false);
       }
     }
     , 
     externalItemListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
-        if (s==externalRunBatch)        klonk.doShell();
+        if (s==externalRunBatch)        ctrlOther.doShell();
         else
           throw new RuntimeException("Unexpected "+s);
       }
@@ -753,15 +817,15 @@ public class Menus {
     optionListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
-        if (s==optionWordWrap)        klonk.doWordWrap();
+        if (s==optionWordWrap)        ctrlOptions.doWordWrap();
         else
-        if (s==optionTabsAndIndents)  klonk.doTabsAndIndents();
+        if (s==optionTabsAndIndents)  ctrlOptions.doTabsAndIndents();
         else
-        if (s==optionLineDelimiters)  klonk.doLineDelimiters();
+        if (s==optionLineDelimiters)  ctrlOptions.doLineDelimiters();
         else
-        if (s==optionFont)            klonk.doFontAndColors();
+        if (s==optionFont)            ctrlOptions.doFontAndColors();
         else
-        if (s==optionFavorites)       klonk.doFavorites();
+        if (s==optionFavorites)       ctrlOptions.doFavorites();
       }
     }
     , 
@@ -769,10 +833,10 @@ public class Menus {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
         if (s==helpShortcut)
-          klonk.doHelpShortcuts();
+          ctrlOther.doHelpShortcuts();
         else
         if (s==helpAbout)
-          klonk.doHelpAbout();
+          ctrlOther.doHelpAbout();
       }
     }
     ;

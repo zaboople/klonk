@@ -41,6 +41,7 @@ import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.FontOptions;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.edit.MyTextArea;
 
 
@@ -71,7 +72,8 @@ class FindAndReplace {
   
   //This is so we can send updates back to the main window ourselves, as well
   //as to an alert popup:
-  Setter<String> statusBar, alerter;
+  Setter<String> alerter;
+  StatusUpdate statusBar;
   
   //Note that these are transient (so to speak) and require single-threaded
   //behavior from the class. 
@@ -84,7 +86,7 @@ class FindAndReplace {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public FindAndReplace(JFrame parentFrame, Fail fail, Setter<String> alerter, Setter<String> statusBar) {
+  public FindAndReplace(JFrame parentFrame, Fail fail, Setter<String> alerter, StatusUpdate statusBar) {
     this.parentFrame=parentFrame;
     this.statusBar=statusBar;
     this.fail=fail;
@@ -189,7 +191,7 @@ class FindAndReplace {
           .setReplace(replaceOn, mtaReplace.getText())
           .find(searchFor, forwards, chkCase.isSelected(), chkRegex.isSelected());
         if (!found) {
-          if (!foundOnce) statusBar.set("Not found");
+          if (!foundOnce) statusBar.showBad("Not found");
           return;
         }
         foundOnce|=true;
@@ -203,12 +205,12 @@ class FindAndReplace {
           target.setCaretPosition(pos);
           target.moveCaretPosition(endPos);
         }
-        statusBar.set("Found at file position: "+(pos));
+        statusBar.show("Found at file position: "+(pos));
         if (replaceOn)
           if (!mustConfirmReplace  || confirmReplace(pos, endPos)) {
             String replacement=finder.replaceResult;
             target.betterReplaceRange(replacement, pos, endPos);
-            statusBar.set("Replaced");
+            statusBar.show("Replaced");
             if (replaceAll)
               offset=pos + (forwards ?replacement.length()  :0);
             else

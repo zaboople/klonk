@@ -247,9 +247,9 @@ class LineDelimiters {
         LineDelimiters k=new LineDelimiters(context.mainFrame, context.fail);
         k.show(
           kdo,
-          new LineDelimiterListener(){ //FIXME dependencies
-            public void setDefault(String i) {System.out.println("Default "+i);}
-            public void setThis(String i)    {System.out.println("This "+i);   }
+          new LineDelimiterListener(){ 
+            public void setDefault(String i) {System.out.println("Default >"+i+"<");}
+            public void setThis(String i)    {System.out.println("This >"+i+"<");   }
           }
         );
       }

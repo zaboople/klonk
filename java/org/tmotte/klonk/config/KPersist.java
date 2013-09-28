@@ -154,7 +154,7 @@ public class KPersist {
     return fo;
   }
 
-  // RECENT FILES & DIRECTORIES: //
+  // RECENT FILES & DIRECTORIES & COMMANDS: //
 
   public KPersist setCommands(List<String> recentCommands){
     setFiles(recentCommands, "File.Batch.", maxRecent);
@@ -165,17 +165,15 @@ public class KPersist {
     return getFiles(recentCommands, "File.Batch.", maxRecent);
   }
   
-  public void getFiles(
-      List<String> recentFiles, 
-      List<String> recentDirs,
-      List<String> faveFiles, 
-      List<String> faveDirs
-    ) {
-    getFiles(recentFiles,  "File.RecentFiles.", maxRecent);
+  public void getFavorites(List<String> faveFiles,  List<String> faveDirs) {
     getFiles(faveFiles,    "File.Favorite.Files.", maxFavorite);
-    getFiles(recentDirs,   "File.RecentDirs." , maxRecent);
     getFiles(faveDirs,     "File.Favorite.Dirs." , maxFavorite);
   }
+  public void getRecent(List<String> recentFiles,  List<String> recentDirs) {
+    getFiles(recentFiles,  "File.RecentFiles.",    maxRecent);
+    getFiles(recentDirs,   "File.RecentDirs." ,    maxRecent);
+  }
+  
   public void setRecentFiles(List<String> files) {
     recentFilesCache=files;
     hasChanges=true;

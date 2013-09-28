@@ -34,7 +34,6 @@ class Shell {
 
   private boolean shownBefore=false;
   private List<String> persistedFiles=new LinkedList<>();
-  private int maxRecent=1;
 
   private JFrame win;
   private MyTextArea mtaOutput;
@@ -50,7 +49,6 @@ class Shell {
     this.persist=persist;
     this.currFileGetter=cfGetter;
     persist.getCommands(persistedFiles);
-    this.maxRecent=persist.maxRecent;
     create(img);
     layout(); 
     listen();
@@ -121,7 +119,7 @@ class Shell {
     return index;
   }
   private void save(DefaultComboBoxModel<String> lm, List<String> names) {
-    while (lm.getSize()>maxRecent)
+    while (lm.getSize()>KPersist.maxFavorite)
       lm.removeElementAt(lm.getSize()-1);
     names.clear();
     int size=lm.getSize();
