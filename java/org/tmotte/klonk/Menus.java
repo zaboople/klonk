@@ -59,7 +59,7 @@ public class Menus {
                 search, mark, switcher, undo, select, align, external, options, help;
   private JMenuItem fileOpen, fileSave, fileNew, fileSaveAs, fileClose, 
                     fileCloseOthers, fileCloseAll,
-                    filePrint,              
+                    filePrint,
                     fileDocDirWindows, fileClipboardDoc, fileClipboardDocDir, 
                     fileOpenFromDocDir, fileSaveToDocDir,
                     fileFaveAddFile, fileFaveAddDir,

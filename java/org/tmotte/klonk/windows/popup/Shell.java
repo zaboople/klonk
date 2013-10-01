@@ -242,6 +242,8 @@ class Shell {
            bEnd="</b>";
 
     win=new JFrame("Klonk: Run batch program:");
+    win.setPreferredSize(new java.awt.Dimension(450, 450));
+        
     win.setIconImage(img);
 
     btnSelectFile=new JButton("File...");
@@ -274,7 +276,6 @@ class Shell {
   }
   private MyTextArea getMTA(){
     MyTextArea mta=new MyTextArea();
-    mta.setPreferredSize(new java.awt.Dimension(250, 350));
     mta.setLineWrap(true);
     mta.setWrapStyleWord(false);
     mta.setEditable(true);

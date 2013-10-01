@@ -93,75 +93,19 @@ public class Boot {
     
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        startSwing(args, home, log, fileListen);
+        //startSwing(args, home, log, fileListen);
+        startSwing(args, new BootContext(home, log, fileListen));
       }
     });
   }
-
-  private static void startSwing(String[] args, KHome home, KLog log, FileListen fileListen) {
-    //Persist:
-    final KPersist persist=new KPersist(home, log);
-
-    //Main controller. 
-    final CtrlMain ctrlMain=new CtrlMain(log, persist);
-    Editors editors=ctrlMain.getEditors();
-
-    //Main Frame:
-    JFrame frame=new JFrame("Klonk");
-    frame.setIconImage(getAppIcon());
-
-    //Layout; display starts here:
-    final MainLayout layout=new MainLayout(frame, ctrlMain.getAppCloseListener());
-    layout.show(
-      persist.getWindowBounds(
-        new java.awt.Rectangle(10, 10, 300, 300)
-      ),
-      persist.getWindowMaximized()
-    );
-    StatusUpdate statusBar=layout.getStatusBar(); 
-
-    //Popups:
-    Popups popups=new Popups(
-        home, log, frame, persist, statusBar
-        ,getPopupIcon() 
-        ,ctrlMain.getCurrFileNameGetter()
-      );
-
-    //Menus & Controllers & JMenuBar:
-    final Menus menus=new Menus(editors, log);
-    menus.setFastUndos(persist.getFastUndos())
-         .setWordWrap(persist.getWordWrap());
-    Favorites favorites=new Favorites(
-      persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
-    );
-    menus.setControllers(
-       ctrlMain
-      ,new CtrlMarks    (editors, statusBar)
-      ,new CtrlSelection(editors, popups, statusBar)
-      ,new CtrlUndo     (editors, popups, statusBar, persist)
-      ,new CtrlSearch   (editors, popups)
-      ,new CtrlOptions  (editors, popups, statusBar, persist, favorites, ctrlMain.getLineDelimiterListener())
-      ,new CtrlFileOther(editors, statusBar, favorites)
-      ,new CtrlOther    (popups)
-    );
-    frame.setJMenuBar(menus.getMenuBar());
-
-    //Now we loop back to ctrlMain to fill in its circular dependencies:
-    //(Menus currently has access to ctrlMain, so it could that part itself:)
-    ctrlMain.setLayout(layout.getMainDisplay(), statusBar);
-    ctrlMain.setPopups(popups);
-    ctrlMain.setListeners(
-      fileListen.getLockRemover(),
-      menus.getEditorSwitchListener(),
-      menus.getRecentFileListener(),
-      menus.getRecentDirListener()
-    );
-    
-    //Now start a new editor and loading files:
+  
+  private static void startSwing(String[] args, BootContext context) {
+    CtrlMain ctrlMain=context.getMainController();
     ctrlMain.doNew();
     ctrlMain.doLoadFiles(args);
-    fileListen.startDirectoryListener(ctrlMain.getFileReceiver());
+    context.getFileListener().startDirectoryListener(ctrlMain.getFileReceiver());
   }
+
   
   
   public static Popups getPopupsForUnitTest() {

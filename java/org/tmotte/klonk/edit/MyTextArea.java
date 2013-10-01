@@ -144,7 +144,6 @@ public class MyTextArea extends JTextArea {
     //Default scroll mode is the "BLIT" scroll mode, which doesn't seem to be as fast.
     JViewport jvp=jsp.getViewport();
     jvp.setScrollMode(jvp.SIMPLE_SCROLL_MODE);
-    
     return jsp;
   }
   public boolean isAnythingSelected() {
