@@ -11,7 +11,7 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import org.tmotte.common.swang.Fail;
-import org.tmotte.klonk.config.FontOptions;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.Boot;
 
 /** 

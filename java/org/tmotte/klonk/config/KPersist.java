@@ -12,6 +12,9 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Properties;
 import org.tmotte.common.swang.Fail;
+import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.option.TabAndIndentOptions;
+import org.tmotte.klonk.config.option.LineDelimiterOptions;
 
 public class KPersist {
   public static int maxRecent=15;

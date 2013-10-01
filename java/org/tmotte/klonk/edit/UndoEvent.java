@@ -16,4 +16,7 @@ public class UndoEvent {
     isUndoSaveStable=true;
     return this;
   }
+  public String toString(){
+    return "No more undos: "+isNoMoreUndos+" No more redos: "+isNoMoreRedos+" Stable: "+isUndoSaveStable;
+  }
 }

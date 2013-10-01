@@ -1,4 +1,4 @@
-package org.tmotte.klonk.config;
+package org.tmotte.klonk.config.option;
 import org.tmotte.common.swang.Fail;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;

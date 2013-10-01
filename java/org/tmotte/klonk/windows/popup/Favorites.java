@@ -34,7 +34,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.Boot;
 import org.tmotte.klonk.edit.MyTextArea;
-import org.tmotte.klonk.config.FontOptions;
+import org.tmotte.klonk.config.option.FontOptions;
 
 class Favorites {
 

@@ -39,7 +39,7 @@ import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
-import org.tmotte.klonk.config.FontOptions;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.edit.MyTextArea;

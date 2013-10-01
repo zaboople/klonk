@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import javax.swing.JTextArea;
 import javax.swing.text.Document;
 import org.tmotte.common.text.StringChunker;
-import org.tmotte.klonk.config.LineDelimiterOptions;
+import org.tmotte.klonk.config.option.LineDelimiterOptions;
 
 
 public class KFileIO {

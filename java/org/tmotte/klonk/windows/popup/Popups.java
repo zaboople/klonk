@@ -9,14 +9,14 @@ import java.io.File;
 import java.util.Collection;
 import javax.swing.JFrame;
 import org.tmotte.common.swang.Fail;
-import org.tmotte.klonk.config.FontOptions;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.config.LineDelimiterOptions;
-import org.tmotte.klonk.config.TabAndIndentOptions;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
+import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.option.LineDelimiterOptions;
+import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 
 /**

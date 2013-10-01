@@ -33,8 +33,8 @@ import javax.swing.text.Document;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
-import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.TabAndIndentOptions;
+import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.edit.Spaceable;
 import org.tmotte.klonk.edit.UndoListener;
@@ -679,8 +679,8 @@ public class Editor {
   }   
   private UndoListener myUndoListener=new UndoListener() {
     public void happened(UndoEvent ue) {
-      if (unsavedChanges==ue.isUndoSaveStable) {
-        unsavedChanges=!ue.isUndoSaveStable;
+      if (unsavedChanges && ue.isUndoSaveStable) {
+        unsavedChanges=false;
         editListener.doEditorChanged(Editor.this);
       }
       if ((ue.isNoMoreUndos || ue.isUndoSaveStable) && file==null && jta.getLineCount()==1 && "".equals(jta.getText())){
@@ -696,6 +696,7 @@ public class Editor {
 
 
   private void doLoadFile(File file, String defaultLineBreaker) throws Exception {
+    jta.reset();
     jta.setSuppressUndo(true);
     jta.getDocument().removeDocumentListener(docListener);
     try {

@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Iterator;
 import javax.swing.SwingWorker;
 import org.tmotte.common.swang.Fail;
-import org.tmotte.klonk.config.FontOptions;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.config.LineDelimiterOptions;
-import org.tmotte.klonk.config.TabAndIndentOptions;
+import org.tmotte.klonk.config.option.LineDelimiterOptions;
+import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.MainDisplay;
@@ -549,9 +549,6 @@ public class CtrlMain  {
       else
       if (ue.isNoMoreRedos)
         statusBar.showBad("No more redos.");
-      else
-      if (ue.isUndoSaveStable)
-        stabilityChange(editorMgr.getFirst());
     }
   };
 

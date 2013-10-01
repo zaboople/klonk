@@ -186,6 +186,7 @@ public class MyTextArea extends JTextArea {
     setSuppressUndo(true);
     undos.clearUndos();
     undos.clearRedos();
+    undos.markSave();
     setText("");
     setSuppressUndo(false);
   }
@@ -845,10 +846,6 @@ public class MyTextArea extends JTextArea {
 
   
   private boolean checkUnstableAndFast(UndoStep newStep) { 
-    if (undos.isSavedState()){
-      fireUndoEvent(new UndoEvent().setUndoSaveStable());
-      return false;
-    }
     //Agree to fast undo if we aren't in stable state, and
     //either fast undos are on, or we have a doubleUp 
     return checkUnstable() && (fastUndos || newStep.doubleUp);

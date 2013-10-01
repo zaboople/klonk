@@ -5,9 +5,9 @@ import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.windows.popup.Popups;
 import java.util.LinkedList;
-import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.LineDelimiterOptions;
-import org.tmotte.klonk.config.TabAndIndentOptions;
+import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.option.LineDelimiterOptions;
+import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 
 public class CtrlOptions {
