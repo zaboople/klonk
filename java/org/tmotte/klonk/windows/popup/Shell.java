@@ -20,7 +20,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.PopupContext;
+import org.tmotte.klonk.config.Boot;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.edit.MyTextArea;
@@ -42,7 +42,8 @@ class Shell {
   private DefaultComboBoxModel<String> jcbPreviousData=new DefaultComboBoxModel<>();
   private Font fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
 
-  public Shell(JFrame parentFrame, Fail fail, Popups popups, Image img, KPersist persist, Getter<String> cfGetter) {
+  public Shell(JFrame parentFrame, Fail fail, KPersist persist, 
+               Popups popups, Image img, Getter<String> cfGetter) {
     this.parentFrame=parentFrame;
     this.fail=fail;
     this.popups=popups;
@@ -273,8 +274,7 @@ class Shell {
   }
   private MyTextArea getMTA(){
     MyTextArea mta=new MyTextArea();
-    mta.setRows(7);
-    mta.setColumns(60);
+    mta.setPreferredSize(new java.awt.Dimension(250, 350));
     mta.setLineWrap(true);
     mta.setWrapStyleWord(false);
     mta.setEditable(true);
@@ -440,16 +440,8 @@ class Shell {
   public static void main(String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        final PopupContext context=PopupContext.getForUnitTest();
-        
-        //Show the window:
-        Shell pop=new Shell(
-          context.mainFrame, context.fail, context.popups, 
-          context.iconImageFindReplace, context.persist, context.currentFileGetter
-        );
-        pop.setFont(context.persist.getFontAndColors());
-        pop.show();
-                
+        final Popups popups=Boot.getPopupsForUnitTest();
+        popups.showShell();
       }
     });  
   }

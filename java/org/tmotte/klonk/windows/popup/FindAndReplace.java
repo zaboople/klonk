@@ -653,8 +653,5 @@ class FindAndReplace {
     chkConfirmReplace.setEnabled(replaceOn && !chkReplaceAll.isSelected());
   }
 
-
-
-
   
 }

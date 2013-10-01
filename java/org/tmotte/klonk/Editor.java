@@ -69,7 +69,8 @@ public class Editor {
   /////////////////////////
 
   public Editor(
-      EditorListener editListener, Fail fail, UndoListener undoL, 
+      Fail fail, 
+      EditorListener editListener, UndoListener undoL, 
       String lineBreaker, boolean wordWrap
     ) {
     this.editListener=editListener;

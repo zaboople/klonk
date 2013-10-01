@@ -16,6 +16,7 @@ import org.tmotte.klonk.config.LineDelimiterOptions;
 import org.tmotte.klonk.config.TabAndIndentOptions;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Editors;
+import org.tmotte.klonk.config.msg.MainDisplay;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
@@ -24,14 +25,13 @@ import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.EditorListener;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
-import org.tmotte.klonk.windows.MainLayout; 
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups; 
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
 
 /** Refer to org.tmotte.klonk.config.Boot for application startup */
 
-public class CtrlMain implements EditorListener {
+public class CtrlMain  {
 
 
   /////////////////////
@@ -41,18 +41,13 @@ public class CtrlMain implements EditorListener {
   /////////////////////
 
   
-  //Main GUI components:
-  private MainLayout layout;
+  //DI-injected stuff:
   private Popups popups;
-  private boolean anyUnsaved=false;
-  private boolean thisUnsaved=false;
-  private StatusUpdate statusBar;
-  
-  //Configuration stuff:
   private KPersist persist;
+  private StatusUpdate statusBar;
   private Fail fail;
   private Doer lockRemover, editorSwitchedListener;
-  private Recents recents;
+  private MainDisplay layout;
 
   //Editors list:
   private LinkedList<Editor> editors=new LinkedList<>();
@@ -62,10 +57,14 @@ public class CtrlMain implements EditorListener {
     public int size() {return editors.size();}
   };
 
+  //Other components:
+  private boolean anyUnsaved=false;
+  private boolean thisUnsaved=false;
+  private Recents recents;
+
   //Constructor:
-  public CtrlMain(Fail fail, final KPersist persist, Doer lockRemover) {
+  public CtrlMain(Fail fail, final KPersist persist) {
     this.fail=fail;
-    this.lockRemover=lockRemover;
     this.persist=persist;
     recents=new Recents(persist); 
   }
@@ -74,7 +73,9 @@ public class CtrlMain implements EditorListener {
   //DI initialization functions: //
   /////////////////////////////////
   
-  public void setLayout(MainLayout layout, StatusUpdate statusBar) {
+  // DI SET: //
+  
+  public void setLayout(MainDisplay layout, StatusUpdate statusBar) {
     this.layout=layout;
     this.statusBar=statusBar;
   }
@@ -82,15 +83,20 @@ public class CtrlMain implements EditorListener {
     this.popups=p;
   }
   public void setListeners(
+      Doer lockRemover,
       Doer editorSwitchListener,
       Setter<List<String>> recentFileListener,
       Setter<List<String>> recentDirListener
     ) {  
+    this.lockRemover=lockRemover;
     this.editorSwitchedListener=editorSwitchListener;
     this.recents.setFileListener(recentFileListener);
     this.recents.setDirListener(recentDirListener);
   }
   
+
+  // DI GET: //
+
   public Editors getEditors() {
     return editorMgr;
   }
@@ -110,7 +116,7 @@ public class CtrlMain implements EditorListener {
     return new Doer() {
       //This is the application close listener:
       public @Override void doIt() 
-        {tryExitSystem();}
+        {tryExit();}
     };
   }
   public LineDelimiterListener getLineDelimiterListener() {
@@ -128,31 +134,29 @@ public class CtrlMain implements EditorListener {
     };  
   }
   
-  /////////////////////////
-  // STARTUP & SHUTDOWN: //
-  /////////////////////////
-  
-  
-  public void begin(final String[] args) {
-    newEditor();
+  //DI OTHER: //
+ 
+  public void doLoadFiles(String[] args) {
     loadFiles(args);
   }
-
-  public void tryExitSystem() {
-    while (editorMgr.size()>0)
-      if (!fileCloseLastFirst(true))
-        return;
-    if (!layout.isMaximized()) {
-      persist.setWindowBounds(layout.getMainWindowBounds());
-      persist.setWindowMaximized(false);
+  private EditorListener editorListener=new EditorListener(){
+    public void doCapsLock(boolean state) {
+      statusBar.showCapsLock(state);
     }
-    else
-      persist.setWindowMaximized(true);
-    persist.save();
-    lockRemover.doIt();
-    layout.dispose();
-    System.exit(0);
-  }
+    public void doCaretMoved(Editor editor, int dotPos) {
+      editorCaretMoved(editor, dotPos);
+    }
+    public void doEditorChanged(Editor e) {
+      stabilityChange(e);
+    }
+    public void fileDropped(File file) {
+      loadFile(file);
+    }
+    public void closeEditor() {
+      fileClose(false);
+    }
+  };
+
  
   //////////////////////
   //                  //
@@ -205,9 +209,8 @@ public class CtrlMain implements EditorListener {
   public void doLoadFile(String file) {
     loadFile(new File(file));
   }
-
  
-  // FILE OPEN FROM/SAVE TO: //
+  // FILE OPEN FROM: //
   public void doOpenFromDocDir() {
     File file;
     if ((file=popups.showFileDialogForDir(false, editorMgr.getFirst().getFile().getParentFile()))!=null)
@@ -220,21 +223,23 @@ public class CtrlMain implements EditorListener {
       )!=null)
       loadFile(file);
   }
+  
+  // FILE SAVE TO: //
   public void doSaveToDocDir() {
     File file;
     Editor ed=editorMgr.getFirst();
-    if ((file=showFileSaveDialog(null, ed.getFile().getParentFile()))!=null)
+    if ((file=showFileDialogForSave(null, ed.getFile().getParentFile()))!=null)
       fileSave(ed, file, true);
   }
   public void doSaveTo(String dir) {
     File file;
     if ((
-      file=showFileSaveDialog(null, new File(dir)) 
+      file=showFileDialogForSave(null, new File(dir)) 
       )!=null)
       fileSave(editorMgr.getFirst(), file, true);
   }
   public void doFileExit() {
-    tryExitSystem();
+    tryExit();
   }
   
   //////////////////
@@ -256,26 +261,6 @@ public class CtrlMain implements EditorListener {
   }
 
   
-  ////////////////////
-  // EDITOR EVENTS: //
-  ////////////////////
-
-  public void doCapsLock(boolean state) {
-    layout.showCapsLock(state);
-  }
-  public void doCaretMoved(Editor editor, int dotPos) {
-    editorCaretMoved(editor, dotPos);
-  }
-  public void doEditorChanged(Editor e) {
-    stabilityChange(e);
-  }
-  public void fileDropped(File file) {
-    loadFile(file);
-  }
-  public void closeEditor() {
-    fileClose(false);
-  }
-  
 
   ///////////////////////
   //                   //
@@ -283,6 +268,22 @@ public class CtrlMain implements EditorListener {
   //                   //
   ///////////////////////
 
+
+  private void tryExit() {
+    while (editorMgr.size()>0)
+      if (!fileCloseLastFirst(true))
+        return;
+    if (!layout.isMaximized()) {
+      persist.setWindowBounds(layout.getBounds());
+      persist.setWindowMaximized(false);
+    }
+    else
+      persist.setWindowMaximized(true);
+    persist.save();
+    lockRemover.doIt();
+    System.exit(0);
+  }
+ 
   private String getCurrentFileName() {
     File file=editorMgr.getFirst().getFile();
     return file==null ?null :getFullPath(file);
@@ -295,14 +296,14 @@ public class CtrlMain implements EditorListener {
 
   private void editorCaretMoved(Editor e, int caretPos) {
     showCaretPos(e, caretPos);
-    layout.showNoStatus();
+    statusBar.showNoStatus();
   }
   private void showCaretPos(Editor e) {
     showCaretPos(e, e.getCaretPos());
   }
   private void showCaretPos(Editor e, int caretPos) {
     int rowPos=e.getRow(caretPos);
-    layout.showRowColumn(rowPos+1, caretPos-e.getRowOffset(rowPos));
+    statusBar.showRowColumn(rowPos+1, caretPos-e.getRowOffset(rowPos));
   }
   
   ////////////////
@@ -319,7 +320,7 @@ public class CtrlMain implements EditorListener {
       File dir=oldFile==null && recents.hasDirs()
         ?new File(recents.getFirstDir())
         :null;
-      if ((file=showFileSaveDialog(oldFile, dir))==null){
+      if ((file=showFileDialogForSave(oldFile, dir))==null){
         statusBar.showBad("File save cancelled");
         return false;
       }
@@ -346,7 +347,7 @@ public class CtrlMain implements EditorListener {
     persist.checkSave();
     return true;
   }
-  private File showFileSaveDialog(File f, File dir) {
+  private File showFileDialogForSave(File f, File dir) {
     File file;
     if (f!=null)
       file=popups.showFileDialog(true,  f);
@@ -417,7 +418,7 @@ public class CtrlMain implements EditorListener {
   // FILE LOAD: //
   ////////////////
 
-  private void doLoadAsync(final List<String> fileNames) {
+  private void doLoadAsync(final List<String> fileNames) { //FIXME this uses Swing. Bad.
     //Do nothing in the doInBackground() thread, since it is not
     //a GUI thread. Do it all in done(), which is sync'd to GUI events,
     //IE EventDispatch.
@@ -501,7 +502,7 @@ public class CtrlMain implements EditorListener {
   }
   private Editor newEditor(){
     Editor e=new Editor(
-      this, fail, myUndoListener, 
+      fail, editorListener, myUndoListener, 
       persist.getDefaultLineDelimiter(), persist.getWordWrap()
     ); 
     e.setFastUndos(persist.getFastUndos());
@@ -516,7 +517,7 @@ public class CtrlMain implements EditorListener {
     return e;
   }
   private void setEditor(Editor e) {
-    layout.setEditor(e.getContainer(), e.getTitle());
+    layout.setEditor(e.getContainer());
     editorSwitched(e);
     e.requestFocus();
   }
@@ -578,10 +579,10 @@ public class CtrlMain implements EditorListener {
   }
   private void showLights() {
     //This adjusts the red/blue lights:
-    layout.showChangeThis(thisUnsaved);
+    statusBar.showChangeThis(thisUnsaved);
     if (thisUnsaved) {
       if (!anyUnsaved)
-        layout.showChangeAny(anyUnsaved=true);
+        statusBar.showChangeAny(anyUnsaved=true);
       return;
     }
     else 
@@ -589,7 +590,7 @@ public class CtrlMain implements EditorListener {
       for (Editor ed: editors)
         if (ed.hasUnsavedChanges())
           return;
-    layout.showChangeAny(anyUnsaved=false);
+    statusBar.showChangeAny(anyUnsaved=false);
   }
   /** Invoked whenever we switch to a different editor, 
       or current editor is used to open a file
@@ -597,7 +598,7 @@ public class CtrlMain implements EditorListener {
   private void editorSwitched(Editor e) {
     thisUnsaved=e.hasUnsavedChanges();
     showLights();
-    layout.showTitle(e.getTitle());
+    statusBar.showTitle(e.getTitle());
     showCaretPos(e);
     editorSwitchedListener.doIt();
   }

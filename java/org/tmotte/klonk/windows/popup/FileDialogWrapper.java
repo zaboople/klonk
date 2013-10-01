@@ -12,7 +12,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.KHome;
+import org.tmotte.klonk.config.Boot;
 
 /** 
  * The FileDialog/JFileChooser classes already do most of the work, so this just does a minimal 
@@ -78,6 +78,17 @@ class FileDialogWrapper {
         throw new RuntimeException(e);
       }
   }
-
+  public static void main(String[] args) {
+    Popups p=Boot.getPopupsForUnitTest();
+    File d=new File(args[0]),
+         f=new File(args[1]);
+    System.out.println("For save: >"+p.showFileDialog(true)+"<");
+    System.out.println("For save to file: >"+p.showFileDialog(true, f)+"<");
+    System.out.println("For save to dir: >"+p.showFileDialogForDir(true, d)+"<");
+  
+    System.out.println("For open: >"+p.showFileDialog(false)+"<");
+    System.out.println("For open to file: >"+p.showFileDialog(false, f)+"<");
+    System.out.println("For open to dir: >"+p.showFileDialogForDir(false, d)+"<");
+  }
 
 }

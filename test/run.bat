@@ -10,7 +10,7 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 REM run it:
 set CLASSPATH=build
 echo %1 %2 %3
-java %1 %2 %3 %4 %5 %6 %7 %8 %9
+java -Xshare:off %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 
 

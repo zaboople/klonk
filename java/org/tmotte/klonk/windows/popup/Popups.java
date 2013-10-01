@@ -10,21 +10,18 @@ import java.util.Collection;
 import javax.swing.JFrame;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.PopupContext;
+import org.tmotte.klonk.config.KHome;
+import org.tmotte.klonk.config.KPersist;
+import org.tmotte.klonk.config.LineDelimiterOptions;
+import org.tmotte.klonk.config.TabAndIndentOptions;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
-import org.tmotte.klonk.config.KHome;
-import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.config.PopupContext;
-import org.tmotte.klonk.config.LineDelimiterOptions;
-import org.tmotte.klonk.config.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 
-
 /**
- * This is a sort of sublayer in our DI/IoC setup. Boot creates PopupContext creates Popups. Among other things, 
- * Popups is separated because it does lazy initialization.
+ * This is a sort of sublayer in our DI/IoC setup. Note that
+ * Popups does lazy initialization.
  */
 public class Popups {
 
@@ -52,7 +49,7 @@ public class Popups {
   private KPersist persist;
   private StatusUpdate statusBar;
   private Getter<String> currFileGetter;
-  private Image iconImageFindReplace;    
+  private Image iconImagePopup;    
 
   //Other components. Well at least it's just this one:
   private FontOptions fontOptions; 
@@ -61,14 +58,19 @@ public class Popups {
   // INITIALIZATION AND CONFIGURATION: //
   ///////////////////////////////////////
   
-  public Popups(PopupContext context, Getter<String> currFileGetter) {
-    this.mainFrame=context.mainFrame;
-    this.statusBar=context.statusBar;
-    this.fail=context.fail;
-    this.persist=context.persist;
-    this.home=context.home;
-    this.iconImageFindReplace=context.iconImageFindReplace;
+  public Popups(
+      KHome home, Fail fail, JFrame mainFrame, KPersist persist, StatusUpdate statusBar, 
+      Image iconImagePopup, Getter<String> currFileGetter
+    ) {
+    this.home          =home;
+    this.fail          =fail;
+    this.mainFrame     =mainFrame;
+    this.statusBar     =statusBar;
+    this.persist       =persist;
+    this.iconImagePopup=iconImagePopup;
     this.currFileGetter=currFileGetter;
+    //A little more setup:
+    this.fontOptions   =persist.getFontAndColors();
   }
 
   public void setFontAndColors(FontOptions fo) {
@@ -81,6 +83,9 @@ public class Popups {
       favorites.setFont(fontOptions);
     if (shell!=null)
       shell.setFont(fontOptions);
+  }
+  public JFrame getMainFrame() {
+    return mainFrame;
   }
 
   ///////////////////////////
@@ -142,7 +147,7 @@ public class Popups {
       statusBar.showBad("Go to line cancelled.");
     else
     if (!target.goToLine(i-1))
-      statusBar.showBad("Line number "+i+" is out of range"); //FIXME needs StatusUpdater here to red out the message
+      statusBar.showBad("Line number "+i+" is out of range"); 
   }
   public void showLineDelimiters(LineDelimiterOptions k, LineDelimiterListener k2){
     getLineDelimiters().show(k, k2);
@@ -192,8 +197,8 @@ public class Popups {
   private Shell getShell() {
     if (shell==null) {
       shell=new Shell(
-        mainFrame, fail, this, 
-        iconImageFindReplace, persist, currFileGetter
+        mainFrame, fail, persist, this, 
+        iconImagePopup, currFileGetter
       );
       shell.setFont(fontOptions);
     }

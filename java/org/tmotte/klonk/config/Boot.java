@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.Menus;
+import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Getter;
@@ -88,7 +89,6 @@ public class Boot {
     );
     initLookFeel();
     
-    
     /* 2. Now get all the swing details going: */
     
     SwingUtilities.invokeLater(new Runnable() {
@@ -103,12 +103,12 @@ public class Boot {
     final KPersist persist=new KPersist(home, log);
 
     //Main controller. 
-    final CtrlMain ctrlMain=new CtrlMain(log, persist, fileListen.getLockRemover());
+    final CtrlMain ctrlMain=new CtrlMain(log, persist);
     Editors editors=ctrlMain.getEditors();
 
     //Main Frame:
     JFrame frame=new JFrame("Klonk");
-    frame.setIconImage(getIcon("org/tmotte/klonk/windows/app.png", Boot.class));
+    frame.setIconImage(getAppIcon());
 
     //Layout; display starts here:
     final MainLayout layout=new MainLayout(frame, ctrlMain.getAppCloseListener());
@@ -118,20 +118,19 @@ public class Boot {
       ),
       persist.getWindowMaximized()
     );
-    StatusUpdate statusBar=new StatusUpdate(){ 
-      public void show(String s)    {layout.showStatus(s, false); }
-      public void showBad(String s) {layout.showStatus(s, true);}
-    };
+    StatusUpdate statusBar=layout.getStatusBar(); 
 
     //Popups:
-    Popups popups=new PopupContext(
-        home, log, frame, persist, statusBar, ctrlMain.getCurrFileNameGetter()
-      ).popups;
+    Popups popups=new Popups(
+        home, log, frame, persist, statusBar
+        ,getPopupIcon() 
+        ,ctrlMain.getCurrFileNameGetter()
+      );
 
     //Menus & Controllers & JMenuBar:
     final Menus menus=new Menus(editors, log);
     menus.setFastUndos(persist.getFastUndos())
-        .setWordWrap(persist.getWordWrap());
+         .setWordWrap(persist.getWordWrap());
     Favorites favorites=new Favorites(
       persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
     );
@@ -149,38 +148,42 @@ public class Boot {
 
     //Now we loop back to ctrlMain to fill in its circular dependencies:
     //(Menus currently has access to ctrlMain, so it could that part itself:)
-    ctrlMain.setLayout(layout, statusBar);
+    ctrlMain.setLayout(layout.getMainDisplay(), statusBar);
     ctrlMain.setPopups(popups);
     ctrlMain.setListeners(
+      fileListen.getLockRemover(),
       menus.getEditorSwitchListener(),
       menus.getRecentFileListener(),
       menus.getRecentDirListener()
     );
-    ctrlMain.begin(args);
-
-    //Starts thread to listen for other instances:
+    
+    //Now start a new editor and loading files:
+    ctrlMain.doNew();
+    ctrlMain.doLoadFiles(args);
     fileListen.startDirectoryListener(ctrlMain.getFileReceiver());
   }
   
   
-  public static PopupContext getForUnitTest() {
+  public static Popups getPopupsForUnitTest() {
 
     //Create frame that can die off on ESC or when unit test tells it
     //to die via JFrame.dispose()
     initLookFeel();
     final JFrame frame=new JFrame("Klonk");
-    frame.addKeyListener(new KeyAdapter() {
+    KeyAdapter ka=new KeyAdapter() {
       public void keyPressed(KeyEvent e){
         if (e.getKeyCode()==KeyEvent.VK_ESCAPE)
           System.exit(0);
       }
-    });
+    };
+    frame.addKeyListener(ka);
     frame.addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e){
         System.exit(0);
       }
     });
     frame.setVisible(true);
+    frame.setBounds(new java.awt.Rectangle(100,100,300,300));
     frame.toFront();
 
     //Return a custom context. At some point we might change the
@@ -188,15 +191,20 @@ public class Boot {
     //but for now it's fine:
     KHome home=new KHome("./test/home");
     KLog log=new KLog(System.out);
-    return new PopupContext(
+    return new Popups (
       home, log, frame, 
       new KPersist(home, log), 
       new StatusUpdate(){
-        public void show(String msg) 
-          {System.out.println(msg);}
-        public void showBad(String msg) 
-          {System.out.println("***"+msg+"***");}
+        public void show(String msg)   {System.out.println(msg);}
+        public void showBad(String msg){System.out.println("***"+msg+"***");}
+        public void showCapsLock(boolean b)           {}
+        public void showNoStatus()                    {}
+        public void showRowColumn(int row, int column){}
+        public void showChangeThis(boolean b){}
+        public void showChangeAny(boolean b) {}
+        public void showTitle(String title)  {}
       },
+      getPopupIcon(),
       new Getter<String>(){
         public String get(){return "-none-";}
       }
@@ -216,8 +224,15 @@ public class Boot {
       throw new RuntimeException(e);
     }
   }
-  static Image getIcon(String filename, Class cl) {
-    URL url=cl.getClassLoader().getResource(filename);
+  static Image getPopupIcon() {
+    return getIcon("org/tmotte/klonk/windows/app-find-replace.png");  
+  }
+  static Image getAppIcon() {
+    return getIcon("org/tmotte/klonk/windows/app.png");
+  }
+  
+  static Image getIcon(String filename) {
+    URL url=Boot.class.getClassLoader().getResource(filename);
     ImageIcon ii=new ImageIcon(url);
     return ii.getImage();
   }

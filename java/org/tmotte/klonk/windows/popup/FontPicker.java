@@ -38,13 +38,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.tmotte.common.io.Loader;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.PopupContext;
+import org.tmotte.klonk.config.Boot;
 import org.tmotte.klonk.edit.MyTextArea;
 
 class FontPicker {
@@ -513,12 +512,8 @@ class FontPicker {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          PopupContext context=PopupContext.getForUnitTest();
-          FontPicker pop=new FontPicker(
-            context.mainFrame, context.fail, context.popups
-          );
-          pop.show(new FontOptions());
-          context.mainFrame.dispose();
+          Popups p=Boot.getPopupsForUnitTest();
+          p.doFontAndColors(new FontOptions());
         } catch (Exception e) {
           e.printStackTrace();
         }

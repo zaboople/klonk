@@ -16,8 +16,6 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.BorderFactory;
@@ -33,6 +31,9 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.msg.Doer;
+import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.MainDisplay;
+import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 
@@ -70,6 +71,43 @@ public class MainLayout {
     layout();
     this.appCloseListener=appCloseListener;
   }
+  
+  
+  
+  
+  
+  /////////////////////
+  // PUBLIC METHODS: //
+  /////////////////////
+
+  // DI STUFF //
+  
+  public StatusUpdate getStatusBar() {
+    return new StatusUpdate(){ //FIXME make the below methods private (the right hand methods)
+      public void show(String s)                    {MainLayout.this.showStatus(s, false); }
+      public void showBad(String s)                 {MainLayout.this.showStatus(s, true);}
+      public void showCapsLock(boolean b)           {MainLayout.this.showCapsLock(b);}
+      public void showNoStatus()                    {MainLayout.this.showNoStatus();}
+      public void showRowColumn(int row, int column){MainLayout.this.showRowColumn(row,column);}
+      public void showChangeThis(boolean b)         {MainLayout.this.showChangeThis(b);}
+      public void showChangeAny(boolean b)          {MainLayout.this.showChangeAny(b);}
+      public void showTitle(String title)           {MainLayout.this.showTitle(title);}    
+    };  
+  }
+  public MainDisplay getMainDisplay() {
+    return new MainDisplay() {
+      public Rectangle getBounds() {
+        return frame.getBounds();
+      }
+      public boolean isMaximized() {
+        return (frame.getExtendedState() & frame.MAXIMIZED_BOTH) == frame.MAXIMIZED_BOTH;
+      }
+      public void setEditor(Component c) {
+        setCurrentEditor(c);
+      }
+    };
+  }
+
   public void show(Rectangle rect, boolean maximized) {
     //Set location:
     Toolkit toolkit =  Toolkit.getDefaultToolkit();
@@ -83,49 +121,28 @@ public class MainLayout {
       frame.setExtendedState(frame.MAXIMIZED_BOTH);
     frame.setVisible(true);
   }
-  
-  /////////////////////
-  // PUBLIC METHODS: //
-  /////////////////////
 
-  public void setEditor(Component c, String title) {
-    pnlEditor.removeAll();
-    editorGB.add(c);
-    frame.paintAll(frame.getGraphics());
-    showTitle(title);
-  }
-  public void dispose() {
-    frame.dispose();
-  }
-  public Rectangle getMainWindowBounds() {
-    return frame.getBounds();
-  }
-  public boolean isMaximized() {
-    return (frame.getExtendedState() & frame.MAXIMIZED_BOTH) == frame.MAXIMIZED_BOTH;
-  }
-  public JFrame getFrame() {
-    return frame;
-  }
-  public void toFront() {
-    frame.toFront();
-  }
+
+  //////////////////////
+  // PRIVATE METHODS: //
+  //////////////////////
 
   // STATUS INFO: //
 
-  public void showTitle(String title) {
+  private void showTitle(String title) {
     frame.setTitle("Klonk: "+title);
   }
-  public void showChangeThis(boolean chg) {
+  private void showChangeThis(boolean chg) {
     pnlSaveThisAlert.setBackground(chg ?Color.RED :noChangeColor);
   }
-  public void showChangeAny(boolean chg) {
+  private void showChangeAny(boolean chg) {
     pnlSaveAlert.setBackground(chg ?Color.BLUE :noChangeColor);
   }
   
-  public void showStatus(String msg) {
+  private void showStatus(String msg) {
     showStatus(msg, false);
   }
-  public void showStatus(String msg, boolean isBad) {
+  private void showStatus(String msg, boolean isBad) {
     lblMsg.setVisible(!isBad);
     lblMsgBad.setVisible(isBad);
     if (isBad)
@@ -135,7 +152,7 @@ public class MainLayout {
     pStatus.paintAll(pStatus.getGraphics());//Because during long save/load operations it doesn't update
     hasStatus=true;
   }
-  public void showNoStatus() {
+  private void showNoStatus() {
     if (hasStatus){
       lblMsg.setText("");
       lblMsg.setVisible(false);
@@ -143,18 +160,19 @@ public class MainLayout {
       hasStatus=false;
     }
   }
-  public void showRowColumn(int row, int col) {
+  private void showRowColumn(int row, int col) {
     lblRow.setText(String.valueOf(row));
     lblCol.setText(String.valueOf(col));
   }
-  public void showCapsLock(boolean visible) {
+  private void showCapsLock(boolean visible) {
     pnlCapsLock.setVisible(visible);
   }
     
-
-  //////////////////////
-  // PRIVATE METHODS: //
-  //////////////////////
+  private void setCurrentEditor(Component c) {
+    pnlEditor.removeAll();
+    editorGB.add(c);
+    frame.paintAll(frame.getGraphics());
+  }
 
   private void doEvents() {
     frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);  

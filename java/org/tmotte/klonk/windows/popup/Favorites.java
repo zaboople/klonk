@@ -29,11 +29,10 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JWindow;
-import org.tmotte.common.io.Loader;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.config.PopupContext;
+import org.tmotte.klonk.config.Boot;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.config.FontOptions;
 
@@ -291,27 +290,19 @@ class Favorites {
   public static void main(String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        PopupContext context=PopupContext.getForUnitTest();
         List<String> files=new java.util.ArrayList<>(),
                      dirs =new java.util.ArrayList<>();
         files.add("aaaaa");
         files.add("bbbbb");
         files.add("CCCC/cc/c/c///ccc");
         dirs.add("dddddddddd");
-        Favorites pop=new Favorites(
-          context.mainFrame, 
-          context.fail,
-          context.popups
-        );
-        pop.setFont(context.persist.getFontAndColors());
-        System.out.println("\nAccepted: "+pop.show(files, dirs));
+        Boot.getPopupsForUnitTest().showFavorites(files, dirs);
         System.out.println("\nFILES: ");
         for (String s: files)
           System.out.println(s);
         System.out.println("\nDIRS: ");
         for (String s: dirs)
           System.out.println(s);
-        context.mainFrame.dispose();
       }
     });  
   }

@@ -31,7 +31,7 @@ import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.FontOptions;
-import org.tmotte.klonk.config.PopupContext;
+import org.tmotte.klonk.config.Boot;
 import org.tmotte.klonk.edit.MyTextArea;
 
 class Help {
@@ -134,15 +134,8 @@ class Help {
   public static void main(String[] args) throws Exception{
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        PopupContext context=PopupContext.getForUnitTest();
-        Help help=new Help(
-          context.mainFrame, 
-          context.fail,
-          context.home.getUserHome()
-        );
-        help.setFont(context.persist.getFontAndColors());
-        help.show();
-        context.mainFrame.dispose();
+        Popups p=Boot.getPopupsForUnitTest();
+        p.showHelp();
       }
     });  
       

@@ -28,15 +28,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.JWindow;
 import javax.swing.SpinnerNumberModel;
-import org.tmotte.common.io.Loader;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.TabAndIndentOptions;
-import org.tmotte.klonk.config.PopupContext;
+import org.tmotte.klonk.config.Boot;
 
 class TabsAndIndents {
 
@@ -329,14 +327,11 @@ class TabsAndIndents {
   public static void main(String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        PopupContext context=PopupContext.getForUnitTest();
-        TabsAndIndents tai=new TabsAndIndents(
-          context.mainFrame, context.fail
-        );
+        Popups p=Boot.getPopupsForUnitTest();
         TabAndIndentOptions ti=new TabAndIndentOptions();
         ti.indentionMode=ti.INDENT_TABS;
         ti.indentionModeDefault=ti.INDENT_SPACES;
-        tai.show(ti);
+        p.showTabAndIndentOptions(ti);
       }
     });  
   }

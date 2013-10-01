@@ -3,8 +3,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Window;
@@ -29,7 +27,7 @@ import javax.swing.JWindow;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.config.PopupContext;
+import org.tmotte.klonk.config.Boot;
 import org.tmotte.klonk.config.LineDelimiterOptions;
 
 class LineDelimiters {
@@ -242,10 +240,9 @@ class LineDelimiters {
   public static void main(String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        PopupContext context=PopupContext.getForUnitTest();
+        Popups p=Boot.getPopupsForUnitTest();
         LineDelimiterOptions kdo=new LineDelimiterOptions();
-        LineDelimiters k=new LineDelimiters(context.mainFrame, context.fail);
-        k.show(
+        p.showLineDelimiters(
           kdo,
           new LineDelimiterListener(){ 
             public void setDefault(String i) {System.out.println("Default >"+i+"<");}
