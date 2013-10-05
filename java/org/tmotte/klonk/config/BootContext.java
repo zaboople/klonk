@@ -88,7 +88,7 @@ public class BootContext {
     if (mainFrame==null) {
       mainFrame=new JFrame("Klonk");
       mainFrame.setIconImage(Boot.getAppIcon());
-      mainFrame.setJMenuBar(getMenus().getMenuBar());
+      mainFrame.setJMenuBar(getMenuBar());
     }
     return mainFrame;
   }
@@ -155,8 +155,6 @@ public class BootContext {
       );
     return favorites;
   }
-
-
   public FileListen getFileListener() {
     return fileListen;
   }
@@ -171,12 +169,6 @@ public class BootContext {
   protected Fail getFail() {
     return fail;
   }
-  protected Setter<List<String>> getFavoriteFileListener() {
-    return getMenus().getFavoriteFileListener();
-  }
-  protected Setter<List<String>> getFavoriteDirListener() {
-    return getMenus().getFavoriteDirListener();
-  }
   protected LineDelimiterListener getLineDelimiterListener() {
     return getMainController().getLineDelimiterListener();
   }
@@ -186,11 +178,19 @@ public class BootContext {
   protected Getter<String> getCurrFileNameGetter() {
     return getMainController().getCurrFileNameGetter();
   }
+  
   protected MainDisplay getMainDisplay() {
     return getLayout().getMainDisplay();
   }
   protected Doer getLockRemover() {
     return getFileListener().getLockRemover();
+  }
+  
+  protected Setter<List<String>> getFavoriteFileListener() {
+    return getMenus().getFavoriteFileListener();
+  }
+  protected Setter<List<String>> getFavoriteDirListener() {
+    return getMenus().getFavoriteDirListener();
   }
   protected Doer getEditorSwitchListener() {
     return getMenus().getEditorSwitchListener();
@@ -200,6 +200,9 @@ public class BootContext {
   }
   protected Setter<List<String>> getRecentDirListener() {
     return getMenus().getRecentDirListener();
+  }
+  protected JMenuBar getMenuBar() {
+    return getMenus().getMenuBar()  ;
   }
 
 }
