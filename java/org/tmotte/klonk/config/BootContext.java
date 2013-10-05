@@ -40,7 +40,7 @@ import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
-
+import javax.swing.JMenuBar;
 public class BootContext {
   KHome home;
   Fail fail;
