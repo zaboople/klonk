@@ -34,7 +34,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
-import org.tmotte.klonk.config.Boot;
+import org.tmotte.klonk.config.PopupTestContext;
 
 class TabsAndIndents {
 
@@ -324,10 +324,10 @@ class TabsAndIndents {
   /// TEST: ///
   /////////////
   
-  public static void main(String[] args) throws Exception {
+  public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Popups p=Boot.getPopupsForUnitTest();
+        Popups p=new PopupTestContext(args).getPopups();
         TabAndIndentOptions ti=new TabAndIndentOptions();
         ti.indentionMode=ti.INDENT_TABS;
         ti.indentionModeDefault=ti.INDENT_SPACES;

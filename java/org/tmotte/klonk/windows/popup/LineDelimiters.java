@@ -27,7 +27,7 @@ import javax.swing.JWindow;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.config.Boot;
+import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 
 class LineDelimiters {
@@ -237,10 +237,10 @@ class LineDelimiters {
   // TEST: //
   ///////////
  
-  public static void main(String[] args) throws Exception {
+  public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Popups p=Boot.getPopupsForUnitTest();
+        Popups p=new PopupTestContext(args).getPopups();
         LineDelimiterOptions kdo=new LineDelimiterOptions();
         p.showLineDelimiters(
           kdo,

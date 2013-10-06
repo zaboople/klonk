@@ -116,14 +116,15 @@ to execute it.
 Similar to a web browser's address bar, this keystroke transfers focus to the dropdown list of commands.
 
 
-**HOME DIRECTORY**
+**COMMAND-LINE PARAMETERS**
+
+Klonk will open any file whose name is passed to it on the command line.
 
 Configuration data and so on is stored in the user's home directory, which is automatically detected. You can specify an alternate home directory using 
   -home [directory name]
 as a command-line option. Currently your home directory is set to:
   $[Home]
 Note that a file named Klonk.properties is stored in this directory. You can modify your settings directly (albeit carefully) or remove them entirely to reset to the application defaults.
-
 
 **SHUTTING DOWN THE APPLICATION**
 

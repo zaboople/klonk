@@ -41,9 +41,20 @@ import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
 import javax.swing.JMenuBar;
+
+
+/** 
+ * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) architecture. By
+ * default, BootContext will assemble the full array of components for a complete application. Using inheritance
+ * &amp; overrides, a test context can be created that provides a more minimalist environment with mocking et al.
+ */
 public class BootContext {
+  //Inputs:
+  String[] args;
+
+  //DI Components:
   KHome home;
-  Fail fail;
+  KLog log;
   FileListen fileListen;
   KPersist persist;
   CtrlMain ctrlMain;
@@ -54,17 +65,33 @@ public class BootContext {
   Menus menus;
   Favorites favorites;
   MainDisplay mainDisplay;
+  String processID;
   
-  protected BootContext(){
+  protected BootContext(String [] args){
+    this.args=args;
+    initLookFeel();
   }
-  public BootContext(KHome home, Fail fail, FileListen listen) {
-    this.home=home;
-    this.fail=fail;
-    this.fileListen=listen;
+  public KHome getHome() {
+    if (home==null) {
+      String homeDir=KHome.nameIt(System.getProperty("user.home"), "klonk");
+      for (int i=0; i<args.length; i++)
+        if (args[i].equals("-home") && i<args.length-1){
+          args[i]=null;
+          homeDir=args[++i].trim();
+          args[i]=null;
+        }
+      home=new KHome(homeDir);
+    }
+    return home;
+  }
+  public KLog getLog() {
+    if (log==null)
+      log=new KLog(getHome(), getProcessID());
+    return log;
   }
   public KPersist getPersist() {
     if (persist==null)
-      persist=new KPersist(home, getFail());
+      persist=new KPersist(getHome(), getFail());
     return persist;
   }
   public CtrlMain getMainController() {
@@ -87,7 +114,7 @@ public class BootContext {
   public JFrame getMainFrame() {
     if (mainFrame==null) {
       mainFrame=new JFrame("Klonk");
-      mainFrame.setIconImage(Boot.getAppIcon());
+      mainFrame.setIconImage(getAppIcon());
       mainFrame.setJMenuBar(getMenuBar());
     }
     return mainFrame;
@@ -100,11 +127,11 @@ public class BootContext {
   public Popups getPopups() {
     if (popups==null)
       popups=new Popups(
-        home, getFail()
+        getHome(), getFail()
         ,getMainFrame()
         ,getPersist()
         ,getStatusBar()
-        ,Boot.getPopupIcon() 
+        ,getPopupIcon() 
         ,getCurrFileNameGetter()
       );
     return popups;
@@ -156,7 +183,25 @@ public class BootContext {
     return favorites;
   }
   public FileListen getFileListener() {
+    if (fileListen==null) 
+      fileListen=new FileListen(getLog(), getProcessID(), getHome());    
     return fileListen;
+  }
+  public Image getPopupIcon() {
+    return getIcon("org/tmotte/klonk/windows/app-find-replace.png");  
+  }
+  public Image getAppIcon() {
+    return getIcon("org/tmotte/klonk/windows/app.png");
+  }
+  public JMenuBar getMenuBar() {
+    return getMenus().getMenuBar()  ;
+  }
+  public String getProcessID() {
+    if (processID==null) {
+      String pid=ManagementFactory.getRuntimeMXBean().getName();
+      processID=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
+    }
+    return processID;
   }
   
 
@@ -167,7 +212,7 @@ public class BootContext {
   //////////////////////////////////////////////////////////
 
   protected Fail getFail() {
-    return fail;
+    return getLog();
   }
   protected LineDelimiterListener getLineDelimiterListener() {
     return getMainController().getLineDelimiterListener();
@@ -201,8 +246,64 @@ public class BootContext {
   protected Setter<List<String>> getRecentDirListener() {
     return getMenus().getRecentDirListener();
   }
-  protected JMenuBar getMenuBar() {
-    return getMenus().getMenuBar()  ;
+
+  ////////////////
+  // UTILITIES: //
+  ////////////////
+
+  protected Image getIcon(String filename) {
+    URL url=getClass().getClassLoader().getResource(filename);
+    ImageIcon ii=new ImageIcon(url);
+    return ii.getImage();
   }
+  public void initLookFeel() {
+    try {
+      javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());    
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+
+  ///////////////////////
+  // BOOT APPLICATION: //
+  ///////////////////////
+ 
+ 
+  public static void bootApplication(final String[] args){
+
+    //Initialize the context object. If we can't get a home directory,
+    //we're DOA, no point in logging:
+    final BootContext context=new BootContext(args);
+    if (!context.getHome().ready)
+      return;  
+      
+    //Find out if the application is already running:
+    if (!context.getFileListener().lockOrSignal(args)) {
+      context.getLog().log("Klonk is handing off to another process.");
+      System.exit(0);
+      return;
+    }
+    
+    //After the GUI starts up, all errors go here:
+    Thread.setDefaultUncaughtExceptionHandler( 
+      new Thread.UncaughtExceptionHandler() {
+        public void uncaughtException(Thread t, Throwable e){
+          context.getLog().fail(e);
+        }
+      }
+    );
+    
+    //Now we start doing things:
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        CtrlMain ctrlMain=context.getMainController();
+        ctrlMain.doNew();
+        ctrlMain.doLoadFiles(args);
+        context.getFileListener().startDirectoryListener(ctrlMain.getFileReceiver());
+      }
+    });
+  }
+  
 
 }

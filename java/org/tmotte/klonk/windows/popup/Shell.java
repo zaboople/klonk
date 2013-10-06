@@ -20,27 +20,31 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
 import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.config.Boot;
+import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.edit.MyTextArea;
 
 class Shell {
+
+  //DI components:
   private JFrame parentFrame;
   private Fail fail;
   private Popups popups;
   private KPersist persist;
   private Getter<String> currFileGetter;
 
-  private boolean shownBefore=false;
-  private List<String> persistedFiles=new LinkedList<>();
-
+  //Visual components:
   private JFrame win;
   private MyTextArea mtaOutput;
   private JButton btnRun, btnClose, btnSwitch, btnSelectFile, btnForgetFile, btnStop;
   private JComboBox<String> jcbPrevious;
   private DefaultComboBoxModel<String> jcbPreviousData=new DefaultComboBoxModel<>();
   private Font fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
+
+  //State:
+  private boolean shownBefore=false;
+  private List<String> persistedFiles=new LinkedList<>();
 
   public Shell(JFrame parentFrame, Fail fail, KPersist persist, 
                Popups popups, Image img, Getter<String> cfGetter) {
@@ -257,6 +261,7 @@ class Shell {
       jcbPreviousData.addElement(f);
     jcbPrevious=new JComboBox<>(jcbPreviousData);
     jcbPrevious.setEditable(true);
+    jcbPrevious.setMaximumRowCount(KPersist.maxFavorite);
   
 
     btnRun   =new JButton(hStart+bStart+"Run "+bEnd+" (Ctrl-E)"+hEnd); 
@@ -438,11 +443,10 @@ class Shell {
   /// TEST: ///
   /////////////
   
-  public static void main(String[] args) throws Exception {
+  public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        final Popups popups=Boot.getPopupsForUnitTest();
-        popups.showShell();
+        new PopupTestContext(args).getPopups().showShell();
       }
     });  
   }

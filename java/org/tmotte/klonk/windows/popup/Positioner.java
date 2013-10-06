@@ -12,6 +12,7 @@ class Positioner {
   }
   static void set(Window parent, Window popup, boolean unless) {
     if (!unless) {
+      //Align to top right of window:
       Rectangle pt2=parent.getBounds();
       popup.setLocation(pt2.x+Math.max(0, pt2.width-popup.getWidth()), pt2.y+20);
     }
