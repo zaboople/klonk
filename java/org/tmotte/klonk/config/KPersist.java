@@ -66,19 +66,11 @@ public class KPersist {
   // WINDOW BOUNDS: //
 
   public KPersist setWindowBounds(Rectangle r) {
-    setInt("Window.Top", r.y);
-    setInt("Window.Left", r.x);
-    setInt("Window.Width", r.width);
-    setInt("Window.Height", r.height);
+    setBounds("Window", r);
     return this;
   }
   public Rectangle getWindowBounds(Rectangle defR) {
-    Rectangle r=new Rectangle();
-    r.y=getInt("Window.Top", defR.y);
-    r.x=getInt("Window.Left", defR.x);
-    r.width=getInt("Window.Width", defR.width);
-    r.height=getInt("Window.Height", defR.height);
-    return r;
+    return getBounds("Window", defR);
   }
   public KPersist setWindowMaximized(boolean b) {
     return setBoolean("Window.Maximized", b);
@@ -86,6 +78,14 @@ public class KPersist {
   public boolean getWindowMaximized() {
     return getBoolean("Window.Maximized", false);
   }
+  
+  public void setShellWindowBounds(Rectangle r) {
+    setBounds("Shell.Window", r);
+  }
+  public Rectangle getShellWindowBounds(Rectangle defR) {
+    return getBounds("Shell.Window", defR);
+  }
+
 
   // TABS AND INDENTS: //
 
@@ -239,6 +239,22 @@ public class KPersist {
   //////////////////////
   // PRIVATE METHODS: //
   //////////////////////
+
+  private void setBounds(String name, Rectangle r) {
+    setInt(name+".Top", r.y);
+    setInt(name+".Left", r.x);
+    setInt(name+".Width", r.width);
+    setInt(name+".Height", r.height);
+    hasChanges=true;
+  }
+  private Rectangle getBounds(String name, Rectangle defR) {
+    Rectangle r=new Rectangle();
+    r.y     =getInt(name+".Top", defR.y);
+    r.x     =getInt(name+".Left", defR.x);
+    r.width =getInt(name+".Width", defR.width);
+    r.height=getInt(name+".Height", defR.height);
+    return r;
+  }
 
   private void setFiles(List<String> files, String name, int max) {
     int len=files.size();

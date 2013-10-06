@@ -3,7 +3,7 @@ Check it one more time.
 Check it now.
 Check it.
 
-package org.tmotte.klonk;
+package org.tmotte.klonk; 
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

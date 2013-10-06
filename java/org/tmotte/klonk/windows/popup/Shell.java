@@ -2,8 +2,10 @@ package org.tmotte.klonk.windows.popup;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.*;
 import java.io.BufferedReader;
@@ -55,7 +57,7 @@ class Shell {
     this.currFileGetter=cfGetter;
     persist.getCommands(persistedFiles);
     create(img);
-    layout(); 
+    layout(persist); 
     listen();
   }  
   public void setFont(FontOptions f) {
@@ -65,7 +67,7 @@ class Shell {
   public void show() {
     if (!jcbPrevious.hasFocus() && !mtaOutput.hasFocus())
       jcbPrevious.requestFocusInWindow();
-    Positioner.set(parentFrame, win, shownBefore);
+    Positioner.set(parentFrame, win, shownBefore || (win.getBounds().x>-1 && win.getBounds().y>-1));
     shownBefore=true;
     win.setVisible(true);
     win.toFront();
@@ -90,10 +92,15 @@ class Shell {
 
 
   private void close() {
+    preserveBounds();
     win.setVisible(false);  
   }
   private void switchBack() {
+    preserveBounds();
     parentFrame.toFront();
+  }
+  private void preserveBounds() {
+    persist.setShellWindowBounds(win.getBounds());
   }
   private void setFont(FontOptions f, JTextComponent mta) {
     mta.setFont(f.getFont());
@@ -246,8 +253,6 @@ class Shell {
            bEnd="</b>";
 
     win=new JFrame("Klonk: Run batch program:");
-    win.setPreferredSize(new java.awt.Dimension(450, 450));
-        
     win.setIconImage(img);
 
     btnSelectFile=new JButton("File...");
@@ -262,7 +267,6 @@ class Shell {
     jcbPrevious=new JComboBox<>(jcbPreviousData);
     jcbPrevious.setEditable(true);
     jcbPrevious.setMaximumRowCount(KPersist.maxFavorite);
-  
 
     btnRun   =new JButton(hStart+bStart+"Run "+bEnd+" (Ctrl-E)"+hEnd); 
     btnRun.setMnemonic(KeyEvent.VK_R);
@@ -287,7 +291,7 @@ class Shell {
     return mta;
   }
   
-  private void layout() {
+  private void layout(KPersist persist) {
     GridBug gb=new GridBug(win);
     gb.gridXY(0);
     gb.weightXY(1, 0);
@@ -304,7 +308,12 @@ class Shell {
     gb.weightXY(1,0);
     gb.fill=gb.HORIZONTAL;
     gb.addY(getButtonClosePanel());
+    Rectangle r=persist.getShellWindowBounds(
+      new Rectangle(-1, -1, 450, 450)
+    );
     win.pack();
+    win.setBounds(r);
+    win.setPreferredSize(new Dimension(r.width, r.height));
   }
   private Container getFileSelectPanel() {
     GridBug gb=new GridBug(new JPanel());
@@ -446,7 +455,10 @@ class Shell {
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        new PopupTestContext(args).getPopups().showShell();
+        PopupTestContext ptc=new PopupTestContext(args);
+        ptc.getPopups().showShell();
+        //Won't work because previous command is not synchronous
+        //ptc.getPersist().save();
       }
     });  
   }
