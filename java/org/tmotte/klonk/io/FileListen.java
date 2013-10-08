@@ -26,6 +26,8 @@ import org.tmotte.klonk.config.msg.Doer;
 
 public class FileListen {
  
+  final static String DO_NOT_TOUCH="DO-NOT-TOUCH---";
+ 
   Setter<List<String>> fileReceiver;
   KLog log;
   KHome homeWatch;
@@ -65,14 +67,13 @@ public class FileListen {
     return true;
   }
   
-
+  /** Always returns false */
   private boolean makePID(String[] fileNames) {
-    //Make PID file:
     if (fileNames==null || fileNames.length==0)
       return false;
     try {
       log.log("FileListen.makePID(): I am going to write the pid...");
-      File pidFile=homeWatch.nameFile("DO-NOT-TOUCH---"+pidName);
+      File pidFile=homeWatch.nameFile(DO_NOT_TOUCH+pidName);
       FileOutputStream os=new FileOutputStream(pidFile);
       FileLock flocker=os.getChannel().lock();
       if (flocker==null) {
@@ -106,19 +107,19 @@ public class FileListen {
         //This is ok because we delete the file after loading it, just
         //in case we get an event for it as well:
         for (String name: new File(homeWatch.dirName).list())
-          loadFiles(homeWatch.nameFile(name));
+          loadFiles(name);
         while (true){
           WatchKey key=service.take();
           for (WatchEvent we: key.pollEvents()){
             WatchEvent.Kind kind=we.kind();
             String fileName=we.context().toString();
             log.log("FileListen: WatchEvent "+we.count()+": "+fileName+" kind:"+kind);
-            if (fileName.startsWith("DO-NOT-TOUCH---") || we.count()>1)
+            if (we.count()>1)
               continue;
             if (kind==StandardWatchEventKinds.ENTRY_CREATE ||
                 kind==StandardWatchEventKinds.ENTRY_MODIFY)
               try {
-                loadFiles(homeWatch.nameFile(fileName));
+                loadFiles(fileName);
               } catch (Exception e) {
                 log.log("Failed on reading, waiting for another chance: "+fileName+" Exception: "+e);
               }
@@ -139,34 +140,41 @@ public class FileListen {
 
 
 
-  private void loadFiles(File pidFile) throws Exception{
-    log.log("FileListen: Reading PID File..."+pidFile+" "+pidFile.exists());
-    if (!pidFile.exists())
-      return;
-    RandomAccessFile fis=new RandomAccessFile(pidFile, "rw");
-    FileChannel fc=fis.getChannel();
-    FileLock lock=fc.lock();
-    List<String> files=new LinkedList<String>();
+  private void loadFiles(String filename) throws Exception{
     try {
-      String s;
-      while ((s=fis.readLine())!=null)
-        if (!s.trim().equals("")){
-          files.add(s);
-          log.log("FileListen: Flagging file for open: "+s);
-        }
-    } finally {
+      if (filename.startsWith(DO_NOT_TOUCH))
+        return;
+      File pidFile=homeWatch.nameFile(filename);
+      log.log("FileListen: Reading PID File..."+pidFile+" "+pidFile.exists());
+      if (!pidFile.exists())
+        return;
+      RandomAccessFile fis=new RandomAccessFile(pidFile, "rw");
+      FileChannel fc=fis.getChannel();
+      FileLock lock=fc.lock();
+      List<String> files=new LinkedList<String>();
       try {
-        lock.release();
-        fis.close();
-        pidFile.delete();
-      } catch (Exception e) {
-        log.log(e, "BIG TIME SCREWUP, COULDN'T UNLOCK/CLOSE/DELETE "+pidFile);
+        String s;
+        while ((s=fis.readLine())!=null)
+          if (!s.trim().equals("")){
+            files.add(s);
+            log.log("FileListen: Flagging file for open: "+s);
+          }
+      } finally {
+        try {
+          lock.release();
+          fis.close();
+          pidFile.delete();
+        } catch (Exception e) {
+          log.log(e, "COULDN'T UNLOCK/CLOSE/DELETE "+pidFile);
+        }
       }
-    }
-    if (files.size()>0) {
-      log.log("FileListen: telling File Receiver to load from listener....");
-      fileReceiver.set(files);
-      log.log("FileListen: told File Receiver to load from listener.");
+      if (files.size()>0) {
+        log.log("FileListen: telling File Receiver to load from listener....");
+        fileReceiver.set(files);
+        log.log("FileListen: told File Receiver to load from listener.");
+      }
+    } catch (Exception e) {
+      log.log("Failed on reading, waiting for another chance: "+filename+" Exception: "+e);
     }
   }
 
