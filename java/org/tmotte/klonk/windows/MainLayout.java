@@ -112,13 +112,7 @@ public class MainLayout {
   
 
   public void show(Rectangle rect, boolean maximized) {
-    //Set location:
-    Toolkit toolkit =  Toolkit.getDefaultToolkit();
-    Dimension dim = toolkit.getScreenSize();    
-    rect.x=Math.max(0, Math.min(rect.x, dim.width-10));
-    rect.y=Math.max(0, Math.min(rect.y, dim.height-10));
-    rect.width=Math.min(rect.width, dim.width-rect.x);
-    rect.height=Math.min(rect.height, dim.height-rect.y);
+    Positioner.fix(rect);
     frame.setBounds(rect);
     if (maximized)
       frame.setExtendedState(frame.MAXIMIZED_BOTH);

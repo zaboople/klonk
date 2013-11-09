@@ -43,7 +43,7 @@ import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.edit.MyTextArea;
-
+import org.tmotte.klonk.windows.Positioner;
 
 class FindAndReplace {
 

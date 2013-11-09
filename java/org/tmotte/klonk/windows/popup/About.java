@@ -31,6 +31,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
 import org.tmotte.klonk.config.PopupTestContext;
+import org.tmotte.klonk.windows.Positioner;
 
 class About {
 

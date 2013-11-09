@@ -28,6 +28,7 @@ import javax.swing.JTextField;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
+import org.tmotte.klonk.windows.Positioner;
 
 class GoToLine {
 

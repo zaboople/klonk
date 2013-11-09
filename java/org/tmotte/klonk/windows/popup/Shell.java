@@ -26,6 +26,7 @@ import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.edit.MyTextArea;
+import org.tmotte.klonk.windows.Positioner;
 
 class Shell {
 
@@ -91,8 +92,11 @@ class Shell {
   }
 
 
-  private void close() {
+  private void closing() {
     preserveBounds();
+  }
+  private void close() {
+    closing();
     win.setVisible(false);  
   }
   private void switchBack() {
@@ -423,6 +427,11 @@ class Shell {
     KeyMapper.accel(btnClose, closeAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
     KeyMapper.accel(btnClose, closeAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
     KeyMapper.accel(btnClose, closeAction, KeyMapper.key(KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));
+    win.addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e){
+        closing();
+      }
+    });
 
     //Switch back:
     Action switchAction=new AbstractAction() {
