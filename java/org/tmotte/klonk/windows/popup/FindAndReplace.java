@@ -170,8 +170,8 @@ class FindAndReplace {
   private void find(boolean forwards) {
     try {
       win.setVisible(false);
-      boolean replaceOn=chkReplace.isSelected(),
-              replaceAll=chkReplaceAll.isSelected();
+      boolean replaceOn=chkReplace.isSelected();
+      boolean replaceAll=replaceOn && chkReplaceAll.isSelected();
       skipReplace&=replaceOn;
       String searchFor=mtaFind.getText();
       boolean foundOnce=false;
@@ -358,13 +358,15 @@ class FindAndReplace {
   private boolean confirmReplace(int startPos, int endPos) throws Exception {
     YesNoCancel asker=getAskReplaceWindow();
     Point caretPoint=target.getVisualCaretPosition();
-    Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();    
+    Rectangle dim =parentFrame.getBounds();
+    int tooLow=dim.y+dim.height,
+        tooRight=dim.x+dim.width;
     int top, left;
     {
       int spaceTop=80,
           cy=caretPoint.y,
           askHeight=asker.getHeight();
-      top=cy+askHeight+spaceTop<dim.height
+      top=cy+askHeight+spaceTop<tooLow
         ?cy+spaceTop
         :cy-(spaceTop+askHeight);
     }
@@ -372,12 +374,12 @@ class FindAndReplace {
       int spaceLeft=80,
           cx=caretPoint.x,
           askWidth=asker.getWidth();
-      left=cx+askWidth+spaceLeft<dim.width
+      left=cx+askWidth+spaceLeft<tooRight
         ?cx+spaceLeft
         :cx-(spaceLeft+askWidth);
     }
-    if (top<0)  top=0;
-    if (left<0) left=0;
+    if (left<dim.x) left=dim.x;
+    if (top <dim.y) top=dim.y;
     return asker.show(left, top).isYes();
   }
 

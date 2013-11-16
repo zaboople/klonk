@@ -256,6 +256,20 @@ public class CtrlMain  {
     editors.addFirst(e);
     setEditor(e);
   }
+  public void doSwitchToNextUnsaved() {
+    for (int i=1; i<editors.size(); i++){
+      Editor e=editors.get(i);
+      if (e.hasUnsavedChanges()){
+        editorSwitch(e);
+        return;
+      }
+    }
+    popups.alert(
+      editors.getFirst().hasUnsavedChanges()
+        ?"No other files have unsaved changes."
+        :"No files have unsaved changes."
+    );
+  }
   public void doSwitch(Editor editor) {
     editorSwitch(editor);
   }

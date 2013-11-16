@@ -1,3 +1,10 @@
+Fixed
+  Added "Switch to next unsaved" in the Switch menu
+  Disabled booting with shared classes. I do not trust it.
+  Fixed: Leaving "Replace all" checked causes the "Replace all now?" dialog to come up when you do a find (i.e. a find without replace)
+  Fixed: Find-Replace confirm dialog shows up too far left in dual-screen mode when Klonk is on right screen.
+  
+
 -Current
   -Maybe a more sophisticated version of find/replace, where I break up the String? It is pretty slow on an 8MB file.
     -Loop thru 20000 characters at a time, appending last searchFor.length() from previous to first. 
@@ -15,17 +22,11 @@
   -Indents & Tabs, Fonts should only enable ok button when something changes.
     -Also should show message when ok is clicked.
 
-  
-
 -Long term problems
-  -Can't delete a directory in windows until closing Klonk. Well, it only happened once. Dunno.
-    
   -Weird background bugs
-    -OK I tried this new thing with =Xshare:off, hoping it prevents processes from messing with each other
     -Do you see that doo doo where java says it's starting up with mixed mode "sharing"? 
     -Mostly when it runs two at once.
-    -Watch out for system.out.println's. That may be freaking out the exe.
-    -Exe?
+    -Exe alternatives?
       -Consider jexepack, which costs $100 or you get an alert everytime you open it.
   
   -Slow scrolling:

@@ -6,15 +6,20 @@
   <JVMSearchPath>jdkpath</JVMSearchPath>
   <JVMSearchPath>exepath</JVMSearchPath>
   <JVMSearchPath>jview</JVMSearchPath>
-  <arguments></arguments>
   <embeddedJar>true</embeddedJar>
   <executableName>..\dist\bin\klonk.exe</executableName>
   
-  <!--FIXME ICON NAME-->
   <iconLocation>app.ico</iconLocation>
   
   <initialMemoryHeap>-1</initialMemoryHeap>
   <jarLocation>..\dist\klonk.jar</jarLocation>
+  
+  <!--Added to keep java apps from messing with each other:-->
+  <javaProperties>
+    <name>Xshare</name>
+    <value>off</value>
+  </javaProperties>
+
   <mainClassName>org.tmotte.klonk.config.Boot</mainClassName>
   <maximumMemoryHeap>-1</maximumMemoryHeap>
   <maximumVersion></maximumVersion>
@@ -42,8 +47,10 @@
     <key>JniSmooth</key>
     <value>0</value>
   </skeletonProperties>
+  <!--
   <skeletonProperties>
     <key>Debug</key>
     <value>4</value>
   </skeletonProperties>
+  -->
 </jsmoothproject>

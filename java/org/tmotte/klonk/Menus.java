@@ -65,7 +65,7 @@ public class Menus {
                     fileFaveAddFile, fileFaveAddDir,
                     fileExit,
                     searchFind, searchReplace, searchRepeat, searchRepeatBackwards, searchGoToLine,
-                    switchBackToFront, switchFrontToBack,
+                    switchBackToFront, switchFrontToBack, switchNextUnsaved,
                     markSet, markGoToPrevious, markGoToNext, markClearCurrent, markClearAll,
                     undoUndo, undoRedo,
                     undoToBeginning, undoRedoToEnd, undoClearUndos, undoClearRedos, undoClearBoth,
@@ -292,6 +292,7 @@ public class Menus {
       switcher.addSeparator();
       switcher.add(switchFrontToBack);
       switcher.add(switchBackToFront);
+      switcher.add(switchNextUnsaved);
     }
     
     fileCloseOthers.setEnabled(editors.size()>1);
@@ -421,7 +422,10 @@ public class Menus {
       "Send front to back", switchListener, KeyEvent.VK_S, KeyMapper.key(KeyEvent.VK_F11)
     );
     switchBackToFront=mu.doMenuItem(
-      "Send back to front", switchListener, KeyEvent.VK_S, KeyMapper.key(KeyEvent.VK_F11, KeyEvent.SHIFT_DOWN_MASK)
+      "Send back to front", switchListener, KeyEvent.VK_E, KeyMapper.key(KeyEvent.VK_F11, KeyEvent.SHIFT_DOWN_MASK)
+    );
+    switchNextUnsaved=mu.doMenuItem(
+      "Next unsaved file", switchListener, KeyEvent.VK_X
     );
 
     
@@ -747,6 +751,9 @@ public class Menus {
         else
         if (s==switchFrontToBack)
           ctrlMain.doSendFrontToBack();
+        else
+        if (s==switchNextUnsaved)
+          ctrlMain.doSwitchToNextUnsaved();
         else {
           Editor e=switchMenuToEditor.get(s);
           if (e==null)
