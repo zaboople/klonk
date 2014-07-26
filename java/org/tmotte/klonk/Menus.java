@@ -633,6 +633,11 @@ public class Menus {
       ,helpShortcut=mu.doMenuItem("Shortcuts and hidden features", helpListener, KeyEvent.VK_S)
     );
   }
+  
+  //////////////////////
+  // EVENT LISTENERS: //
+  //////////////////////
+  
   private Action
     fileListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {

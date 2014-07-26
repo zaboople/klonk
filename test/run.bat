@@ -11,8 +11,3 @@ REM run it:
 set CLASSPATH=build
 echo %1 %2 %3
 java -Xshare:off %1 %2 %3 %4 %5 %6 %7 %8 %9
-
-
-
-
-

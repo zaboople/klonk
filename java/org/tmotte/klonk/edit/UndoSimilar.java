@@ -6,7 +6,7 @@ public class UndoSimilar {
       return false;
     char a=ass.charAt(0), b=bss.charAt(0);
     if (a==b) return true;
-    String[] possible={
+    final String[] possible={
       Selectable.strLetterCaps+Selectable.strLetterLow 
      ,Selectable.strNum+"/-.+*"       
      ,Selectable.strStartSection+Selectable.strEndSection  

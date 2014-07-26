@@ -2,6 +2,7 @@ test/home/klonk.properties
 test/home/log.txt
 test/home/watch
 test/home/seize
+test/autoopen
 build
 dist
 

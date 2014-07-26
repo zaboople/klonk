@@ -6,10 +6,10 @@ public final class UndoStep {
   public int start, len, uType;
   public String text;
   public boolean doubleUp, doubleUpDone;
-  public UndoStep(int uType, int start, int len, String text, boolean doubleUp) {
+  UndoStep(int uType, int start, int len, String text, boolean doubleUp) {
     this(uType, start, len, text, doubleUp, false);
   }
-  public UndoStep(int uType, int start, int len, String text, boolean doubleUp, boolean doubleUpDone) {
+  UndoStep(int uType, int start, int len, String text, boolean doubleUp, boolean doubleUpDone) {
     this.uType=uType;
     this.start=start;
     this.len=len;
