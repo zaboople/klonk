@@ -8,38 +8,18 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.lang.management.ManagementFactory;
-import java.net.URL;
 import java.util.List;
-import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-import javax.swing.SwingUtilities;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.Menus;
-import org.tmotte.klonk.config.msg.Doer;
-import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Getter;
-import org.tmotte.klonk.config.msg.MainDisplay;
-import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
-import org.tmotte.klonk.controller.CtrlFileOther;
 import org.tmotte.klonk.controller.CtrlMain;
-import org.tmotte.klonk.controller.CtrlMarks;
-import org.tmotte.klonk.controller.CtrlOptions;
-import org.tmotte.klonk.controller.CtrlOther;
-import org.tmotte.klonk.controller.CtrlSearch;
-import org.tmotte.klonk.controller.CtrlSelection;
-import org.tmotte.klonk.controller.CtrlUndo;
-import org.tmotte.klonk.controller.Favorites;
-import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.windows.MainLayout;
-import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
 
 /** 
@@ -68,7 +48,7 @@ public class PopupTestContext extends BootContext {
   }
   public @Override JFrame getMainFrame() {
     if (mainFrame==null) {
-      mainFrame=new JFrame("Klonk");
+      mainFrame=new JFrame("Klonk - Test Main Frame");
       KeyAdapter ka=new KeyAdapter() {
         public void keyPressed(KeyEvent e){
           if (e.getKeyCode()==KeyEvent.VK_ESCAPE)
@@ -82,7 +62,7 @@ public class PopupTestContext extends BootContext {
         }
       });
       mainFrame.setVisible(true);
-      mainFrame.setBounds(new java.awt.Rectangle(100,100,300,300));
+      mainFrame.setBounds(new java.awt.Rectangle(400,400,300,300));
       mainFrame.toFront();
     }
     return mainFrame;
@@ -104,7 +84,8 @@ public class PopupTestContext extends BootContext {
   public @Override Popups getPopups() {
     if (popups==null)
       popups=new Popups(
-        home, getFail()
+        home
+        ,getFail()
         ,getMainFrame()
         ,getPersist()
         ,getStatusBar()
