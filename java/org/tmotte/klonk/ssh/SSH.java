@@ -13,7 +13,7 @@ public class SSH {
   private JSch jsch=new JSch();
   private Session session;
   private boolean debug;
-  private String user, pass, host, knownHosts, authKeys;
+  private String user, pass, host, knownHosts, privateKeys;
   private boolean connected=false;
   private SFTP sftp;
   private SSHExec exec;
@@ -38,8 +38,8 @@ public class SSH {
     this.pass=pass;
     return this;
   }
-  public SSH withAuthKeys(String authKeys) throws Exception {
-    this.authKeys=authKeys;
+  public SSH withPrivateKeys(String privateKeys) throws Exception {
+    this.privateKeys=privateKeys;
     return this;
   }
   
@@ -67,7 +67,7 @@ public class SSH {
     return connected;
   }
   public boolean canConnect() {
-    return pass!=null || authKeys!=null;
+    return pass!=null || privateKeys!=null;
   }
   protected Session getSession() throws Exception {
     checkConnect();
@@ -87,9 +87,9 @@ public class SSH {
     session=jsch.getSession(user, host, 22);
     if (knownHosts==null)
       session.setConfig("StrictHostKeyChecking", "no");
-    if (authKeys!=null) {
+    if (privateKeys!=null) {
       session.setConfig("PreferredAuthentications", "publickey");
-      jsch.addIdentity(authKeys);
+      jsch.addIdentity(privateKeys);
     }
     if (pass!=null){
       session.setPassword(pass);
@@ -110,7 +110,7 @@ public class SSH {
       host.equals(this.host);
   }
   public String toString() {
-    return "user: "+user+" host: "+host+" knownHosts: "+knownHosts+" authKeys: "+authKeys;
+    return "user: "+user+" host: "+host+" knownHosts: "+knownHosts+" privateKeys: "+privateKeys;
   }
 
   
@@ -136,11 +136,11 @@ public class SSH {
 
   
   private static void usage() {
-    System.err.println("Usage: -u user -h host -k knownhostsfile -p pass -a privatekeyfile");
+    System.err.println("Usage: -u user -h host -k knownhostsfile -p pass -r privatekeyfile");
     System.exit(1);
   }
   public static SSH cmdLine(String[] args) throws Exception {
-    String user=null, host=null, knownHosts=null, pass=null, authKeys=null;
+    String user=null, host=null, knownHosts=null, pass=null, privateKeys=null;
     for (int i=0; i<args.length; i++){
       String arg=args[i];
       if (arg.startsWith("-help"))
@@ -157,8 +157,8 @@ public class SSH {
       if (arg.startsWith("-p"))
         pass=args[++i];
       else
-      if (arg.startsWith("-a"))
-        authKeys=args[++i];
+      if (arg.startsWith("-r"))
+        privateKeys=args[++i];
       else {
         System.err.println("Unexpected: "+arg);
         System.exit(1);
@@ -170,7 +170,7 @@ public class SSH {
     return new SSH(user, host)
       .withKnown(knownHosts)
       .withPassword(pass)
-      .withAuthKeys(authKeys);
+      .withPrivateKeys(privateKeys);
   }
   
 }

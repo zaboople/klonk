@@ -1,8 +1,5 @@
 package org.tmotte.klonk.config.option;
 import org.tmotte.common.text.DelimitedString;
-import org.tmotte.common.swang.Fail;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.awt.Font;
 import java.awt.Color;
 
