@@ -43,12 +43,10 @@ import org.tmotte.klonk.windows.popup.Popups;
 import javax.swing.JMenuBar;
 
 /** 
- * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) architecture. By
- * default, BootContext will assemble the full array of components for a complete application. Using inheritance
- * &amp; overrides, a test context can be created that provides a more minimalist environment with mocking et al.
+ * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) architecture. 
  * <br>
- * Everything that is public here - except main() - is public because of popup testing, not because it needs to be
- * public for regular runtime behavior. 
+ * There are also a few public-static functions that are made available for testing popup windows without
+ * booting the whole application. 
  */
 public class BootContext {
 

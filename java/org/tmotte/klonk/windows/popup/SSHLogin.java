@@ -145,8 +145,12 @@ class SSHLogin {
     gb.insets.right=5;
     
     gb.add(new JLabel("User name: "));
+    gb.weightXY(1, 0);
+    jtfUsername.setColumns(20);
     gb.addX(jtfUsername);
+    gb.weightXY(0, 0);
     gb.setX(0).addY(new JLabel("Password: "));
+    gb.weightXY(1, 0);
     gb.addX(jpfPass);
     
     return jp;

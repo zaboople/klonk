@@ -10,9 +10,6 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Window;
 
-/**
- * Note: GridBagConstraints.gridx &amp; gridy default to something stupid. Set them to 1 so they act normal.
- */
 public class GridBug extends GridBagConstraints {
 
   public GridBagLayout gbl=new GridBagLayout();
