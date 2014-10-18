@@ -170,9 +170,7 @@ public class CtrlMain  {
   ////////////////
 
   public void doFileOpenDialog() {
-    File file=recents.hasDirs()
-      ?popups.showFileDialogForDir(false, new File(recents.getFirstDir()))
-      :popups.showFileDialog(false);
+    File file=popups.showFileDialog(false);
     if (file!=null)
       loadFile(file);
   }

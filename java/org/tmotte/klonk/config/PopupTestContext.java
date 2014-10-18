@@ -21,53 +21,55 @@ import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.common.swang.Fail;
 
 /** 
- * Overrides BootContext methods to create a lightweight environment where
- * we can test dialog windows.
+ * For testing popups without the overhead of the main application running.
  */
-public class PopupTestContext extends BootContext {
+public class PopupTestContext  {
+
+  //DI Components:
+  KHome home;
+  KLog log;
+  KPersist persist;
+  JFrame mainFrame;
+  StatusUpdate statusBar;
+  Fail fail;
   
   public PopupTestContext(String[] args){
-    super(args);
   }
   
-  public @Override CtrlMain getMainController() {
-    return null;
-  }
-  public @Override KLog getLog() {
+  public KLog getLog() {
     if (log==null)
       log=new KLog(System.out);
     return log;
   }
-  public @Override KHome getHome() {
+  public KPersist getPersist() {
+    if (persist==null)
+      persist=new KPersist(getHome(), getFail());
+    return persist;
+  }
+  protected KHome getHome() {
     if (home==null) 
       //This could be improved by using a command line argument
       home=new KHome("./test/home");
     return home;
   }
-  public @Override JFrame getMainFrame() {
-    if (mainFrame==null) {
-      mainFrame=new JFrame("Klonk - Test Main Frame");
-      KeyAdapter ka=new KeyAdapter() {
-        public void keyPressed(KeyEvent e){
-          if (e.getKeyCode()==KeyEvent.VK_ESCAPE)
-            System.exit(0);
-        }
-      };
-      mainFrame.addKeyListener(ka);
-      mainFrame.addWindowListener(new WindowAdapter() {
-        public void windowClosing(WindowEvent e){
-          System.exit(0);
-        }
-      });
-      mainFrame.setVisible(true);
-      mainFrame.setBounds(new java.awt.Rectangle(400,400,300,300));
-      mainFrame.toFront();
-    }
+  public JFrame getMainFrame() {
+    if (mainFrame==null) 
+      mainFrame=makeMainFrame();
     return mainFrame;
   }
-  public @Override StatusUpdate getStatusBar() {
+  public Fail getFail() {
+    if (fail==null)
+      fail=new Fail() {
+        public void fail(Throwable t){
+          t.printStackTrace(System.err);
+        }
+      };
+    return fail;
+  }
+  public StatusUpdate getStatusBar() {
     if (statusBar==null)
       statusBar=new StatusUpdate(){
         public void show(String msg)   {System.out.println(msg);}
@@ -81,35 +83,35 @@ public class PopupTestContext extends BootContext {
       };
     return statusBar;
   }
-  public @Override Popups getPopups() {
-    if (popups==null)
-      popups=new Popups(
-        home
-        ,getFail()
-        ,getMainFrame()
-        ,getPersist()
-        ,getStatusBar()
-        ,getPopupIcon() 
-        ,getCurrFileNameGetter()
-      );
-    return popups;
-  }
-  public @Override Menus getMenus() {
-    return null;
-  }
-  public @Override MainLayout getLayout() {
-    return null;
+  public Image getPopupIcon() {
+    return BootContext.getPopupIcon(this);
   }
   
-
-  //////////////////////////////////////////////////////////
-  //Interface implementations. 
-  //////////////////////////////////////////////////////////
-
-  protected Getter<String> getCurrFileNameGetter() {
-    return new Getter<String>(){
-      public String get(){return "-none-";}
+  ////////////////
+  // UTILITIES: //
+  ////////////////
+ 
+  public static JFrame makeMainFrame() {
+    BootContext.initLookFeel();
+    JFrame mainFrame=new JFrame("Klonk - Test Main Frame");
+    KeyAdapter ka=new KeyAdapter() {
+      public void keyPressed(KeyEvent e){
+        if (e.getKeyCode()==KeyEvent.VK_ESCAPE)
+          System.exit(0);
+      }
     };
+    mainFrame.addKeyListener(ka);
+    mainFrame.addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e){
+        System.exit(0);
+      }
+    });
+    mainFrame.setVisible(true);
+    mainFrame.setBounds(new java.awt.Rectangle(400,400,300,300));
+      mainFrame.toFront();
+    return mainFrame;
   }
-  
+
+    
+
 }

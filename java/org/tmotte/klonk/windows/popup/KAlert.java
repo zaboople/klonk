@@ -2,14 +2,14 @@ package org.tmotte.klonk.windows.popup;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -24,12 +24,14 @@ import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
+import org.tmotte.klonk.config.PopupTestContext;
+import org.tmotte.klonk.config.msg.Setter;
 
 /**
  * Always has one button - OK - and a message. Can display
  * larger, more complex messages unlike YesNoCancel.
  */
-class KAlert implements Fail {
+class KAlert implements Fail, Setter<String> {
 
   private JDialog win;
   private JLabel msgLabel=new JLabel();
@@ -70,8 +72,9 @@ class KAlert implements Fail {
     gb.addY(ok);
     msgLabel.setVisible(false);
   }
-  public void set(String message){
-    show(message);
+  /** Implements Setter interface */
+  public @Override void set(String message){
+    show(message.toString());
   }
   public void show(String message) {
     errorLabel.setSize(new Dimension(0,0));
@@ -115,7 +118,6 @@ class KAlert implements Fail {
     return message+"\n\n"+StackTracer.getStackTrace(e).replaceAll("\t", "    ");
   }
   private void show() {
-    ok.requestFocusInWindow();
     Point pt=parentFrame.getLocation();
     win.setLocation(pt.x+20, pt.y+20);
     win.setVisible(true);
@@ -132,11 +134,10 @@ class KAlert implements Fail {
   ///////////
 
   public static void main(String[] args) throws Exception {
-    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());    
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          JFrame frame=new JFrame("Klonk");
+          JFrame frame=PopupTestContext.makeMainFrame();
           KAlert ka=new KAlert(frame);
           try {throwTest();} catch (Exception f) {ka.fail(f);}
           ka.show("This is simply the most pornographic thing anybody's seen in a while, in these parts."

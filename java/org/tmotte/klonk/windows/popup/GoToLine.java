@@ -29,6 +29,8 @@ import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.windows.Positioner;
+import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.PopupTestContext;
 
 class GoToLine {
 
@@ -37,8 +39,8 @@ class GoToLine {
   /////////////////////////
 
   private JFrame parentFrame;
-  private Popups popups;
   private Fail fail;
+  private Setter<String> complainer;
 
   private JDialog win;
   private JTextField jtfRow;
@@ -51,10 +53,10 @@ class GoToLine {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public GoToLine(JFrame parentFrame, Fail fail, Popups popups) {
+  public GoToLine(JFrame parentFrame, Fail fail, Setter<String> complainer) {
     this.parentFrame=parentFrame;
     this.fail=fail;
-    this.popups=popups;
+    this.complainer=complainer;
     create();
     layout(); 
     listen();
@@ -97,12 +99,12 @@ class GoToLine {
       try {
         result=Integer.parseInt(jtfRow.getText());
       } catch (Exception e) {
-        popups.alert("Value entered is not a valid number ");
+        complainer.set("Value entered is not a valid number ");
         badEntry=true;
         return;
       }
       if (result<=0) {
-        popups.alert("Value must be greater than 0");
+        complainer.set("Value must be greater than 0");
         badEntry=true;
         return;
       }
@@ -190,7 +192,19 @@ class GoToLine {
   /// TEST: ///
   /////////////
   
-  public static void main(String[] args) throws Exception {
-  }
-  
+  public static void main(final String[] args) throws Exception {
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        try {
+          PopupTestContext ptc=new PopupTestContext(args);
+          JFrame parentFrame=ptc.getMainFrame();
+          KAlert alerter=new KAlert(parentFrame);
+          GoToLine gtl=new GoToLine(parentFrame, alerter, alerter);
+          gtl.show();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    });  
+  }  
 }

@@ -9,7 +9,8 @@ public class LineDelimiterOptions {
   public final static String 
     LFs=new String(new char[]{10}), 
     CRs=new String(new char[]{13}); 
-  public final static String CRLFs=CRs+LFs;
+  public final static String 
+    CRLFs=CRs+LFs;
   public final static Pattern pattern=Pattern.compile("([\\r][\\n]|[\\r]|[\\n])");
 
 

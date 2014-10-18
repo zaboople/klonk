@@ -15,14 +15,18 @@
   <property name="dist.dir" value="dist"/>
   <property name="lib.dir" value="lib"/>
   <property name="appname" value="klonk"/>
+
+  <property name="jar.dir" value="${lib.dir}/jar"/>
+  <property name="icon.ico" value="${lib.dir}/app.ico"/>
+
+  <property name="icon.png" value="${build.dir}/org/tmotte/klonk/windows/app.png"/>
+  <property name="iconFR.png" value="${build.dir}/org/tmotte/klonk/windows/app-find-replace.png"/>
+
   <property name="version" value="${VERSION.KLONK}"/>
   <property name="appname.version" value="${appname}.${version}"/>
-  <property name="icon.png" value="${build.dir}/org/tmotte/klonk/windows/app.png"/>
-  <property name="icon.ico" value="${lib.dir}/app.ico"/>
-  <property name="iconFR.png" value="${build.dir}/org/tmotte/klonk/windows/app-find-replace.png"/>
   
   <path id="classpath">
-    <fileset dir="${lib.dir}" includes="*.jar"/>
+    <fileset dir="${jar.dir}" includes="*.jar"/>
   </path>
   
   
@@ -78,12 +82,12 @@
   <!--****************-->
   
   <target name="config.test">
-    <copy file="lib/apptest.png"              tofile="${icon.png}" overwrite="true"/>
-    <copy file="lib/apptest-find-replace.png" tofile="${iconFR.png}" overwrite="true"/>
+    <copy file="${lib.dir}/apptest.png"              tofile="${icon.png}" overwrite="true"/>
+    <copy file="${lib.dir}/apptest-find-replace.png" tofile="${iconFR.png}" overwrite="true"/>
   </target>
   <target name="config.prod">
-    <copy file="lib/app.png"              tofile="${icon.png}"  overwrite="true"/>
-    <copy file="lib/app-find-replace.png" tofile="${iconFR.png}"  overwrite="true"/>
+    <copy file="${lib.dir}/app.png"              tofile="${icon.png}"  overwrite="true"/>
+    <copy file="${lib.dir}/app-find-replace.png" tofile="${iconFR.png}"  overwrite="true"/>
   </target>
   
   <!--****************-->
@@ -132,12 +136,13 @@
   <target name="jar" depends="compile">
     <mkdir dir ="${dist.dir}"/>
     <jar basedir="./build" destfile="dist/${appname}.jar">
+
+      <!--Unzip all the jars and zip them into our own jar:-->
+      <zipgroupfileset dir="${jar.dir}" includes="*.jar" /> 
+
       <manifest>
         <attribute name="Built-By" value="Mr Motte" />
-        <attribute name="Main-Class" value="org.tmotte.klonk.config.Boot" />
-
-        <!-- Finally, use the generated libs path 
-        <attribute name="Class-Path" value="${libs.project}" />-->
+        <attribute name="Main-Class" value="org.tmotte.klonk.config.BootContext" />
       </manifest>
     </jar>
   </target>
@@ -149,11 +154,9 @@
     </subant>
   </target>
   
-
   <!-- ********************* -->
   <!-- TARGETS: DISTRIBUTION -->
   <!-- ********************* -->
-
   
   <target name="dist" depends="_dist.src,_dist.bin,_dist.site">
     
@@ -173,7 +176,7 @@
   <target name="_dist.bin" depends="config.prod,jar,exe">
     <mkdir dir ="${dist.dir}/bin"/>
     <mkdir dir ="${dist.dir}/bin"/>
-    <copy file="lib/Klonk.bat"    todir="${dist.dir}/bin"/>
+    <copy file="${lib.dir}/Klonk.bat"    todir="${dist.dir}/bin"/>
     <copy file="dist/klonk.jar"   tofile="${dist.dir}/bin/${appname.version}.jar"/>
     <zip destfile="${dist.dir}/${appname.version}.zip">
       <zipfileset dir="${dist.dir}/bin" prefix="${appname.version}"/>

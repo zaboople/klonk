@@ -2,18 +2,14 @@ package org.tmotte.klonk.windows.popup;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +39,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
@@ -56,7 +53,7 @@ class FontPicker {
   private JFrame parentFrame;
   private Fail fail;
   private JDialog win;
-  private Popups popupMgr;
+  private Setter<String> alerter;
   private FontOptions fontOptions;
   private boolean ok=false;
   private Map<String,Font> goodFonts=new HashMap<>(),
@@ -79,10 +76,10 @@ class FontPicker {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public FontPicker(JFrame parentFrame, Fail fail, Popups popupMgr) {
+  public FontPicker(JFrame parentFrame, Fail fail, Setter<String> alerter) {
     this.parentFrame=parentFrame;
     this.fail=fail;
-    this.popupMgr=popupMgr;
+    this.alerter=alerter;
     create();
     layout(); 
     listen();
@@ -96,10 +93,10 @@ class FontPicker {
       if (!ok)
         return false;
       if (jlFonts.isSelectionEmpty())
-        popupMgr.alert("No font selected");
+        alerter.set("No font selected");
       else
       if (jlFontSize.isSelectionEmpty()) 
-        popupMgr.alert("No font size selected");
+        alerter.set("No font size selected");
       else {
         fontOptions.setFontName(jlFonts.getSelectedValue());
         fontOptions.setFontSize(jlFontSize.getSelectedValue());
@@ -513,11 +510,20 @@ class FontPicker {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
+          FontOptions fo=new FontOptions();
+          System.out.println(fo);
           PopupTestContext ptc=new PopupTestContext(args);
-          FontOptions fo=ptc.getPersist().getFontAndColors();
-          ptc.getPopups().doFontAndColors(fo);
-          ptc.getPersist().setFontAndColors(fo);
-          ptc.getPersist().save();
+          FontPicker fp=new FontPicker(
+            ptc.getMainFrame(),
+            ptc.getFail(),
+            new Setter<String>(){
+              public void set(String s) {
+                System.out.println("!!!!\n"+s+"\n!!!!");
+              }
+            }
+          );
+          fp.show(fo);
+          System.out.println(fo);
         } catch (Exception e) {
           e.printStackTrace();
         }

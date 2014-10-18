@@ -1,4 +1,5 @@
 package org.tmotte.klonk.config.option;
+import org.tmotte.common.text.DelimitedString;
 import org.tmotte.common.swang.Fail;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -13,6 +14,7 @@ public class FontOptions {
   private Color caretColor=Color.BLACK;
   private Color backgroundColor=Color.WHITE;
 
+  // GETS: //
   public Color getCaretColor() {
     return caretColor;
   }  
@@ -34,6 +36,7 @@ public class FontOptions {
     return fontSize;
   }
   
+  // SETS: //
   public FontOptions setFontName(String name) {
     this.fontName=name;
     this.font=null;
@@ -56,5 +59,12 @@ public class FontOptions {
     this.caretColor=color;
     return this;
   }
+  public String toString() {
+    DelimitedString ds=new DelimitedString(", ");
+    ds.addEach("Caret:"+getCaretColor(), "BG:"+getBackgroundColor(), "Color:"+getColor(), 
+               "Font: "+getFont(), "Name: "+getFontName(), "Size: "+getFontSize());
+    return ds.toString();
+  }
+  
   
 }

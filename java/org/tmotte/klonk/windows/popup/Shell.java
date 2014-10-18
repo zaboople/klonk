@@ -33,7 +33,7 @@ class Shell {
   //DI components:
   private JFrame parentFrame;
   private Fail fail;
-  private Popups popups;
+  private FileDialogWrapper fdw;
   private KPersist persist;
   private Getter<String> currFileGetter;
 
@@ -49,13 +49,19 @@ class Shell {
   private boolean shownBefore=false;
   private List<String> persistedFiles=new LinkedList<>();
 
-  public Shell(JFrame parentFrame, Fail fail, KPersist persist, 
-               Popups popups, Image img, Getter<String> cfGetter) {
+  public Shell(
+     JFrame parentFrame, 
+     Fail fail, 
+     KPersist persist, 
+     FileDialogWrapper fdw, 
+     Image img, 
+     Getter<String> currFileGetter
+    ) {
     this.parentFrame=parentFrame;
     this.fail=fail;
-    this.popups=popups;
+    this.fdw=fdw;
     this.persist=persist;
-    this.currFileGetter=cfGetter;
+    this.currFileGetter=currFileGetter;
     persist.getCommands(persistedFiles);
     create(img);
     layout(persist); 
@@ -82,12 +88,12 @@ class Shell {
 
   private void showFileDialog() {
     File file=new File(jcbPrevious.getEditor().getItem().toString());
-    file=popups.showFileDialog(false, file);
+    file=fdw.show(false, file, null);
     if (file!=null)
       try {
         jcbPrevious.getEditor().setItem(file.getCanonicalPath());
       } catch (Exception e) {
-        popups.fail(e);
+        fail.fail(e);
       }
   }
 
@@ -196,10 +202,7 @@ class Shell {
       //touch any Swing component whatsoever. Leave that for process() & done().
       kill=false;
       try {
-        String currFile=ShellCommandParser.referencesCurrFile(input) 
-          ?currFileGetter.get()
-          :null;
-        List<String> commands=ShellCommandParser.parse(input, currFile);
+        List<String> commands=ShellCommandParser.parse(input, currFileGetter.get());
         for (int i=0; i<commands.size(); i++)
           if (i==0)
             publish("Command: "+commands.get(i));
@@ -462,10 +465,19 @@ class Shell {
   /////////////
   
   public static void main(final String[] args) throws Exception {
+
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         PopupTestContext ptc=new PopupTestContext(args);
-        ptc.getPopups().showShell();
+        Shell shell=new Shell(
+          ptc.getMainFrame(), ptc.getFail(), ptc.getPersist(),
+          new FileDialogWrapper(ptc.getMainFrame()),
+          ptc.getPopupIcon(),
+          new Getter<String>() {
+            public String get() {return null;}
+          }
+        );
+        shell.show();
         //Won't work because previous command is not synchronous
         //ptc.getPersist().save();
       }

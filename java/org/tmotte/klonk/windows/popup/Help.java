@@ -27,7 +27,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JWindow;
 import org.tmotte.common.io.Loader;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.option.FontOptions;
@@ -40,12 +39,10 @@ class Help {
   private JDialog win;
   private MyTextArea mta;
   private Container mtaContainer;
-  private Fail fail;
   private String homeDir;
 
-  public Help(JFrame parentFrame, Fail fail, String homeDir) {
+  public Help(JFrame parentFrame, String homeDir) {
     this.parentFrame=parentFrame;
-    this.fail=fail;
     this.homeDir=homeDir;
     create();
     layout();
@@ -134,8 +131,7 @@ class Help {
   public static void main(final String[] args) throws Exception{
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        PopupTestContext ptc=new PopupTestContext(args);
-        ptc.getPopups().showHelp();
+        new Help(PopupTestContext.makeMainFrame(), ".").show();
       }
     });  
       

@@ -8,9 +8,6 @@ import java.util.regex.Pattern;
 class ShellCommandParser {
   static Pattern delimiterPattern=Pattern.compile("(\"|'|\\p{Blank})");
   static String currFileMarker="[$1]";
-  public static boolean referencesCurrFile(String cmd) {
-    return currFileMarker.indexOf(currFileMarker)!=-1;
-  }
   public static List<String> parse(String cmd) {
     return parse(cmd, null);
   }
@@ -54,6 +51,9 @@ class ShellCommandParser {
     return getProgramArguments(results, sc);
   }
     
+  private static boolean referencesCurrFile(String cmd) {
+    return currFileMarker.indexOf(currFileMarker)!=-1;
+  }
     
   private static List<String> getProgramArguments(List<String> results, StringChunker sc){
 
@@ -80,9 +80,12 @@ class ShellCommandParser {
       results.add(sc.getRest());
     return results;
   }
+  
+  ///////////
+  // TEST: //
+  ///////////
+  
   public static void main(String[] args) {
-    //I tested a lot with this thing:
-    //   C:\Program Files\ATI Technologies\ATI Control Panel\atiprbxx.exe
     String 
       command=args[0],
       currFileName=args.length>1

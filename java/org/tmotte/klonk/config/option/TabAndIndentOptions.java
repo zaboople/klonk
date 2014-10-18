@@ -21,4 +21,5 @@ public class TabAndIndentOptions {
              indentionModeDefault;
   public int indentSpacesSize, 
              tabSize;
+
 }

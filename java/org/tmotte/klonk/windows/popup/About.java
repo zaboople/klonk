@@ -26,7 +26,6 @@ import javax.swing.JTextPane;
 import javax.swing.JWindow;
 import javax.swing.ScrollPaneConstants;
 import org.tmotte.common.io.Loader;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
@@ -36,7 +35,6 @@ import org.tmotte.klonk.windows.Positioner;
 class About {
 
   private JFrame parentFrame;
-  private Fail fail;
   private JDialog win;
   private JTextPane jtpLicense=new JTextPane(), jtpVersion=new JTextPane();
   private JScrollPane jspLicense;
@@ -46,9 +44,8 @@ class About {
   // PUBLIC METHODS: //
   /////////////////////
   
-  public About(JFrame frame, Fail fail) {
+  public About(JFrame frame) {
     this.parentFrame=frame;
-    this.fail=fail;
     create();
     layout();
     listen();
@@ -149,9 +146,7 @@ class About {
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Popups p=new PopupTestContext(args).getPopups();
-        p.showHelpAbout();
-        p.getMainFrame().dispose();
+        new About(PopupTestContext.makeMainFrame()).show();
       }
     });  
   }

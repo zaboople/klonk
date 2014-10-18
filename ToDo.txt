@@ -1,4 +1,5 @@
 -Current
+  
   -Maybe a more sophisticated version of find/replace, where I break up the String? It is pretty slow on an 8MB file.
     -Loop thru 20000 characters at a time, appending last searchFor.length() from previous to first. 
     -This becomes even trickier with regex, but Matcher does have the ability to tell you that the end of a string is a partial match.

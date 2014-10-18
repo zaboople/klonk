@@ -18,10 +18,13 @@ import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
+import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
+import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 
 /**
- * This is a sort of sublayer in our DI/IoC setup. Note that
- * Popups does lazy initialization.
+ * This is a sort of sublayer in our DI/IoC setup. Rather than creating 
+ * all the possible UI components at boot, controllers receive an instance
+ * of Popups and fetch lazy-initialized components from it. 
  */
 public class Popups {
 
@@ -175,7 +178,7 @@ public class Popups {
   
   private GoToLine getGoToLine() {
     if (goToLinePicker==null)
-      goToLinePicker=new GoToLine(mainFrame, fail, this);
+      goToLinePicker=new GoToLine(mainFrame, fail, getAlerter());
     return goToLinePicker;
   }
   private KAlert getAlerter() {
@@ -197,16 +200,23 @@ public class Popups {
   private Shell getShell() {
     if (shell==null) {
       shell=new Shell(
-        mainFrame, fail, persist, this, 
-        iconImagePopup, currFileGetter
+        mainFrame, 
+        fail, 
+        persist, 
+        getFileDialog(), 
+        iconImagePopup, 
+        currFileGetter
       );
       shell.setFont(fontOptions);
     }
     return shell;
   }
   private FileDialogWrapper getFileDialog() {
-    if (fileDialogWrapper==null)
+    if (fileDialogWrapper==null){
       fileDialogWrapper=new FileDialogWrapper(mainFrame);  
+      fileDialogWrapper.getChooser().setFileSystemView(new SSHFileSystemView());
+      fileDialogWrapper.getChooser().setFileView(new SSHFileView());
+    }
     return fileDialogWrapper;
   }
   
@@ -214,45 +224,38 @@ public class Popups {
   // PRIVATE getX() LESS FREQUENTLY USED:  //
   ///////////////////////////////////////////
   
-  private KAlert getKAlert() {
-    if (kAlert==null)
-      kAlert=new KAlert(mainFrame);
-    return kAlert;
-  }
   private Help getHelp() {
     if (help==null){
-      help=new Help(mainFrame, fail, home.getUserHome());
+      help=new Help(mainFrame, home.getUserHome());
       help.setFont(fontOptions);
     }
     return help;
   }
   private About getAbout() {
     if (about==null)
-      about=new About(mainFrame, fail);
+      about=new About(mainFrame);
     return about;
   }
   private FontPicker getFontPicker() {
     if (fontPicker==null)
-      fontPicker=new FontPicker(mainFrame, fail, this);
+      fontPicker=new FontPicker(mainFrame, fail, getAlerter());
     return fontPicker;
   }
   private Favorites getFavorites() {
     if (favorites==null){
-      favorites=new Favorites(mainFrame, fail, this);
+      favorites=new Favorites(mainFrame);
       favorites.setFont(fontOptions);
     }
     return favorites;
   }
   private LineDelimiters getLineDelimiters() {
     if (kDelims==null)
-      kDelims=new LineDelimiters(
-        mainFrame, fail
-      );
+      kDelims=new LineDelimiters(mainFrame);
     return kDelims;
   }
   private TabsAndIndents getTabsAndIndents() {
     if (tabsAndIndents==null) 
-      tabsAndIndents=new TabsAndIndents(mainFrame, fail);
+      tabsAndIndents=new TabsAndIndents(mainFrame);
     return tabsAndIndents;
   }
 }

@@ -24,7 +24,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.PopupTestContext;
@@ -45,14 +44,12 @@ class LineDelimiters {
   
   private LineDelimiterListener listener;
   private LineDelimiterOptions options=new LineDelimiterOptions();
-  private Fail failer;
 
   /////////////////////
   // INITIALIZATION: //
   /////////////////////
 
-  public LineDelimiters(JFrame frame, Fail failer) {
-    this.failer=failer;
+  public LineDelimiters(JFrame frame) {
     parentFrame=frame;
     win=new JDialog(frame, true);
     win.setTitle("Line delimiters");
@@ -240,9 +237,8 @@ class LineDelimiters {
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Popups p=new PopupTestContext(args).getPopups();
         LineDelimiterOptions kdo=new LineDelimiterOptions();
-        p.showLineDelimiters(
+        new LineDelimiters(PopupTestContext.makeMainFrame()).show(
           kdo,
           new LineDelimiterListener(){ 
             public void setDefault(String i) {System.out.println("Default >"+i+"<");}

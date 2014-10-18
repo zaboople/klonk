@@ -13,27 +13,29 @@ import javax.swing.JFrame;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.PopupTestContext;
+import javax.swing.filechooser.FileSystemView;
 
 /** 
  * The FileDialog/JFileChooser classes already do most of the work, so this just does a minimal 
  * bit of upkeep and whatnot. It used to be in the Popups class, but at the risk of earning the title
  * of Wrapper/Facade/Factory Abuser, I moved it down here so Popups could be more focused on its primary task.
  */
-class FileDialogWrapper {
+public class FileDialogWrapper {
 
   private JFrame mainFrame;
   private FileDialog fileDialog;
-  private JFileChooser fileChooser;
+  //JFileChooser sucks but not as bad when used in native mode:
+  private JFileChooser fileChooser=new JFileChooser();;
   
-  FileDialogWrapper(JFrame mainFrame){
+  public FileDialogWrapper(JFrame mainFrame){
     this.mainFrame=mainFrame;
   }
 
-  File show(boolean forSave, File startFile, File startDir) {
-    if (true) {
-      //JFileChooser sucks but not as bad when used in native mode:
-      if (fileChooser==null)
-        fileChooser=new JFileChooser();
+  public JFileChooser getChooser() {
+    return fileChooser;
+  }
+  public File show(boolean forSave, File startFile, File startDir) {
+    if (fileChooser!=null) {
       if (startFile!=null){
         if (startFile.isDirectory()){
           startDir=startFile;
@@ -79,20 +81,23 @@ class FileDialogWrapper {
       }
   }
   public static void main(final String[] args) {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        Popups p=new PopupTestContext(args).getPopups();
-        File d=new File(args[0]),
-            f=new File(args[1]);
-        System.out.println("For save: >"+p.showFileDialog(true)+"<");
-        System.out.println("For save to file: >"+p.showFileDialog(true, f)+"<");
-        System.out.println("For save to dir: >"+p.showFileDialogForDir(true, d)+"<");
-      
-        System.out.println("For open: >"+p.showFileDialog(false)+"<");
-        System.out.println("For open to file: >"+p.showFileDialog(false, f)+"<");
-        System.out.println("For open to dir: >"+p.showFileDialogForDir(false, d)+"<");
-      }
-    });
+    if (args.length<2)
+      System.err.println("Need a directory & file");
+    else
+      javax.swing.SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          FileDialogWrapper fdw=new FileDialogWrapper(new PopupTestContext(args).getMainFrame());
+          File d=new File(args[0]),
+              f=new File(args[1]);
+          System.out.println("For save: >"+fdw.show(true, null, null)+"<");
+          System.out.println("For save to file: "+f+" -> "+fdw.show(true, f, null)+"<");
+          System.out.println("For save to dir: "+d+" -> "+fdw.show(true, null, d)+"<");
+        
+          System.out.println("For open: >"+fdw.show(false, null, null)+"<");
+          System.out.println("For open to file: "+f+" -> "+fdw.show(false, f, null)+"<");
+          System.out.println("For open to dir: "+d+" ->"+fdw.show(false, null, d)+"<");
+        }
+      });
   }
 
 }

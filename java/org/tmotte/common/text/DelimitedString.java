@@ -118,12 +118,12 @@ public class DelimitedString implements Appender {
     return this;
   }
   /** Adds each member of <code>list</code> individually. */
-  public DelimitedString addEach(Object[] list){
+  public DelimitedString addEach(Object... list){
     for (Object o: list)
       add(o);
     return this;
   }
-  
+    
   /////////////////
   // Generation: //
   /////////////////
