@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Properties;
 import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 
@@ -111,6 +112,19 @@ public class KPersist {
       set("Indent.DefaultMode", "SPACES");
     setInt("Indent.SpacesSize", taio.indentSpacesSize);
     setInt("Tabs.Size", taio.tabSize);
+  }
+
+  // SSH OPTIONS: //
+  
+  public SSHOptions getSSHOptions(){
+    SSHOptions opts=new SSHOptions();
+    opts.setKnownHostsFilename(get("SSH.KnownHosts", null));
+    opts.setPrivateKeysFilename(get("SSH.PrivateKeys", null));
+    return opts;
+  }
+  public void setSSHOptions(SSHOptions opts){
+    set("SSH.KnownHosts", opts.getKnownHostsFilename());
+    set("SSH.PrivateKeys", opts.getPrivateKeysFilename());
   }
 
   // LINE DELIMITERS: //

@@ -11,6 +11,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -38,9 +39,16 @@ public class SSHFiles {
   private JFrame parentFrame;
   private FileDialogWrapper fdw;
   
-  private JTextField jtfKnownHosts=new JTextField();
-  private JTextField jtfPrivateKeys=new JTextField();  
-  private JButton btnKnownHosts, btnPrivateKeys;
+  private JCheckBox 
+    jcbKnownHosts, 
+    jcbPrivateKeys;
+  private JTextField 
+    jtfKnownHosts, 
+    jtfPrivateKeys;  
+  private JButton 
+    btnKnownHosts, 
+    btnPrivateKeys;
+  
   
   private JDialog win;
   private JButton btnOK, btnCancel;
@@ -59,9 +67,19 @@ public class SSHFiles {
   }  
   public boolean show(SSHOptions options) {
     result=false;
+    jcbKnownHosts.setSelected( ifEmpty(options.getKnownHostsFilename()) !=null);
+    jcbPrivateKeys.setSelected(ifEmpty(options.getPrivateKeysFilename())!=null);
+    setVisible();
     doShow();
+    if (result) {
+      if (jcbKnownHosts.isSelected())
+        options.setKnownHostsFilename(ifEmpty(jtfKnownHosts));
+      if (jcbPrivateKeys.isSelected())
+        options.setPrivateKeysFilename(ifEmpty(jtfPrivateKeys));
+    }
     return result;
   }
+  /** For looping */
   private void doShow() {
     Positioner.set(parentFrame, win);
     win.setVisible(true);
@@ -87,14 +105,21 @@ public class SSHFiles {
     win=new JDialog(parentFrame, true);
     win.setResizable(false);
     win.setTitle("SSH Configuration");
+
+    jcbKnownHosts=new JCheckBox("Known hosts");
+    jtfKnownHosts=new JTextField();
+    jtfKnownHosts.setColumns(45);
+    btnKnownHosts=new JButton("...");
+
+    jcbPrivateKeys=new JCheckBox("Private keys");
+    jtfPrivateKeys=new JTextField();  
+    jtfPrivateKeys.setColumns(45);
+    btnPrivateKeys=new JButton("...");
+
     btnOK    =new JButton("OK");
     btnOK.setMnemonic(KeyEvent.VK_K);
     btnCancel=new JButton("Cancel");
     btnCancel.setMnemonic(KeyEvent.VK_C);
-    btnKnownHosts=new JButton("...");
-    btnPrivateKeys=new JButton("...");
-    jtfKnownHosts.setColumns(45);
-    jtfPrivateKeys.setColumns(45);
   }
   private void layout(){
     GridBug gb=new GridBug(win);
@@ -118,17 +143,15 @@ public class SSHFiles {
     gb.insets.bottom=2;
     gb.insets.left=5;
 
-    {
-      gb.add(new JLabel("Known hosts"));
-      gb.addX(jtfKnownHosts);
-      gb.addX(btnKnownHosts);
-    }
-    {
-      gb.setX(0);
-      gb.addY(new JLabel("Private key(s)"));
-      gb.addX(jtfPrivateKeys);
-      gb.addX(btnPrivateKeys);
-    }
+    gb.add(jcbKnownHosts);
+    gb.addX(jtfKnownHosts);
+    gb.addX(btnKnownHosts);
+
+    gb.setX(0);
+
+    gb.addY(jcbPrivateKeys);
+    gb.addX(jtfPrivateKeys);
+    gb.addX(btnPrivateKeys);
     
     return jp;
   }
@@ -147,8 +170,35 @@ public class SSHFiles {
     return panel;
   }
   
+  /////////////
+  // LISTEN: //
+  /////////////
 
   private void listen() {
+    listenOKCancel();
+
+    //Checkboxes enable text/file browsing:
+    Action jcbAction=new AbstractAction() {
+      public void actionPerformed(ActionEvent event) {setVisible();}
+    };
+    jcbKnownHosts.addActionListener(jcbAction);
+    jcbPrivateKeys.addActionListener(jcbAction);
+    
+    //GetFiles
+    listenFileSelector(jtfKnownHosts, btnKnownHosts);
+    listenFileSelector(jtfPrivateKeys, btnPrivateKeys);    
+  }
+  private void listenFileSelector(final JTextField jtf, JButton btn) {
+    Action act=new AbstractAction() {
+      public void actionPerformed(ActionEvent event) {
+        String s=showFileDialog(jtf);
+        if (s!=null)
+          jtf.setText(s);
+      }
+    };
+    btn.addActionListener(act);
+  }
+  private void listenOKCancel() {
     Action okAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(true);}
     };
@@ -160,17 +210,34 @@ public class SSHFiles {
     };
     btnCancel.addActionListener(cancelAction);
     KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
-    KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
+    KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));  
   }
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
-    result=false;
+    result=action;
     win.setVisible(false);  
-    if (action){
-      result=true;
-    }
+  }
+  private void setVisible() {
+    boolean kh=jcbKnownHosts.isSelected(),
+            pk=jcbPrivateKeys.isSelected();
+    jtfKnownHosts.setEnabled(kh);
+    btnKnownHosts.setEnabled(kh);
+    jtfPrivateKeys.setEnabled(pk);
+    btnPrivateKeys.setEnabled(pk);
   }
   
+  ////////////////
+  // UTILITIES: //
+  ////////////////
+  
+  private String ifEmpty(JTextField jtf) {
+    return ifEmpty(jtf.getText());
+  }
+  private String ifEmpty(String s) {
+    return s==null || s.trim()==""
+      ?null
+      :s.trim();
+  }
 
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -181,7 +248,8 @@ public class SSHFiles {
           SSHFiles pop=new SSHFiles(parentFrame, new FileDialogWrapper(parentFrame));
           SSHOptions sopt=new SSHOptions();
           //FIXME put default values in
-          pop.show(sopt);
+          if (pop.show(sopt))
+            System.out.println(sopt);
         } catch (Exception e) {
           e.printStackTrace();
         }

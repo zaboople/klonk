@@ -2,14 +2,14 @@ package org.tmotte.klonk.config.option;
 
 public class SSHOptions {
   private String knownHostsFilename;
-  private String privateKeyFilename;
+  private String privateKeysFilename;
 
   // GETS: //
   public String getKnownHostsFilename() {
     return knownHostsFilename;
   }  
-  public String getPrivateKeyFilename() {
-    return privateKeyFilename;
+  public String getPrivateKeysFilename() {
+    return privateKeysFilename;
   }  
   
   // SETS: //
@@ -17,8 +17,13 @@ public class SSHOptions {
     this.knownHostsFilename=name;
     return this;
   }
-  public SSHOptions setPrivateKeyFilename(String name) {
-    this.privateKeyFilename=name;
+  public SSHOptions setPrivateKeysFilename(String name) {
+    this.privateKeysFilename=name;
     return this;
+  }
+  
+  public String toString(){
+    return "Known Hosts:"+knownHostsFilename
+        +"\nPrivate keys:"+privateKeysFilename;
   }
 }
