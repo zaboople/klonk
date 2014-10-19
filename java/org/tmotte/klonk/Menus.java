@@ -72,7 +72,7 @@ public class Menus {
                     selectUpperCase, selectLowerCase, selectSortLines, selectGetSelectionSize,  selectGetAsciiValues, 
                     weirdInsertToAlign, weirdInsertToAlignBelow, weirdBackspaceToAlign, weirdBackspaceToAlignBelow,
                     externalRunBatch,
-                    optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites,
+                    optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionWordWrap;
 
@@ -624,6 +624,7 @@ public class Menus {
       ,optionLineDelimiters=mu.doMenuItem("Line delimiters",              optionListener, KeyEvent.VK_L)
       ,optionFont          =mu.doMenuItem("Font & colors",                optionListener, KeyEvent.VK_F)
       ,optionFavorites     =mu.doMenuItem("Favorite files & directories", optionListener, KeyEvent.VK_A)
+      ,optionSSH           =mu.doMenuItem("SSH Options",                  optionListener, KeyEvent.VK_S)
     );
     
     //HELP:
@@ -838,6 +839,8 @@ public class Menus {
         if (s==optionFont)            ctrlOptions.doFontAndColors();
         else
         if (s==optionFavorites)       ctrlOptions.doFavorites();
+        else
+        if (s==optionSSH)             ctrlOptions.doSSH();
       }
     }
     , 

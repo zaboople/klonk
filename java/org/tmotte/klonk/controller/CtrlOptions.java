@@ -7,6 +7,7 @@ import org.tmotte.klonk.windows.popup.Popups;
 import java.util.LinkedList;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
+import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 
@@ -18,6 +19,7 @@ public class CtrlOptions {
   private Favorites favorites;
   private TabAndIndentOptions taio;
   private FontOptions fontOptions;
+  private SSHOptions sshOptions;
   private LineDelimiterListener delimListener;
   
   public CtrlOptions(
@@ -31,6 +33,7 @@ public class CtrlOptions {
     this.favorites=favorites;
     this.taio=persist.getTabAndIndentOptions();
     this.fontOptions=persist.getFontAndColors();
+    this.sshOptions=persist.getSSHOptions();
     this.delimListener=delimListener;
   }
   
@@ -79,5 +82,12 @@ public class CtrlOptions {
     popups.showLineDelimiters(k, delimListener);
   }
 
- 
+  public void doSSH(){ 
+    if (popups.showSSHOptions(sshOptions)){
+      persist.setSSHOptions(sshOptions);
+      statusBar.show("SSH Options saved.");
+    }
+    else
+      statusBar.show("Cancelled.");
+  }
 }

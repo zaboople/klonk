@@ -16,6 +16,7 @@ import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
+import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
@@ -24,7 +25,9 @@ import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 /**
  * This is a sort of sublayer in our DI/IoC setup. Rather than creating 
  * all the possible UI components at boot, controllers receive an instance
- * of Popups and fetch lazy-initialized components from it. 
+ * of Popups and fetch lazy-initialized components from it. In truth, the lazy
+ * initialization might well be better done in the components itself, but being
+ * lazy is all about being lazy.
  */
 public class Popups {
 
@@ -44,6 +47,7 @@ public class Popups {
   private TabsAndIndents tabsAndIndents;
   private FontPicker fontPicker;
   private Favorites favorites;
+  private SSHFiles sshFiles;  
 
   //DI resources:
   private JFrame mainFrame;
@@ -168,6 +172,9 @@ public class Popups {
   public File showFileDialogForDir(boolean forSave, File startDir) {
     return getFileDialog().show(forSave, null, startDir);
   }
+  public boolean showSSHOptions(SSHOptions ssho) {
+    return getSSHFiles().show(ssho);
+  }
 
 
   
@@ -247,6 +254,11 @@ public class Popups {
       favorites.setFont(fontOptions);
     }
     return favorites;
+  }
+  private SSHFiles getSSHFiles() {
+    if (sshFiles==null)
+      sshFiles=new SSHFiles(getMainFrame(), getFileDialog());
+    return sshFiles;
   }
   private LineDelimiters getLineDelimiters() {
     if (kDelims==null)

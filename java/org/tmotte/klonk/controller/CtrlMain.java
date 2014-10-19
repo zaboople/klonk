@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Iterator;
 import javax.swing.SwingWorker;
 import org.tmotte.common.swang.Fail;
-import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
