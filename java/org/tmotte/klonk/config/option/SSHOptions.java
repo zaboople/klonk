@@ -21,6 +21,4 @@ public class SSHOptions {
     this.privateKeyFilename=name;
     return this;
   }
-  
-  
 }
