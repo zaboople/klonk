@@ -43,8 +43,8 @@ class SSHLogin {
   private JFrame parentFrame;
   private Setter<String> alerter;
 
-  private JTextField jtfUsername=new JTextField();
-  private JPasswordField jpfPass=new JPasswordField();
+  private JTextField jtfUsername;
+  private JPasswordField jpfPass;
   private JDialog win;
   private JButton btnOK, btnCancel;
   private boolean ok=false, badEntry=false, cancelled=false;
@@ -117,6 +117,8 @@ class SSHLogin {
     win=new JDialog(parentFrame, true);
     win.setResizable(false);
     win.setTitle("SSH Login");
+    jtfUsername=new JTextField();
+    jpfPass=new JPasswordField();    
     btnOK    =new JButton("OK");
     btnOK.setMnemonic(KeyEvent.VK_K);
     btnCancel=new JButton("Cancel");

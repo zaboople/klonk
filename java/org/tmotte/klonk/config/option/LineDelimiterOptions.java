@@ -72,8 +72,6 @@ public class LineDelimiterOptions {
   ///////////
   
   
-  
-  /** OK So this works. */
   public static void main(String[] args) throws Exception {
     java.io.InputStreamReader br=new java.io.InputStreamReader(new java.io.FileInputStream(args[0]));
     int charsRead;

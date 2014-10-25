@@ -42,12 +42,12 @@ class Shell {
   private MyTextArea mtaOutput;
   private JButton btnRun, btnClose, btnSwitch, btnSelectFile, btnForgetFile, btnStop;
   private JComboBox<String> jcbPrevious;
-  private DefaultComboBoxModel<String> jcbPreviousData=new DefaultComboBoxModel<>();
-  private Font fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
+  private DefaultComboBoxModel<String> jcbPreviousData;
+  private Font fontBold;
 
   //State:
   private boolean shownBefore=false;
-  private List<String> persistedFiles=new LinkedList<>();
+  private List<String> persistedFiles;
 
   public Shell(
      JFrame parentFrame, 
@@ -62,7 +62,6 @@ class Shell {
     this.fdw=fdw;
     this.persist=persist;
     this.currFileGetter=currFileGetter;
-    persist.getCommands(persistedFiles);
     create(img);
     layout(persist); 
     listen();
@@ -254,6 +253,11 @@ class Shell {
 
 
   private void create(Image img){
+    jcbPreviousData=new DefaultComboBoxModel<>();
+    fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
+    persistedFiles=new LinkedList<>();
+    persist.getCommands(persistedFiles);
+  
     String hStart="<html><body>",
            hEnd="</body></html>",
            bStart="<b>",

@@ -48,8 +48,7 @@ public class SSHFiles {
   private JButton 
     btnKnownHosts, 
     btnPrivateKeys;
-  
-  
+
   private JDialog win;
   private JButton btnOK, btnCancel;
 
