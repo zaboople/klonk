@@ -52,9 +52,9 @@ class FindAndReplace {
   MyTextArea mtaFind, mtaReplace;
   JComponent contFind, contReplace;
   JCheckBox chkReplace, chkCase, chkReplaceAll, chkConfirmReplace, chkRegex;
-  JButton btnFind=new JButton(),
-          btnReverse=new JButton(),
-          btnCancel=new JButton();
+  JButton btnFind,
+          btnReverse,
+          btnCancel;
   JLabel lblFind;
   
   //Other windows. Yes we technically violate our singleton sort-of-a-rule here, creating
@@ -419,10 +419,13 @@ class FindAndReplace {
     
 
     //Bottom buttons:
+    btnFind=new JButton();
     btnFind.setText("Find");
     btnFind.setFont(fontBold);
+    btnReverse=new JButton();
     btnReverse.setText("Find Reverse");
     btnReverse.setFont(fontBold);
+    btnCancel=new JButton();
     btnCancel.setText("Cancel");
 
     lblFind.setDisplayedMnemonic( KeyEvent.VK_D);

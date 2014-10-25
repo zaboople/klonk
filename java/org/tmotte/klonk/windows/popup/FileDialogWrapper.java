@@ -14,6 +14,7 @@ import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.PopupTestContext;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.filechooser.FileView;
 
 /** 
  * The FileDialog/JFileChooser classes already do most of the work, so this just does a minimal 
@@ -24,16 +25,30 @@ public class FileDialogWrapper {
 
   private JFrame mainFrame;
   private FileDialog fileDialog;
-  //JFileChooser sucks but not as bad when used in native mode:
-  private JFileChooser fileChooser=new JFileChooser();;
   
-  public FileDialogWrapper(JFrame mainFrame){
+  //JFileChooser sucks but not as bad when used in native mode:
+  private JFileChooser fileChooser;
+  private FileView fileView;
+  private FileSystemView fileSystemView;
+  
+  public FileDialogWrapper(JFrame mainFrame, FileSystemView fsv, FileView fv){
     this.mainFrame=mainFrame;
+    this.fileSystemView=fsv;
+    this.fileView=fv;
+    create();
+  }
+  public FileDialogWrapper(JFrame mainFrame){
+    this(mainFrame, null, null);
+  }
+  private void create() {
+    fileChooser=new JFileChooser();
+    if (fileSystemView!=null)
+      fileChooser.setFileSystemView(fileSystemView);
+    if (fileView!=null)
+      fileChooser.setFileView(fileView);   
+    //fileDialog=new FileDialog(mainFrame);
   }
 
-  public JFileChooser getChooser() {
-    return fileChooser;
-  }
   public File show(boolean forSave, File startFile, File startDir) {
     if (fileChooser!=null) {
       if (startFile!=null){
@@ -55,30 +70,27 @@ public class FileDialogWrapper {
       else
         return null;
     }
-    else
-      try {
-        //Unused; Broken on MS Windows XP. If you do "save as" and the old file
-        //name is longer than the new one, the last characters from the old
-        //file get appended to the new one - very likely a null terminated string
-        //problem. I tried everything and it was unfixable.
-        if (fileDialog==null)
-          fileDialog=new FileDialog(mainFrame);
-        FileDialog fd=fileDialog;
-        if (startFile!=null)
-          fd.setFile(startFile.getCanonicalPath().trim());
-        if (startDir!=null) 
-          fd.setDirectory(startDir.getCanonicalPath());
-        fd.setTitle(forSave ?"Save" :"Open");
-        fd.setMode(forSave ?fd.SAVE :fd.LOAD);
-        fd.setVisible(true);
-        
-        File[] f=fd.getFiles();
-        if (f==null || f.length==0)
-          return null;
-        return f[0];
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
+    else try {
+      //Unused; Broken on MS Windows XP. If you do "save as" and the old file
+      //name is longer than the new one, the last characters from the old
+      //file get appended to the new one - very likely a null terminated string
+      //problem. I tried everything and it was unfixable.
+      FileDialog fd=fileDialog;
+      if (startFile!=null)
+        fd.setFile(startFile.getCanonicalPath().trim());
+      if (startDir!=null) 
+        fd.setDirectory(startDir.getCanonicalPath());
+      fd.setTitle(forSave ?"Save" :"Open");
+      fd.setMode(forSave ?fd.SAVE :fd.LOAD);
+      fd.setVisible(true);
+      
+      File[] f=fd.getFiles();
+      if (f==null || f.length==0)
+        return null;
+      return f[0];
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
   public static void main(final String[] args) {
     if (args.length<2)

@@ -219,11 +219,10 @@ public class Popups {
     return shell;
   }
   private FileDialogWrapper getFileDialog() {
-    if (fileDialogWrapper==null){
-      fileDialogWrapper=new FileDialogWrapper(mainFrame);  
-      fileDialogWrapper.getChooser().setFileSystemView(new SSHFileSystemView());
-      fileDialogWrapper.getChooser().setFileView(new SSHFileView());
-    }
+    if (fileDialogWrapper==null)
+      fileDialogWrapper=new FileDialogWrapper(
+        mainFrame, new SSHFileSystemView(), new SSHFileView()
+      );
     return fileDialogWrapper;
   }
   

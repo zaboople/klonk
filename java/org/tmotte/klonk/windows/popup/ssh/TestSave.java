@@ -13,9 +13,11 @@ class TestSave {
       public void run() {
         try {
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
-            new org.tmotte.klonk.windows.popup.FileDialogWrapper(PopupTestContext.makeMainFrame());
-          fdw.getChooser().setFileSystemView(new SSHFileSystemView());
-          fdw.getChooser().setFileView(new SSHFileView());
+            new org.tmotte.klonk.windows.popup.FileDialogWrapper(
+              PopupTestContext.makeMainFrame(),
+              new SSHFileSystemView(),
+              new SSHFileView()
+            );
           SSHFile file=
             new SSHFile(
               ssh, 

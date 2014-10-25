@@ -30,20 +30,14 @@ import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 
 class LineDelimiters {
-  public int AllLineDelimiters=-1,
-             ThisLineDelimiters=-1;
 
   private JDialog win;
   private JFrame parentFrame;
-  private String[] jcOptions=getOptions();
-  private JComboBox<String> jcbDefault=new JComboBox<String>(jcOptions),
-                            jcbThis=new JComboBox<String>(jcOptions);
-  private JButton   btnDefault=new JButton("Set"),
-                    btnThis=new JButton("Change"),
-                    btnClose=new JButton("Close");
+  private String[] jcOptions;
+  private JComboBox<String> jcbDefault, jcbThis;
+  private JButton btnDefault, btnThis, btnClose;
   
   private LineDelimiterListener listener;
-  private LineDelimiterOptions options=new LineDelimiterOptions();
 
   /////////////////////
   // INITIALIZATION: //
@@ -54,6 +48,7 @@ class LineDelimiters {
     win=new JDialog(frame, true);
     win.setTitle("Line delimiters");
     
+    create();
     layout();
     listen();
 
@@ -76,24 +71,6 @@ class LineDelimiters {
     win.toFront();
     jcbDefault.requestFocus();
   }
-  private static int getSelectedOption(String option) {
-    if (option.equals(LineDelimiterOptions.CRs))
-      return 0;
-    else
-    if (option.equals(LineDelimiterOptions.LFs))
-      return 1;
-    else
-    if (option.equals(LineDelimiterOptions.CRLFs))
-      return 2;
-    throw new RuntimeException("I don't know what to do with: <"+option+">");
-  }
-  private static String[] getOptions() {
-    return new String[]{
-      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.CRs),
-      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.LFs),
-      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.CRLFs),
-    };
-  }
 
 
   //////////////////////
@@ -101,25 +78,34 @@ class LineDelimiters {
   //////////////////////
 
   private void clickSetDefault() {
-    options.setDefault(jcbDefault.getSelectedItem().toString());
     btnDefault.setEnabled(false);
     jcbDefault.requestFocus();
-    listener.setDefault(options.defaultOption);
+    String sel=jcbDefault.getSelectedItem().toString();
+    listener.setDefault(LineDelimiterOptions.translateFromReadable(sel));
   }
   private void clickSetThis() {
-    options.setThisFile(jcbThis.getSelectedItem().toString());
     btnThis.setEnabled(false);
     jcbThis.requestFocus();
-    listener.setThis(options.thisFile);
+    String sel=jcbThis.getSelectedItem().toString();
+    listener.setThis(LineDelimiterOptions.translateFromReadable(sel));
   }
   private void clickClose() {
     win.setVisible(false);
   }
 
   
-
-  // LAYOUT: //
-
+  ///////////////////////////////
+  // CREATE / LAYOUT / LISTEN: //
+  ///////////////////////////////
+  
+  private void create() {
+    jcOptions =getOptions();
+    jcbDefault=new JComboBox<String>(jcOptions);
+    jcbThis   =new JComboBox<String>(jcOptions);
+    btnDefault=new JButton("Set");
+    btnThis   =new JButton("Change");
+    btnClose  =new JButton("Close");
+  }
   private void layout() {
     GridBug gb=new GridBug(win.getContentPane());
     gb.gridXY(0);
@@ -192,10 +178,8 @@ class LineDelimiters {
     return gb.container;
   }
   
-  // LISTENERS //
   
-  private void listen() {
-  
+  private void listen() { 
     jcbDefault.addItemListener(
       new ItemListener() {
         public void itemStateChanged(ItemEvent e) {
@@ -228,7 +212,29 @@ class LineDelimiters {
     });
   }
  
- 
+  ///////////////////////
+  // STATIC UTILITIES: //
+  ///////////////////////
+  
+  private static int getSelectedOption(String option) {
+    if (option.equals(LineDelimiterOptions.CRs))
+      return 0;
+    else
+    if (option.equals(LineDelimiterOptions.LFs))
+      return 1;
+    else
+    if (option.equals(LineDelimiterOptions.CRLFs))
+      return 2;
+    throw new RuntimeException("I don't know what to do with: <"+option+">");
+  }
+  private static String[] getOptions() {
+    return new String[]{
+      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.CRs),
+      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.LFs),
+      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.CRLFs),
+    };
+  }
+  
   
   ///////////
   // TEST: //
@@ -237,14 +243,21 @@ class LineDelimiters {
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        LineDelimiterOptions kdo=new LineDelimiterOptions();
+        final LineDelimiterOptions kdo=new LineDelimiterOptions();
         new LineDelimiters(PopupTestContext.makeMainFrame()).show(
           kdo,
           new LineDelimiterListener(){ 
-            public void setDefault(String i) {System.out.println("Default >"+i+"<");}
-            public void setThis(String i)    {System.out.println("This >"+i+"<");   }
+            public void setDefault(String i) {
+              kdo.defaultOption=i;
+              System.out.println(kdo);
+            }
+            public void setThis(String i)    {
+              kdo.thisFile=i;
+              System.out.println(kdo);
+            }
           }
         );
+        System.out.println(kdo);
       }
     });  
 

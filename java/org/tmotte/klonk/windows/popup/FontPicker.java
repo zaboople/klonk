@@ -56,12 +56,11 @@ class FontPicker {
   private Setter<String> alerter;
   private FontOptions fontOptions;
   private boolean ok=false;
-  private Map<String,Font> goodFonts=new HashMap<>(),
-                           badFonts =new HashMap<>();
+  private Map<String,Font> goodFonts, badFonts;
   private Color selectedForeground, selectedBackground, selectedCaret;
 
-  private DefaultListModel<String> fontNameData=new DefaultListModel<>();
-  private DefaultListModel<Integer> fontSizeData=new DefaultListModel<>();
+  private DefaultListModel<String> fontNameData;
+  private DefaultListModel<Integer> fontSizeData;
   private JList<String> jlFonts;
   private JList<Integer> jlFontSize;
   private JScrollPane  jspFonts, jspFontSize;
@@ -163,7 +162,12 @@ class FontPicker {
   private void create(){
     win=new JDialog(parentFrame, true);
     win.setTitle("Font Options");
-        
+    
+    goodFonts=new HashMap<>();
+    badFonts =new HashMap<>();       
+    fontNameData=new DefaultListModel<>();
+    fontSizeData=new DefaultListModel<>();
+    
     jlFonts=new JList<>(fontNameData);
     jlFonts.setVisibleRowCount(-1);
     jlFonts.setCellRenderer(new MyFontRenderer(jlFonts.getFont())); 

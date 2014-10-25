@@ -34,10 +34,10 @@ import org.tmotte.klonk.config.msg.Setter;
 class KAlert implements Fail, Setter<String> {
 
   private JDialog win;
-  private JLabel msgLabel=new JLabel();
-  private JTextPane errorLabel=new JTextPane();
+  private JLabel msgLabel;
+  private JTextPane errorLabel;
   private JFrame parentFrame;
-  private JButton ok=new JButton("OK");
+  private JButton ok;
 
   /////////////////////
   // PUBLIC METHODS: //
@@ -45,32 +45,9 @@ class KAlert implements Fail, Setter<String> {
   
   public KAlert(JFrame frame) {
     parentFrame=frame;
-    win=new JDialog(frame, true);
-
-    errorLabel.setEditable(false); // as before
-    errorLabel.setBorder(null);       
-    errorLabel.setOpaque(false);
-
-  
-    ok.addActionListener(btnActions);
-    ok.setMnemonic(KeyEvent.VK_K);
-    KeyMapper.accel(ok, btnActions, KeyEvent.VK_ESCAPE);
-    KeyMapper.accel(ok, btnActions, KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK);
-    
-    GridBug gb=new GridBug(win.getContentPane());
-    
-    gb.insets.left=10;gb.insets.right=10;
-    gb.insets.top=10; gb.insets.bottom=10;
-    gb.gridXY(0).weightXY(1);
-    gb.add(msgLabel);
-    gb.fill=gb.BOTH;
-    gb.addY(errorLabel);
-    gb.weightXY(0);
-    gb.fill=gb.NONE;
-    gb.insets.top=5;
-    gb.insets.bottom=10;
-    gb.addY(ok);
-    msgLabel.setVisible(false);
+    create();
+    layout();
+    listen();
   }
   /** Implements Setter interface */
   public @Override void set(String message){
@@ -102,7 +79,45 @@ class KAlert implements Fail, Setter<String> {
   //////////////////////
   // PRIVATE METHODS: //
   //////////////////////
+  
+  private void create() {
+    win=new JDialog(parentFrame, true);
 
+    msgLabel=new JLabel();
+
+    errorLabel=new JTextPane();
+    errorLabel.setEditable(false); // as before
+    errorLabel.setBorder(null);       
+    errorLabel.setOpaque(false);
+
+    ok=new JButton("OK");
+  }
+  private void layout() {
+    GridBug gb=new GridBug(win.getContentPane());
+    gb.insets.left=10;gb.insets.right=10;
+    gb.insets.top=10; gb.insets.bottom=10;
+    gb.gridXY(0).weightXY(1);
+    gb.add(msgLabel);
+    gb.fill=gb.BOTH;
+    gb.addY(errorLabel);
+    gb.weightXY(0);
+    gb.fill=gb.NONE;
+    gb.insets.top=5;
+    gb.insets.bottom=10;
+    gb.addY(ok);
+    msgLabel.setVisible(false);
+  }
+  private void listen() {
+    Action btnActions=new AbstractAction() {
+      public void actionPerformed(ActionEvent event) {
+        win.setVisible(false);
+      }
+    };
+    ok.addActionListener(btnActions);
+    ok.setMnemonic(KeyEvent.VK_K);
+    KeyMapper.accel(ok, btnActions, KeyEvent.VK_ESCAPE);
+    KeyMapper.accel(ok, btnActions, KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK);
+  }
   
   private void show(String message, Throwable e) {
     if (message==null)
@@ -123,11 +138,7 @@ class KAlert implements Fail, Setter<String> {
     win.setVisible(true);
     win.toFront();
   }
-  private Action btnActions=new AbstractAction() {
-    public void actionPerformed(ActionEvent event) {
-      win.setVisible(false);
-    }
-  };
+
   
   ///////////
   // TEST: //

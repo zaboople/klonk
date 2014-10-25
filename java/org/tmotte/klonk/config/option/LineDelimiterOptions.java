@@ -17,21 +17,16 @@ public class LineDelimiterOptions {
   public String defaultOption=CRLFs,
                 thisFile=CRLFs;
   
-  public LineDelimiterOptions setDefault(String s) {
-    defaultOption=translateFromReadable(s);
-    return this;
-  }
-  public LineDelimiterOptions setThisFile(String s) {
-    thisFile=translateFromReadable(s);
-    return this;
-  }
-  
-
   public static String detect(String s) {
     Matcher m=pattern.matcher(s);
     if (m.find())
       return s.substring(m.start(), m.end());
     return null;
+  }
+  public String toString() {
+    return 
+      "Default: "  +translateToReadable(defaultOption)+
+      "\nThis file: "+translateToReadable(thisFile);
   }
   
   ////////////////
