@@ -45,25 +45,11 @@ class TabsAndIndents {
   private JDialog win;
   private boolean ok=false;
   
-  private JRadioButton 
-    jrbThisTabs=new JRadioButton("Tabs"), 
-    jrbThisSpaces=new JRadioButton("Spaces"),
-    jrbDefTabs=new JRadioButton("Tabs"), 
-    jrbDefSpaces=new JRadioButton("Spaces");
-  private JSpinner jspSpacesSize=new JSpinner(new SpinnerNumberModel(1,1,99,1));
-
-  private JSpinner jspTabSize=new JSpinner(new SpinnerNumberModel(0,0,99,1));
-
-  private JCheckBox chkIndentOnHardReturn=new JCheckBox(
-      "<html><body>Auto-indent when new line is entered</body></html>" 
-    );
-  private JRadioButton
-    jrbTabIndentsLine=new JRadioButton(
-      "<html><body><b>Tab</b> key indents line <br>(use <b>Ctrl</b> - <b>Tab</b> to insert tab)</body></html>"     
-    ),
-    jrbTabIsTab=new JRadioButton(
-        "<html><body><b>Tab</b> key inserts tab character</body></html>" 
-    );
+  private JRadioButton jrbThisTabs, jrbThisSpaces, jrbDefTabs, jrbDefSpaces;
+  private JSpinner jspSpacesSize;
+  private JSpinner jspTabSize;
+  private JCheckBox chkIndentOnHardReturn;
+  private JRadioButton jrbTabIndentsLine, jrbTabIsTab;
   
   private JButton btnOK, btnCancel;
     
@@ -88,7 +74,7 @@ class TabsAndIndents {
     jrbThisSpaces.setSelected(options.indentionMode==options.INDENT_SPACES);
     jrbDefTabs.setSelected(options.indentionModeDefault==options.INDENT_TABS);
     jrbDefSpaces.setSelected(options.indentionModeDefault==options.INDENT_SPACES);
-    jspSpacesSize.setValue(options.indentSpacesSize);
+    jspSpacesSize.setValue(options.indentSpacesSize > 0 ?options.indentSpacesSize :1);
     jspTabSize.setValue(options.tabSize);
     chkIndentOnHardReturn.setSelected(options.indentOnHardReturn);
     jrbTabIndentsLine.setSelected(options.tabIndentsLine);
@@ -137,8 +123,24 @@ class TabsAndIndents {
   ///////////////////////////
   
   private void create() {
+    jrbThisTabs  =new JRadioButton("Tabs"); 
+    jrbThisSpaces=new JRadioButton("Spaces");
+    jrbDefTabs   =new JRadioButton("Tabs"); 
+    jrbDefSpaces =new JRadioButton("Spaces");
+    jspSpacesSize=new JSpinner(new SpinnerNumberModel(1,1,99,1));
+    jspTabSize   =new JSpinner(new SpinnerNumberModel(0,0,99,1));
+
+    chkIndentOnHardReturn=new JCheckBox(
+      "<html><body>Auto-indent when new line is entered</body></html>" 
+    );
+    jrbTabIndentsLine=new JRadioButton(
+      "<html><body><b>Tab</b> key indents line <br>(use <b>Ctrl</b> - <b>Tab</b> to insert tab)</body></html>"     
+    );
+    jrbTabIsTab=new JRadioButton(
+        "<html><body><b>Tab</b> key inserts tab character</body></html>" 
+    );
+  
     win=new JDialog(parentFrame, true);
-    //win.setResizable(false);
     win.setTitle("Tabs & indents");
     btnOK    =new JButton("OK");
     btnOK.setMnemonic(KeyEvent.VK_K);
@@ -218,6 +220,7 @@ class TabsAndIndents {
     allBug.gridx=allBug.gridy=0;
     allBug.insets.top=15;
     allBug.insets.left=allBug.insets.right=5;
+    allBug.insets.bottom=5;
     {
       JPanel panel=new JPanel();
       GridBug gb=new GridBug(panel);
@@ -227,12 +230,9 @@ class TabsAndIndents {
       gb.gridy=0;
       gb.add(new JLabel("Use "));
       gb.addX(jspSpacesSize);
-      gb.addX(new JLabel(" spaces when"));
+      gb.addX(new JLabel(" spaces when indenting with spaces"));
       allBug.add(panel);
     }
-    allBug.insets.top=0;
-    allBug.insets.bottom=5;
-    allBug.addY(new JLabel("indenting with spaces"));
     return allPanel;
   }
   private JPanel getTabSizePanel() {
@@ -330,6 +330,7 @@ class TabsAndIndents {
         ti.indentionMode=ti.INDENT_TABS;
         ti.indentionModeDefault=ti.INDENT_SPACES;
         new TabsAndIndents(PopupTestContext.makeMainFrame()).show(ti);
+        System.out.println(ti);
       }
     });  
   }

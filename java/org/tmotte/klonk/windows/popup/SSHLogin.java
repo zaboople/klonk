@@ -115,7 +115,6 @@ class SSHLogin {
   
   private void create() {
     win=new JDialog(parentFrame, true);
-    win.setResizable(false);
     win.setTitle("SSH Login");
     jtfUsername=new JTextField();
     jpfPass=new JPasswordField();    

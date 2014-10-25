@@ -21,5 +21,16 @@ public class TabAndIndentOptions {
              indentionModeDefault;
   public int indentSpacesSize, 
              tabSize;
+             
+  public String toString() {
+    return 
+      "indentOnHardReturn: "+indentOnHardReturn
+     +"\ntabIndentsLine: "+tabIndentsLine
+     +"\nindentionMode: "+indentionMode
+     +"\nindentionModeDefault: "+indentionModeDefault
+     +"\nindentSpacesSize: "+indentSpacesSize
+     +"\ntabSize: "+tabSize;
+  }
 
 }
+  

@@ -29,10 +29,7 @@ import org.tmotte.klonk.config.option.SSHOptions;
 
 
 /**
- * Needs:
- * - Pick auth file 
- * - Pick host keys file
- * - Kill connection?
+ * FIXME Kill connection?
  */
 public class SSHFiles {
 
@@ -102,7 +99,6 @@ public class SSHFiles {
   
   private void create(){
     win=new JDialog(parentFrame, true);
-    win.setResizable(false);
     win.setTitle("SSH Configuration");
 
     jcbKnownHosts=new JCheckBox("Known hosts");
@@ -124,7 +120,7 @@ public class SSHFiles {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
     gb.weightXY(0);
-    gb.fill=gb.NONE;
+    gb.fill=gb.HORIZONTAL;
     gb.anchor=gb.NORTHWEST;
     gb.add(getInputPanel());
     gb.fill=gb.HORIZONTAL;
@@ -143,13 +139,24 @@ public class SSHFiles {
     gb.insets.left=5;
 
     gb.add(jcbKnownHosts);
-    gb.addX(jtfKnownHosts);
+    
+    gb.weightx=1;
+    gb.fill=gb.HORIZONTAL;    
+    gb.addX(jtfKnownHosts);    
+    gb.fill=gb.NONE;
+    gb.weightx=0;
+    
     gb.addX(btnKnownHosts);
 
     gb.setX(0);
-
     gb.addY(jcbPrivateKeys);
+    
+    gb.weightx=1;
+    gb.fill=gb.HORIZONTAL;
     gb.addX(jtfPrivateKeys);
+    gb.fill=gb.NONE;
+    gb.weightx=0;
+
     gb.addX(btnPrivateKeys);
     
     return jp;
