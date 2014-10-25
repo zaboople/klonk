@@ -47,7 +47,7 @@ class Favorites {
   private JDialog win;
   private MyTextArea mtaFiles, mtaDirs;
   private JButton btnOK, btnCancel;
-  private Font fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
+  private Font fontBold;
 
   private boolean result;
   
@@ -136,9 +136,9 @@ class Favorites {
   private void create(){
     win=new JDialog(parentFrame, true);
     win.setTitle("Favorite files");
+    fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
     mtaFiles=getMTA();
     mtaDirs=getMTA();
-    
     btnOK    =new JButton("OK");
     btnOK.setMnemonic(KeyEvent.VK_K);
     btnCancel=new JButton("Cancel");

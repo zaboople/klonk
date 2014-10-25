@@ -36,9 +36,9 @@ class About {
 
   private JFrame parentFrame;
   private JDialog win;
-  private JTextPane jtpLicense=new JTextPane(), jtpVersion=new JTextPane();
+  private JTextPane jtpLicense, jtpVersion;
   private JScrollPane jspLicense;
-  private JButton btnOK=new JButton(); 
+  private JButton btnOK; 
 
   /////////////////////
   // PUBLIC METHODS: //
@@ -67,6 +67,10 @@ class About {
     win=new JDialog(parentFrame, true);
     win.setTitle("About Klonk");
     win.setPreferredSize(new Dimension(400,400));
+
+    jtpLicense=new JTextPane();
+    jtpVersion=new JTextPane();
+    btnOK=new JButton(); 
 
     jtpVersion.setEditable(false); 
     jtpVersion.setBorder(null);       
