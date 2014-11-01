@@ -10,7 +10,8 @@ import org.tmotte.klonk.config.msg.Setter;
 import java.io.ByteArrayOutputStream;
 
 /** 
-  Meant to be used with FileDialogWrapper. This is actually a FileSystemView that can do both local files and ssh files.
+  Meant to be used with FileDialogWrapper. This is actually a FileSystemView that can do both local 
+  files and ssh files.
   
   FIXME a lot of stuff being created that only needs to be created once.
   FIXME a lot of functions implemented that probably don't need to be.
@@ -34,14 +35,14 @@ public class SSHFileSystemView extends FileSystemView {
   private int _getFiles(SSHFile dir, boolean useFileHiding) throws WrappedSSHException {
     sshErr.reset();
     sshOut.setLength(0);
-    System.out.println("SSHFileSystemView._getFiles(): "+dir.getAbsolutePath());
+    mylog("SSHFileSystemView._getFiles(): "+dir.getAbsolutePath());
     //FIXME getting a null pointer on / here
     return dir.getSSH().getExec().exec(
       "ls --file-type -a -1 "+dir.getAbsolutePath(), sshOut, sshErr //FIXME quote dir, at least spaces
     );
   }
   public @Override File[] getFiles(File fdir, boolean useFileHiding){
-    System.err.println("getFiles() "+fdir);
+    mylog("getFiles() "+fdir);
     SSHFile dir=cast(fdir);
     if (dir==null)
       return defaultView.getFiles(fdir, useFileHiding);
@@ -68,21 +69,21 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* Returns true if the file (directory) can be visited. */
   public @Override Boolean isTraversable(File f){
-    System.out.println("isTraversable "+this);
+    mylog("isTraversable "+this);
     if (cast(f)==null)
       return defaultView.isTraversable(f);
     return f.isDirectory();
   }
   /* Used by UI classes to decide whether to display a special icon for drives or partitions, e.g. */
   public @Override boolean isDrive(File dir){
-    System.out.println("Is drive "+dir+" "+dir.getClass());
+    mylog("Is drive "+dir+" "+dir.getClass());
     if (cast(dir)==null)
       return defaultView.isDrive(dir);
     return dir.getParentFile()==null;
   }
   /* Is dir the root of a tree in the file system, such as a drive or partition. */
   public @Override boolean isFileSystemRoot(File dir){
-    System.out.println("isfsroot "+dir);
+    mylog("isfsroot "+dir);
     if (cast(dir)==null)
       return defaultView.isFileSystemRoot(dir);
     return dir.getParentFile()==null;
@@ -108,7 +109,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* On Windows, a file can appear in multiple folders, other than its parent directory in the filesystem. */
   public @Override boolean isParent(File folder, File file){
-    System.out.println("FIXME SSHFileSystemView.isParent() "+folder+" "+file);
+    mylog("FIXME SSHFileSystemView.isParent() "+folder+" "+file);
     if (cast(folder)==null || cast(file)==null)
       return defaultView.isParent(folder, file);
     return true;
@@ -124,7 +125,7 @@ public class SSHFileSystemView extends FileSystemView {
     SSHFile dir=cast(fdir);
     if (dir==null)
       return defaultView.createFileObject(fdir, filename);
-    System.out.println("FIXME Create file object for dir: "+fdir+" name "+filename);
+    mylog("FIXME Create file object for dir: "+fdir+" name "+filename);
     if (true)
       throw new RuntimeException("FIXME");    
     return new SSHFile(
@@ -135,7 +136,7 @@ public class SSHFileSystemView extends FileSystemView {
     );
   }
   public @Override File createNewFolder(File containingDir){
-    System.out.println("SSHFileSystemView.createNewFolder: "+containingDir);
+    mylog("SSHFileSystemView.createNewFolder: "+containingDir);
     SSHFile dir=cast(containingDir);
     if (dir==null) 
       try {return defaultView.createNewFolder(containingDir);} catch (Exception e) {throw new RuntimeException(e);}
@@ -146,7 +147,7 @@ public class SSHFileSystemView extends FileSystemView {
     }
   }
   public @Override File getChild(File parent, String fileName) {
-    System.out.println("SSHFileSystemView FIXME getChild() "+parent+" "+fileName);
+    mylog("SSHFileSystemView FIXME getChild() "+parent+" "+fileName);
     SSHFile dir=cast(parent);
     if (dir==null)
       return defaultView.getChild(parent, fileName);
@@ -158,7 +159,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* Returns the parent directory of dir. */
   public @Override File getParentDirectory(File fdir){
-    System.out.println("SSHFileSystemView.getParentDirectory: "+fdir);
+    mylog("SSHFileSystemView.getParentDirectory: "+fdir);
     File dir=cast(fdir);
     if (dir==null)
       return defaultView.getParentDirectory(fdir);    
@@ -167,7 +168,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* Name of a file, directory, or folder as it would be displayed in a system file browser. */
   public @Override String getSystemDisplayName(File f){
-    //System.out.println("get system display name "+f);
+    //mylog("get system display name "+f);
     if (cast(f)==null)
       return defaultView.getSystemDisplayName(f);
     return f.getName();
@@ -216,6 +217,10 @@ public class SSHFileSystemView extends FileSystemView {
   private static SSHFile cast(File f) {
     return SSHFile.cast(f);
   }
+  private void mylog(String s) {
+    if (false)
+      System.out.println(s);
+  }
  
   /////////////////
   // TOTAL CRAP: //
@@ -235,7 +240,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* Return the user's default starting directory for the file chooser.*/
   public @Override File getDefaultDirectory() {
-    System.out.println("get Default directory");
+    mylog("get Default directory");
     return defaultView.getDefaultDirectory();
   }
   
