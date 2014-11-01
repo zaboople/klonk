@@ -84,7 +84,8 @@ public class SSH {
         printHostKeys(jsch);
     }
 
-    session=jsch.getSession(user, host, 22);
+    session=jsch.getSession(user, host, 22);  
+    
     if (knownHosts==null)
       session.setConfig("StrictHostKeyChecking", "no");
     if (privateKeys!=null) {
@@ -101,6 +102,8 @@ public class SSH {
     return this;
   }
   public void close() throws Exception {
+    if (sftp!=null)
+      sftp.close();
     session.disconnect();
     connected=false;
   }
@@ -165,9 +168,11 @@ public class SSH {
         return null;
       }
     }
-    if (user==null || host==null)
+    if (user==null || host==null){
       usage();
-    return new SSH(user, host)
+      return null;
+    }
+    else return new SSH(user, host)
       .withKnown(knownHosts)
       .withPassword(pass)
       .withPrivateKeys(privateKeys);

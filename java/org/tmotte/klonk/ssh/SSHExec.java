@@ -2,6 +2,7 @@ package org.tmotte.klonk.ssh;
 import com.jcraft.jsch.*;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.ByteArrayOutputStream;
 
 public class SSHExec {
@@ -26,13 +27,12 @@ public class SSHExec {
   }
   
   /** 
-   * @param sshErr Do not pass System.err/out to this, it will get chewed to pieces.
+   * @param sshErr DO NOT PASS SYSTEM.ERR/OUT TO THIS, IT WILL GET CHEWED TO PIECES.
    */
   public int exec(String command, Appendable out, OutputStream sshErr) throws WrappedSSHException {
     try {
       ChannelExec channel=(ChannelExec)ssh.getSession().openChannel("exec");
-      channel.setCommand(command);
-      
+      channel.setCommand(command);      
       channel.setErrStream(sshErr);
       channel.setOutputStream(null);
       InputStream in=channel.getInputStream();
@@ -66,18 +66,20 @@ public class SSHExec {
     SSH ssh=SSH.cmdLine(args);
     SSHExec exec=new SSHExec(ssh);
     StringBuilder app=new StringBuilder();
-    {
-      System.out.println("\n\n");
-      int fail=exec.exec("ls --file-type -a -1", app, app);
-      System.out.println(fail==0 ?"SUCCESS: " :"FAILED: ");
-      System.out.println(app);
-    }
-    app.setLength(0);
-    {
-      System.out.println("\n\n");
-      int fail=exec.exec("ls /; echo '!!!mcshite!!!'", app, app);
-      System.out.println(fail==0 ?"SUCCESS: " :"FAILED: ");
-      System.out.println(app);
+    for (int i=0; i<20; i++) {
+      app.setLength(0);
+      {
+        System.out.println("\n\n");
+        int fail=exec.exec("ls --file-type -a -1", app, app);
+        System.out.println(fail==0 ?"SUCCESS: " :"FAILED: ");
+        System.out.println(app);
+      }
+      {
+        System.out.println("\n\n");
+        int fail=exec.exec("ls /; echo '!!!mcshite!!!'", app, app);
+        System.out.println(fail==0 ?"SUCCESS: " :"FAILED: ");
+        System.out.println(app);
+      }
     }
     System.err.flush();
     System.out.flush();

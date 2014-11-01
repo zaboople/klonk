@@ -76,8 +76,6 @@ public class Popups {
     this.persist       =persist;
     this.iconImagePopup=iconImagePopup;
     this.currFileGetter=currFileGetter;
-    //A little more setup:
-    this.fontOptions   =persist.getFontAndColors();
   }
 
   public void setFontAndColors(FontOptions fo) {
@@ -130,8 +128,8 @@ public class Popups {
   public boolean showTabAndIndentOptions(TabAndIndentOptions options) {
     return getTabsAndIndents().show(options);
   }
-  public boolean doFontAndColors(FontOptions fontOptions) {
-    return getFontPicker().show(fontOptions);
+  public boolean doFontAndColors(FontOptions input) {
+    return getFontPicker().show(input);
   }
   
   public boolean showFavorites(Collection<String> favoriteFiles, Collection<String> favoriteDirs) {
@@ -200,7 +198,7 @@ public class Popups {
         new Setter<String>(){public void set(String s) {alert(s);}}, 
         statusBar
       );
-      findAndReplace.setFont(fontOptions);
+      findAndReplace.setFont(getFontOptions());
     }
     return findAndReplace;
   }
@@ -214,7 +212,7 @@ public class Popups {
         iconImagePopup, 
         currFileGetter
       );
-      shell.setFont(fontOptions);
+      shell.setFont(getFontOptions());
     }
     return shell;
   }
@@ -224,6 +222,11 @@ public class Popups {
         mainFrame, new SSHFileSystemView(), new SSHFileView()
       );
     return fileDialogWrapper;
+  }
+  private FontOptions getFontOptions() {
+    if (fontOptions==null) 
+      fontOptions=persist.getFontAndColors();
+    return fontOptions;
   }
   
   ///////////////////////////////////////////
