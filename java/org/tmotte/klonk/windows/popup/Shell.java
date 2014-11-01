@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import org.tmotte.common.text.StringChunker;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
@@ -25,6 +24,7 @@ import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Getter;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 
@@ -32,7 +32,7 @@ class Shell {
 
   //DI components:
   private JFrame parentFrame;
-  private Fail fail;
+  private Setter<Throwable> fail;
   private FileDialogWrapper fdw;
   private KPersist persist;
   private Getter<String> currFileGetter;
@@ -51,7 +51,7 @@ class Shell {
 
   public Shell(
      JFrame parentFrame, 
-     Fail fail, 
+     Setter<Throwable> fail, 
      KPersist persist, 
      FileDialogWrapper fdw, 
      Image img, 
@@ -92,7 +92,7 @@ class Shell {
       try {
         jcbPrevious.getEditor().setItem(file.getCanonicalPath());
       } catch (Exception e) {
-        fail.fail(e);
+        fail.set(e);
       }
   }
 

@@ -30,9 +30,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Caret;
 import javax.swing.text.Document;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
@@ -48,7 +48,7 @@ public class Editor {
 
   //Dependencies:
   private EditorListener editListener;
-  private Fail fail;
+  private Setter<Throwable> failHandler;
 
   //Purely private:
   private MyTextArea jta;
@@ -69,12 +69,12 @@ public class Editor {
   /////////////////////////
 
   public Editor(
-      Fail fail, 
+      Setter<Throwable> failHandler, 
       EditorListener editListener, UndoListener undoL, 
       String lineBreaker, boolean wordWrap
     ) {
     this.editListener=editListener;
-    this.fail=fail;
+    this.failHandler=failHandler;
     this.lineBreaker=lineBreaker;
     jta=new MyTextArea();
     jta.setDragEnabled(false);
@@ -176,7 +176,7 @@ public class Editor {
     try {
       return jta.getLineOfOffset(offset);
     } catch (Exception e) {
-      fail.fail(e);
+      failHandler.set(e);
       return -1;
     }
   }
@@ -184,7 +184,7 @@ public class Editor {
     try {
       return jta.getLineStartOffset(row);
     } catch (Exception e) {
-      fail.fail(e);
+      failHandler.set(e);
       return -1;
     }
   }
@@ -414,7 +414,7 @@ public class Editor {
       }
       jta.betterReplaceRange(sb.toString(), veryFirst, veryLast);
     } catch (Exception e) {
-      fail.fail(e);
+      failHandler.set(e);
     }
     return true;
   } 
@@ -562,7 +562,7 @@ public class Editor {
         text, i<j ?i :j, i<j ?j :i
       );
     } catch (Exception e) {
-      fail.fail(e);
+      failHandler.set(e);
     }
   }
 
@@ -648,7 +648,7 @@ public class Editor {
         for (Object file : droppedFiles) 
           editListener.fileDropped((File)file);
       } catch (Exception ex) {
-        fail.fail(ex);
+        failHandler.set(ex);
       }
     }
   };

@@ -11,7 +11,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Properties;
-import org.tmotte.common.swang.Fail;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
@@ -23,12 +23,12 @@ public class KPersist {
 
   private File file;
   private Properties properties=new Properties();
-  private Fail logFail;
+  private Setter<Throwable> logFail;
   private boolean hasChanges=false;
 
   private List<String> recentFilesCache, recentDirsCache;
   
-  public KPersist(KHome home, Fail logFail) {
+  public KPersist(KHome home, Setter<Throwable> logFail) {
     this.logFail=logFail;
     try {
       file=home.nameFile("klonk.properties");
@@ -37,7 +37,7 @@ public class KPersist {
       else
         load();
     } catch (Exception e) {
-      logFail.fail(e); 
+      logFail.set(e); 
     }
   }
   
@@ -245,7 +245,7 @@ public class KPersist {
       properties.store(fos, "You are permitted to sort this file");
       hasChanges=false;
     } catch (Exception e) {
-      logFail.fail(e); 
+      logFail.set(e); 
     }
     
   }
@@ -318,7 +318,7 @@ public class KPersist {
     try {
       return Boolean.parseBoolean(s);
     } catch (Exception e) {
-      logFail.fail(e);
+      logFail.set(e);
       return false;
     }
   }
@@ -333,7 +333,7 @@ public class KPersist {
     try {
       return Integer.parseInt(s);
     } catch (Exception e) {
-      logFail.fail(e);
+      logFail.set(e);
       return -1;
     }
   }
@@ -355,7 +355,7 @@ public class KPersist {
     try (FileInputStream fos=new FileInputStream(file);) {
       properties.load(fos);
     } catch (Exception e) {
-      logFail.fail(e); 
+      logFail.set(e); 
     }
   }
   

@@ -1,15 +1,20 @@
 package org.tmotte.klonk.io;
 import java.io.*;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.KHome;
+import org.tmotte.klonk.config.msg.Setter;
 
-public class KLog implements org.tmotte.common.swang.Fail {
+public class KLog {
   
-  String pid;
-  final long start=System.nanoTime();
-  Fail failPopup;
-  KHome home;
-  PrintWriter commandLineWriter;
+  private String pid;
+  private final long start=System.nanoTime();
+  private KHome home;
+  private PrintWriter commandLineWriter;
+  private Setter<Throwable> failPopup;
+  private Setter<Throwable> failer=new Setter<Throwable>(){
+    public void set(Throwable t) {
+      log(t);
+    }
+  };
   
   public KLog(OutputStream os){
     this.commandLineWriter=new PrintWriter(new OutputStreamWriter(os));
@@ -19,16 +24,13 @@ public class KLog implements org.tmotte.common.swang.Fail {
     this.home=home;
     this.pid=pid;
   }
-  public KLog setFailPopup(Fail a) {
+  public KLog setFailPopup(Setter<Throwable> a) {
     this.failPopup=a;
     return this;
   }
 
-  /** Fulfills Fail interface: */
-  public void fail(Throwable t) {
-    if (failPopup!=null)
-      failPopup.fail(t);
-    logError(t);
+  public Setter<Throwable> exceptionHandler(){
+    return failer;
   }
   public void log(String s) {
     logPlain(pid+": "+(System.currentTimeMillis())+" "+s);
@@ -50,6 +52,8 @@ public class KLog implements org.tmotte.common.swang.Fail {
   //////////////////////
 
   private void logError(Throwable e) {
+    if (failPopup!=null)
+      failPopup.set(e);
     e.printStackTrace();
     PrintWriter pw=getWriter();
     if (pw!=null)

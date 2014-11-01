@@ -15,13 +15,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import org.tmotte.klonk.Menus;
 import org.tmotte.klonk.config.msg.Getter;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.controller.CtrlMain;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.Popups;
-import org.tmotte.common.swang.Fail;
 
 /** 
  * For testing popups without the overhead of the main application running.
@@ -34,7 +34,7 @@ public class PopupTestContext  {
   KPersist persist;
   JFrame mainFrame;
   StatusUpdate statusBar;
-  Fail fail;
+  Setter<Throwable> fail;
   
   public PopupTestContext(String[] args){
   }
@@ -60,10 +60,10 @@ public class PopupTestContext  {
       mainFrame=makeMainFrame();
     return mainFrame;
   }
-  public Fail getFail() {
+  public Setter<Throwable> getFail() {
     if (fail==null)
-      fail=new Fail() {
-        public void fail(Throwable t){
+      fail=new Setter<Throwable>() {
+        public void set(Throwable t){
           t.printStackTrace(System.err);
         }
       };

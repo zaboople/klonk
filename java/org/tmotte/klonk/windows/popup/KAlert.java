@@ -20,7 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.JWindow;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;

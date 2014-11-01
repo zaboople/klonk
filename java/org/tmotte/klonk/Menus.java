@@ -19,7 +19,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.msg.Editors;
@@ -37,7 +36,7 @@ import org.tmotte.klonk.controller.CtrlUndo;
 public class Menus {
 
   //Various instance variables:
-  private Fail failer;
+  private Setter<Throwable> failer;
   private Editors editors;
   private Map<JMenuItem,Editor> switchMenuToEditor=new Hashtable<>();
   private MenuUtils mu=new MenuUtils();
@@ -88,7 +87,7 @@ public class Menus {
   // INITIALIZATION: //
   /////////////////////
   
-  public Menus(Editors editors, Fail failer) {
+  public Menus(Editors editors, Setter<Throwable> failer) {
     this.editors=editors;
     this.failer=failer;
     create();
@@ -763,7 +762,7 @@ public class Menus {
         else {
           Editor e=switchMenuToEditor.get(s);
           if (e==null)
-            failer.fail(new RuntimeException("Menus.switchListener(): Null editor in hash"));
+            failer.set(new RuntimeException("Menus.switchListener(): Null editor in hash"));
           ctrlMain.doSwitch(e);
         }
       }

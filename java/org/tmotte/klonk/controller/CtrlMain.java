@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Iterator;
 import javax.swing.SwingWorker;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
@@ -44,7 +43,7 @@ public class CtrlMain  {
   private Popups popups;
   private KPersist persist;
   private StatusUpdate statusBar;
-  private Fail fail;
+  private Setter<Throwable> failHandler;
   private Doer lockRemover, editorSwitchedListener;
   private MainDisplay layout;
 
@@ -62,8 +61,8 @@ public class CtrlMain  {
   private Recents recents;
 
   //Constructor:
-  public CtrlMain(Fail fail, final KPersist persist) {
-    this.fail=fail;
+  public CtrlMain(Setter<Throwable> failHandler, final KPersist persist) {
+    this.failHandler=failHandler;
     this.persist=persist;
     recents=new Recents(persist); 
   }
@@ -350,7 +349,7 @@ public class CtrlMain  {
       statusBar.show("Saving...");
       e.saveFile(file);
     } catch (Exception ex) {
-      fail.fail(ex);
+      failHandler.set(ex);
       statusBar.showBad("Save failed.");
       return false;
     }
@@ -439,7 +438,7 @@ public class CtrlMain  {
         try {
           loadFiles(fileNames);
         } catch (Exception e) {
-          fail.fail(e);
+          failHandler.set(e);
         }
         fileNames.clear();
       }
@@ -485,7 +484,7 @@ public class CtrlMain  {
         toUse=newEditor();
       loadFile(toUse, file);
     } catch (Exception e) {
-      fail.fail(e);
+      failHandler.set(e);
     }
   }
   private boolean loadFile(Editor e, File file) {
@@ -493,7 +492,7 @@ public class CtrlMain  {
       statusBar.show("Loading: "+file+"...");
       e.loadFile(file, persist.getDefaultLineDelimiter());
     } catch (Exception ex) {
-      fail.fail(ex);
+      failHandler.set(ex);
       statusBar.showBad("Load failed");
       return false;
     }
@@ -513,7 +512,7 @@ public class CtrlMain  {
   }
   private Editor newEditor(){
     Editor e=new Editor(
-      fail, editorListener, myUndoListener, 
+      failHandler, editorListener, myUndoListener, 
       persist.getDefaultLineDelimiter(), persist.getWordWrap()
     ); 
     e.setFastUndos(persist.getFastUndos());
@@ -620,7 +619,7 @@ public class CtrlMain  {
     try {
       return file.getCanonicalPath();
     } catch (Exception e) {
-      fail.fail(e);
+      failHandler.set(e);
       return null;
     }
   }

@@ -8,7 +8,6 @@ import java.awt.Window;
 import java.io.File;
 import java.util.Collection;
 import javax.swing.JFrame;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Getter;
@@ -52,7 +51,7 @@ public class Popups {
   //DI resources:
   private JFrame mainFrame;
   private KHome home;
-  private Fail logFail;
+  private Setter<Throwable> logFail;
   private KPersist persist;
   private StatusUpdate statusBar;
   private Getter<String> currFileGetter;
@@ -66,8 +65,13 @@ public class Popups {
   ///////////////////////////////////////
   
   public Popups(
-      KHome home, Fail logFail, JFrame mainFrame, KPersist persist, StatusUpdate statusBar, 
-      Image iconImagePopup, Getter<String> currFileGetter
+      KHome home, 
+      Setter<Throwable> logFail, 
+      JFrame mainFrame, 
+      KPersist persist, 
+      StatusUpdate statusBar, 
+      Image iconImagePopup, 
+      Getter<String> currFileGetter
     ) {
     this.home          =home;
     this.logFail       =logFail;

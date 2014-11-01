@@ -17,7 +17,6 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.klonk.Menus;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Editors;
@@ -77,7 +76,7 @@ public class BootContext {
     Thread.setDefaultUncaughtExceptionHandler( 
       new Thread.UncaughtExceptionHandler() {
         public void uncaughtException(Thread t, Throwable e){
-          context.getLog().fail(e);
+          context.getLog().log(e);//FIXME make this blow up when sending an alert
         }
       }
     );
@@ -121,7 +120,7 @@ public class BootContext {
     if (popups==null)
       popups=new Popups(
          getHome()
-        ,getLog()
+        ,getLog().exceptionHandler()
         ,getMainFrame()
         ,getPersist()
         ,getStatusBar()
@@ -150,12 +149,12 @@ public class BootContext {
   }
   private KPersist getPersist() {
     if (persist==null)
-      persist=new KPersist(getHome(), getLog());
+      persist=new KPersist(getHome(), getLog().exceptionHandler());
     return persist;
   }
   private CtrlMain getMainController() {
     if (ctrlMain==null){
-      ctrlMain=new CtrlMain(getLog(), getPersist());
+      ctrlMain=new CtrlMain(getLog().exceptionHandler(), getPersist());
       ctrlMain.setLayout(getMainDisplay(), getStatusBar());
       ctrlMain.setPopups(getPopups());
       ctrlMain.setListeners(
@@ -185,7 +184,7 @@ public class BootContext {
   }
   private Menus getMenus() {
     if (menus==null) {
-      menus=new Menus(getEditors(), getLog());
+      menus=new Menus(getEditors(), getLog().exceptionHandler());
       menus.setFastUndos(getPersist().getFastUndos())
            .setWordWrap( getPersist().getWordWrap());
       Editors ed=getEditors();
