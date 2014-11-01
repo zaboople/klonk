@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import org.tmotte.common.text.StringChunker;
 
-//ssh:troym@xshell.xshellz.com:/blahblahblahb/bhb/abhba/habbh
 /** This does not establish a connection. It only collects potential connections. Not thread-safe. */
 public class SSHConnections {
 
