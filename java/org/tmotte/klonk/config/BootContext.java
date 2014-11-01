@@ -49,14 +49,14 @@ import javax.swing.JMenuBar;
  */
 public class BootContext {
 
+  //////////////////
+  // STATIC BOOT: //
+  //////////////////
 
   public static void main(String[] args) {
     bootApplication(args);
   }
 
-  /** 
-   * BOOT APPLICATION: 
-   */
   private static void bootApplication(final String[] args){
 
     //Initialize the context object. If we can't get a home directory,
@@ -92,6 +92,9 @@ public class BootContext {
     });
   }
 
+  /////////////////////////////////////////
+  // INSTANCE VARIABLES AND CONSTRUCTOR: //
+  /////////////////////////////////////////
 
   //Inputs:
   private String[] args;
@@ -115,6 +118,13 @@ public class BootContext {
     this.args=args;
     initLookFeel();
   }
+  
+  //////////////////////////////////////////
+  // CONCRETE CLASSES:                    //
+  // Sure maybe everything should be an   //
+  // interface but sometimes that's just  //
+  // not worth it:                        //
+  //////////////////////////////////////////
 
   private Popups getPopups() {
     if (popups==null)
@@ -169,19 +179,6 @@ public class BootContext {
   private Editors getEditors() {
     return getMainController().getEditors();
   }
-  public JFrame getMainFrame() {
-    if (mainFrame==null) {
-      mainFrame=new JFrame("Klonk");
-      mainFrame.setIconImage(getAppIcon());
-      mainFrame.setJMenuBar(getMenuBar());
-    }
-    return mainFrame;
-  }
-  private StatusUpdate getStatusBar() {
-    if (statusBar==null)
-      statusBar=getLayout().getStatusBar(); 
-    return statusBar;
-  }
   private Menus getMenus() {
     if (menus==null) {
       menus=new Menus(getEditors(), getLog().exceptionHandler());
@@ -233,14 +230,30 @@ public class BootContext {
       fileListen=new FileListen(getLog(), getProcessID(), getHome());    
     return fileListen;
   }
+  
+
+  ///////////////////////////////////////////
+  // PURE INTERFACES AND ABSTRACT CLASSES: //
+  // and so on...                          //
+  ///////////////////////////////////////////
+
+  public JFrame getMainFrame() {
+    if (mainFrame==null) {
+      mainFrame=new JFrame("Klonk");
+      mainFrame.setIconImage(getAppIcon());
+      mainFrame.setJMenuBar(getMenuBar());
+    }
+    return mainFrame;
+  }
+  private JMenuBar getMenuBar() {
+    return getMenus().getMenuBar();
+  }
+  
   private Image getPopupIcon() {
     return getPopupIcon(this);
   }
   private Image getAppIcon() {
     return getAppIcon(this);
-  }
-  private JMenuBar getMenuBar() {
-    return getMenus().getMenuBar()  ;
   }
   private String getProcessID() {
     if (processID==null) {
@@ -249,14 +262,12 @@ public class BootContext {
     }
     return processID;
   }
-  
 
-  //////////////////////////////////////////////////////////
-  // Interface implementations. 
-  // These do not need to be tested, but possibly mocked.
-  // All will only be invoked once if at all.
-  //////////////////////////////////////////////////////////
-
+  private StatusUpdate getStatusBar() {
+    if (statusBar==null)
+      statusBar=getLayout().getStatusBar(); 
+    return statusBar;
+  }
   private LineDelimiterListener getLineDelimiterListener() {
     return getMainController().getLineDelimiterListener();
   }
