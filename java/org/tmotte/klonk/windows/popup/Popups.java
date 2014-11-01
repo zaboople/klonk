@@ -52,7 +52,7 @@ public class Popups {
   //DI resources:
   private JFrame mainFrame;
   private KHome home;
-  private Fail fail;
+  private Fail logFail;
   private KPersist persist;
   private StatusUpdate statusBar;
   private Getter<String> currFileGetter;
@@ -66,11 +66,11 @@ public class Popups {
   ///////////////////////////////////////
   
   public Popups(
-      KHome home, Fail fail, JFrame mainFrame, KPersist persist, StatusUpdate statusBar, 
+      KHome home, Fail logFail, JFrame mainFrame, KPersist persist, StatusUpdate statusBar, 
       Image iconImagePopup, Getter<String> currFileGetter
     ) {
     this.home          =home;
-    this.fail          =fail;
+    this.logFail       =logFail;
     this.mainFrame     =mainFrame;
     this.statusBar     =statusBar;
     this.persist       =persist;
@@ -104,14 +104,8 @@ public class Popups {
     getAbout().show();
   }
   
-  public Fail getFailPopup() {
-    return getAlerter();
-  }
   public void alert(String message) {
     getAlerter().show(message);
-  }
-  public void fail(Throwable message) {
-    getAlerter().fail(message);
   }
 
   public YesNoCancelAnswer askYesNoCancel(String message) {
@@ -183,7 +177,7 @@ public class Popups {
   
   private GoToLine getGoToLine() {
     if (goToLinePicker==null)
-      goToLinePicker=new GoToLine(mainFrame, fail, getAlerter());
+      goToLinePicker=new GoToLine(mainFrame, getAlerter());
     return goToLinePicker;
   }
   private KAlert getAlerter() {
@@ -194,9 +188,7 @@ public class Popups {
   private FindAndReplace getFindAndReplace() {
     if (findAndReplace==null){
       findAndReplace=new FindAndReplace(
-        mainFrame, fail, 
-        new Setter<String>(){public void set(String s) {alert(s);}}, 
-        statusBar
+        mainFrame, getAlerter(), statusBar
       );
       findAndReplace.setFont(getFontOptions());
     }
@@ -206,7 +198,7 @@ public class Popups {
     if (shell==null) {
       shell=new Shell(
         mainFrame, 
-        fail, 
+        logFail, 
         persist, 
         getFileDialog(), 
         iconImagePopup, 
@@ -247,7 +239,7 @@ public class Popups {
   }
   private FontPicker getFontPicker() {
     if (fontPicker==null)
-      fontPicker=new FontPicker(mainFrame, fail, getAlerter());
+      fontPicker=new FontPicker(mainFrame, getAlerter());
     return fontPicker;
   }
   private Favorites getFavorites() {

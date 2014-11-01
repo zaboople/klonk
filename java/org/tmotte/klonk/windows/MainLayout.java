@@ -34,7 +34,6 @@ import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.MainDisplay;
 import org.tmotte.klonk.config.msg.StatusUpdate;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 
 public class MainLayout { 
@@ -45,7 +44,6 @@ public class MainLayout {
 
   //Core stuff:
   private JFrame frame;
-  private Fail failer;
   private Doer appCloseListener;
   
   //Main editor window components:

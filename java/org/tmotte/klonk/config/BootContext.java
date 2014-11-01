@@ -121,7 +121,7 @@ public class BootContext {
     if (popups==null)
       popups=new Popups(
          getHome()
-        ,getFail()
+        ,getLog()
         ,getMainFrame()
         ,getPersist()
         ,getStatusBar()
@@ -150,12 +150,12 @@ public class BootContext {
   }
   private KPersist getPersist() {
     if (persist==null)
-      persist=new KPersist(getHome(), getFail());
+      persist=new KPersist(getHome(), getLog());
     return persist;
   }
   private CtrlMain getMainController() {
     if (ctrlMain==null){
-      ctrlMain=new CtrlMain(getFail(), getPersist());
+      ctrlMain=new CtrlMain(getLog(), getPersist());
       ctrlMain.setLayout(getMainDisplay(), getStatusBar());
       ctrlMain.setPopups(getPopups());
       ctrlMain.setListeners(
@@ -185,7 +185,7 @@ public class BootContext {
   }
   private Menus getMenus() {
     if (menus==null) {
-      menus=new Menus(getEditors(), getFail());
+      menus=new Menus(getEditors(), getLog());
       menus.setFastUndos(getPersist().getFastUndos())
            .setWordWrap( getPersist().getWordWrap());
       Editors ed=getEditors();
@@ -255,12 +255,9 @@ public class BootContext {
   //////////////////////////////////////////////////////////
   // Interface implementations. 
   // These do not need to be tested, but possibly mocked.
-  // All but getFail() will only be invoked once if at all.
+  // All will only be invoked once if at all.
   //////////////////////////////////////////////////////////
 
-  private Fail getFail() {
-    return getLog();
-  }
   private LineDelimiterListener getLineDelimiterListener() {
     return getMainController().getLineDelimiterListener();
   }

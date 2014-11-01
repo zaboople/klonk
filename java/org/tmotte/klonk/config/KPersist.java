@@ -23,13 +23,13 @@ public class KPersist {
 
   private File file;
   private Properties properties=new Properties();
-  private Fail failer;
+  private Fail logFail;
   private boolean hasChanges=false;
 
   private List<String> recentFilesCache, recentDirsCache;
   
-  public KPersist(KHome home, Fail failer) {
-    this.failer=failer;
+  public KPersist(KHome home, Fail logFail) {
+    this.logFail=logFail;
     try {
       file=home.nameFile("klonk.properties");
       if (!file.exists())
@@ -37,7 +37,7 @@ public class KPersist {
       else
         load();
     } catch (Exception e) {
-      failer.fail(e); 
+      logFail.fail(e); 
     }
   }
   
@@ -245,7 +245,7 @@ public class KPersist {
       properties.store(fos, "You are permitted to sort this file");
       hasChanges=false;
     } catch (Exception e) {
-      failer.fail(e); 
+      logFail.fail(e); 
     }
     
   }
@@ -318,7 +318,7 @@ public class KPersist {
     try {
       return Boolean.parseBoolean(s);
     } catch (Exception e) {
-      failer.fail(e);
+      logFail.fail(e);
       return false;
     }
   }
@@ -333,7 +333,7 @@ public class KPersist {
     try {
       return Integer.parseInt(s);
     } catch (Exception e) {
-      failer.fail(e);
+      logFail.fail(e);
       return -1;
     }
   }
@@ -355,7 +355,7 @@ public class KPersist {
     try (FileInputStream fos=new FileInputStream(file);) {
       properties.load(fos);
     } catch (Exception e) {
-      failer.fail(e); 
+      logFail.fail(e); 
     }
   }
   

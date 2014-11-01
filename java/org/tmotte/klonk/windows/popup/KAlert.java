@@ -31,7 +31,7 @@ import org.tmotte.klonk.config.msg.Setter;
  * Always has one button - OK - and a message. Can display
  * larger, more complex messages unlike YesNoCancel.
  */
-class KAlert implements Fail, Setter<String> {
+class KAlert implements Setter<String> {
 
   private JDialog win;
   private JLabel msgLabel;
@@ -71,7 +71,6 @@ class KAlert implements Fail, Setter<String> {
     show();
   }
 
-  /** Implements Fail interface: */
   public void fail(Throwable e) {
     show(null, e);
   }

@@ -25,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.windows.Positioner;
@@ -39,7 +38,6 @@ class GoToLine {
   /////////////////////////
 
   private JFrame parentFrame;
-  private Fail fail;
   private Setter<String> complainer;
 
   private JDialog win;
@@ -53,9 +51,8 @@ class GoToLine {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public GoToLine(JFrame parentFrame, Fail fail, Setter<String> complainer) {
+  public GoToLine(JFrame parentFrame, Setter<String> complainer) {
     this.parentFrame=parentFrame;
-    this.fail=fail;
     this.complainer=complainer;
     create();
     layout(); 
@@ -199,7 +196,7 @@ class GoToLine {
           PopupTestContext ptc=new PopupTestContext(args);
           JFrame parentFrame=ptc.getMainFrame();
           KAlert alerter=new KAlert(parentFrame);
-          GoToLine gtl=new GoToLine(parentFrame, alerter, alerter);
+          GoToLine gtl=new GoToLine(parentFrame, alerter);
           gtl.show();
         } catch (Exception e) {
           e.printStackTrace();

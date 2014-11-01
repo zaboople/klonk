@@ -34,7 +34,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
@@ -51,7 +50,6 @@ class FontPicker {
   /////////////////////////
 
   private JFrame parentFrame;
-  private Fail fail;
   private JDialog win;
   private Setter<String> alerter;
   private FontOptions fontOptions;
@@ -75,9 +73,8 @@ class FontPicker {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public FontPicker(JFrame parentFrame, Fail fail, Setter<String> alerter) {
+  public FontPicker(JFrame parentFrame, Setter<String> alerter) {
     this.parentFrame=parentFrame;
-    this.fail=fail;
     this.alerter=alerter;
     create();
     layout(); 
@@ -519,7 +516,6 @@ class FontPicker {
           PopupTestContext ptc=new PopupTestContext(args);
           FontPicker fp=new FontPicker(
             ptc.getMainFrame(),
-            ptc.getFail(),
             new Setter<String>(){
               public void set(String s) {
                 System.out.println("!!!!\n"+s+"\n!!!!");

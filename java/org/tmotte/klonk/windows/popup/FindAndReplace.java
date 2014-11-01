@@ -35,7 +35,6 @@ import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.Position;
 import javax.swing.text.Segment;
-import org.tmotte.common.swang.Fail;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
@@ -62,9 +61,6 @@ class FindAndReplace {
   JFrame parentFrame;
   YesNoCancel popupAskReplace, popupAskReplaceAll;
   
-  //Blah:
-  Fail fail;
-  
   //Only false when window has never been shown:
   boolean everShown=false;
   //Other state
@@ -86,10 +82,9 @@ class FindAndReplace {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public FindAndReplace(JFrame parentFrame, Fail fail, Setter<String> alerter, StatusUpdate statusBar) {
+  public FindAndReplace(JFrame parentFrame, Setter<String> alerter, StatusUpdate statusBar) {
     this.parentFrame=parentFrame;
     this.statusBar=statusBar;
-    this.fail=fail;
     this.alerter=alerter;
     create();
     layout();
