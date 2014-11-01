@@ -18,6 +18,7 @@ import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
+import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 
@@ -48,14 +49,15 @@ public class Popups {
   private Favorites favorites;
   private SSHFiles sshFiles;  
 
-  //DI resources:
-  private JFrame mainFrame;
-  private KHome home;
-  private Setter<Throwable> logFail;
-  private KPersist persist;
-  private StatusUpdate statusBar;
-  private Getter<String> currFileGetter;
-  private Image iconImagePopup;    
+  //DI resources for constructor:
+  private final KHome home;
+  private final Setter<Throwable> logFail;
+  private final JFrame mainFrame;
+  private final KPersist persist;
+  private final StatusUpdate statusBar;
+  private final Image iconImagePopup;    
+  private final Getter<String> currFileGetter;
+  private final SSHConnections sshConns;
 
   //Other components. Well at least it's just this one:
   private FontOptions fontOptions; 
@@ -71,7 +73,8 @@ public class Popups {
       KPersist persist, 
       StatusUpdate statusBar, 
       Image iconImagePopup, 
-      Getter<String> currFileGetter
+      Getter<String> currFileGetter,
+      SSHConnections sshConns
     ) {
     this.home          =home;
     this.logFail       =logFail;
@@ -80,6 +83,7 @@ public class Popups {
     this.persist       =persist;
     this.iconImagePopup=iconImagePopup;
     this.currFileGetter=currFileGetter;
+    this.sshConns      =sshConns;
   }
 
   public void setFontAndColors(FontOptions fo) {
@@ -215,7 +219,9 @@ public class Popups {
   private FileDialogWrapper getFileDialog() {
     if (fileDialogWrapper==null)
       fileDialogWrapper=new FileDialogWrapper(
-        mainFrame, new SSHFileSystemView(), new SSHFileView()
+        mainFrame, 
+        new SSHFileSystemView(sshConns), 
+        new SSHFileView()
       );
     return fileDialogWrapper;
   }

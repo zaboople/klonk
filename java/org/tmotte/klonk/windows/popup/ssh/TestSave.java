@@ -2,20 +2,23 @@ package org.tmotte.klonk.windows.popup.ssh;
 import java.io.File;
 import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.ssh.SSH;
+import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.SSHExec;
 import org.tmotte.klonk.ssh.SSHFile;
 
 class TestSave {
 
-  public static void main(String[] args) throws Exception {
+  private static void testSimple(String[] args) throws Exception {
     final SSH ssh=SSH.cmdLine(args);
+    final SSHConnections conns=new SSHConnections();
+    conns.put(ssh.getUser(), ssh.getHost(), ssh);
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
             new org.tmotte.klonk.windows.popup.FileDialogWrapper(
               PopupTestContext.makeMainFrame(),
-              new SSHFileSystemView(),
+              new SSHFileSystemView(conns),
               new SSHFileView()
             );
           SSHFile file=
@@ -41,5 +44,8 @@ class TestSave {
         }
       }//run()
     });
+  }
+  public static void main(String[] args) throws Exception {
+    testSimple(args);
   }
 }

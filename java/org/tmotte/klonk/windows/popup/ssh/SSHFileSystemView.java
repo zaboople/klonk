@@ -22,12 +22,13 @@ public class SSHFileSystemView extends FileSystemView {
   private final FileSystemView defaultView=FileSystemView.getFileSystemView();
   private final ByteArrayOutputStream sshErr=new ByteArrayOutputStream(1024*24);
   private final StringBuilder sshOut=new StringBuilder();
-  private final SSHConnections conns=new SSHConnections();
+  private final SSHConnections conns;
 
   private static File[] noFiles=new File[]{};
   
-  public SSHFileSystemView() {
+  public SSHFileSystemView(SSHConnections conns) {
     super();
+    this.conns=conns;
   }
   
 

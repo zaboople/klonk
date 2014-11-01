@@ -12,7 +12,7 @@ public class SSHFile extends File {
   public static SSHFile cast(File f) {
     if (f instanceof SSHFile)
       return (SSHFile)f;
-    //System.out.println("WARNING NOT SSH "+f);
+    //mylog("WARNING NOT SSH "+f);
     return null;    
   }
  
@@ -87,7 +87,7 @@ public class SSHFile extends File {
   }
   /*Converts this abstract pathname into a pathname string.*/
   public @Override String	getPath() {
-    //System.out.println("SSHFile.getPath: FIXME "+getName());
+    //mylog("SSHFile.getPath: FIXME "+getName());
     return getAbsolutePath();
   }
   /*Compares two abstract pathnames lexicographically.*/
@@ -132,7 +132,7 @@ public class SSHFile extends File {
 
   /*Returns the length of the file denoted by this abstract pathname.*/
   public @Override long length(){
-    System.out.println("FIXME SSHFile.length()");
+    mylog("FIXME SSHFile.length()");
     return 100;
   }
   
@@ -142,7 +142,7 @@ public class SSHFile extends File {
   
   /*Returns a java.nio.file.Path object constructed from the this abstract path.*/
   public @Override Path toPath() {
-    System.out.println("SSHFile.toPath");
+    mylog("SSHFile.toPath");
     return super.toPath();
   }  
   /*Creates the directory named by this abstract pathname.*/
@@ -160,17 +160,17 @@ public class SSHFile extends File {
 
   /*Tests whether the application can execute the file denoted by this abstract pathname.*/
   public @Override boolean canExecute() {
-    System.out.println("SSHFile.canExecute");
+    mylog("SSHFile.canExecute");
     return super.canExecute();
   }  
   /*Tests whether the application can read the file denoted by this abstract pathname.*/
   public @Override boolean canRead() {
-    System.out.println("SSHFile.canRead");
+    mylog("SSHFile.canRead");
     return super.canRead();
   }  
   /*Tests whether the application can modify the file denoted by this abstract pathname.*/
   public @Override boolean canWrite() {
-    System.out.println("SSHFile.canWrite");
+    mylog("SSHFile.canWrite");
     return super.canWrite();
   }
   /*Atomically creates a new, empty file named by this abstract pathname if and only if a file with this name does not yet exist.*/
@@ -183,15 +183,19 @@ public class SSHFile extends File {
   }
   /*Returns the absolute form of this abstract pathname.*/
   public @Override File	getAbsoluteFile(){
-    System.out.println("SSHFile.getAbsoluteFile: FIXME "+getName());
+    mylog("SSHFile.getAbsoluteFile: FIXME "+getName());
     return this;  
   }
   
   
   /*Returns the time that the file denoted by this abstract pathname was last modified.*/
   public @Override long	lastModified() {
-    System.out.println("SSHFile.lastModified: FIXME "+this);
+    mylog("SSHFile.lastModified: FIXME "+this);
     return 1;
+  }
+  
+  private void mylog(String s) {
+    System.out.println(s);
   }
   
   ////////////////////////

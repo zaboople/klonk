@@ -1,11 +1,76 @@
 -Current
-  
-  -Maybe a more sophisticated version of find/replace, where I break up the String? It is pretty slow on an 8MB file.
-    -Loop thru 20000 characters at a time, appending last searchFor.length() from previous to first. 
-    -This becomes even trickier with regex, but Matcher does have the ability to tell you that the end of a string is a partial match.
+
+  -SSH Klonk
+    To keep my account, I need to do this
+      https://www.xshellz.com/shell
+      How much longer do I have it?
+        !info zaboople 
+      Let me keep it:
+        !keep zaboople
+    SSH server is shell.xshellz.com
+      ssh user is same as web site user
+      ssh password: wb2ur2jcv
+    Web site:
+      https://www.xshellz.com/
+      username: zaboople
+      password: Same pass as ghub
+    This is my profile, if that matters:
+      http://xshellz.com/profile/zaboople
+
+  -SSH Todo:
+    SSHFileSystemView.createFileObject needs to be able to go to the cache.
+    Save as
+    File open 
+    Reconnect after lost connection
+    Dialog for entering SSH info:
+      host
+      user
+      pass/keyfile
+        -keyfile defaults to pass
+
+  -It honestly would be handy to turn multiline off in find/repl. Just because ^.*?$ can cross multiple lines
+
+  -File open ought to start off the session with the last directory opened. 
+   It's annoying when it defaults to my stupid home directory. Well ...ssh. Ugh.
+      
+  -New Klonk Bug
+  Also consider the idea offered at bottom of this page:
+  http://stackoverflow.com/questions/6436944/java-illegalstateexception-buffers-have-not-been-created
+  java.lang.IllegalStateException: Buffers have not been created
+          at sun.awt.windows.WComponentPeer.getBackBuffer(Unknown Source)
+          at java.awt.Component$FlipBufferStrategy.getBackBuffer(Unknown Source)
+          at java.awt.Component$FlipBufferStrategy.updateInternalBuffers(Unknown Source)
+          at java.awt.Component$FlipBufferStrategy.revalidate(Unknown Source)
+          at java.awt.Component$FlipBufferStrategy.revalidate(Unknown Source)
+          at java.awt.Component$FlipBufferStrategy.getDrawGraphics(Unknown Source)
+          at javax.swing.BufferStrategyPaintManager.prepare(Unknown Source)
+          at javax.swing.BufferStrategyPaintManager.paint(Unknown Source)
+          at javax.swing.RepaintManager.paint(Unknown Source)
+          at javax.swing.JComponent.paint(Unknown Source)
+          at java.awt.GraphicsCallback$PaintCallback.run(Unknown Source)
+          at sun.awt.SunGraphicsCallback.runOneComponent(Unknown Source)
+          at sun.awt.SunGraphicsCallback.runComponents(Unknown Source)
+          at java.awt.Container.paint(Unknown Source)
+          at java.awt.Window.paint(Unknown Source)
+          at javax.swing.RepaintManager$3.run(Unknown Source)
+          at javax.swing.RepaintManager$3.run(Unknown Source)
+          at java.security.AccessController.doPrivileged(Native Method)
+          at java.security.ProtectionDomain$1.doIntersectionPrivilege(Unknown Source)
+          at javax.swing.RepaintManager.paintDirtyRegions(Unknown Source)
+          at javax.swing.RepaintManager.paintDirtyRegions(Unknown Source)
+          at javax.swing.RepaintManager.prePaintDirtyRegions(Unknown Source)
+          at javax.swing.RepaintManager.access$1100(Unknown Source)
+          at javax.swing.RepaintManager$ProcessingRunnable.run(Unknown Source)
+          at java.awt.event.InvocationEvent.dispatch(Unknown Source)
+          at java.awt.EventQueue.dispatchEventImpl(Unknown Source)
+          at java.awt.EventQueue.access$200(Unknown Source)
+          at java.awt.EventQueue$3.run(Unknown Source)        
 
 
 -Maybe  
+  -Maybe a more sophisticated version of find/replace, where I break up the String? It is pretty slow on an 8MB file.
+    -Loop thru 20000 characters at a time, appending last searchFor.length() from previous to first. 
+    -Note that java.util.regex.Matcher does have the ability to tell you that the end of a string is a partial match.
   -How about dual-window mode. Only two windows, that's it.
   -About should show an icon
   -Undo

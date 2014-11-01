@@ -26,6 +26,9 @@ public class SSH {
     this.user=user;
     this.host=host;
   }
+  public SSH(String host) {
+    this.host=host;
+  }
   public SSH withKnown(String hosts) {
     this.knownHosts=hosts;
     return this;
@@ -36,6 +39,10 @@ public class SSH {
   }
   public SSH withPassword(String pass) throws Exception {
     this.pass=pass;
+    return this;
+  }
+  public SSH withUser(String user) throws Exception {
+    this.user=user;
     return this;
   }
   public SSH withPrivateKeys(String privateKeys) throws Exception {

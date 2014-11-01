@@ -35,7 +35,7 @@ public class ConnectionParse {
 
     SSH ssh=connMgr.getOrCreate(user, host);
     
-    //Now get file:
+    //Now get file name:
     chunker.reset(chunker.getRest());    
     return parse(ssh, null, chunker);
   }

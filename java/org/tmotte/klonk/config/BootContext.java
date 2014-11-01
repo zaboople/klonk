@@ -36,6 +36,7 @@ import org.tmotte.klonk.controller.Favorites;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
+import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
@@ -113,6 +114,7 @@ public class BootContext {
   private Favorites favorites;
   private MainDisplay mainDisplay;
   private String processID;
+  private SSHConnections sshConns;
   
   private BootContext(String [] args){
     this.args=args;
@@ -136,6 +138,7 @@ public class BootContext {
         ,getStatusBar()
         ,getPopupIcon() 
         ,getCurrFileNameGetter()
+        ,getSSHConnections()
       );
     return popups;
   }
@@ -230,6 +233,11 @@ public class BootContext {
       fileListen=new FileListen(getLog(), getProcessID(), getHome());    
     return fileListen;
   }
+  private SSHConnections getSSHConnections() {
+    if (sshConns==null)
+      sshConns=new SSHConnections();
+    return sshConns;
+  }
   
 
   ///////////////////////////////////////////
@@ -249,19 +257,6 @@ public class BootContext {
     return getMenus().getMenuBar();
   }
   
-  private Image getPopupIcon() {
-    return getPopupIcon(this);
-  }
-  private Image getAppIcon() {
-    return getAppIcon(this);
-  }
-  private String getProcessID() {
-    if (processID==null) {
-      String pid=ManagementFactory.getRuntimeMXBean().getName();
-      processID=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
-    }
-    return processID;
-  }
 
   private StatusUpdate getStatusBar() {
     if (statusBar==null)
@@ -277,14 +272,12 @@ public class BootContext {
   private Getter<String> getCurrFileNameGetter() {
     return getMainController().getCurrFileNameGetter();
   }
-  
   private MainDisplay getMainDisplay() {
     return getLayout().getMainDisplay();
   }
   private Doer getLockRemover() {
     return getFileListener().getLockRemover();
   }
-  
   private Setter<List<String>> getFavoriteFileListener() {
     return getMenus().getFavoriteFileListener();
   }
@@ -301,6 +294,19 @@ public class BootContext {
     return getMenus().getRecentDirListener();
   }
 
+  private Image getPopupIcon() {
+    return getPopupIcon(this);
+  }
+  private Image getAppIcon() {
+    return getAppIcon(this);
+  }
+  private String getProcessID() {
+    if (processID==null) {
+      String pid=ManagementFactory.getRuntimeMXBean().getName();
+      processID=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
+    }
+    return processID;
+  }
   ////////////////
   // UTILITIES: //
   ////////////////
