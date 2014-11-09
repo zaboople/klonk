@@ -18,6 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.tmotte.klonk.Menus;
+import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Getter;
@@ -37,9 +38,11 @@ import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.ssh.SSHConnections;
+import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.klonk.windows.popup.SSHLogin;
 import javax.swing.JMenuBar;
 
 /** 
@@ -115,6 +118,7 @@ public class BootContext {
   private MainDisplay mainDisplay;
   private String processID;
   private SSHConnections sshConns;
+  private IUserPass iUserPass;
   
   private BootContext(String [] args){
     this.args=args;
@@ -139,6 +143,7 @@ public class BootContext {
         ,getPopupIcon() 
         ,getCurrFileNameGetter()
         ,getSSHConnections()
+        ,getSSHLogin()
       );
     return popups;
   }
@@ -234,17 +239,28 @@ public class BootContext {
     return fileListen;
   }
   private SSHConnections getSSHConnections() {
-    if (sshConns==null)
-      sshConns=new SSHConnections();
+    if (sshConns==null){
+      SSHOptions sshOpts=getPersist().getSSHOptions();
+      sshConns=new SSHConnections()
+        .withLogin(getSSHLogin())
+        .withKnown(sshOpts.getKnownHostsFilename())
+        .withPrivateKeys(sshOpts.getPrivateKeysFilename());        
+    }
     return sshConns;
+  }
+  private IUserPass getSSHLogin() {
+    if (iUserPass==null) 
+      iUserPass=new SSHLogin(getMainFrame(), popups.getAlerter());
+    return iUserPass;
   }
   
 
-  ///////////////////////////////////////////
-  // PURE INTERFACES AND ABSTRACT CLASSES: //
-  // and so on...                          //
-  ///////////////////////////////////////////
+  /////////////////////////////////////////////
+  // PURE INTERFACES, ABSTRACT CLASSES, AND: //
+  // VALUE OBJECTS:                          //
+  /////////////////////////////////////////////
 
+  //Abstracts:
   public JFrame getMainFrame() {
     if (mainFrame==null) {
       mainFrame=new JFrame("Klonk");
@@ -257,7 +273,7 @@ public class BootContext {
     return getMenus().getMenuBar();
   }
   
-
+  //Interfaces:
   private StatusUpdate getStatusBar() {
     if (statusBar==null)
       statusBar=getLayout().getStatusBar(); 
@@ -294,6 +310,7 @@ public class BootContext {
     return getMenus().getRecentDirListener();
   }
 
+  //Concrete value objects:
   private Image getPopupIcon() {
     return getPopupIcon(this);
   }
@@ -307,6 +324,8 @@ public class BootContext {
     }
     return processID;
   }
+  
+  
   ////////////////
   // UTILITIES: //
   ////////////////

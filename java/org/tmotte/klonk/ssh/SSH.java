@@ -17,6 +17,7 @@ public class SSH {
   private boolean connected=false;
   private SFTP sftp;
   private SSHExec exec;
+  private IUserPass iUserPass;
    
   ////////////////////
   // INSTANTIATION: //
@@ -29,26 +30,31 @@ public class SSH {
   public SSH(String host) {
     this.host=host;
   }
-  public SSH withKnown(String hosts) {
-    this.knownHosts=hosts;
+  public SSH withPassword(String pass) {
+    this.pass=pass;
+    return this;
+  }
+  public SSH withUser(String user) {
+    this.user=user;
     return this;
   }
   public SSH withDebug(boolean debug) {
     this.debug=true;
     return this;
   }
-  public SSH withPassword(String pass) throws Exception {
-    this.pass=pass;
+  public SSH withKnown(String hosts) {
+    this.knownHosts=hosts;
     return this;
   }
-  public SSH withUser(String user) throws Exception {
-    this.user=user;
-    return this;
-  }
-  public SSH withPrivateKeys(String privateKeys) throws Exception {
+  public SSH withPrivateKeys(String privateKeys) {
     this.privateKeys=privateKeys;
     return this;
   }
+  public SSH withIUserPass(IUserPass iUserPass) {
+    this.iUserPass=iUserPass;
+    return this;
+  }
+  
   
   //////////
   // USE: //
@@ -95,14 +101,21 @@ public class SSH {
     
     if (knownHosts==null)
       session.setConfig("StrictHostKeyChecking", "no");
+    
     if (privateKeys!=null) {
       session.setConfig("PreferredAuthentications", "publickey");
       jsch.addIdentity(privateKeys);
     }
+    
     if (pass!=null){
       session.setPassword(pass);
       pass=null; //Security feature - yes your password is one-time. I'm not letting somebody come get it.
     }
+    else
+    if (iUserPass!=null && iUserPass.get(null, host)){ //FIXME why null the user just reuse
+      withUser(iUserPass.getUser());
+      withPassword(iUserPass.getPass());
+    }      
     session.setTimeout(20000);
     session.connect(); 
     connected=true;
@@ -120,7 +133,7 @@ public class SSH {
       host.equals(this.host);
   }
   public String toString() {
-    return "user: "+user+" host: "+host+" knownHosts: "+knownHosts+" privateKeys: "+privateKeys;
+    return "SSH: user: "+user+" host: "+host+" knownHosts: "+knownHosts+" privateKeys: "+privateKeys;
   }
 
   

@@ -5,11 +5,15 @@ import org.tmotte.common.text.StringChunker;
 import java.util.regex.Pattern;
 import java.util.Set;
 
-public class ConnectionParse {
+/** 
+ * This is really just an extension of SSHConnections, should maybe be combined
+ */
+class ConnectionParse {
 
   private final Pattern sshPattern=Pattern.compile("ssh:/*", Pattern.CASE_INSENSITIVE);
   private final StringChunker chunker=new StringChunker();
-  
+
+  /** FIXME no COnnectionParseExceptions */
   protected SSHFile parse(SSHConnections connMgr, String uri) throws ConnectionParseException {
     String user=null, host=null, dirFile=null;
     chunker.reset(uri);
@@ -19,25 +23,29 @@ public class ConnectionParse {
       throw new RuntimeException(uri+" does not contain "+sshPattern);
           
     //Optionally get user@...:  FIXME TEST WITH MULTIPLE USERS
-    if (!chunker.find("@")) {
-      Set<String> users=connMgr.getUsers();
-      if (users.size()!=1)
-        throw new ConnectionParseException(uri+" does not designate \"user@\" in the connection string");
-      user=users.iterator().next();
-    }
-    else 
-      user=chunker.getUpTo();
+    if (chunker.find("@")) 
+      user=chunker.getUpTo();          
       
     //Get host:
     if (!chunker.find(":"))
-      throw new ConnectionParseException(uri+" does not seem to have a hostname ");
-    host=chunker.getUpTo();
-
-    SSH ssh=connMgr.getOrCreate(user, host);
+      host=chunker.getRest();
+    else
+      host=chunker.getUpTo();
     
-    //Now get file name:
+    //Go back and try again on user if we need to:
+    if (user==null)
+      user=connMgr.inferUserForHost(host);
+    if (user==null)
+      return null;
+  
+    //Now make the SSh object & get file name:
+    SSH ssh=connMgr.getOrCreate(user, host);
     chunker.reset(chunker.getRest());    
-    return parse(ssh, null, chunker);
+    SSHFile result=parse(ssh, null, chunker);
+    if (result==null) 
+      //No name given, default to "~"
+      result=new SSHFile(ssh, null, "~", true);
+    return result;
   }
   
   private SSHFile parse(SSH ssh, SSHFile parent, StringChunker left) {

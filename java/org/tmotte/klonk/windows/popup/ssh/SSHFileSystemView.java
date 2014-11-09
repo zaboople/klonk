@@ -5,6 +5,7 @@ import org.tmotte.klonk.ssh.SSH;
 import org.tmotte.klonk.ssh.SSHExec;
 import org.tmotte.klonk.ssh.SSHFile;
 import org.tmotte.klonk.ssh.SSHConnections;
+import org.tmotte.klonk.ssh.ConnectionParseException;
 import org.tmotte.klonk.ssh.WrappedSSHException;
 import org.tmotte.klonk.config.msg.Setter;
 import java.io.ByteArrayOutputStream;
@@ -31,6 +32,19 @@ public class SSHFileSystemView extends FileSystemView {
     this.conns=conns;
   }
   
+  /* This gets called when you just bang in a path name or press enter on  a path name. FIXME */
+  public @Override File createFileObject(String path){
+    if (conns.is(path))
+      try {
+        return conns.getFile(path);
+      } catch (ConnectionParseException e) {
+        System.err.println("FUCK FUCK FUCK");
+        e.printStackTrace();
+        return null;
+      }
+    else
+      return defaultView.createFileObject(path);
+  }
 
   //FIXME what does the user interface do on authentication failure?
   private int _getFiles(SSHFile dir, boolean useFileHiding) throws WrappedSSHException {
@@ -88,14 +102,6 @@ public class SSHFileSystemView extends FileSystemView {
     if (cast(dir)==null)
       return defaultView.isFileSystemRoot(dir);
     return dir.getParentFile()==null;
-  }
-  /* This gets called when you just bang in a path name or press enter on  a path name. FIXME */
-  public @Override File createFileObject(String path){
-    if (conns.is(path)){
-      throw new RuntimeException("FIXME Create file object for dir: "+path);
-    }
-    else
-      return defaultView.createFileObject(path);
   }
 
   /* Creates a new File object for f with correct behavior for a file system root directory.*/

@@ -1,10 +1,12 @@
 -Current
 
   -SSH Klonk
+    Go here:
+      ssh://zaboople@shell.xshellz.com
     To keep my account, I need to do this
-      https://www.xshellz.com/shell
+        https://www.xshellz.com/shell
       How much longer do I have it?
-        !info zaboople 
+        !info zaboople
       Let me keep it:
         !keep zaboople
     SSH server is shell.xshellz.com

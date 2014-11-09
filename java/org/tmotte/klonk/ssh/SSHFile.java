@@ -6,9 +6,6 @@ import java.nio.file.Path;
 
 public class SSHFile extends File {
   
-  public final static SSHFile SLASH(SSH ssh){
-    return new SSHFile(ssh, null, "/", true);
-  }
   public static SSHFile cast(File f) {
     if (f instanceof SSHFile)
       return (SSHFile)f;

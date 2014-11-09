@@ -19,6 +19,7 @@ import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.ssh.SSHConnections;
+import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 
@@ -48,6 +49,7 @@ public class Popups {
   private FontPicker fontPicker;
   private Favorites favorites;
   private SSHFiles sshFiles;  
+  private IUserPass sshLogin;
 
   //DI resources for constructor:
   private final KHome home;
@@ -74,7 +76,8 @@ public class Popups {
       StatusUpdate statusBar, 
       Image iconImagePopup, 
       Getter<String> currFileGetter,
-      SSHConnections sshConns
+      SSHConnections sshConns,
+      IUserPass sshLogin
     ) {
     this.home          =home;
     this.logFail       =logFail;
@@ -84,9 +87,10 @@ public class Popups {
     this.iconImagePopup=iconImagePopup;
     this.currFileGetter=currFileGetter;
     this.sshConns      =sshConns;
+    this.sshLogin      =sshLogin;
   }
 
-  public void setFontAndColors(FontOptions fo) {
+  public void setFontAndColors(FontOptions fo) { //FIXME change this to a Setter<FontOptions>
     this.fontOptions=fo;
     if (help!=null)
       help.setFont(fontOptions);
@@ -177,6 +181,12 @@ public class Popups {
   }
 
 
+  public KAlert getAlerter() {
+    if (kAlert==null)
+      kAlert=new KAlert(mainFrame);
+    return kAlert;
+  }
+
   
   ///////////////////////////////////////////
   // PRIVATE getX() MORE FREQUENTLY USED:  //
@@ -187,11 +197,6 @@ public class Popups {
     if (goToLinePicker==null)
       goToLinePicker=new GoToLine(mainFrame, getAlerter());
     return goToLinePicker;
-  }
-  private KAlert getAlerter() {
-    if (kAlert==null)
-      kAlert=new KAlert(mainFrame);
-    return kAlert;
   }
   private FindAndReplace getFindAndReplace() {
     if (findAndReplace==null){
