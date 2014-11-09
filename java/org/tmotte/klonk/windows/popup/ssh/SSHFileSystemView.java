@@ -38,7 +38,6 @@ public class SSHFileSystemView extends FileSystemView {
       try {
         return conns.getFile(path);
       } catch (ConnectionParseException e) {
-        System.err.println("FUCK FUCK FUCK");
         e.printStackTrace();
         return null;
       }

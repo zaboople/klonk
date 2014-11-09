@@ -113,10 +113,10 @@ public class SSH {
       pass=null; //Security feature - yes your password is one-time. I'm not letting somebody come get it.
     }
     else
-    if (iUserPass!=null && iUserPass.get(null, host)){ //FIXME why null the user just reuse
-      System.out.println("FIXME "+iUserPass.getUser()+" "+iUserPass.getPass());
+    if (iUserPass!=null && iUserPass.get(user, host)){ //FIXME why null the user just reuse
       withUser(iUserPass.getUser());
       withPassword(iUserPass.getPass());
+      session.setPassword(pass);
     }      
     session.setTimeout(20000);
     session.connect(); 
