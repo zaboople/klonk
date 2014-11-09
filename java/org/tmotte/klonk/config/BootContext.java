@@ -248,11 +248,6 @@ public class BootContext {
     }
     return sshConns;
   }
-  private IUserPass getSSHLogin() {
-    if (iUserPass==null) 
-      iUserPass=new SSHLogin(getMainFrame(), popups.getAlerter());
-    return iUserPass;
-  }
   
 
   /////////////////////////////////////////////
@@ -274,6 +269,11 @@ public class BootContext {
   }
   
   //Interfaces:
+  private IUserPass getSSHLogin() {
+    if (iUserPass==null) 
+      iUserPass=new SSHLogin(getMainFrame(), popups.getAlerter());
+    return iUserPass;
+  }
   private StatusUpdate getStatusBar() {
     if (statusBar==null)
       statusBar=getLayout().getStatusBar(); 

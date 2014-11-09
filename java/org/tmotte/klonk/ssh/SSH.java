@@ -107,12 +107,14 @@ public class SSH {
       jsch.addIdentity(privateKeys);
     }
     
+    System.out.println("FIXME "+iUserPass+" "+pass);
     if (pass!=null){
       session.setPassword(pass);
       pass=null; //Security feature - yes your password is one-time. I'm not letting somebody come get it.
     }
     else
     if (iUserPass!=null && iUserPass.get(null, host)){ //FIXME why null the user just reuse
+      System.out.println("FIXME "+iUserPass.getUser()+" "+iUserPass.getPass());
       withUser(iUserPass.getUser());
       withPassword(iUserPass.getPass());
     }      

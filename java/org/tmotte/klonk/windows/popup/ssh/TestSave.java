@@ -22,7 +22,7 @@ class TestSave {
             new SSHLogin(
               m, 
               new Setter<String>(){
-                public void set(String s) {System.err.println(s);}
+                public void set(String s) {System.err.println("Message: "+s);}
               }
             )
           );

@@ -1,23 +1,5 @@
 -Current
 
-  -SSH Klonk
-    Go here:
-      ssh://zaboople@shell.xshellz.com
-    To keep my account, I need to do this
-        https://www.xshellz.com/shell
-      How much longer do I have it?
-        !info zaboople
-      Let me keep it:
-        !keep zaboople
-    SSH server is shell.xshellz.com
-      ssh user is same as web site user
-      ssh password: wb2ur2jcv
-    Web site:
-      https://www.xshellz.com/
-      username: zaboople
-      password: Same pass as ghub
-    This is my profile, if that matters:
-      http://xshellz.com/profile/zaboople
 
   -SSH Todo:
     SSHFileSystemView.createFileObject needs to be able to go to the cache.
