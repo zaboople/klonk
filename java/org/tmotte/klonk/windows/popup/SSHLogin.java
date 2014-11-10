@@ -53,7 +53,6 @@ public class SSHLogin implements IUserPass {
   private JDialog win;
   private JButton btnOK, btnCancel;
   private JLabel lblHost;
-  private boolean initialized=false;
   private boolean ok=false, badEntry=false, cancelled=false;
     
   /////////////////////
@@ -63,6 +62,9 @@ public class SSHLogin implements IUserPass {
   public SSHLogin(JFrame parentFrame, Setter<String> alerter) {
     this.parentFrame=parentFrame;
     this.alerter=alerter;
+    create();
+    layout(); 
+    listen();
   }
   public @Override String getUser() {
     return ok 
@@ -79,8 +81,7 @@ public class SSHLogin implements IUserPass {
   }
   public boolean show(String user, String host) {
     
-    init();
-    
+    //Display:
     if (user!=null)
       jtfUsername.setText(user);
     jpfPass.setText("");    
@@ -103,22 +104,13 @@ public class SSHLogin implements IUserPass {
   //  PRIVATE METHODS:  //
   //                    //
   ////////////////////////
-  
-  private void init() {
-    if (!initialized) {
-      create();
-      layout(); 
-      listen(); 
-      initialized=true;
-    }
-  }
 
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
     ok=action;
     win.setVisible(false);  
     badEntry=false;
-    if (ok &&
+    if (action &&
           (
             jtfUsername.getText().trim().equals("") 
             || 
@@ -228,7 +220,7 @@ public class SSHLogin implements IUserPass {
       public void run() {
         JFrame m=PopupTestContext.makeMainFrame();
         SSHLogin win=new SSHLogin(m, new KAlert(m));
-        System.out.println("RESULT: "+win.show("burtbutt", "that.server.danglblangdingdongwhat.com"));
+        System.out.println("RESULT: "+win.show("aname", "that.who.youknowthat.server.danglblangdingdongwhat.com"));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
       }
     });  

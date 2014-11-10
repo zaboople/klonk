@@ -43,6 +43,7 @@ import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
 import org.tmotte.klonk.windows.popup.SSHLogin;
+import org.tmotte.klonk.windows.popup.KAlert;
 import javax.swing.JMenuBar;
 
 /** 
@@ -119,6 +120,7 @@ public class BootContext {
   private String processID;
   private SSHConnections sshConns;
   private IUserPass iUserPass;
+  private Setter<String> alerter;
   
   private BootContext(String [] args){
     this.args=args;
@@ -142,6 +144,7 @@ public class BootContext {
         ,getStatusBar()
         ,getPopupIcon() 
         ,getCurrFileNameGetter()
+        ,getAlerter()
         ,getSSHConnections()
         ,getSSHLogin()
       );
@@ -269,9 +272,14 @@ public class BootContext {
   }
   
   //Interfaces:
+  private Setter<String> getAlerter() {
+    if (alerter==null)
+      alerter=new KAlert(getMainFrame());
+    return alerter;
+  }
   private IUserPass getSSHLogin() {
     if (iUserPass==null) 
-      iUserPass=new SSHLogin(getMainFrame(), popups.getAlerter());
+      iUserPass=new SSHLogin(getMainFrame(), getAlerter());
     return iUserPass;
   }
   private StatusUpdate getStatusBar() {

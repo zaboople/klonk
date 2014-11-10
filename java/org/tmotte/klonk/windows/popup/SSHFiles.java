@@ -63,15 +63,29 @@ public class SSHFiles {
   }  
   public boolean show(SSHOptions options) {
     result=false;
-    jcbKnownHosts.setSelected( ifEmpty(options.getKnownHostsFilename()) !=null);
-    jcbPrivateKeys.setSelected(ifEmpty(options.getPrivateKeysFilename())!=null);
+    {
+      String knownHosts=ifEmpty(options.getKnownHostsFilename());
+      if (knownHosts!=null)
+        jtfKnownHosts.setText(knownHosts);
+      jcbKnownHosts.setSelected( knownHosts !=null);
+      String privateKeys=ifEmpty(options.getPrivateKeysFilename());
+      if (privateKeys!=null)
+        jtfPrivateKeys.setText(privateKeys);
+      jcbPrivateKeys.setSelected( privateKeys !=null);
+    }
     setVisible();
     doShow();
     if (result) {
-      if (jcbKnownHosts.isSelected())
-        options.setKnownHostsFilename(ifEmpty(jtfKnownHosts));
-      if (jcbPrivateKeys.isSelected())
-        options.setPrivateKeysFilename(ifEmpty(jtfPrivateKeys));
+      options.setKnownHostsFilename(
+        jcbKnownHosts.isSelected()
+          ?ifEmpty(jtfKnownHosts)
+          :""
+      );
+      options.setPrivateKeysFilename(
+        jcbPrivateKeys.isSelected()
+          ?ifEmpty(jtfPrivateKeys)
+          :""
+      );    
     }
     return result;
   }

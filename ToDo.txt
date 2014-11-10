@@ -1,5 +1,5 @@
 -Current
-
+  -SSH Known hosts / Private keys popup still doesn't work right.
 
   -SSH Todo:
     SSHFileSystemView.createFileObject needs to be able to go to the cache.

@@ -77,18 +77,12 @@ public class SSH {
     return sftp;
   }
   public boolean isConnected(){
-    return connected;
-  }
-  public boolean canConnect() {
-    return pass!=null || privateKeys!=null;
+    return connected && session!=null && session.isConnected();
   }
   protected Session getSession() throws Exception {
-    checkConnect();
-    return session;
-  }
-  private void checkConnect() throws Exception {
-    if (!connected)
+    if (!isConnected())
       connect();
+    return session;
   }
   private SSH connect() throws Exception {
     if (knownHosts!=null) {
@@ -101,27 +95,47 @@ public class SSH {
     
     if (knownHosts==null)
       session.setConfig("StrictHostKeyChecking", "no");
-    
+        
+    //Try private keys:
     if (privateKeys!=null) {
       session.setConfig("PreferredAuthentications", "publickey");
       jsch.addIdentity(privateKeys);
     }
-    
-    System.out.println("FIXME "+iUserPass+" "+pass);
+    if (tryConnect())
+      return this;
+
+    //Try the password we have:
     if (pass!=null){
       session.setPassword(pass);
       pass=null; //Security feature - yes your password is one-time. I'm not letting somebody come get it.
+      if (tryConnect())
+        return this;
     }
-    else
-    if (iUserPass!=null && iUserPass.get(user, host)){ //FIXME why null the user just reuse
-      withUser(iUserPass.getUser());
-      withPassword(iUserPass.getPass());
-      session.setPassword(pass);
-    }      
-    session.setTimeout(20000);
-    session.connect(); 
-    connected=true;
-    return this;
+
+    //Try calling a user interface to get it:
+    if (iUserPass!=null) 
+      while (iUserPass.get(user, host)){ 
+        withUser(iUserPass.getUser());
+        withPassword(iUserPass.getPass());
+        session.setPassword(pass);
+        if (tryConnect())
+          return this;
+      }
+    
+    return null;
+  }
+  private boolean tryConnect() throws Exception {
+    session.setTimeout(10000);
+    try {
+      session.connect(); 
+      return connected=true;
+    } catch (Exception e) {    
+      if (e.getMessage().equals("Auth fail"))
+        return connected=false;
+      else
+        throw e;
+    }
+    
   }
   public void close() throws Exception {
     if (sftp!=null)

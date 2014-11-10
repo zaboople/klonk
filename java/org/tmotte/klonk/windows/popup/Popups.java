@@ -33,7 +33,7 @@ import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 public class Popups {
 
   //Frequently used popup windows:
-  private KAlert kAlert;
+  private Setter<String> alerter;
   private YesNoCancel yesNoCancel;
   private YesNoCancel yesNo;
   private FindAndReplace findAndReplace;
@@ -76,6 +76,7 @@ public class Popups {
       StatusUpdate statusBar, 
       Image iconImagePopup, 
       Getter<String> currFileGetter,
+      Setter<String> alerter,
       SSHConnections sshConns,
       IUserPass sshLogin
     ) {
@@ -86,6 +87,7 @@ public class Popups {
     this.persist       =persist;
     this.iconImagePopup=iconImagePopup;
     this.currFileGetter=currFileGetter;
+    this.alerter       =alerter;
     this.sshConns      =sshConns;
     this.sshLogin      =sshLogin;
   }
@@ -117,7 +119,7 @@ public class Popups {
   }
   
   public void alert(String message) {
-    getAlerter().show(message);
+    getAlerter().set(message);
   }
 
   public YesNoCancelAnswer askYesNoCancel(String message) {
@@ -181,10 +183,8 @@ public class Popups {
   }
 
 
-  public KAlert getAlerter() {
-    if (kAlert==null)
-      kAlert=new KAlert(mainFrame);
-    return kAlert;
+  public Setter<String> getAlerter() {
+    return alerter;
   }
 
   
