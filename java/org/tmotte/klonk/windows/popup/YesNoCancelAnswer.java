@@ -6,4 +6,16 @@ public class YesNoCancelAnswer {
   public boolean isYes(){return answer==YES;}
   public boolean isNo() {return answer==NO;}
   public boolean isCancel() {return answer==CANCEL;}
+  public String toString() {
+    if (isYes())
+      return "Yes";
+    else
+    if (isNo())
+      return "No";
+    else
+    if (isCancel())
+      return "Cancel";
+    else
+      throw new RuntimeException("Unexpected result "+answer);
+  }
 }

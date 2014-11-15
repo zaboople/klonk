@@ -223,7 +223,6 @@ class YesNoCancel {
     win.pack();
     KeyMapper.accel(btnYes, btnActions, KeyEvent.VK_F3);
     KeyMapper.accel(btnYes, btnActions, KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK);
-    //KeyMapper.accel(btnCancel, "efindcan",   btnActions, KeyEvent.VK_ESCAPE);
   }
   private void click(int result) {
     win.setVisible(false);  

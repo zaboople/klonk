@@ -146,7 +146,6 @@ public class BootContext {
         ,getCurrFileNameGetter()
         ,getAlerter()
         ,getSSHConnections()
-        ,getSSHLogin()
       );
     return popups;
   }

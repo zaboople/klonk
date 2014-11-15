@@ -49,7 +49,6 @@ public class Popups {
   private FontPicker fontPicker;
   private Favorites favorites;
   private SSHFiles sshFiles;  
-  private IUserPass sshLogin;
 
   //DI resources for constructor:
   private final KHome home;
@@ -77,8 +76,7 @@ public class Popups {
       Image iconImagePopup, 
       Getter<String> currFileGetter,
       Setter<String> alerter,
-      SSHConnections sshConns,
-      IUserPass sshLogin
+      SSHConnections sshConns
     ) {
     this.home          =home;
     this.logFail       =logFail;
@@ -89,7 +87,6 @@ public class Popups {
     this.currFileGetter=currFileGetter;
     this.alerter       =alerter;
     this.sshConns      =sshConns;
-    this.sshLogin      =sshLogin;
   }
 
   public void setFontAndColors(FontOptions fo) { //FIXME change this to a Setter<FontOptions>
