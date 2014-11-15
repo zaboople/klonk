@@ -15,6 +15,7 @@ public class SSH {
   private boolean debug;
   private String user, pass, host, knownHosts, privateKeys;
   private boolean connected=false;
+  private String lastConnectError;
   private SFTP sftp;
   private SSHExec exec;
   private IUserPass iUserPass;
@@ -77,65 +78,12 @@ public class SSH {
     return sftp;
   }
   public boolean isConnected(){
-    return connected && session!=null && session.isConnected();
-  }
-  protected Session getSession() throws Exception {
-    if (!isConnected())
-      connect();
-    return session;
-  }
-  private SSH connect() throws Exception {
-    if (knownHosts!=null) {
-      jsch.setKnownHosts(knownHosts);
-      if (debug)
-        printHostKeys(jsch);
+    if (session!=null) {
+      if (session.isConnected())
+        return true;
+      session=null;
     }
-
-    session=jsch.getSession(user, host, 22);  
-    
-    if (knownHosts==null)
-      session.setConfig("StrictHostKeyChecking", "no");
-        
-    //Try private keys:
-    if (privateKeys!=null) {
-      session.setConfig("PreferredAuthentications", "publickey");
-      jsch.addIdentity(privateKeys);
-    }
-    if (tryConnect())
-      return this;
-
-    //Try the password we have:
-    if (pass!=null){
-      session.setPassword(pass);
-      pass=null; //Security feature - yes your password is one-time. I'm not letting somebody come get it.
-      if (tryConnect())
-        return this;
-    }
-
-    //Try calling a user interface to get it:
-    if (iUserPass!=null) 
-      while (iUserPass.get(user, host)){ 
-        withUser(iUserPass.getUser());
-        withPassword(iUserPass.getPass());
-        session.setPassword(pass);
-        if (tryConnect())
-          return this;
-      }
-    
-    return null;
-  }
-  private boolean tryConnect() throws Exception {
-    session.setTimeout(10000);
-    try {
-      session.connect(); 
-      return connected=true;
-    } catch (Exception e) {    
-      if (e.getMessage().equals("Auth fail"))
-        return connected=false;
-      else
-        throw e;
-    }
-    
+    return false;
   }
   public void close() throws Exception {
     if (sftp!=null)
@@ -150,6 +98,76 @@ public class SSH {
   }
   public String toString() {
     return "SSH: user: "+user+" host: "+host+" knownHosts: "+knownHosts+" privateKeys: "+privateKeys;
+  }
+
+
+  protected Session getSession() throws Exception {
+    if (!isConnected())
+      connect();
+    return session;
+  }
+  private boolean connect() throws Exception {
+    if (knownHosts!=null) {
+      jsch.setKnownHosts(knownHosts);
+      if (debug)
+        printHostKeys(jsch);
+    }
+
+    if (session!=null) 
+      try {
+        session.disconnect();
+      } catch (Exception e) {
+        //FIXME log it
+      }
+    session=jsch.getSession(user, host, 22);  
+    
+    if (knownHosts==null)
+      session.setConfig("StrictHostKeyChecking", "no");
+        
+    //Try the password we have:
+    if (pass!=null){
+      session.setPassword(pass);
+      if (tryConnect())
+        return true;
+    }
+
+    //Try private keys:
+    if (privateKeys!=null) {
+      session.setConfig("PreferredAuthentications", "publickey");
+      jsch.addIdentity(privateKeys);
+      if (tryConnect())
+        return true;
+    }
+
+    //Try calling a user interface to get it. If the user gives
+    //us a bad password
+    while (iUserPass!=null && iUserPass.get(user, host, lastConnectError)){ 
+      String newUser=iUserPass.getUser();
+      if (!newUser.equalsIgnoreCase(user)) { //FIXME ssh is not case sensitive right?
+        user=newUser;
+        session.disconnect();
+        session=jsch.getSession(user, host, 22);
+      }
+      pass=iUserPass.getPass();
+      session.setPassword(pass);
+      if (tryConnect())
+        return true;
+    }
+    
+    return false;
+  }
+  private boolean tryConnect() throws Exception {
+    lastConnectError=null;
+    session.setTimeout(10000);
+    try {
+      session.connect(); 
+      return connected=true;
+    } catch (Exception e) {    
+      lastConnectError=e.getMessage().equals("Auth fail")
+        ?"Bad password"
+        :e.getMessage();
+      return connected=false;
+    }    
   }
 
   

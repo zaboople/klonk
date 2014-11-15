@@ -1,5 +1,12 @@
 -Current
-  -SSH Known hosts / Private keys popup still doesn't work right.
+  -Right now
+    The session.exec thing is returning an int. It doesn't account for the fact that we might have refused to login or whatever or our password didn't work. When our password doesn't work, we should retry. We shouldn't just splat.
+
+  -Why don't the windows close when you click the close button? What? 
+  
+  -Tabs & Indents allows invalid input - letters instead of numbers
+  
+  -SSH Login needs a list of open connections to select for closing.
 
   -SSH Todo:
     SSHFileSystemView.createFileObject needs to be able to go to the cache.

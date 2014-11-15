@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -38,7 +40,6 @@ import org.tmotte.klonk.ssh.IUserPass;
 
 //FIXME default focus to password if we already have a user
 //FIXME what is deal with closing window not escaping?? If I close the window that's an ESC
-//FIXME gotta show host
 public class SSHLogin implements IUserPass {
 
   /////////////////////////
@@ -52,7 +53,7 @@ public class SSHLogin implements IUserPass {
   private JPasswordField jpfPass;
   private JDialog win;
   private JButton btnOK, btnCancel;
-  private JLabel lblHost;
+  private JLabel lblHost, lblError, lblErrorText;
   private boolean ok=false, badEntry=false, cancelled=false;
     
   /////////////////////
@@ -76,20 +77,26 @@ public class SSHLogin implements IUserPass {
       ?new String(jpfPass.getPassword())
       :null;
   } 
-  public @Override boolean get(String user, String host) {  
-    return show(user, host);
+  public @Override boolean get(String user, String host, String lastError) {  
+    return show(user, host, lastError);
   }
-  public boolean show(String user, String host) {
+  public boolean show(String user, String host, String lastError) {
     
-    //Display:
+    //Initialize:
     if (user!=null)
       jtfUsername.setText(user);
     jpfPass.setText("");    
     lblHost.setText(host);
+    lblError.setVisible(lastError!=null);
+    lblErrorText.setVisible(lastError!=null);
+    lblErrorText.setText(lastError);
+    
+    //Position:
     win.pack();
     Point pt=parentFrame.getLocation();    
     win.setLocation(pt.x+20, pt.y+20);
 
+    //Display cycle:
     badEntry=true;
     cancelled=false;
     while (badEntry && !cancelled) {
@@ -140,6 +147,10 @@ public class SSHLogin implements IUserPass {
     btnCancel.setMnemonic(KeyEvent.VK_C);
     lblHost=new JLabel("                                             ");
     lblHost.setFont(lblHost.getFont().deriveFont(Font.BOLD));
+    lblError=new JLabel("Error: ");
+    lblError.setForeground(Color.RED);
+    lblErrorText=new JLabel("");
+    lblErrorText.setForeground(Color.RED);
   }
   
   
@@ -177,6 +188,11 @@ public class SSHLogin implements IUserPass {
     gb.setX(0).addY(new JLabel("Password: "));
     gb.weightXY(1, 0);
     gb.addX(jpfPass);
+
+    gb.weightXY(0, 0);
+    gb.setX(0).addY(lblError);
+    gb.weightXY(1, 0);
+    gb.addX(lblErrorText);
     
     return jp;
   }
@@ -209,6 +225,13 @@ public class SSHLogin implements IUserPass {
     btnCancel.addActionListener(cancelAction);
     KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
     KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
+    KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));
+    win.addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e){
+        click(false);
+      }
+    });
+    
   }
   
   /////////////
@@ -220,7 +243,11 @@ public class SSHLogin implements IUserPass {
       public void run() {
         JFrame m=PopupTestContext.makeMainFrame();
         SSHLogin win=new SSHLogin(m, new KAlert(m));
-        System.out.println("RESULT: "+win.show("aname", "that.who.youknowthat.server.danglblangdingdongwhat.com"));
+        System.out.println("RESULT: "+win.show("aname", "that.who.youknowthat.server.danglblangdingdongwhat.com", null));
+        System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
+        System.out.println("RESULT: "+win.show("aname", "that.who.perv.com", "Holy crap it blew up"));
+        System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
+        System.out.println("RESULT: "+win.show(null, "bleagh.com", null));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
       }
     });  

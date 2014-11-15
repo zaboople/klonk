@@ -175,7 +175,6 @@ public class KPersist {
 
   public KPersist setCommands(List<String> recentCommands){
     setFiles(recentCommands, "File.Batch.", maxRecent);
-    hasChanges=true;
     return this;
   }
   public KPersist getCommands(List<String> recentCommands){
@@ -193,11 +192,9 @@ public class KPersist {
   
   public void setRecentFiles(List<String> files) {
     recentFilesCache=files;
-    hasChanges=true;
   }
   public void setRecentDirs(List<String> dirs) {
     recentDirsCache=dirs;
-    hasChanges=true;
   }
   public void setFavoriteFiles(List<String> files) {
     setFiles(files, "File.Favorite.Files.", maxFavorite);
@@ -259,7 +256,6 @@ public class KPersist {
     setInt(name+".Left", r.x);
     setInt(name+".Width", r.width);
     setInt(name+".Height", r.height);
-    hasChanges=true;
   }
   private Rectangle getBounds(String name, Rectangle defR) {
     Rectangle r=new Rectangle();
@@ -340,6 +336,7 @@ public class KPersist {
   
   private void set(String name, String val) {
     properties.setProperty(name, val);
+    hasChanges=true;
   }
   private String get(String name) {
     return properties.getProperty(name);

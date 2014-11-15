@@ -99,6 +99,7 @@ class Shell {
 
   private void closing() {
     preserveBounds();
+    persist.checkSave();
   }
   private void close() {
     closing();

@@ -83,8 +83,10 @@ public class CtrlOptions {
   }
 
   public void doSSH(){ 
-    if (popups.showSSHOptions(sshOptions))
+    if (popups.showSSHOptions(sshOptions)){
       persist.setSSHOptions(sshOptions);
+      persist.save();
+    }
     else
       statusBar.show("Cancelled.");
   }

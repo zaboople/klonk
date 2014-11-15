@@ -31,6 +31,7 @@ public class SSHExec {
    */
   public int exec(String command, Appendable out, OutputStream sshErr) throws WrappedSSHException {
     try {
+      Session session=ssh.getSession();
       ChannelExec channel=(ChannelExec)ssh.getSession().openChannel("exec");
       channel.setCommand(command);      
       channel.setErrStream(sshErr);

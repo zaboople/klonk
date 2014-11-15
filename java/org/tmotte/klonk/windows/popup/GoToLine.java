@@ -12,6 +12,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -183,6 +185,11 @@ class GoToLine {
     btnCancel.addActionListener(cancelAction);
     KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
     KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
+    win.addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e){
+        click(false);
+      }
+    });
   }
   
   /////////////
@@ -197,7 +204,7 @@ class GoToLine {
           JFrame parentFrame=ptc.getMainFrame();
           KAlert alerter=new KAlert(parentFrame);
           GoToLine gtl=new GoToLine(parentFrame, alerter);
-          gtl.show();
+          System.out.println(gtl.show());
         } catch (Exception e) {
           e.printStackTrace();
         }
