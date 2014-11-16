@@ -143,7 +143,7 @@ public class SSH {
     //us a bad password
     while (iUserPass!=null && iUserPass.get(user, host, lastConnectError)){ 
       String newUser=iUserPass.getUser();
-      if (!newUser.equalsIgnoreCase(user)) { //FIXME ssh is not case sensitive right?
+      if (!newUser.equals(user)) { 
         user=newUser;
         session.disconnect();
         session=jsch.getSession(user, host, 22);

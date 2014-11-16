@@ -96,7 +96,8 @@ public class SSHLogin implements IUserPass {
     win.setLocation(pt.x+20, pt.y+20);
 
     //Display cycle: No we don't need a loop, we just 
-    //leave the screen up until we pass validation. duh.
+    //leave the screen up until we pass validation. This is because
+    //we display the error inline and not in another pop-up:    
     badEntry=true;
     ok=true;
     win.pack();

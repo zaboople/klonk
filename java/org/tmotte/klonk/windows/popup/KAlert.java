@@ -67,6 +67,7 @@ public class KAlert implements Setter<String> {
       errorLabel.setPreferredSize(new Dimension(500, high));
       win.pack();
     }
+    ok.requestFocusInWindow();
     show();
   }
 
