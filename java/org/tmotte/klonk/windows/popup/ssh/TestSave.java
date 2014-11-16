@@ -9,22 +9,18 @@ import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.SSHExec;
 import org.tmotte.klonk.ssh.SSHFile;
 import org.tmotte.klonk.windows.popup.SSHLogin;
+import org.tmotte.klonk.windows.popup.KAlert;
 
 class TestSave {
 
-  private static void testSimple(String[] args) throws Exception {
-    final SSHConnections conns=new SSHConnections();
+  private static void testSimple(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
+          final SSHConnections conns=new SSHConnections();
           JFrame m=PopupTestContext.makeMainFrame();
           conns.withLogin(
-            new SSHLogin(
-              m, 
-              new Setter<String>(){
-                public void set(String s) {System.err.println("Message: "+s);}
-              }
-            )
+            new SSHLogin(m, new KAlert(m))
           );
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
             new org.tmotte.klonk.windows.popup.FileDialogWrapper(

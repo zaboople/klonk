@@ -9,6 +9,7 @@
   -SSH Login needs a list of open connections to select for closing.
 
   -SSH Todo:
+    We need a last user saved to persist so we can hotrod logins.
     SSHFileSystemView.createFileObject needs to be able to go to the cache.
     Save as
     File open 

@@ -34,13 +34,11 @@ public class SSHFileSystemView extends FileSystemView {
   
   /* This gets called when you just bang in a path name or press enter on  a path name. FIXME */
   public @Override File createFileObject(String path){
-    if (conns.is(path))
-      try {
-        return conns.getFile(path);
-      } catch (ConnectionParseException e) {
-        e.printStackTrace();
-        return null;
-      }
+    if (conns.is(path)){
+      File file=conns.getFile(path);
+      mylog("Getting file for "+path+" "+file);
+      return file==null ?new File(".") :file;
+    }
     else
       return defaultView.createFileObject(path);
   }
@@ -61,7 +59,11 @@ public class SSHFileSystemView extends FileSystemView {
     if (dir==null)
       return defaultView.getFiles(fdir, useFileHiding);
     try {
-      if (_getFiles(dir, useFileHiding)!=0)
+      int res=_getFiles(dir, useFileHiding);
+      if (res==-1)
+        return noFiles;//No connection
+      else
+      if (res!=0)
         throw new Exception(sshErr.toString("utf-8"));        
     } catch (WrappedSSHException e) {
       if ("socket is not established".equals(e.getWrapped().getMessage()))
@@ -83,21 +85,21 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* Returns true if the file (directory) can be visited. */
   public @Override Boolean isTraversable(File f){
-    mylog("isTraversable "+this);
+    mylog("isTraversable "+f);
     if (cast(f)==null)
       return defaultView.isTraversable(f);
     return f.isDirectory();
   }
   /* Used by UI classes to decide whether to display a special icon for drives or partitions, e.g. */
   public @Override boolean isDrive(File dir){
-    mylog("Is drive "+dir+" "+dir.getClass());
+    //mylog("Is drive "+dir+" "+dir.getClass());
     if (cast(dir)==null)
       return defaultView.isDrive(dir);
     return dir.getParentFile()==null;
   }
   /* Is dir the root of a tree in the file system, such as a drive or partition. */
   public @Override boolean isFileSystemRoot(File dir){
-    mylog("isfsroot "+dir);
+    //mylog("isfsroot "+dir);
     if (cast(dir)==null)
       return defaultView.isFileSystemRoot(dir);
     return dir.getParentFile()==null;
@@ -224,7 +226,7 @@ public class SSHFileSystemView extends FileSystemView {
     return SSHFile.cast(f);
   }
   private void mylog(String s) {
-    if (false)
+    if (true)
       System.out.println(s);
   }
  

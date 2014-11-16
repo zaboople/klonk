@@ -54,7 +54,8 @@ public class SSHLogin implements IUserPass {
   private JDialog win;
   private JButton btnOK, btnCancel;
   private JLabel lblHost, lblError, lblErrorText;
-  private boolean ok=false, badEntry=false, cancelled=false;
+  private boolean ok=false, badEntry=false;
+  private boolean initialized=false;
     
   /////////////////////
   // PUBLIC METHODS: //
@@ -63,9 +64,6 @@ public class SSHLogin implements IUserPass {
   public SSHLogin(JFrame parentFrame, Setter<String> alerter) {
     this.parentFrame=parentFrame;
     this.alerter=alerter;
-    create();
-    layout(); 
-    listen();
   }
   public @Override String getUser() {
     return ok 
@@ -83,6 +81,7 @@ public class SSHLogin implements IUserPass {
   public boolean show(String user, String host, String lastError) {
     
     //Initialize:
+    init();
     if (user!=null)
       jtfUsername.setText(user);
     jpfPass.setText("");    
@@ -96,43 +95,29 @@ public class SSHLogin implements IUserPass {
     Point pt=parentFrame.getLocation();    
     win.setLocation(pt.x+20, pt.y+20);
 
-    //Display cycle:
+    //Display cycle: No we don't need a loop, we just 
+    //leave the screen up until we pass validation. duh.
     badEntry=true;
-    cancelled=false;
-    while (badEntry && !cancelled) {
-      win.setVisible(true);
-      win.toFront();
-    }
-    return ok;
+    ok=true;
+    win.pack();
+    win.setVisible(true);
+    win.toFront();
+    return ok;  
   }
   
-  ////////////////////////
-  //                    //
-  //  PRIVATE METHODS:  //
-  //                    //
-  ////////////////////////
-
-  /** action=true means OK, false means Cancel */
-  private void click(boolean action) {
-    ok=action;
-    win.setVisible(false);  
-    badEntry=false;
-    if (action &&
-          (
-            jtfUsername.getText().trim().equals("") 
-            || 
-            new String(jpfPass.getPassword()).trim().equals("")
-          )
-      ){
-      alerter.set("User name & password are required");
-      badEntry=true;
-    }
-  }
-
-  
+ 
   ///////////////////////////
   // CREATE/LAYOUT/LISTEN: //
   ///////////////////////////
+  
+  private void init() {
+    if (!initialized) {
+      create();
+      layout(); 
+      listen();
+      initialized=true;
+    }
+  }
   
   private void create() {
     win=new JDialog(parentFrame, true);
@@ -234,6 +219,36 @@ public class SSHLogin implements IUserPass {
     
   }
   
+
+  /** @param action true means OK, false means Cancel */
+  private void click(boolean action) {
+    ok=action;
+    badEntry=false;
+    if (ok && 
+        (
+        jtfUsername.getText().trim().equals("") 
+        || 
+        new String(jpfPass.getPassword()).trim().equals("")
+        )
+      ){
+      badEntry=true;
+      lblError.setVisible(true);
+      lblErrorText.setText("User name & password are required");
+      lblErrorText.setVisible(true);
+      win.pack();
+    }
+    else
+      win.setVisible(false);
+  }
+
+  private String debugVals(){
+    return " badEntry:"+badEntry+" ok "+ok;
+  }
+    
+  private void debug(String val) {
+    System.out.println("DEBUG "+val);
+  }
+  
   /////////////
   /// TEST: ///
   /////////////
@@ -243,11 +258,11 @@ public class SSHLogin implements IUserPass {
       public void run() {
         JFrame m=PopupTestContext.makeMainFrame();
         SSHLogin win=new SSHLogin(m, new KAlert(m));
-        System.out.println("RESULT: "+win.show("aname", "that.who.youknowthat.server.danglblangdingdongwhat.com", null));
+        System.out.println("RESULT: "+win.show("aname", "test1.youknowthat.server.danglblangdingdongwhat.com", null));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
-        System.out.println("RESULT: "+win.show("aname", "that.who.perv.com", "Holy crap it blew up"));
+        System.out.println("RESULT: "+win.show("aname", "test2.who.perv.com", "Holy crap it blew up"));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
-        System.out.println("RESULT: "+win.show(null, "bleagh.com", null));
+        System.out.println("RESULT: "+win.show(null, "test3.bleagh.com", null));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
       }
     });  

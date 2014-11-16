@@ -14,7 +14,7 @@ class ConnectionParse {
   private final StringChunker chunker=new StringChunker();
 
   /** FIXME no COnnectionParseExceptions */
-  protected SSHFile parse(SSHConnections connMgr, String uri) throws ConnectionParseException {
+  protected SSHFile parse(SSHConnections connMgr, String uri) {
     String user=null, host=null, dirFile=null;
     chunker.reset(uri);
     

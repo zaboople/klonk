@@ -28,10 +28,13 @@ public class SSHExec {
   
   /** 
    * @param sshErr DO NOT PASS SYSTEM.ERR/OUT TO THIS, IT WILL GET CHEWED TO PIECES.
+   * @return The output (typically 0,1,2) of the unix command, or -1 if we could not get a connection.
    */
   public int exec(String command, Appendable out, OutputStream sshErr) throws WrappedSSHException {
     try {
       Session session=ssh.getSession();
+      if (session==null)
+        return -1;
       ChannelExec channel=(ChannelExec)ssh.getSession().openChannel("exec");
       channel.setCommand(command);      
       channel.setErrStream(sshErr);

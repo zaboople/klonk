@@ -153,7 +153,10 @@ public class SSH {
       if (tryConnect())
         return true;
     }
-    
+    if (session!=null){
+      session.disconnect();
+      session=null;
+    }
     return false;
   }
   private boolean tryConnect() throws Exception {
