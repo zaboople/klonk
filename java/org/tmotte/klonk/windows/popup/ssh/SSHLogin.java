@@ -1,4 +1,4 @@
-package org.tmotte.klonk.windows.popup;
+package org.tmotte.klonk.windows.popup.ssh;
 import org.tmotte.klonk.ssh.SSH;
 import java.awt.Color;
 import java.awt.Component;
@@ -37,6 +37,7 @@ import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.ssh.IUserPass;
+import org.tmotte.klonk.windows.popup.KAlert;
 
 //FIXME default focus to password if we already have a user
 //FIXME what is deal with closing window not escaping?? If I close the window that's an ESC

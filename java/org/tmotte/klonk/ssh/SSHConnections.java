@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 import org.tmotte.common.text.StringChunker;
+import org.tmotte.klonk.config.msg.Setter;
 
 /** This does not establish a connection. It only collects potential connections. Not thread-safe. */
 public class SSHConnections {
@@ -12,9 +13,15 @@ public class SSHConnections {
   private final Map<String, Map<String, SSH>> conns=new HashMap<>();
   private final ConnectionParse parser=new ConnectionParse();
   private Set<String> users=new HashSet<>();
-  private IUserPass iUserPass;
   private String knownHosts, privateKeys;
 
+  private IUserPass iUserPass;
+  private Setter<String> errorHandler;
+
+  public SSHConnections (Setter<String> errorHandler) {
+    this.errorHandler=errorHandler;
+  }
+  
   public SSHConnections withKnown(String hosts) {
     this.knownHosts=hosts;
     return this;
@@ -63,7 +70,7 @@ public class SSHConnections {
     Map<String,SSH> perHost=getForHost(host);
     SSH ssh=perHost.get(user);
     if (ssh==null) {
-      ssh=new SSH(user, host)
+      ssh=new SSH(user, host, errorHandler)
         .withKnown(knownHosts)
         .withPrivateKeys(privateKeys)
         .withIUserPass(iUserPass);
@@ -101,7 +108,13 @@ public class SSHConnections {
   //////////////
 
   public static void main(String[] args) throws Exception {
-    SSHConnections conns=new SSHConnections();
+    SSHConnections conns=new SSHConnections(
+      new Setter<String>(){
+        public void set(String error) {
+          System.err.println("ERROR "+error);
+        }
+      }
+    );
     for (String s: args) {
       SSHFile f=conns.getFile(s);
       System.out.println(

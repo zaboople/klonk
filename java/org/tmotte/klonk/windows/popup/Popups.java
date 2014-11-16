@@ -20,6 +20,7 @@ import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.IUserPass;
+import org.tmotte.klonk.windows.popup.ssh.SSHFiles;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 

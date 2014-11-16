@@ -42,7 +42,7 @@ import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
-import org.tmotte.klonk.windows.popup.SSHLogin;
+import org.tmotte.klonk.windows.popup.ssh.SSHLogin;
 import org.tmotte.klonk.windows.popup.KAlert;
 import javax.swing.JMenuBar;
 
@@ -243,7 +243,7 @@ public class BootContext {
   private SSHConnections getSSHConnections() {
     if (sshConns==null){
       SSHOptions sshOpts=getPersist().getSSHOptions();
-      sshConns=new SSHConnections()
+      sshConns=new SSHConnections(getAlerter())
         .withLogin(getSSHLogin())
         .withKnown(sshOpts.getKnownHostsFilename())
         .withPrivateKeys(sshOpts.getPrivateKeysFilename());        

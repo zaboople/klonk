@@ -6,6 +6,7 @@ import com.jcraft.jsch.HostKeyRepository;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
+import org.tmotte.klonk.config.msg.Setter;
 
 //FIXME reconnect verify health
 public class SSH {
@@ -18,15 +19,19 @@ public class SSH {
   private String lastConnectError;
   private SFTP sftp;
   private SSHExec exec;
+  
+  //DI UI components:
   private IUserPass iUserPass;
+  private Setter<String> errorHandler;
    
   ////////////////////
   // INSTANTIATION: //
   ////////////////////
    
-  public SSH(String user, String host) {
+  public SSH(String user, String host, Setter<String> errorHandler) {
     this.user=user;
     this.host=host;
+    this.errorHandler=errorHandler;
   }
   public SSH(String host) {
     this.host=host;
@@ -165,10 +170,9 @@ public class SSH {
     try {
       session.connect(); 
       return connected=true;
-    } catch (Exception e) {    
-      lastConnectError=e.getMessage().equals("Auth fail")
-        ?"Bad password"
-        :e.getMessage();
+    } catch (Exception e) {          
+      if (!e.getMessage().equals("Auth fail")) 
+        errorHandler.set(e.getMessage());
       return connected=false;
     }    
   }
@@ -229,10 +233,18 @@ public class SSH {
       usage();
       return null;
     }
-    else return new SSH(user, host)
-      .withKnown(knownHosts)
-      .withPassword(pass)
-      .withPrivateKeys(privateKeys);
+    else return 
+      new SSH(
+          user, host, 
+          new Setter<String>() {
+            public void set(String s) {
+              System.out.println("ERROR: "+s);
+            }
+          }      
+        )
+        .withKnown(knownHosts)
+        .withPassword(pass)
+        .withPrivateKeys(privateKeys);
   }
   
 }

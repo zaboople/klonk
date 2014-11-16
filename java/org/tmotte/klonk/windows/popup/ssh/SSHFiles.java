@@ -1,4 +1,4 @@
-package org.tmotte.klonk.windows.popup;
+package org.tmotte.klonk.windows.popup.ssh;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.windows.Positioner;
+import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.config.option.SSHOptions;
 

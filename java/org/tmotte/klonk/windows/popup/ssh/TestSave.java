@@ -8,7 +8,6 @@ import org.tmotte.klonk.ssh.SSH;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.SSHExec;
 import org.tmotte.klonk.ssh.SSHFile;
-import org.tmotte.klonk.windows.popup.SSHLogin;
 import org.tmotte.klonk.windows.popup.KAlert;
 
 class TestSave {
@@ -17,10 +16,11 @@ class TestSave {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          final SSHConnections conns=new SSHConnections();
           JFrame m=PopupTestContext.makeMainFrame();
+          KAlert alerter=new KAlert(m);
+          SSHConnections conns=new SSHConnections(alerter);
           conns.withLogin(
-            new SSHLogin(m, new KAlert(m))
+            new SSHLogin(m, alerter)
           );
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
             new org.tmotte.klonk.windows.popup.FileDialogWrapper(
