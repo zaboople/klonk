@@ -16,22 +16,22 @@ public class SSH {
   private boolean debug;
   private String user, pass, host, knownHosts, privateKeys;
   private boolean connected=false;
-  private String lastConnectError;
+  private boolean lastConnectAuthFail=false;
   private SFTP sftp;
   private SSHExec exec;
   
   //DI UI components:
   private IUserPass iUserPass;
-  private Setter<String> errorHandler;
+  private Setter<String> alertHandler;
    
   ////////////////////
   // INSTANTIATION: //
   ////////////////////
    
-  public SSH(String user, String host, Setter<String> errorHandler) {
+  public SSH(String user, String host, Setter<String> alertHandler) {
     this.user=user;
     this.host=host;
-    this.errorHandler=errorHandler;
+    this.alertHandler=alertHandler;
   }
   public SSH(String host) {
     this.host=host;
@@ -129,16 +129,16 @@ public class SSH {
     try {
       return tryConnect1();
     } catch (java.io.IOException e) {
-      errorHandler.set(e.getMessage());
+      alertHandler.set(e.getMessage());
       return false;
     } catch (com.jcraft.jsch.JSchException e) {
-      errorHandler.set(e.getMessage());
+      alertHandler.set(e.getMessage());
       return false;
     } catch (Exception e) {
       Throwable internal=e.getCause();
       if (internal!=null){
         if ((internal instanceof java.net.UnknownHostException)) {
-          errorHandler.set(internal.toString());
+          alertHandler.set(internal.toString());
           return false;
         }
       }
@@ -146,7 +146,7 @@ public class SSH {
       String s=e.getMessage();
       if (s==null)
         s=e.toString();
-      errorHandler.set(s);
+      alertHandler.set(s);
       return false;
     }
   }
@@ -184,7 +184,7 @@ public class SSH {
 
     //Try calling a user interface to get it. If the user gives
     //us a bad password
-    while (iUserPass!=null && iUserPass.get(user, host, lastConnectError)){ 
+    while (iUserPass!=null && iUserPass.get(user, host, lastConnectAuthFail)){ 
       String newUser=iUserPass.getUser();
       if (!newUser.equals(user)) { 
         user=newUser;
@@ -203,7 +203,7 @@ public class SSH {
   }
   private boolean tryConnect2() throws Exception {
     connected=false;
-    lastConnectError=null;
+    lastConnectAuthFail=false;
     session.setTimeout(10000);
     try {
       myLog("Connecting...");
@@ -212,8 +212,9 @@ public class SSH {
     } catch (Exception e) {          
       myLog("Didn't.");
       close();
-      if (e.getMessage().equals("Auth fail")) 
-        return connected=false;
+      if (e.getMessage().equals("Auth fail")) {
+        return connected=!(lastConnectAuthFail=true);
+      }
       else
         throw e;
     }    

@@ -76,10 +76,10 @@ public class SSHLogin implements IUserPass {
       ?new String(jpfPass.getPassword())
       :null;
   } 
-  public @Override boolean get(String user, String host, String lastError) {  
-    return show(user, host, lastError);
+  public @Override boolean get(String user, String host, boolean authFail) {  
+    return show(user, host, authFail);
   }
-  public boolean show(String user, String host, String lastError) {
+  public boolean show(String user, String host, boolean authFail) {
     
     //Initialize:
     init();
@@ -87,9 +87,9 @@ public class SSHLogin implements IUserPass {
       jtfUsername.setText(user);
     jpfPass.setText("");    
     lblHost.setText(host);
-    lblError.setVisible(lastError!=null);
-    lblErrorText.setVisible(lastError!=null);
-    lblErrorText.setText(lastError);
+    lblError.setVisible(authFail);
+    lblErrorText.setVisible(authFail);
+    lblErrorText.setText(authFail ?"User/password failed" :"");
     
     //Position:
     win.pack();
@@ -260,11 +260,11 @@ public class SSHLogin implements IUserPass {
       public void run() {
         JFrame m=PopupTestContext.makeMainFrame();
         SSHLogin win=new SSHLogin(m, new KAlert(m));
-        System.out.println("RESULT: "+win.show("aname", "test1.youknowthat.server.danglblangdingdongwhat.com", null));
+        System.out.println("RESULT: "+win.show("aname", "test1.youknowthat.server.danglblangdingdongwhat.com", false));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
-        System.out.println("RESULT: "+win.show("aname", "test2.who.perv.com", "Holy crap it blew up"));
+        System.out.println("RESULT: "+win.show("aname", "test2.who.perv.com", true));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
-        System.out.println("RESULT: "+win.show(null, "test3.bleagh.com", null));
+        System.out.println("RESULT: "+win.show(null, "test3.bleagh.com", false));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
       }
     });  
