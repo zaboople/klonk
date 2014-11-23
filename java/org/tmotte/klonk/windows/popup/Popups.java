@@ -21,8 +21,6 @@ import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.windows.popup.ssh.SSHFiles;
-import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
-import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 
 /**
  * This is a sort of sublayer in our DI/IoC setup. Rather than creating 
@@ -34,11 +32,9 @@ import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 public class Popups {
 
   //Frequently used popup windows:
-  private Setter<String> alerter;
   private YesNoCancel yesNoCancel;
   private YesNoCancel yesNo;
   private FindAndReplace findAndReplace;
-  private FileDialogWrapper fileDialogWrapper;
   private GoToLine goToLinePicker;
   private Shell shell;
   
@@ -54,12 +50,14 @@ public class Popups {
   //DI resources for constructor:
   private final KHome home;
   private final Setter<Throwable> logFail;
+  private final Setter<String> alerter;
   private final JFrame mainFrame;
   private final KPersist persist;
   private final StatusUpdate statusBar;
   private final Image iconImagePopup;    
   private final Getter<String> currFileGetter;
   private final SSHConnections sshConns;
+  private final FileDialogWrapper fileDialogWrapper;
 
   //Other components. Well at least it's just this one:
   private FontOptions fontOptions; 
