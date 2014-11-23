@@ -97,7 +97,9 @@ public class SSH {
   public void close() throws Exception {
     if (sftp!=null)
       sftp.close();
-    session.disconnect();
+    if (session!=null) 
+      try {session.disconnect();} catch (Exception e2) {}
+    session=null;
     connected=false;
   }
   public boolean matches(String user, String host) {
@@ -119,31 +121,39 @@ public class SSH {
       :null;
   }
   
-  
+  //////////////////////////////
+  // PRIVATE CONNECT METHODS: //
+  ////////////////////////////// 
   
   private boolean connect() {
     try {
       return tryConnect1();
-    } catch (Exception e) {
+    } catch (java.io.IOException e) {
       errorHandler.set(e.getMessage());
+      return false;
+    } catch (Exception e) {
+      e.printStackTrace();
+      String s=e.getMessage();
+      if (s==null)
+        s=e.toString();
+      errorHandler.set(s);
       return false;
     }
   }
   private boolean tryConnect1() throws Exception {
+  
+    //Set known hosts:
     if (knownHosts!=null) {
       jsch.setKnownHosts(knownHosts);
       if (debug)
         printHostKeys(jsch);
     }
 
-    if (session!=null) 
-      try {
-        session.disconnect();
-      } catch (Exception e) {
-        //FIXME log it
-      }
-    session=jsch.getSession(user, host, 22);  
+    //OK close:
+    close();
+    session=makeNewSession();
     
+    //Back to known hosts again... not sure why I wait til here:
     if (knownHosts==null)
       session.setConfig("StrictHostKeyChecking", "no");
         
@@ -168,18 +178,17 @@ public class SSH {
       String newUser=iUserPass.getUser();
       if (!newUser.equals(user)) { 
         user=newUser;
-        session.disconnect();
-        session=jsch.getSession(user, host, 22);
+        close();
+        session=makeNewSession();
       }
       pass=iUserPass.getPass();
       session.setPassword(pass);
       if (tryConnect2())
         return true;
+      else
+        session=makeNewSession();
     }
-    if (session!=null){
-      session.disconnect();
-      session=null;
-    }
+    close();
     return false;
   }
   private boolean tryConnect2() throws Exception {
@@ -192,12 +201,14 @@ public class SSH {
       return connected=true;
     } catch (Exception e) {          
       myLog("Didn't.");
-      try {session.disconnect();} catch (Exception e2) {}
-      session=null;
+      close();
       if (e.getMessage().equals("Auth fail")) 
         return connected=false;
       throw e;
     }    
+  }
+  private Session makeNewSession() throws Exception {
+    return jsch.getSession(user, host, 22);
   }
   private static void myLog(String s) {
     if (true)

@@ -25,9 +25,13 @@ import org.tmotte.klonk.windows.popup.ssh.SSHFiles;
 /**
  * This is a sort of sublayer in our DI/IoC setup. Rather than creating 
  * all the possible UI components at boot, controllers receive an instance
- * of Popups and fetch lazy-initialized components from it. In truth, the lazy
- * initialization might well be better done in the components itself, but being
- * lazy is all about being lazy.
+ * of Popups and fetch lazy-initialized components from it. 
+ * <br>
+ * However: This isn't really that great. Most of these objects are already
+ * internally amenable to lazy initialization with low overhead, since they don't
+ * extend JFrame or similar ilk, but contain such instead. So I am regularly 
+ * moving things backwards up to BootContext (which creates Popups) so that
+ * we have one layer instead of two.
  */
 public class Popups {
 

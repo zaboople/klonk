@@ -16,7 +16,10 @@ class TestSave {
     Thread.setDefaultUncaughtExceptionHandler( 
         new Thread.UncaughtExceptionHandler() {
           public void uncaughtException(Thread t, Throwable e){
-            System.err.println("OK had a fail "+e);
+            if (e instanceof SSHFileDialogNoFileException)
+              System.err.println("OK no biggie "+e);
+            else
+              e.printStackTrace();
           }
         }
       );
