@@ -77,17 +77,19 @@ public class Popups {
       Image iconImagePopup, 
       Getter<String> currFileGetter,
       Setter<String> alerter,
-      SSHConnections sshConns
+      SSHConnections sshConns,
+      FileDialogWrapper fileDialogWrapper
     ) {
-    this.home          =home;
-    this.logFail       =logFail;
-    this.mainFrame     =mainFrame;
-    this.statusBar     =statusBar;
-    this.persist       =persist;
-    this.iconImagePopup=iconImagePopup;
-    this.currFileGetter=currFileGetter;
-    this.alerter       =alerter;
-    this.sshConns      =sshConns;
+    this.home             =home;
+    this.logFail          =logFail;
+    this.mainFrame        =mainFrame;
+    this.statusBar        =statusBar;
+    this.persist          =persist;
+    this.iconImagePopup   =iconImagePopup;
+    this.currFileGetter   =currFileGetter;
+    this.alerter          =alerter;
+    this.sshConns         =sshConns;
+    this.fileDialogWrapper=fileDialogWrapper;
   }
 
   public void setFontAndColors(FontOptions fo) { //FIXME change this to a Setter<FontOptions>
@@ -220,12 +222,6 @@ public class Popups {
     return shell;
   }
   private FileDialogWrapper getFileDialog() {
-    if (fileDialogWrapper==null)
-      fileDialogWrapper=new FileDialogWrapper(
-        mainFrame, 
-        new SSHFileSystemView(sshConns), 
-        new SSHFileView()
-      );
     return fileDialogWrapper;
   }
   private FontOptions getFontOptions() {

@@ -42,7 +42,11 @@ import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.windows.popup.ssh.SSHLogin;
+import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
+import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
+import org.tmotte.klonk.windows.popup.ssh.SSHFileDialogNoFileException;
 import org.tmotte.klonk.windows.popup.KAlert;
 import javax.swing.JMenuBar;
 
@@ -81,7 +85,10 @@ public class BootContext {
     Thread.setDefaultUncaughtExceptionHandler( 
       new Thread.UncaughtExceptionHandler() {
         public void uncaughtException(Thread t, Throwable e){
-          context.getLog().log(e);//FIXME make this blow up when sending an alert
+          //SSHFileDialogNoFileException is thrown by our nasty
+          //SSHFileSystemView and can be ignored:
+          if (!(e instanceof SSHFileDialogNoFileException))
+            context.getLog().log(e);//FIXME make this blow up when sending an alert
         }
       }
     );
@@ -120,6 +127,7 @@ public class BootContext {
   private String processID;
   private SSHConnections sshConns;
   private IUserPass iUserPass;
+  private FileDialogWrapper fileDialogWrapper;
   private Setter<String> alerter;
   
   private BootContext(String [] args){
@@ -146,6 +154,7 @@ public class BootContext {
         ,getCurrFileNameGetter()
         ,getAlerter()
         ,getSSHConnections()
+        ,getFileDialog()
       );
     return popups;
   }
@@ -250,7 +259,15 @@ public class BootContext {
     }
     return sshConns;
   }
-  
+  private FileDialogWrapper getFileDialog() {
+    if (fileDialogWrapper==null)
+      fileDialogWrapper=new FileDialogWrapper(
+        mainFrame, 
+        new SSHFileSystemView(sshConns), 
+        new SSHFileView()
+      );
+    return fileDialogWrapper;
+  }  
 
   /////////////////////////////////////////////
   // PURE INTERFACES, ABSTRACT CLASSES, AND: //
