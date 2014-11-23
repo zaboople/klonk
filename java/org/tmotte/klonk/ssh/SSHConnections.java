@@ -13,15 +13,18 @@ public class SSHConnections {
   private final Map<String, Map<String, SSH>> conns=new HashMap<>();
   private final ConnectionParse parser=new ConnectionParse();
   private Set<String> users=new HashSet<>();
+  
   private String knownHosts, privateKeys;
-
   private IUserPass iUserPass;
   private Setter<String> errorHandler;
 
+  /////////////
+  // CREATE: //
+  /////////////
+
   public SSHConnections (Setter<String> errorHandler) {
     this.errorHandler=errorHandler;
-  }
-  
+  }  
   public SSHConnections withKnown(String hosts) {
     this.knownHosts=hosts;
     return this;
@@ -34,6 +37,10 @@ public class SSHConnections {
     this.iUserPass=iUserPass;
     return this;
   }
+  
+  /////////////
+  // PUBLIC: //
+  /////////////
 
   public boolean is(String uri) {
     return uri!=null && (
@@ -44,7 +51,28 @@ public class SSHConnections {
   public SSHFile getFile(String uri) {
     return parser.parse(this, uri);
   }
-  public String inferUserForHost(String host) {
+  public SSH getOrCreate(String user, String host) {
+    Map<String,SSH> perHost=getForHost(host);
+    SSH ssh=perHost.get(user);
+    if (ssh==null) {
+      ssh=new SSH(user, host, errorHandler)
+        .withKnown(knownHosts)
+        .withPrivateKeys(privateKeys)
+        .withIUserPass(iUserPass);
+      perHost.put(user, ssh);
+    }
+    return ssh;
+  }
+  public String toString() {
+    return conns.toString();
+  }
+
+  ////////////////
+  // PROTECTED: //
+  ////////////////
+
+  /** This is here only for the connection parser: */
+  protected String inferUserForHost(String host) {
     
     //If there is only one user so far, assume it's them:
     if (users.size()==1)      
@@ -66,34 +94,16 @@ public class SSHConnections {
     else
       return null;
   }
-  public SSH getOrCreate(String user, String host) {
-    Map<String,SSH> perHost=getForHost(host);
-    SSH ssh=perHost.get(user);
-    if (ssh==null) {
-      ssh=new SSH(user, host, errorHandler)
-        .withKnown(knownHosts)
-        .withPrivateKeys(privateKeys)
-        .withIUserPass(iUserPass);
-      perHost.put(user, ssh);
-    }
-    return ssh;
-  }
-  public SSH get(String user, String host) { //FIXME I don't think anything is going to use this
-    Map<String,SSH> perHost=getForHost(user);
-    return perHost.get(host);
-  }
-  public void put(String user, String host, SSH ssh) {
+  
+  ////////////////////////
+  // PRIVATE FUNCTIONS: //
+  ////////////////////////
+  
+  private void put(String user, String host, SSH ssh) {
     users.add(user);
     Map<String,SSH> perHost=getForHost(host);
     perHost.put(user, ssh);
-  }
-  public String toString() {
-    return conns.toString();
-  }
-  protected Set<String> getUsers(){
-    return users;
-  }
-  
+  } 
   private Map<String,SSH> getForHost(String host) {
     Map<String,SSH> perHost=conns.get(host);
     if (perHost==null){
@@ -101,6 +111,10 @@ public class SSHConnections {
       conns.put(host, perHost);
     }
     return perHost;
+  }
+  private SSH get(String user, String host) { //FIXME I don't think anything is going to use this
+    Map<String,SSH> perHost=getForHost(user);
+    return perHost.get(host);
   }
   
   //////////////

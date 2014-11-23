@@ -30,12 +30,6 @@ public class SSHFile extends File {
   public SSH getSSH(){
     return ssh;
   }
-  public String getHost() {
-    return ssh.getHost();
-  }
-  public String getUser() {
-    return ssh.getUser();
-  }
   
   /*Tests whether this abstract pathname is absolute.*/
   public @Override boolean isAbsolute() {

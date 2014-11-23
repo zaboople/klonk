@@ -45,7 +45,9 @@ public class KLog {
     error(s);
     logError(e);
   }
-
+  public File getLogFile(){
+    return home.nameFile("log.txt");
+  }
 
   //////////////////////
   // PRIVATE METHODS: //
@@ -82,7 +84,7 @@ public class KLog {
   private PrintWriter getWriter() {
     if (commandLineWriter!=null)
       return commandLineWriter;
-    File logFile=home.nameFile("log.txt");
+    File logFile=getLogFile();
     try {
       return new PrintWriter(new OutputStreamWriter(new FileOutputStream(logFile, true)));
     } catch (Exception e) {

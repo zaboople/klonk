@@ -34,10 +34,16 @@ public class SSHFileSystemView extends FileSystemView {
   
   /* This gets called when you just bang in a path name or press enter on  a path name. FIXME */
   public @Override File createFileObject(String path){
+    String logstring="SSHFileSystemView.createFileObject() ";
+    mylog(logstring+path);
     if (conns.is(path)){
-      File file=conns.getFile(path);
-      mylog("Getting file for "+path+" "+file);
-      return file==null ?new File(".") :file;
+      SSHFile file=conns.getFile(path);
+      if (file!=null && !file.getSSH().verifyConnection()) 
+        file=null;
+      if (file==null)
+        throw new SSHFileDialogNoFileException();
+      mylog(logstring+"Returning file for "+path+": "+file+" is dir "+(file==null ?null :file.isDirectory()));
+      return file;
     }
     else
       return defaultView.createFileObject(path);
@@ -117,7 +123,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* On Windows, a file can appear in multiple folders, other than its parent directory in the filesystem. */
   public @Override boolean isParent(File folder, File file){
-    mylog("FIXME SSHFileSystemView.isParent() "+folder+" "+file);
+    mylog("SSHFileSystemView.isParent() "+folder+" "+file);
     if (cast(folder)==null || cast(file)==null)
       return defaultView.isParent(folder, file);
     return true;
@@ -130,10 +136,10 @@ public class SSHFileSystemView extends FileSystemView {
 
   /* Returns a File object constructed in dir from the given filename. */
   public @Override File createFileObject(File fdir, String filename) {
+    mylog("SSHFileSystemView.createFileObject(): Create file object for dir: "+fdir+" name "+filename);
     SSHFile dir=cast(fdir);
     if (dir==null)
       return defaultView.createFileObject(fdir, filename);
-    mylog("FIXME Create file object for dir: "+fdir+" name "+filename);
     if (true)
       throw new RuntimeException("FIXME");    
     return new SSHFile(
@@ -155,7 +161,7 @@ public class SSHFileSystemView extends FileSystemView {
     }
   }
   public @Override File getChild(File parent, String fileName) {
-    mylog("SSHFileSystemView FIXME getChild() "+parent+" "+fileName);
+    mylog("SSHFileSystemView.getChild() "+parent+" "+fileName);
     SSHFile dir=cast(parent);
     if (dir==null)
       return defaultView.getChild(parent, fileName);

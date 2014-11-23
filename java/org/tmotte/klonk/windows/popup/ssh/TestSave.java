@@ -13,6 +13,14 @@ import org.tmotte.klonk.windows.popup.KAlert;
 class TestSave {
 
   private static void testSimple(final String[] args) throws Exception {
+    Thread.setDefaultUncaughtExceptionHandler( 
+        new Thread.UncaughtExceptionHandler() {
+          public void uncaughtException(Thread t, Throwable e){
+            System.err.println("OK had a fail "+e);
+          }
+        }
+      );
+  
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {

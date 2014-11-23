@@ -90,6 +90,10 @@ public class SSH {
     }
     return false;
   }
+  public boolean verifyConnection() {
+    getSession();
+    return isConnected();
+  }
   public void close() throws Exception {
     if (sftp!=null)
       sftp.close();
@@ -105,13 +109,27 @@ public class SSH {
     return "SSH: user: "+user+" host: "+host+" knownHosts: "+knownHosts+" privateKeys: "+privateKeys;
   }
 
-
-  protected Session getSession() throws Exception {
+  /** For locals only; SSHExec & SFTP */
+  protected Session getSession() {
+    myLog("getSession");
     if (!isConnected())
       connect();
-    return session;
+    return isConnected() 
+      ?session
+      :null;
   }
-  private boolean connect() throws Exception {
+  
+  
+  
+  private boolean connect() {
+    try {
+      return tryConnect1();
+    } catch (Exception e) {
+      errorHandler.set(e.getMessage());
+      return false;
+    }
+  }
+  private boolean tryConnect1() throws Exception {
     if (knownHosts!=null) {
       jsch.setKnownHosts(knownHosts);
       if (debug)
@@ -132,7 +150,7 @@ public class SSH {
     //Try the password we have:
     if (pass!=null){
       session.setPassword(pass);
-      if (tryConnect())
+      if (tryConnect2())
         return true;
     }
 
@@ -140,7 +158,7 @@ public class SSH {
     if (privateKeys!=null) {
       session.setConfig("PreferredAuthentications", "publickey");
       jsch.addIdentity(privateKeys);
-      if (tryConnect())
+      if (tryConnect2())
         return true;
     }
 
@@ -155,7 +173,7 @@ public class SSH {
       }
       pass=iUserPass.getPass();
       session.setPassword(pass);
-      if (tryConnect())
+      if (tryConnect2())
         return true;
     }
     if (session!=null){
@@ -164,19 +182,27 @@ public class SSH {
     }
     return false;
   }
-  private boolean tryConnect() throws Exception {
+  private boolean tryConnect2() throws Exception {
+    connected=false;
     lastConnectError=null;
     session.setTimeout(10000);
     try {
+      myLog("Connecting...");
       session.connect(); 
       return connected=true;
     } catch (Exception e) {          
-      if (!e.getMessage().equals("Auth fail")) 
-        errorHandler.set(e.getMessage());
-      return connected=false;
+      myLog("Didn't.");
+      try {session.disconnect();} catch (Exception e2) {}
+      session=null;
+      if (e.getMessage().equals("Auth fail")) 
+        return connected=false;
+      throw e;
     }    
   }
-
+  private static void myLog(String s) {
+    if (true)
+      System.out.println("SSH.myLog(): "+s);
+  }
   
   ////////////////////////
   // TESTING/DEBUGGING: //

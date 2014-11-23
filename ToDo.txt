@@ -2,6 +2,8 @@
   -Right now
     The session.exec thing is returning an int. It doesn't account for the fact that we might have refused to login or whatever or our password didn't work. When our password doesn't work, we should retry. We shouldn't just splat.
 
+  -Put a lazy-load wrapper around the file system view so we can DI it.
+
   -Why don't the windows close when you click the close button? What? 
   
   -Tabs & Indents allows invalid input - letters instead of numbers
