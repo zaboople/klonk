@@ -131,8 +131,18 @@ public class SSH {
     } catch (java.io.IOException e) {
       errorHandler.set(e.getMessage());
       return false;
+    } catch (com.jcraft.jsch.JSchException e) {
+      errorHandler.set(e.getMessage());
+      return false;
     } catch (Exception e) {
-      e.printStackTrace();
+      Throwable internal=e.getCause();
+      if (internal!=null){
+        if ((internal instanceof java.net.UnknownHostException)) {
+          errorHandler.set(internal.toString());
+          return false;
+        }
+      }
+      e.printStackTrace();//FIXME print to standard handler
       String s=e.getMessage();
       if (s==null)
         s=e.toString();
@@ -204,7 +214,8 @@ public class SSH {
       close();
       if (e.getMessage().equals("Auth fail")) 
         return connected=false;
-      throw e;
+      else
+        throw e;
     }    
   }
   private Session makeNewSession() throws Exception {

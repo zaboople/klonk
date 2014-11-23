@@ -37,6 +37,7 @@ public class KAlert implements Setter<String> {
   private JTextPane errorLabel;
   private JFrame parentFrame;
   private JButton ok;
+  private Setter<Throwable> errorHandler;
   
   private boolean initialized=false;
 
@@ -50,6 +51,15 @@ public class KAlert implements Setter<String> {
   /** Implements Setter interface */
   public @Override void set(String message){
     show(message.toString());
+  }
+  public Setter<Throwable> getErrorHandler(){
+    if (errorHandler==null)
+      errorHandler=new Setter<Throwable>(){
+        public @Override void set(Throwable error) {
+          fail(error);
+        }
+      };
+    return errorHandler;
   }
   public void show(String message) {
     init();
