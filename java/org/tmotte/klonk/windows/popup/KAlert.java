@@ -34,10 +34,14 @@ import org.tmotte.klonk.config.msg.Setter;
 public class KAlert implements Setter<String> {
 
   private JDialog win;
-  private JEditorPane errorLabel;
+  private JTextPane errorLabel;
+  private JEditorPane sizer;
   private JFrame parentFrame;
   private JButton ok;
   private Setter<Throwable> errorHandler;
+  int baseSizerHeight;
+  int baseLabelHeight;
+  
   
   private boolean initialized=false;
 
@@ -63,16 +67,20 @@ public class KAlert implements Setter<String> {
   }
   public void show(String message) {
     init();
-    errorLabel.setPreferredSize(null);
-    errorLabel.setSize(new Dimension(100,100));
-    errorLabel.setText(message);
-    Dimension sized=errorLabel.getPreferredSize();
-    if (sized.height<100) {
+    sizer.setPreferredSize(null);
+    sizer.setSize(new Dimension(300,1));
+    sizer.setText(message);
+    Dimension sized=sizer.getPreferredSize();
+    if (sized.height<baseSizerHeight) {
       errorLabel.setPreferredSize(null);
       errorLabel.setText(message);
     }
     else {
-      errorLabel.setSize(new Dimension(500,100));
+      sizer.setSize(500, 10);
+      sizer.setText(message);
+      Dimension d=sizer.getPreferredSize();
+      d.height=d.height+(d.height/20);
+      errorLabel.setPreferredSize(d);
       errorLabel.setText(message);
     }
     win.pack();
@@ -100,11 +108,17 @@ public class KAlert implements Setter<String> {
   private void create() {
     win=new JDialog(parentFrame, true);
 
-    errorLabel=new JEditorPane();
+    errorLabel=new JTextPane();
     errorLabel.setEditable(false); // as before
     errorLabel.setBorder(null);       
     errorLabel.setOpaque(false);
-
+    
+    sizer=new JEditorPane();
+    errorLabel.setText("ABCDEFG\naaa\n\neee\neifif");
+    sizer.setText(errorLabel.getText());
+    baseSizerHeight=sizer.getPreferredSize().height;
+    baseLabelHeight=errorLabel.getPreferredSize().height;
+    
     ok=new JButton("OK");
   }
   private void layout() {
@@ -158,6 +172,9 @@ public class KAlert implements Setter<String> {
         try {
           JFrame frame=PopupTestContext.makeMainFrame();
           KAlert ka=new KAlert(frame);
+          ka.show("Small warning thing okay.");
+          ka.show("Small warning thing okay but larger.");
+          ka.show("Small warning thing okay but it's just a bit larger than before.");
           try {throwTest();} catch (Exception f) {ka.fail(f);}
           ka.show("This is simply the most weird thing anybody's seen in a while, in these parts."
                  +" I'm not sure what you folks are into but you won't be dissatisfied, I "

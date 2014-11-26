@@ -85,7 +85,7 @@ public class SSHConnections {
     if (perHost.size()==1)
       return perHost.values().iterator().next().getUser();
     else 
-    if (iUserPass!=null && iUserPass.get(null, host, null)){ //FIXME I don't like this let's nuke it. You can type a user
+    if (iUserPass!=null && iUserPass.get(null, host, false)){ //FIXME I don't like this let's nuke it. You can type a user
       String user=iUserPass.getUser();
       SSH ssh=getOrCreate(user, host);
       ssh.withPassword(iUserPass.getPass());//FIXME now we have a problem of not needing a password but asking for it
