@@ -162,11 +162,7 @@ public class SSH {
     //OK close:
     close();
     session=makeNewSession();
-    
-    //Back to known hosts again... not sure why I wait til here:
-    if (knownHosts==null)
-      session.setConfig("StrictHostKeyChecking", "no");
-        
+           
     //Try the password we have:
     if (pass!=null){
       session.setPassword(pass);
@@ -191,12 +187,12 @@ public class SSH {
         close();
         session=makeNewSession();
       }
+      if (session==null)
+        session=makeNewSession();
       pass=iUserPass.getPass();
       session.setPassword(pass);
       if (tryConnect2())
         return true;
-      else
-        session=makeNewSession();
     }
     close();
     return false;
@@ -220,7 +216,10 @@ public class SSH {
     }    
   }
   private Session makeNewSession() throws Exception {
-    return jsch.getSession(user, host, 22);
+    Session temp=jsch.getSession(user, host, 22);
+    if (knownHosts==null)
+      temp.setConfig("StrictHostKeyChecking", "no");    
+    return temp;
   }
   private static void myLog(String s) {
     if (true)
