@@ -13,6 +13,14 @@ import org.tmotte.klonk.windows.popup.KAlert;
 class TestSave {
 
   private static void testSimple(final String[] args) throws Exception {
+    String tempPrivateKeys=null;
+    String tempKnownHosts=null;
+    for (String s:args) {
+    }
+    
+    final String privateKeysFile=tempPrivateKeys;
+    final String knownHostsFile=tempKnownHosts;
+    
     Thread.setDefaultUncaughtExceptionHandler( 
         new Thread.UncaughtExceptionHandler() {
           public void uncaughtException(Thread t, Throwable e){
@@ -29,10 +37,12 @@ class TestSave {
         try {
           JFrame m=PopupTestContext.makeMainFrame();
           KAlert alerter=new KAlert(m);
-          SSHConnections conns=new SSHConnections(alerter);
-          conns.withLogin(
-            new SSHLogin(m, alerter)
-          );
+          SSHConnections conns=new SSHConnections(alerter)
+            .withKnown(knownHostsFile)
+            .withPrivateKeys(privateKeysFile)
+            .withLogin(
+              new SSHLogin(m, alerter)
+            );
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
             new org.tmotte.klonk.windows.popup.FileDialogWrapper(
               PopupTestContext.makeMainFrame(),

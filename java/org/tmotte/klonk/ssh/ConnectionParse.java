@@ -27,10 +27,15 @@ class ConnectionParse {
       user=chunker.getUpTo();          
       
     //Get host:
-    if (!chunker.find(":"))
-      host=chunker.getRest();
-    else
+    if (chunker.find(":"))
       host=chunker.getUpTo();
+    else
+    if (chunker.find("/")){
+      host=chunker.getUpTo();
+      chunker.reset("/"+chunker.getRest());
+    }
+    else
+      host=chunker.getRest();
     
     //Go back and try again on user if we need to:
     if (user==null)

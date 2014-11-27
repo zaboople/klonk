@@ -129,6 +129,7 @@ public class SSH {
     try {
       return tryConnect1();
     } catch (java.io.IOException e) {
+      //Includes java.net.NoRouteToHostException and some others:
       alertHandler.set(e.getMessage());
       return false;
     } catch (com.jcraft.jsch.JSchException e) {
