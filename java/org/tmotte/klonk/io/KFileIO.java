@@ -16,11 +16,12 @@ import org.tmotte.klonk.config.option.LineDelimiterOptions;
 
 
 public class KFileIO {
-  private static int bufSize=1024*64;
-  private static LineDelimiterOptions delimOpt=new LineDelimiterOptions();
-  static byte[] utf8BOM   =makeByteArray(0xEF, 0xBB, 0xBF),
-                utf16BEBOM=makeByteArray(0xFE, 0xFF),
-                utf16LEBOM=makeByteArray(0xFF, 0xFE);
+  private final static int bufSize=1024*64;
+  private final static LineDelimiterOptions delimOpt=new LineDelimiterOptions();
+  private final static byte[] 
+    utf8BOM   =makeByteArray(0xEF, 0xBB, 0xBF),
+    utf16BEBOM=makeByteArray(0xFE, 0xFF),
+    utf16LEBOM=makeByteArray(0xFF, 0xFE);
   private static byte[] makeByteArray(int... vals) {
     byte[] r=new byte[vals.length];
     for (int i=0; i<vals.length; i++)

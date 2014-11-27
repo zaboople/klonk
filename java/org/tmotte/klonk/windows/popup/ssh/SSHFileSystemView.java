@@ -25,7 +25,7 @@ public class SSHFileSystemView extends FileSystemView {
   private final StringBuilder sshOut=new StringBuilder();
   private final SSHConnections conns;
 
-  private static File[] noFiles=new File[]{};
+  private final static File[] noFiles=new File[]{};
   
   public SSHFileSystemView(SSHConnections conns) {
     super();

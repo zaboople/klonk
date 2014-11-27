@@ -25,12 +25,12 @@ public class SSHConnections {
   public SSHConnections (Setter<String> errorHandler) {
     this.errorHandler=errorHandler;
   }  
-  public SSHConnections withKnown(String hosts) {
-    this.knownHosts=hosts;
+  public SSHConnections withKnown(String hostsFile) {
+    this.knownHosts=hostsFile;
     return this;
   }
-  public SSHConnections withPrivateKeys(String privateKeys) {
-    this.privateKeys=privateKeys;
+  public SSHConnections withPrivateKeys(String privateKeysFile) {
+    this.privateKeys=privateKeysFile;
     return this;
   }
   public SSHConnections withLogin(IUserPass iUserPass) {

@@ -18,8 +18,8 @@ import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 
 public class KPersist {
-  public static int maxRecent=15;
-  public static int maxFavorite=50;
+  public final static int maxRecent=15;
+  public final static int maxFavorite=50;
 
   private File file;
   private Properties properties=new Properties();

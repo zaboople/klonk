@@ -1,4 +1,6 @@
 package org.tmotte.klonk.edit; 
+
+/** Not threadsafe, as it doesn't need to be. */
 public class Spaceable {
 
   final static char LINEFEED=((char)10),
