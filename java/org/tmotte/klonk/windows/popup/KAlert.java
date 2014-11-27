@@ -67,6 +67,8 @@ public class KAlert implements Setter<String> {
   }
   public void show(String message) {
     init();
+    //Warning: JEditorPane does not wrap words properly, so this is STILL
+    //an approximation.
     sizer.setPreferredSize(null);
     sizer.setSize(new Dimension(300,1));
     sizer.setText(message);
@@ -79,7 +81,7 @@ public class KAlert implements Setter<String> {
       sizer.setSize(500, 10);
       sizer.setText(message);
       Dimension d=sizer.getPreferredSize();
-      d.height=d.height+(d.height/20);
+      d.height=d.height+(d.height/baseSizerHeight);
       errorLabel.setPreferredSize(d);
       errorLabel.setText(message);
     }
