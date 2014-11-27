@@ -41,7 +41,7 @@ public class SSHFile extends File {
   }  
 
   public @Override boolean isFile() {
-    return !isDirectory;
+    return !isDirectory();
   }
   public @Override boolean isDirectory() {
     return isDir;
