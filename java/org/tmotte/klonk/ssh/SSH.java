@@ -77,6 +77,9 @@ public class SSH {
       this.exec=new SSHExec(this);  
     return exec;
   }
+  public String exec(String command) throws WrappedSSHException {
+    return getExec().exec(command);
+  }
   public SFTP getSFTP() {
     if (this.sftp==null)
       this.sftp=new SFTP(this);  
@@ -247,53 +250,5 @@ public class SSH {
       "Fingerprint: "+hk.getFingerPrint(jsch);
   }
 
-  
-  private static void usage() {
-    System.err.println("Usage: -u user -h host -k knownhostsfile -p pass -r privatekeyfile");
-    System.exit(1);
-  }
-  public static SSH cmdLine(String[] args) throws Exception {
-    String user=null, host=null, knownHosts=null, pass=null, privateKeys=null;
-    for (int i=0; i<args.length; i++){
-      String arg=args[i];
-      if (arg.startsWith("-help"))
-        usage();
-      if (arg.startsWith("-u"))
-        user=args[++i];
-      else
-      if (arg.startsWith("-h"))
-        host=args[++i];
-      else
-      if (arg.startsWith("-k"))
-        knownHosts=args[++i];
-      else
-      if (arg.startsWith("-p"))
-        pass=args[++i];
-      else
-      if (arg.startsWith("-r"))
-        privateKeys=args[++i];
-      else {
-        System.err.println("Unexpected: "+arg);
-        System.exit(1);
-        return null;
-      }
-    }
-    if (user==null || host==null){
-      usage();
-      return null;
-    }
-    else return 
-      new SSH(
-          user, host, 
-          new Setter<String>() {
-            public void set(String s) {
-              System.out.println("ERROR: "+s);
-            }
-          }      
-        )
-        .withKnown(knownHosts)
-        .withPassword(pass)
-        .withPrivateKeys(privateKeys);
-  }
   
 }

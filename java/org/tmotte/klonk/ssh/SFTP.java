@@ -42,7 +42,8 @@ public class SFTP {
   ///////////
   // TEST: //
   ///////////
-  
+
+  /*
   public static void main(String[] args) throws Exception{
     SSH ssh=SSH.cmdLine(args);
     if (ssh==null)
@@ -103,6 +104,6 @@ public class SFTP {
     sftp.close();
     ssh.close();
   }
- 
+  */
   
 }
