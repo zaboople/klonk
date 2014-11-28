@@ -12,15 +12,13 @@ import org.tmotte.common.text.ArgHandler;
 
 public class SSHCommandLine {
   public static void main(String[] args) throws Exception {
-    for (String s: args)
-      System.out.println("FUCK "+s);
-    /*
     FileGrab grab=new FileGrab();
     SSHConnections conns=SSHCommandLine.cmdLine(args, grab);
-    //System.out.println(grab.file);
-    File file=conns.getFile(grab.file);
-    //System.out.println(file);
-    */
+    System.out.println(grab.file);
+    SSHFile file=conns.getFile(grab.file);
+    System.out.println(
+      file.getSSH().exec("ls -lda "+file.getName())
+    );
   }
   private static class FileGrab implements ArgHandler {
     String file;
@@ -98,7 +96,7 @@ public class SSHCommandLine {
         
         System.out.print("User: ");
         if (user!=null && !user.trim().equals("")) 
-          System.out.print("<"+user+"> press en");
+          System.out.print("<"+user+"> press enter to keep or: ");
         u=br.readLine().trim();
         if (!u.trim().equals(""))
           this.user=u;

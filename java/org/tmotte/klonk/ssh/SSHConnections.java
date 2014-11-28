@@ -42,6 +42,14 @@ public class SSHConnections {
   // PUBLIC: //
   /////////////
 
+  public void close() {
+    for (String host: conns.keySet()){
+    }
+    try {
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
   public boolean is(String uri) {
     return uri!=null && (
       uri.startsWith("ssh:") || 
