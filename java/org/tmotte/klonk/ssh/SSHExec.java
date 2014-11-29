@@ -44,11 +44,12 @@ public class SSHExec {
    * @return The output (typically 0,1,2) of the unix command, or -1 if we could not get a connection.
    */
   public int exec(String command, Appendable out, OutputStream sshErr) throws WrappedSSHException {
+    mylog("SSHExec: "+command);
     try {
       Session session=ssh.getSession();
       if (session==null)
         return -1;
-      ChannelExec channel=(ChannelExec)ssh.getSession().openChannel("exec");
+      ChannelExec channel=(ChannelExec)session.openChannel("exec");
       channel.setCommand(command);      
       channel.setErrStream(sshErr);
       channel.setOutputStream(null);
@@ -77,6 +78,10 @@ public class SSHExec {
     } catch (Exception e) {
       throw new WrappedSSHException("Failed to execute: "+command, e);
     }
+  }
+
+  private void mylog(String s) {
+    System.out.println(s);
   }
 
   public static void main(String[] args) throws Exception {

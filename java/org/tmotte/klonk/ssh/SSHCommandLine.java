@@ -17,9 +17,9 @@ public class SSHCommandLine {
     mylog("File: "+grab.file);
     SSHFile file=conns.getFile(grab.file);
     mylog("SSH File: "+file);
-    mylog(
-      file.getSSH().exec("ls -lda "+file.getName()).toString()
-    );
+    mylog("Is directory: "+file.isDirectory());
+    for (String s: file.list())
+      System.out.println(s);
     conns.close();
   }
   private static void mylog(String msg) {

@@ -3,6 +3,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.FileFilter;
 import java.nio.file.Path;
+import org.tmotte.common.text.StringChunker;
+import java.util.List;
+import java.util.LinkedList;
 
 public class SSHFile extends File {
   
@@ -44,8 +47,38 @@ public class SSHFile extends File {
     return !isDirectory();
   }
   public @Override boolean isDirectory() {
-    return ssh.exec("ls -lda "+getName()).success;
+    SSHExecResult res=ssh.exec("ls -lda "+getName());
+    return res.success && res.output.startsWith("d");
   }
+  /*Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.*/
+  public @Override String[] list(){
+    SSHExecResult res=ssh.exec("ls --file-type -1 "+getName());
+
+    //Fail, for whatever reason including nonexistence:
+    if (!res.success)
+      return new String[]{};
+    
+    //List files & dirs:
+    StringChunker sc=new StringChunker(res.output);
+    List<String> lFiles=new LinkedList<>();
+    while (sc.find("\n"))
+      lFiles.add(sc.getUpTo().trim());
+    String last=sc.getRest().trim();
+    if (!last.equals(""))
+      lFiles.add(last);
+      
+    //Copy into results:
+    String[] files=new String[lFiles.size()];
+    for (int i=0; i<lFiles.size(); i++)
+      files[i]=lFiles.get(i);
+    return files;
+  }
+  /*Returns an array of abstract pathnames denoting the files in the directory denoted by this abstract pathname.*/
+  public @Override File[] listFiles(){
+    throw new UnsupportedOperationException();
+  }
+  
+  
   public @Override SSHFile getParentFile() {
     return parent;
   }
@@ -209,19 +242,12 @@ public class SSHFile extends File {
   public @Override long	getUsableSpace(){
     throw new UnsupportedOperationException();
   }
-  /*Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.*/
-  public @Override String[] list(){
-    throw new UnsupportedOperationException();
-  }
+
   /** 
    * Returns an array of strings naming the files and directories in the directory denoted by this 
    * abstract pathname that satisfy the specified filter.
    */
   public @Override String[] list(FilenameFilter filter){
-    throw new UnsupportedOperationException();
-  }
-  /*Returns an array of abstract pathnames denoting the files in the directory denoted by this abstract pathname.*/
-  public @Override File[] listFiles(){
     throw new UnsupportedOperationException();
   }
   /** 
