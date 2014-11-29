@@ -44,7 +44,7 @@ public class SSHFile extends File {
     return !isDirectory();
   }
   public @Override boolean isDirectory() {
-    return isDir;
+    return ssh.exec("ls -lda "+getName()).success;
   }
   public @Override SSHFile getParentFile() {
     return parent;

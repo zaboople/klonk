@@ -77,7 +77,7 @@ public class SSH {
       this.exec=new SSHExec(this);  
     return exec;
   }
-  public String exec(String command) throws WrappedSSHException {
+  public SSHExecResult exec(String command) throws WrappedSSHException {
     return getExec().exec(command);
   }
   public SFTP getSFTP() {

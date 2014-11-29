@@ -15,19 +15,18 @@ public class SSHExec {
   public SSH getSSH() {
     return ssh;
   }
-  public String exec(String command) throws WrappedSSHException {
+  public SSHExecResult exec(String command) throws WrappedSSHException {
     StringBuilder out=new StringBuilder();
     ByteArrayOutputStream err=new ByteArrayOutputStream(512);
     int result=exec(command, out, err);
     if (err.size()>0 || result!=0)
       try {
-        StringBuilder sbErr=new StringBuilder();
-        sbErr.append(err.toString("utf-8"));
-        throw new RuntimeException("Failed: "+command+"\n"+sbErr.toString());
+        out.append(err.toString("utf-8"));
+        result=1;
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
-    return out.toString();
+    return new SSHExecResult(result==0, out.toString());
   }
   public int exec(String command, Appendable out, Appendable err) throws WrappedSSHException {
     ByteArrayOutputStream baos=new ByteArrayOutputStream(512);

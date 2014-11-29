@@ -18,7 +18,7 @@ public class SSHCommandLine {
     SSHFile file=conns.getFile(grab.file);
     mylog("SSH File: "+file);
     mylog(
-      file.getSSH().exec("ls -lda "+file.getName())
+      file.getSSH().exec("ls -lda "+file.getName()).toString()
     );
     conns.close();
   }

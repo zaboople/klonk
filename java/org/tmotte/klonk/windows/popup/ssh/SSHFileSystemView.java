@@ -6,7 +6,6 @@ import org.tmotte.klonk.ssh.SSHExec;
 import org.tmotte.klonk.ssh.SSHFile;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.ConnectionParseException;
-import org.tmotte.klonk.ssh.WrappedSSHException;
 import org.tmotte.klonk.config.msg.Setter;
 import java.io.ByteArrayOutputStream;
 
@@ -50,7 +49,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
 
   //FIXME what does the user interface do on authentication failure?
-  private int _getFiles(SSHFile dir, boolean useFileHiding) throws WrappedSSHException {
+  private int _getFiles(SSHFile dir, boolean useFileHiding) {
     sshErr.reset();
     sshOut.setLength(0);
     mylog("SSHFileSystemView._getFiles(): "+dir.getAbsolutePath());
@@ -71,11 +70,6 @@ public class SSHFileSystemView extends FileSystemView {
       else
       if (res!=0)
         throw new Exception(sshErr.toString("utf-8"));        
-    } catch (WrappedSSHException e) {
-      if ("socket is not established".equals(e.getWrapped().getMessage()))
-        return noFiles;
-      else
-        throw new RuntimeException(e);
     } catch (Exception e) {
       throw new RuntimeException("Could not list "+dir, e);
     }
