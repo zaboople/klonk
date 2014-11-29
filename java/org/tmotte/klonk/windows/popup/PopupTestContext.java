@@ -32,7 +32,6 @@ public class PopupTestContext  {
   KLog log;
   KPersist persist;
   JFrame mainFrame;
-  StatusUpdate statusBar;
   Setter<Throwable> fail;
   
   
