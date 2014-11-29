@@ -2,7 +2,6 @@ package org.tmotte.klonk.windows.popup.ssh;
 import java.io.File;
 import javax.swing.JFrame;
 import org.tmotte.klonk.config.PopupTestContext;
-import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.ssh.SSH;
 import org.tmotte.klonk.ssh.SSHConnections;
@@ -45,7 +44,7 @@ class TestSave {
             );
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
             new org.tmotte.klonk.windows.popup.FileDialogWrapper(
-              PopupTestContext.makeMainFrame(),
+              m,
               new SSHFileSystemView(conns),
               new SSHFileView()
             );
