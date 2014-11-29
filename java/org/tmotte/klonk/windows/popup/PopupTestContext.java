@@ -22,6 +22,8 @@ import org.tmotte.klonk.config.BootContext;
 
 /** 
  * For testing popups without the overhead of the main application running.
+ * It should be noted that 90% of the tests herein only use the makeMainFrame() function.
+ * Shell is the exception, but then again, it is a complicated animal.
  */
 public class PopupTestContext  {
 
@@ -58,20 +60,6 @@ public class PopupTestContext  {
         }
       };
     return fail;
-  }
-  public StatusUpdate getStatusBar() {
-    if (statusBar==null)
-      statusBar=new StatusUpdate(){
-        public void show(String msg)   {System.out.println(msg);}
-        public void showBad(String msg){System.out.println("***"+msg+"***");}
-        public void showCapsLock(boolean b)           {}
-        public void showNoStatus()                    {}
-        public void showRowColumn(int row, int column){}
-        public void showChangeThis(boolean b){}
-        public void showChangeAny(boolean b) {}
-        public void showTitle(String title)  {}
-      };
-    return statusBar;
   }
   public Image getPopupIcon() {
     return BootContext.getPopupIcon(this);
