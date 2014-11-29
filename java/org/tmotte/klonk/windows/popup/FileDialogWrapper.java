@@ -29,26 +29,20 @@ public class FileDialogWrapper {
   private JFileChooser fileChooser;
   private FileView fileView;
   private FileSystemView fileSystemView;
+  private boolean initialized=false;
   
   public FileDialogWrapper(JFrame mainFrame, FileSystemView fsv, FileView fv){
     this.mainFrame=mainFrame;
     this.fileSystemView=fsv;
     this.fileView=fv;
-    create();
   }
   public FileDialogWrapper(JFrame mainFrame){
     this(mainFrame, null, null);
   }
-  private void create() {
-    fileChooser=new JFileChooser();
-    if (fileSystemView!=null)
-      fileChooser.setFileSystemView(fileSystemView);
-    if (fileView!=null)
-      fileChooser.setFileView(fileView);   
-    //fileDialog=new FileDialog(mainFrame);
-  }
+  
 
   public File show(boolean forSave, File startFile, File startDir) {
+    init();
     if (fileChooser!=null) {
       if (startFile!=null){
         if (startFile.isDirectory()){
@@ -91,6 +85,23 @@ public class FileDialogWrapper {
       throw new RuntimeException(e);
     }
   }
+
+
+  private void init() {
+    if (!initialized){
+      create();
+      initialized=true;
+    }
+  }
+  private void create() {
+    fileChooser=new JFileChooser();
+    if (fileSystemView!=null)
+      fileChooser.setFileSystemView(fileSystemView);
+    if (fileView!=null)
+      fileChooser.setFileView(fileView);   
+    //fileDialog=new FileDialog(mainFrame);
+  }
+
   public static void main(final String[] args) {
     if (args.length<2)
       System.err.println("Need a directory & file");
