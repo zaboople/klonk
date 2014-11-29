@@ -25,7 +25,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.windows.Positioner;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
-import org.tmotte.klonk.config.PopupTestContext;
+import org.tmotte.klonk.windows.popup.PopupTestContext;
 import org.tmotte.klonk.config.option.SSHOptions;
 
 
@@ -264,8 +264,7 @@ public class SSHFiles {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          PopupTestContext ptc=new PopupTestContext(args);
-          JFrame parentFrame=ptc.getMainFrame();
+          JFrame parentFrame=PopupTestContext.makeMainFrame();
           SSHFiles pop=new SSHFiles(parentFrame, new FileDialogWrapper(parentFrame));
           SSHOptions sopt=new SSHOptions();
           //FIXME put default values in

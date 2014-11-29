@@ -26,7 +26,6 @@ import javax.swing.JWindow;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import java.awt.FocusTraversalPolicy;
-import org.tmotte.klonk.config.PopupTestContext;
 
 class YesNoCancel {
   private int yesOrNoOrCancel=-1;

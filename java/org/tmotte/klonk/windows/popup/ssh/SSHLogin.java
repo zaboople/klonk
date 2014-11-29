@@ -35,9 +35,9 @@ import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.config.msg.Setter;
-import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.windows.popup.KAlert;
+import org.tmotte.klonk.windows.popup.PopupTestContext;
 
 //FIXME default focus to password if we already have a user
 //FIXME what is deal with closing window not escaping?? If I close the window that's an ESC

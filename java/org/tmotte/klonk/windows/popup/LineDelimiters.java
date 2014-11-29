@@ -26,7 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 
 class LineDelimiters {

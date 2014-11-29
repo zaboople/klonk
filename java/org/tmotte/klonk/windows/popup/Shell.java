@@ -21,7 +21,6 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
 import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
@@ -473,7 +472,7 @@ class Shell {
 
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        PopupTestContext ptc=new PopupTestContext(args);
+        PopupTestContext ptc=new PopupTestContext();
         Shell shell=new Shell(
           ptc.getMainFrame(), ptc.getFail(), ptc.getPersist(),
           new FileDialogWrapper(ptc.getMainFrame()),

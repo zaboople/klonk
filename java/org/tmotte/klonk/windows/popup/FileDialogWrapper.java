@@ -11,7 +11,6 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.config.PopupTestContext;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 
@@ -108,7 +107,7 @@ public class FileDialogWrapper {
     else
       javax.swing.SwingUtilities.invokeLater(new Runnable() {
         public void run() {
-          FileDialogWrapper fdw=new FileDialogWrapper(new PopupTestContext(args).getMainFrame());
+          FileDialogWrapper fdw=new FileDialogWrapper(PopupTestContext.makeMainFrame());
           File d=new File(args[0]),
               f=new File(args[1]);
           System.out.println("For save: >"+fdw.show(true, null, null)+"<");

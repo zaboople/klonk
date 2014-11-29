@@ -30,7 +30,6 @@ import org.tmotte.common.io.Loader;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.edit.MyTextArea;
 
 class Help {

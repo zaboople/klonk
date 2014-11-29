@@ -31,7 +31,6 @@ import javax.swing.JTextField;
 import javax.swing.JWindow;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.windows.Positioner;
@@ -292,8 +291,7 @@ class Favorites {
         files.add("bbbbb");
         files.add("CCCC/cc/c/c///ccc");
         dirs.add("dddddddddd");
-        PopupTestContext ptc=new PopupTestContext(args);
-        new Favorites(ptc.getMainFrame()).show(files, dirs);
+        new Favorites(PopupTestContext.makeMainFrame()).show(files, dirs);
         System.out.println("\nFILES: ");
         for (String s: files)
           System.out.println(s);

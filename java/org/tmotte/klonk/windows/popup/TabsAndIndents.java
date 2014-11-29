@@ -33,7 +33,6 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
-import org.tmotte.klonk.config.PopupTestContext;
 
 class TabsAndIndents {
 

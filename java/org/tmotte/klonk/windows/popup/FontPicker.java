@@ -39,7 +39,6 @@ import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.msg.Setter;
-import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 
@@ -513,9 +512,8 @@ class FontPicker {
         try {
           FontOptions fo=new FontOptions();
           System.out.println(fo);
-          PopupTestContext ptc=new PopupTestContext(args);
           FontPicker fp=new FontPicker(
-            ptc.getMainFrame(),
+            PopupTestContext.makeMainFrame(),
             new Setter<String>(){
               public void set(String s) {
                 System.out.println("!!!!\n"+s+"\n!!!!");

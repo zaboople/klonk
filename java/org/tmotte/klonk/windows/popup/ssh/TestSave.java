@@ -1,13 +1,13 @@
 package org.tmotte.klonk.windows.popup.ssh;
 import java.io.File;
 import javax.swing.JFrame;
-import org.tmotte.klonk.config.PopupTestContext;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.ssh.SSH;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.SSHExec;
 import org.tmotte.klonk.ssh.SSHFile;
 import org.tmotte.klonk.windows.popup.KAlert;
+import org.tmotte.klonk.windows.popup.PopupTestContext;
 
 class TestSave {
 

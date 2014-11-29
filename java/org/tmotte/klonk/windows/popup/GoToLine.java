@@ -31,7 +31,6 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.windows.Positioner;
 import org.tmotte.klonk.config.msg.Setter;
-import org.tmotte.klonk.config.PopupTestContext;
 
 class GoToLine {
 
@@ -200,8 +199,7 @@ class GoToLine {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          PopupTestContext ptc=new PopupTestContext(args);
-          JFrame parentFrame=ptc.getMainFrame();
+          JFrame parentFrame=PopupTestContext.makeMainFrame();
           KAlert alerter=new KAlert(parentFrame);
           GoToLine gtl=new GoToLine(parentFrame, alerter);
           System.out.println(gtl.show());
