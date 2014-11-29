@@ -14,11 +14,16 @@ public class SSHCommandLine {
   public static void main(String[] args) throws Exception {
     FileGrab grab=new FileGrab();
     SSHConnections conns=SSHCommandLine.cmdLine(args, grab);
-    System.out.println(grab.file);
+    mylog("File: "+grab.file);
     SSHFile file=conns.getFile(grab.file);
-    System.out.println(
+    mylog("SSH File: "+file);
+    mylog(
       file.getSSH().exec("ls -lda "+file.getName())
     );
+    conns.close();
+  }
+  private static void mylog(String msg) {
+    System.out.println("SSHCommandLine: "+msg);
   }
   private static class FileGrab implements ArgHandler {
     String file;
@@ -90,8 +95,10 @@ public class SSHCommandLine {
     }
     final BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
     public boolean get(String u, String host, boolean authFail) {
+      user=u;
+      if (user!=null && pass !=null) 
+        return true;
       try {
-        user=u;
         System.out.println("Host: "+host);
         
         System.out.print("User: ");

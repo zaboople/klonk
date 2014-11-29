@@ -42,8 +42,11 @@ public class SSHConnections {
   // PUBLIC: //
   /////////////
 
-  public void close() {
+  public void close() throws Exception {
     for (String host: conns.keySet()){
+      Map<String,SSH> forHost=conns.get(host);
+      for (String user: forHost.keySet())
+        forHost.get(user).close();
     }
     try {
     } catch (Exception e) {
