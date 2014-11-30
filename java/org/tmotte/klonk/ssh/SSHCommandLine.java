@@ -11,39 +11,15 @@ import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.common.text.ArgHandler;
 
 public class SSHCommandLine {
-  public static void main(String[] args) throws Exception {
-    FileGrab grab=new FileGrab();
-    SSHConnections conns=SSHCommandLine.cmdLine(args, grab);
-    mylog("File: "+grab.file);
-    SSHFile file=conns.getFile(grab.file);
-    mylog("SSH File: "+file);
-    mylog("Is directory: "+file.isDirectory());
-    for (String s: file.list())
-      mylog("File: "+s);
-    for (File f: file.listFiles())
-      mylog("File: "+f);
-    conns.close();
+  private ArgHandler argHandler;
+  public SSHCommandLine(ArgHandler argHandler) throws Exception {  
+    this.argHandler=argHandler;
   }
-  private static void mylog(String msg) {
-    System.out.println("SSHCommandLine: "+msg);
-  }
-  private static class FileGrab implements ArgHandler {
-    String file;
-    public int handle(String[] args, int i) {
-      if (args[i].equals("-f"))
-        file=args[++i];
-      else
-        i=-1;
-      return i;      
-    }
-  }
-  
-  
-  private static void usage() {
-    System.err.println("Usage: -u user -h host -k knownhostsfile -p pass -r privatekeyfile");
+  private void usage() {
+    System.err.println("Usage: -u user -h host -k knownhostsfile -p pass -r privatekeyfile "+argHandler.document());
     System.exit(1);
   }
-  public static SSHConnections cmdLine(String[] args, ArgHandler argHandler) throws Exception {
+  public SSHConnections process(String[] args) throws Exception {
     int max=0;
     String user=null, host=null, knownHosts=null, pass=null, privateKeys=null;
     for (int i=0; i<args.length && max<100; i++){

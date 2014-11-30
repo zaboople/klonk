@@ -50,14 +50,18 @@ public class SSHFile extends File {
     SSHExecResult res=ssh.exec("ls -lda "+getName());
     return res.success && res.output.startsWith("d");
   }
+  
+  private static String[] noFiles={};
+  
   /*Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.*/
   public @Override String[] list(){
-    SSHExecResult res=ssh.exec("ls --file-type -1 "+getAbsolutePath()); //FIXME quote the file
+    String absolutePath=getAbsolutePath();
+    SSHExecResult res=ssh.exec("ls --file-type -1 "+absolutePath); //FIXME quote the file
 
     //Fail, for whatever reason including nonexistence:
     if (!res.success) {
       mylog("Failed to list: "+res.output);
-      return new String[]{};
+      return noFiles;
     }
       
     //List files & dirs:
@@ -69,9 +73,13 @@ public class SSHFile extends File {
     if (!last.equals(""))
       lFiles.add(last);
       
+    //This happens when it's not a directory, it's a file and you just ls'd it anyhow:
+    if (lFiles.size()==1 && lFiles.get(0).equals(absolutePath))
+      return noFiles;
+      
     //Copy into results:
     String[] files=new String[lFiles.size()];
-    for (int i=0; i<lFiles.size(); i++)
+    for (int i=0; i<lFiles.size(); i++) 
       files[i]=lFiles.get(i);
     return files;
   }

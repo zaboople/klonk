@@ -227,7 +227,7 @@ public class SSH {
   }
   private static void myLog(String s) {
     if (true)
-      System.out.println("SSH.myLog(): "+s);
+      System.out.println("SSH: "+s);
   }
   
   ////////////////////////
