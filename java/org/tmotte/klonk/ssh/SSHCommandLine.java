@@ -19,7 +19,9 @@ public class SSHCommandLine {
     mylog("SSH File: "+file);
     mylog("Is directory: "+file.isDirectory());
     for (String s: file.list())
-      System.out.println(s);
+      mylog("File: "+s);
+    for (File f: file.listFiles())
+      mylog("File: "+f);
     conns.close();
   }
   private static void mylog(String msg) {

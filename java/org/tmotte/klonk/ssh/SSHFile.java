@@ -52,12 +52,14 @@ public class SSHFile extends File {
   }
   /*Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.*/
   public @Override String[] list(){
-    SSHExecResult res=ssh.exec("ls --file-type -1 "+getName());
+    SSHExecResult res=ssh.exec("ls --file-type -1 "+getAbsolutePath()); //FIXME quote the file
 
     //Fail, for whatever reason including nonexistence:
-    if (!res.success)
+    if (!res.success) {
+      mylog("Failed to list: "+res.output);
       return new String[]{};
-    
+    }
+      
     //List files & dirs:
     StringChunker sc=new StringChunker(res.output);
     List<String> lFiles=new LinkedList<>();
@@ -75,7 +77,11 @@ public class SSHFile extends File {
   }
   /*Returns an array of abstract pathnames denoting the files in the directory denoted by this abstract pathname.*/
   public @Override File[] listFiles(){
-    throw new UnsupportedOperationException();
+    String[] fs=list();
+    File[] files=new File[fs.length];
+    for (int i=0; i<fs.length; i++)
+      files[i]=new SSHFile(ssh, this, fs[i], fs[i].endsWith("/"));
+    return files;
   }
   
   

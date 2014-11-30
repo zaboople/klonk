@@ -401,6 +401,9 @@ public class StringChunker{
       }
     }
   }  
+  public String toString() {
+    return index+" "+text;
+  }
 
   private static void rip(String s1, String s2){
     System.out.println(s1+">"+s2+"<");

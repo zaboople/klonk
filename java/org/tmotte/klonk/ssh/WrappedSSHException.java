@@ -1,5 +1,5 @@
 package org.tmotte.klonk.ssh;
-public class WrappedSSHException extends RuntimeException {
+public class WrappedSSHException extends RuntimeException { /** FIXME probably junk */
   Exception wrapped;
   public WrappedSSHException(String message, Exception e) {
     super(message, e);
