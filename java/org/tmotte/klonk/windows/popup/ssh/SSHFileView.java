@@ -13,7 +13,6 @@ public class SSHFileView extends FileView{
    * does the same thing. 
    */
   public Boolean isTraversable(File fdir){
-    //System.out.println("SSHFileView.isTraversable: "+f);
     if (SSHFile.cast(fdir)==null)
       return super.isTraversable(fdir);
     return fdir.isDirectory();

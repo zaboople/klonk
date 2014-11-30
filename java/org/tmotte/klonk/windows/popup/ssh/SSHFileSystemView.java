@@ -49,18 +49,17 @@ public class SSHFileSystemView extends FileSystemView {
   }
 
   public @Override File[] getFiles(File fdir, boolean useFileHiding){
-    mylog("getFiles() "+fdir);
     SSHFile dir=cast(fdir);
     if (dir==null)
       return defaultView.getFiles(fdir, useFileHiding);
-    else
-      return dir.listFiles();
+    mylog("getFiles() "+fdir);
+    return dir.listFiles();
   }
   /* Returns true if the file (directory) can be visited. */
   public @Override Boolean isTraversable(File f){
-    mylog("isTraversable "+f);
     if (cast(f)==null)
       return defaultView.isTraversable(f);
+    mylog("isTraversable "+f);
     return f.isDirectory();
   }
   /* Used by UI classes to decide whether to display a special icon for drives or partitions, e.g. */
@@ -90,9 +89,9 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* On Windows, a file can appear in multiple folders, other than its parent directory in the filesystem. */
   public @Override boolean isParent(File folder, File file){
-    mylog("SSHFileSystemView.isParent() "+folder+" "+file);
     if (cast(folder)==null || cast(file)==null)
       return defaultView.isParent(folder, file);
+    mylog("SSHFileSystemView.isParent() "+folder+" "+file);
     return true;
   }
 

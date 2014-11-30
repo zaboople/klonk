@@ -27,14 +27,13 @@ public class SSHFile extends File {
   
   public SSHFile(SSH ssh, SSHFile parent, String name) {
     super(parent, name); 
-    this.name=name.endsWith("/")
-      ?name.substring(0, name.length()-1)
-      :name;
+    this.name=name;
     this.ssh=ssh;
     this.parent=parent;   
   }
   protected SSHFile(SSH ssh, SSHFile parent, String name, boolean isDir) {
     this(ssh, parent, name);
+    this.knowsIsDir=true;
     this.isDir=isDir;
   }
 
@@ -102,8 +101,18 @@ public class SSHFile extends File {
   public @Override File[] listFiles(){
     String[] fs=list();
     File[] files=new File[fs.length];
-    for (int i=0; i<fs.length; i++)
-      files[i]=new SSHFile(ssh, this, fs[i], fs[i].endsWith("/"));
+    for (int i=0; i<fs.length; i++){
+      String f=fs[i];
+      boolean endsWithSlash=f.endsWith("/");      
+      files[i]=new SSHFile(
+        ssh, 
+        this, 
+        endsWithSlash 
+          ?f.substring(0, f.length()-1)
+          :f, 
+        endsWithSlash
+      );
+    }
     return files;
   }
   private void getAbsolutePath(StringBuilder sb) {
