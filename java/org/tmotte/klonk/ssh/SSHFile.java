@@ -21,20 +21,27 @@ public class SSHFile extends File {
   protected boolean isDir=false;  
   private final SSH ssh;
   private String name;
+  
+  private boolean knowsIsDir=false;
 
   
-  public SSHFile(SSH ssh, SSHFile parent, String name, boolean isDir) {
+  public SSHFile(SSH ssh, SSHFile parent, String name) {
     super(parent, name); 
     this.name=name;
     this.ssh=ssh;
     this.parent=parent;   
+  }
+  protected SSHFile(SSH ssh, SSHFile parent, String name, boolean isDir) {
+    this(ssh, parent, name);
     this.isDir=isDir;
   }
+
+
   public SSH getSSH(){
     return ssh;
   }
   
-  /*Tests whether this abstract pathname is absolute.*/
+  /*Tests whether this abstract pathname is absolute. FIXME what happens with ~? */
   public @Override boolean isAbsolute() {
     return true;
   }
@@ -47,8 +54,14 @@ public class SSHFile extends File {
     return !isDirectory();
   }
   public @Override boolean isDirectory() {
-    SSHExecResult res=ssh.exec("ls -lda "+getName());
-    return res.success && res.output.startsWith("d");
+    if (knowsIsDir) 
+      return isDir;
+    else {
+      SSHExecResult res=ssh.exec("ls -lda "+getAbsolutePath());
+      knowsIsDir=true;
+      isDir=res.success && res.output.startsWith("d");
+      return isDir;
+    }
   }
   
   private static String[] noFiles={};
@@ -91,14 +104,6 @@ public class SSHFile extends File {
       files[i]=new SSHFile(ssh, this, fs[i], fs[i].endsWith("/"));
     return files;
   }
-  
-  
-  public @Override SSHFile getParentFile() {
-    return parent;
-  }
-  public @Override boolean exists() {
-    return true; //FIXME
-  }
   private void getAbsolutePath(StringBuilder sb) {
     if (parent!=null){
       parent.getAbsolutePath(sb);
@@ -120,18 +125,27 @@ public class SSHFile extends File {
   public @Override String getCanonicalPath() {
     return getAbsolutePath();
   }
-  public @Override String	getName() {
-    return name;
-  }
   /*Converts this abstract pathname into a pathname string.*/
   public @Override String	getPath() {
     //mylog("SSHFile.getPath: FIXME "+getName());
     return getAbsolutePath();
   }
+  public @Override String	getName() {
+    return name;
+  }
+
+
   /*Compares two abstract pathnames lexicographically.*/
   public @Override int compareTo(File other){
     return getAbsolutePath().compareTo(other.getAbsolutePath()); 
   }
+
+  
+  
+  public @Override SSHFile getParentFile() {
+    return parent;
+  }
+
   /*Tests this abstract pathname for equality with the given object.*/
   public @Override boolean equals(Object obj){
     if (obj==null || !(obj instanceof SSHFile))
@@ -151,7 +165,9 @@ public class SSHFile extends File {
   }
   /*Computes a hash code for this abstract pathname.*/
   public @Override int hashCode(){
-    return getAbsolutePath().hashCode();
+    return ssh!=null
+      ?(getAbsolutePath()+ssh.getHost()).hashCode()
+      :getAbsolutePath().hashCode();
   }
   
   public @Override String toString() {
@@ -172,6 +188,9 @@ public class SSHFile extends File {
   public @Override long length(){
     mylog("FIXME SSHFile.length()");
     return 100;
+  }
+  public @Override boolean exists() {
+    return true; //FIXME
   }
   
   
@@ -292,14 +311,11 @@ public class SSHFile extends File {
           new SSHFile(
             null, 
             null, 
-            "/",
-            true
+            "/"
           ), 
-          "home", 
-          true
+          "home"
         ), 
-        "zaboople", 
-        true
+        "zaboople"
       );
     System.out.println(file.getAbsolutePath());
   }

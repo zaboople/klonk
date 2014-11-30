@@ -15,7 +15,7 @@ public class SSHExec {
   public SSH getSSH() {
     return ssh;
   }
-  public SSHExecResult exec(String command) throws WrappedSSHException {
+  public SSHExecResult exec(String command) {
     StringBuilder out=new StringBuilder();
     ByteArrayOutputStream err=new ByteArrayOutputStream(512);
     int result=exec(command, out, err);

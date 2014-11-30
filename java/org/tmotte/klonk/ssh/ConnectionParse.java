@@ -13,7 +13,7 @@ class ConnectionParse {
   private final Pattern sshPattern=Pattern.compile("ssh:/*", Pattern.CASE_INSENSITIVE);
   private final StringChunker chunker=new StringChunker();
 
-  /** FIXME no COnnectionParseExceptions */
+  /** FIXME no ConnectionParseExceptions */
   protected SSHFile parse(SSHConnections connMgr, String uri) {
     String user=null, host=null, dirFile=null;
     chunker.reset(uri);
@@ -49,7 +49,7 @@ class ConnectionParse {
     SSHFile result=parse(ssh, null, chunker);
     if (result==null) 
       //No name given, default to "~"
-      result=new SSHFile(ssh, null, "~", true);
+      result=new SSHFile(ssh, null, "~");
     return result;
   }
   
@@ -66,7 +66,7 @@ class ConnectionParse {
           return parent;
         if (parent!=null)
           parent.isDir=true;
-        return new SSHFile(ssh, parent, remains, false);//FIXME not false, find out if it's a dir!
+        return new SSHFile(ssh, parent, remains);
       }
     }
     else {
@@ -75,7 +75,7 @@ class ConnectionParse {
       String name=left.getUpTo();
       return parse(
         ssh, 
-        new SSHFile(ssh, parent, name, false), //FIXME is it or not a dir?      
+        new SSHFile(ssh, parent, name), 
         left
       );
     }

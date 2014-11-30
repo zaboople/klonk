@@ -48,40 +48,13 @@ public class SSHFileSystemView extends FileSystemView {
       return defaultView.createFileObject(path);
   }
 
-  //FIXME what does the user interface do on authentication failure?
-  private int _getFiles(SSHFile dir, boolean useFileHiding) {
-    sshErr.reset();
-    sshOut.setLength(0);
-    mylog("SSHFileSystemView._getFiles(): "+dir.getAbsolutePath());
-    //FIXME getting a null pointer on / here
-    return dir.getSSH().getExec().exec(
-      "ls --file-type -a -1 "+dir.getAbsolutePath(), sshOut, sshErr //FIXME quote dir, at least spaces
-    );
-  }
   public @Override File[] getFiles(File fdir, boolean useFileHiding){
     mylog("getFiles() "+fdir);
     SSHFile dir=cast(fdir);
     if (dir==null)
       return defaultView.getFiles(fdir, useFileHiding);
-    try {
-      int res=_getFiles(dir, useFileHiding);
-      if (res==-1)
-        return noFiles;//No connection
-      else
-      if (res!=0)
-        throw new Exception(sshErr.toString("utf-8"));        
-    } catch (Exception e) {
-      throw new RuntimeException("Could not list "+dir, e);
-    }
-    String sshOutStr=DotStripper.process(sshOut.toString());
-    String[] s=sshOutStr.split("\n");
-    File[] files=new File[s.length];
-    for (int i=0; i<s.length; i++){
-      boolean isDir=s[i].endsWith("/");
-      String name=isDir ? s[i].substring(0, s[i].length()-1) :s[i];
-      files[i]=new SSHFile(dir.getSSH(), dir, name, isDir);
-    }
-    return files;
+    else
+      return dir.listFiles();
   }
   /* Returns true if the file (directory) can be visited. */
   public @Override Boolean isTraversable(File f){
@@ -138,9 +111,8 @@ public class SSHFileSystemView extends FileSystemView {
       throw new RuntimeException("FIXME");    
     return new SSHFile(
       dir.getSSH(), 
-      new SSHFile(dir.getSSH(), dir.getParentFile(), dir.getName(), true),
-      filename,
-      filename.endsWith("/")
+      dir,
+      filename
     );
   }
   public @Override File createNewFolder(File containingDir){
@@ -149,7 +121,7 @@ public class SSHFileSystemView extends FileSystemView {
     if (dir==null) 
       try {return defaultView.createNewFolder(containingDir);} catch (Exception e) {throw new RuntimeException(e);}
     else {
-      File f=new SSHFile(dir.getSSH(), dir, "New-Folder", true);
+      File f=new SSHFile(dir.getSSH(), dir, "New-Folder");
       f.mkdir();
       return f;
     }
@@ -159,7 +131,7 @@ public class SSHFileSystemView extends FileSystemView {
     SSHFile dir=cast(parent);
     if (dir==null)
       return defaultView.getChild(parent, fileName);
-    return new SSHFile(dir.getSSH(), dir, fileName, false);
+    return new SSHFile(dir.getSSH(), dir, fileName);
   }
   
   public @Override File getHomeDirectory() {

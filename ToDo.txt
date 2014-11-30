@@ -1,5 +1,6 @@
 -Current
   -Right now
+    It looks like we are doubling up //'s on absolutePath. 
     Make sure you have a clean way to close all ssh connections on exit. You don't right now.
     When we ask for a directory in TestSave we are not being told it's a directory and it becomes the target, bad; example "~/.ssh", or "/home/zaboople".
     The login screen is not saying "hey login failed" when it fails
