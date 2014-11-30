@@ -27,7 +27,9 @@ public class SSHFile extends File {
   
   public SSHFile(SSH ssh, SSHFile parent, String name) {
     super(parent, name); 
-    this.name=name;
+    this.name=name.endsWith("/")
+      ?name.substring(0, name.length()-1)
+      :name;
     this.ssh=ssh;
     this.parent=parent;   
   }
