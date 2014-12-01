@@ -73,6 +73,8 @@ class ConnectionParse {
       if (parent!=null)
         parent.isDir=true;
       String name=left.getUpTo();
+      if (name.equals("") && parent==null)
+        name="/";
       return parse(
         ssh, 
         new SSHFile(ssh, parent, name), 

@@ -12,7 +12,6 @@ public class SSHFile extends File {
   public static SSHFile cast(File f) {
     if (f instanceof SSHFile)
       return (SSHFile)f;
-    //mylog("WARNING NOT SSH "+f);
     return null;    
   }
  
@@ -263,7 +262,7 @@ public class SSHFile extends File {
   }
   
   private void mylog(String s) {
-    System.out.println(s);
+    System.out.println("SSHFile:"+s);
   }
   
   ////////////////////////
