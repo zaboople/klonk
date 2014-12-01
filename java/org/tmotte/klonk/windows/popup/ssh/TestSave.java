@@ -57,7 +57,7 @@ class TestSave {
               else
                 file=temp;
             }
-            File picked=fdw.show(true, null, null);
+            File picked=fdw.show(true, file, dir);
             System.out.println("RESULT: "+
               picked+" "+(picked==null ?"" :picked.getClass())
             );
