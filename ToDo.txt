@@ -1,7 +1,6 @@
 -Current
   -Right now
-    If we're gonna have ~ fine but that's not an absolutePath.
-    We got slow action on those isDirectory's and stuff, maybe keep the channel alive better.
+    Make sure that you have a test-open as well as a test-save.
     Make sure you have a clean way to close all ssh connections on exit. You don't right now.
     When we ask for a directory in TestSave we are not being told it's a directory and it becomes the target, bad; example "~/.ssh", or "/home/zaboople".
     The login screen is not saying "hey login failed" when it fails

@@ -41,6 +41,9 @@ public class SSHFile extends File {
     return ssh;
   }
   
+  public @Override String getName() {
+    return name;
+  }
   /*Tests whether this abstract pathname is absolute. FIXME what happens with ~? */
   public @Override boolean isAbsolute() {
     return true;
@@ -57,8 +60,8 @@ public class SSHFile extends File {
     if (knowsIsDir) 
       return isDir;
     else {
-      SSHExecResult res=ssh.exec("ls -lda "+getAbsolutePath());
-      knowsIsDir=true;
+      SSHExecResult res=ssh.exec("ls -lda "+getSystemPath());
+      knowsIsDir=res.success;
       isDir=res.success && res.output.startsWith("d");
       return isDir;
     }
@@ -68,7 +71,7 @@ public class SSHFile extends File {
   
   /*Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.*/
   public @Override String[] list(){
-    String absolutePath=getAbsolutePath();
+    String absolutePath=getSystemPath();
     SSHExecResult res=ssh.exec("ls --file-type -1 "+absolutePath); //FIXME quote the file
 
     //Fail, for whatever reason including nonexistence:
@@ -114,34 +117,41 @@ public class SSHFile extends File {
     }
     return files;
   }
-  private void getAbsolutePath(StringBuilder sb) {
+  public @Override String getAbsolutePath(){
+    return getSystemPath();
+  }
+  /** This will get called when deciding what icon to display in a JFileChooser. Just warning about that. */
+  public @Override String getCanonicalPath() {
+    return getSystemPath();
+  }
+  /*Converts this abstract pathname into a pathname string.*/
+  public @Override String getPath() {
+    return getSystemPath();
+  }
+
+  /** Includes the ssh://name@host: in the path */
+  public String getNetworkPath() {
+    String user=getUser(), host=getHost();
+    StringBuilder sb=new StringBuilder(20);
+    sb.append("ssh://");
+    sb.append(user==null ?""  :user+"@");
+    sb.append(host==null ?":" :host+":");
+    getSystemPath(sb);
+    return sb.toString();
+  }
+  /** Just the path on the remote system, not including ssh/server/user info */
+  public String getSystemPath() {
+    StringBuilder sb=new StringBuilder();
+    getSystemPath(sb);
+    return sb.toString();
+  }
+  private void getSystemPath(StringBuilder sb) {
     if (parent!=null){
-      parent.getAbsolutePath(sb);
+      parent.getSystemPath(sb);
       if (!parent.name.equals("/")) 
         sb.append("/");
     }
     sb.append(getName());
-  }
-  public @Override String getAbsolutePath(){
-    StringBuilder sb=new StringBuilder(10);
-    getAbsolutePath(sb);
-    return sb.toString();
-  }
-  public String getNetworkPath() {
-    StringBuilder sb=new StringBuilder("ssh://");
-    getAbsolutePath(sb);
-    return sb.toString();
-  }
-  public @Override String getCanonicalPath() {
-    return getAbsolutePath();
-  }
-  /*Converts this abstract pathname into a pathname string.*/
-  public @Override String	getPath() {
-    //mylog("SSHFile.getPath: FIXME "+getName());
-    return getAbsolutePath();
-  }
-  public @Override String	getName() {
-    return name;
   }
 
 
@@ -150,6 +160,16 @@ public class SSHFile extends File {
     return getAbsolutePath().compareTo(other.getAbsolutePath()); 
   }
 
+  private String getUser() {
+    return ssh==null 
+      ?null
+      :ssh.getUser();
+  }
+  private String getHost() {
+    return ssh==null 
+      ?null
+      :ssh.getHost();
+  }
   
   
   public @Override SSHFile getParentFile() {
@@ -175,13 +195,11 @@ public class SSHFile extends File {
   }
   /*Computes a hash code for this abstract pathname.*/
   public @Override int hashCode(){
-    return ssh!=null
-      ?(getAbsolutePath()+ssh.getHost()).hashCode()
-      :getAbsolutePath().hashCode();
+    return getNetworkPath().hashCode();
   }
   
   public @Override String toString() {
-    return getAbsolutePath();
+    return getNetworkPath();
   }
   /*Returns the canonical form of this abstract pathname.*/
   public @Override File	getCanonicalFile(){
