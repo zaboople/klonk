@@ -105,9 +105,9 @@
     <javac destdir="${build.dir}" 
           debug="true" 
           failonerror="true"
-          deprecation="on">
+          deprecation="on"
+          srcdir="${java.dir}">
       <compilerarg value="-Xlint:unchecked"/>
-      <src path="${java.dir}"/>
       <classpath refid="classpath"/>
     </javac>
     

@@ -1,10 +1,6 @@
 -Current
   -Right now
-    Make sure that you have a test-open as well as a test-save.
-    Make sure you have a clean way to close all ssh connections on exit. You don't right now.
     When we ask for a directory in TestSave we are not being told it's a directory and it becomes the target, bad; example "~/.ssh", or "/home/zaboople".
-    The login screen is not saying "hey login failed" when it fails
-    The session.exec thing is returning an int. It doesn't account for the fact that we might have refused to login or whatever or our password didn't work. When our password doesn't work, we should retry. We shouldn't just splat.
 
   -Make it where the log prints the dang date. Come on, man.
 
@@ -23,6 +19,7 @@
       user
       pass/keyfile
         -keyfile defaults to pass
+    File size & date: You have no choice. Well use ls --full-time
 
   -It honestly would be handy to turn multiline off in find/repl. Just because ^.*?$ can cross multiple lines
 

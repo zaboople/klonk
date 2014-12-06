@@ -21,7 +21,7 @@ public class SSHFile extends File {
   private final SSH ssh;
   private String name;
   
-  private boolean knowsIsDir=false;
+  private boolean knows=false;
 
   
   public SSHFile(SSH ssh, SSHFile parent, String name) {
@@ -32,7 +32,7 @@ public class SSHFile extends File {
   }
   protected SSHFile(SSH ssh, SSHFile parent, String name, boolean isDir) {
     this(ssh, parent, name);
-    this.knowsIsDir=true;
+    this.knows=true;
     this.isDir=isDir;
   }
 
@@ -53,18 +53,19 @@ public class SSHFile extends File {
     return false;
   }  
 
+  public @Override boolean exists() {
+    SSHExecResult res=ssh.exec("ls -lda "+getSystemPath());
+    knows=true;
+    isDir=res.success && res.output.startsWith("d");
+    return res.success;
+  }
   public @Override boolean isFile() {
     return !isDirectory();
   }
   public @Override boolean isDirectory() {
-    if (knowsIsDir) 
-      return isDir;
-    else {
-      SSHExecResult res=ssh.exec("ls -lda "+getSystemPath());
-      knowsIsDir=res.success;
-      isDir=res.success && res.output.startsWith("d");
-      return isDir;
-    }
+    if (!knows)
+      exists();
+    return isDir;
   }
   
   private static String[] noFiles={};
@@ -216,9 +217,6 @@ public class SSHFile extends File {
   public @Override long length(){
     mylog("FIXME SSHFile.length()");
     return 100;
-  }
-  public @Override boolean exists() {
-    return true; //FIXME
   }
   
   

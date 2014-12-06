@@ -5,11 +5,12 @@ import org.tmotte.klonk.config.msg.Setter;
 
 public class KLog {
   
-  private String pid;
   private final long start=System.nanoTime();
   private KHome home;
   private PrintWriter commandLineWriter;
   private Setter<Throwable> failPopup;
+  private java.text.SimpleDateFormat sdformat;
+  
   private Setter<Throwable> failer=new Setter<Throwable>(){
     public void set(Throwable t) {
       log(t);
@@ -18,11 +19,11 @@ public class KLog {
   
   public KLog(OutputStream os){
     this.commandLineWriter=new PrintWriter(new OutputStreamWriter(os));
-    this.pid=pid;
+    sdformat=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S ");
   }
   public KLog(KHome home, String pid){
     this.home=home;
-    this.pid=pid;
+    sdformat=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S '"+pid+"\t'");
   }
   public KLog setFailPopup(Setter<Throwable> a) {
     this.failPopup=a;
@@ -33,7 +34,9 @@ public class KLog {
     return failer;
   }
   public void log(String s) {
-    logPlain(pid+": "+(System.currentTimeMillis())+" "+s);
+    logPlain(
+      sdformat.format(new java.util.Date())+s
+    );
   }
   public void error(String s) {
     log("ERROR: "+s);
@@ -99,5 +102,9 @@ public class KLog {
   ///////////
   
   public static void main(String[] args) {
+    KLog log=new KLog(System.out);
+    log.log("BARF");
+    System.out.flush();
+    
   }
 }
