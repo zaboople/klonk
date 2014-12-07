@@ -138,7 +138,7 @@ public class BootContext {
     if (popups==null)
       popups=new Popups(
          getHome()
-        ,getLog().exceptionHandler()
+        ,getLog().getExceptionHandler()
         ,getMainFrame()
         ,getPersist()
         ,getStatusBar()
@@ -170,12 +170,12 @@ public class BootContext {
   }
   private KPersist getPersist() {
     if (persist==null)
-      persist=new KPersist(getHome(), getLog().exceptionHandler());
+      persist=new KPersist(getHome(), getLog().getExceptionHandler());
     return persist;
   }
   private CtrlMain getMainController() {
     if (ctrlMain==null){
-      ctrlMain=new CtrlMain(getLog().exceptionHandler(), getPersist());
+      ctrlMain=new CtrlMain(getLog().getExceptionHandler(), getPersist());
       ctrlMain.setLayout(getMainDisplay(), getStatusBar());
       ctrlMain.setPopups(getPopups());
       ctrlMain.setListeners(
@@ -192,7 +192,7 @@ public class BootContext {
   }
   private Menus getMenus() {
     if (menus==null) {
-      menus=new Menus(getEditors(), getLog().exceptionHandler());
+      menus=new Menus(getEditors());
       menus.setFastUndos(getPersist().getFastUndos())
            .setWordWrap( getPersist().getWordWrap());
       Editors ed=getEditors();
@@ -244,7 +244,10 @@ public class BootContext {
   private SSHConnections getSSHConnections() {
     if (sshConns==null){
       SSHOptions sshOpts=getPersist().getSSHOptions();
-      sshConns=new SSHConnections(getAlerter())
+      sshConns=new SSHConnections(
+          getLog().getLogger(),
+          getAlerter()
+        )
         .withLogin(getSSHLogin())
         .withKnown(sshOpts.getKnownHostsFilename())
         .withPrivateKeys(sshOpts.getPrivateKeysFilename());        
@@ -255,7 +258,7 @@ public class BootContext {
     if (fileDialogWrapper==null)
       fileDialogWrapper=new FileDialogWrapper(
         mainFrame, 
-        new SSHFileSystemView(sshConns), 
+        new SSHFileSystemView(sshConns, getLog().getLogger()), 
         new SSHFileView()
       );
     return fileDialogWrapper;

@@ -23,12 +23,14 @@ public class SSHFileSystemView extends FileSystemView {
   private final ByteArrayOutputStream sshErr=new ByteArrayOutputStream(1024*24);
   private final StringBuilder sshOut=new StringBuilder();
   private final SSHConnections conns;
+  private final Setter<String> logger;
 
   private final static File[] noFiles=new File[]{};
   
-  public SSHFileSystemView(SSHConnections conns) {
+  public SSHFileSystemView(SSHConnections conns, Setter<String> logger) {
     super();
     this.conns=conns;
+    this.logger=logger;
   }
   
   /* This gets called when you just bang in a path name or press enter on  a path name. FIXME */

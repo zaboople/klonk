@@ -2,8 +2,6 @@
   -Right now
     When we ask for a directory in TestSave we are not being told it's a directory and it becomes the target, bad; example "~/.ssh", or "/home/zaboople".
 
-  -Make it where the log prints the dang date. Come on, man.
-
   -Tabs & Indents allows invalid input - letters instead of numbers
   
   -SSH Login needs a list of open connections to select for closing.

@@ -55,11 +55,15 @@ public class SSHCommandLine {
       }
     }
     return 
-      new SSHConnections(new Setter<String>(){
-        public void set(String err) {
-          System.err.println(err);
+      new SSHConnections(
+        new Setter<String>(){
+          public void set(String s) {System.out.println(s);}
         }
-      })
+        ,
+        new Setter<String>(){
+          public void set(String err) {System.err.println(err);}
+        }
+      )
       .withLogin(new Login(user, pass))
       .withKnown(knownHosts)
       .withPrivateKeys(privateKeys);

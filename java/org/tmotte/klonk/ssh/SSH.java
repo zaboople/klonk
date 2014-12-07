@@ -22,15 +22,16 @@ public class SSH {
   
   //DI UI components:
   private IUserPass iUserPass;
-  private Setter<String> alertHandler;
+  private Setter<String> alertHandler, logger;
    
   ////////////////////
   // INSTANTIATION: //
   ////////////////////
    
-  public SSH(String user, String host, Setter<String> alertHandler) {
+  public SSH(String user, String host, Setter<String> logger, Setter<String> alertHandler) {
     this.user=user;
     this.host=host;
+    this.logger=logger;
     this.alertHandler=alertHandler;
   }
   public SSH(String host) {
@@ -116,7 +117,6 @@ public class SSH {
 
   /** For locals only; SSHExec & SFTP */
   protected Session getSession() {
-    myLog("getSession");
     if (!isConnected())
       connect();
     return isConnected() 
@@ -225,9 +225,8 @@ public class SSH {
       temp.setConfig("StrictHostKeyChecking", "no");    
     return temp;
   }
-  private static void myLog(String s) {
-    if (true)
-      System.out.println("SSH: "+s);
+  private void myLog(String s) {
+    logger.set("SSH: "+s);
   }
   
   ////////////////////////

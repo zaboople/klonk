@@ -16,13 +16,14 @@ public class SSHConnections {
   
   private String knownHosts, privateKeys;
   private IUserPass iUserPass;
-  private Setter<String> errorHandler;
+  private Setter<String> logger, errorHandler;
 
   /////////////
   // CREATE: //
   /////////////
 
-  public SSHConnections (Setter<String> errorHandler) {
+  public SSHConnections (Setter<String> logger, Setter<String> errorHandler) {
+    this.logger=logger;
     this.errorHandler=errorHandler;
   }  
   public SSHConnections withKnown(String hostsFile) {
@@ -66,7 +67,7 @@ public class SSHConnections {
     Map<String,SSH> perHost=getForHost(host);
     SSH ssh=perHost.get(user);
     if (ssh==null) {
-      ssh=new SSH(user, host, errorHandler)
+      ssh=new SSH(user, host, logger, errorHandler)
         .withKnown(knownHosts)
         .withPrivateKeys(privateKeys)
         .withIUserPass(iUserPass);
@@ -134,6 +135,12 @@ public class SSHConnections {
 
   public static void main(String[] args) throws Exception {
     SSHConnections conns=new SSHConnections(
+      new Setter<String>(){
+        public void set(String msg) {
+          System.err.println("LOG   "+msg);
+        }
+      }
+      ,
       new Setter<String>(){
         public void set(String error) {
           System.err.println("ERROR "+error);

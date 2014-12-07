@@ -58,9 +58,12 @@ class Test {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
+          Setter<String> logger=new Setter<String>(){
+            public void set(String s) {System.out.println(s);}
+          };
           JFrame m=ptc.getMainFrame();
           KAlert alerter=new KAlert(m);
-          SSHConnections conns=new SSHConnections(alerter)
+          SSHConnections conns=new SSHConnections(logger, alerter)
             .withKnown(options.getKnownHostsFilename())
             .withPrivateKeys(options.getPrivateKeysFilename())
             .withLogin(
@@ -69,7 +72,7 @@ class Test {
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
             new org.tmotte.klonk.windows.popup.FileDialogWrapper(
               m,
-              new SSHFileSystemView(conns),
+              new SSHFileSystemView(conns, logger),
               new SSHFileView()
             );
           {

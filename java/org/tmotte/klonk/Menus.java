@@ -36,7 +36,6 @@ import org.tmotte.klonk.controller.CtrlUndo;
 public class Menus {
 
   //Various instance variables:
-  private Setter<Throwable> failer;
   private Editors editors;
   private Map<JMenuItem,Editor> switchMenuToEditor=new Hashtable<>();
   private MenuUtils mu=new MenuUtils();
@@ -87,9 +86,8 @@ public class Menus {
   // INITIALIZATION: //
   /////////////////////
   
-  public Menus(Editors editors, Setter<Throwable> failer) {
+  public Menus(Editors editors) {
     this.editors=editors;
-    this.failer=failer;
     create();
   }
   public void setControllers(
@@ -760,9 +758,9 @@ public class Menus {
         if (s==switchNextUnsaved)
           ctrlMain.doSwitchToNextUnsaved();
         else {
-          Editor e=switchMenuToEditor.get(s);
+          Editor e=switchMenuToEditor.get(s);          
           if (e==null)
-            failer.set(new RuntimeException("Menus.switchListener(): Null editor in hash"));
+            throw new RuntimeException("Menus.switchListener(): Null editor in hash");
           ctrlMain.doSwitch(e);
         }
       }

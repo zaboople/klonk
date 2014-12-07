@@ -9,13 +9,17 @@ public class KLog {
   private KHome home;
   private PrintWriter commandLineWriter;
   private Setter<Throwable> failPopup;
-  private java.text.SimpleDateFormat sdformat;
-  
+  private java.text.SimpleDateFormat sdformat;  
   private Setter<Throwable> failer=new Setter<Throwable>(){
-    public void set(Throwable t) {
-      log(t);
-    }
+    public void set(Throwable t) {log(t);}
   };
+  private Setter<String> ilogger=new Setter<String>(){
+    public void set(String s) {log(s);}
+  };
+  
+  //////////////////
+  // CONSTRUCTOR: //
+  //////////////////
   
   public KLog(OutputStream os){
     this.commandLineWriter=new PrintWriter(new OutputStreamWriter(os));
@@ -29,10 +33,22 @@ public class KLog {
     this.failPopup=a;
     return this;
   }
+  
+  /////////////////
+  // INTERFACES: //
+  /////////////////
 
-  public Setter<Throwable> exceptionHandler(){
+  public Setter<Throwable> getExceptionHandler(){
     return failer;
   }
+  public Setter<String> getLogger(){
+    return ilogger;
+  }
+
+  ///////////////////////
+  // PUBLIC FUNCTIONS: //
+  ///////////////////////
+  
   public void log(String s) {
     logPlain(
       sdformat.format(new java.util.Date())+s
