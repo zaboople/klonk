@@ -7,16 +7,12 @@
   -SSH Login needs a list of open connections to select for closing.
 
   -SSH Todo:
+    We have got to have that channel thing be more persistent.
     We need a last user saved to persist so we can hotrod logins.
     SSHFileSystemView.createFileObject needs to be able to go to the cache.
     Save as
     File open 
     Reconnect after lost connection
-    Dialog for entering SSH info:
-      host
-      user
-      pass/keyfile
-        -keyfile defaults to pass
     File size & date: You have no choice. Well use ls --full-time
 
   -It honestly would be handy to turn multiline off in find/repl. Just because ^.*?$ can cross multiple lines
