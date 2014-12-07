@@ -225,7 +225,7 @@ public class SSHFile extends File {
   
   /*Returns a java.nio.file.Path object constructed from the this abstract path.*/
   public @Override Path toPath() {
-    mylog("SSHFile.toPath");
+    mylog("toPath");
     return super.toPath();
   }  
   /*Creates the directory named by this abstract pathname.*/
@@ -243,18 +243,18 @@ public class SSHFile extends File {
 
   /*Tests whether the application can execute the file denoted by this abstract pathname.*/
   public @Override boolean canExecute() {
-    mylog("SSHFile.canExecute");
+    mylog("canExecute");
     return super.canExecute();
   }  
   /*Tests whether the application can read the file denoted by this abstract pathname.*/
   public @Override boolean canRead() {
-    mylog("SSHFile.canRead");
+    mylog("canRead");
     return super.canRead();
   }  
   /*Tests whether the application can modify the file denoted by this abstract pathname.*/
   public @Override boolean canWrite() {
-    mylog("SSHFile.canWrite");
-    return super.canWrite();
+    mylog("canWrite");
+    return true;
   }
   /*Atomically creates a new, empty file named by this abstract pathname if and only if a file with this name does not yet exist.*/
   public @Override boolean createNewFile(){
@@ -266,14 +266,14 @@ public class SSHFile extends File {
   }
   /*Returns the absolute form of this abstract pathname.*/
   public @Override File	getAbsoluteFile(){
-    mylog("SSHFile.getAbsoluteFile: FIXME "+getName());
+    mylog("getAbsoluteFile: FIXME "+getName());
     return this;  
   }
   
   
   /*Returns the time that the file denoted by this abstract pathname was last modified.*/
   public @Override long	lastModified() {
-    mylog("SSHFile.lastModified: FIXME "+this);
+    mylog("lastModified: FIXME "+this);
     return 1;
   }
   

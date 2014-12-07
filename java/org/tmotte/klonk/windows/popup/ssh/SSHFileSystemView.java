@@ -35,7 +35,7 @@ public class SSHFileSystemView extends FileSystemView {
   
   /* This gets called when you just bang in a path name or press enter on  a path name. FIXME */
   public @Override File createFileObject(String path){
-    String logstring="SSHFileSystemView.createFileObject() ";
+    String logstring="createFileObject() ";
     mylog(logstring+path);
     if (conns.is(path)){
       SSHFile file=conns.getFile(path);
@@ -93,7 +93,7 @@ public class SSHFileSystemView extends FileSystemView {
   public @Override boolean isParent(File folder, File file){
     if (cast(folder)==null || cast(file)==null)
       return defaultView.isParent(folder, file);
-    mylog("SSHFileSystemView.isParent() "+folder+" "+file);
+    mylog("isParent() "+folder+" "+file);
     return true;
   }
 
@@ -104,7 +104,7 @@ public class SSHFileSystemView extends FileSystemView {
 
   /* Returns a File object constructed in dir from the given filename. */
   public @Override File createFileObject(File fdir, String filename) {
-    mylog("SSHFileSystemView.createFileObject(): Create file object for dir: "+fdir+" name "+filename);
+    mylog("createFileObject(): Create file object for dir: "+fdir+" name "+filename);
     SSHFile dir=cast(fdir);
     if (dir==null)
       return defaultView.createFileObject(fdir, filename);
@@ -117,7 +117,7 @@ public class SSHFileSystemView extends FileSystemView {
     );
   }
   public @Override File createNewFolder(File containingDir){
-    mylog("SSHFileSystemView.createNewFolder: "+containingDir);
+    mylog("createNewFolder: "+containingDir);
     SSHFile dir=cast(containingDir);
     if (dir==null) 
       try {return defaultView.createNewFolder(containingDir);} catch (Exception e) {throw new RuntimeException(e);}
@@ -128,7 +128,7 @@ public class SSHFileSystemView extends FileSystemView {
     }
   }
   public @Override File getChild(File parent, String fileName) {
-    mylog("SSHFileSystemView.getChild() "+parent+" "+fileName);
+    mylog("getChild() "+parent+" "+fileName);
     SSHFile dir=cast(parent);
     if (dir==null)
       return defaultView.getChild(parent, fileName);
@@ -140,7 +140,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* Returns the parent directory of dir. */
   public @Override File getParentDirectory(File fdir){
-    mylog("SSHFileSystemView.getParentDirectory: "+fdir);
+    mylog("getParentDirectory: "+fdir);
     File dir=cast(fdir);
     if (dir==null)
       return defaultView.getParentDirectory(fdir);    
@@ -200,7 +200,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
   private void mylog(String s) {
     if (true)
-      System.out.println(s);
+      System.out.println("SSHFileSystemView."+s);
   }
  
   /////////////////
