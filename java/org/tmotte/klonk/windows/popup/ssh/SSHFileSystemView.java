@@ -200,7 +200,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
   private void mylog(String s) {
     if (true)
-      System.out.println("SSHFileSystemView."+s);
+      logger.set("SSHFileSystemView."+s);
   }
  
   /////////////////

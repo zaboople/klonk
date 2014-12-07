@@ -83,7 +83,7 @@ public class SSHFile extends File {
   }
   private void check(){
     long currCheck=System.currentTimeMillis();
-    if (currCheck-lastCheck > 1000){
+    if (currCheck-lastCheck > 2000){
       lastCheck=currCheck;
       refresh();
     }

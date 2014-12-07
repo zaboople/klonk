@@ -59,7 +59,7 @@ class Test {
       public void run() {
         try {
           Setter<String> logger=new Setter<String>(){
-            public void set(String s) {System.out.println(s);}
+            public void set(String s) {System.out.println(Thread.currentThread()+" "+s);}
           };
           JFrame m=ptc.getMainFrame();
           KAlert alerter=new KAlert(m);
