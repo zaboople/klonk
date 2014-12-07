@@ -22,6 +22,7 @@ public class SSHFile extends File {
   private String name;
   
   private boolean knows=false;
+  private boolean exists=false;
 
   
   public SSHFile(SSH ssh, SSHFile parent, String name) {
@@ -44,6 +45,9 @@ public class SSHFile extends File {
   public @Override String getName() {
     return name;
   }
+  
+  
+  
   /*Tests whether this abstract pathname is absolute. FIXME what happens with ~? */
   public @Override boolean isAbsolute() {
     return true;
@@ -52,21 +56,35 @@ public class SSHFile extends File {
   public @Override boolean isHidden(){
     return false;
   }  
-
+  
+  ///////////////////////////
+  // LAZY LOAD ATTRIBUTES: //
+  ///////////////////////////
+  
   public @Override boolean exists() {
-    SSHExecResult res=ssh.exec("ls -lda "+getSystemPath());
-    knows=true;
-    isDir=res.success && res.output.startsWith("d");
-    return res.success;
+    check();
+    return exists;
   }
   public @Override boolean isFile() {
     return !isDirectory();
   }
   public @Override boolean isDirectory() {
-    if (!knows)
-      exists();
+    check();
     return isDir;
   }
+  private void refresh(){
+    SSHExecResult res=ssh.exec("ls -lda "+getSystemPath());
+    knows=true;
+    isDir=res.success && res.output.startsWith("d");
+  }
+  private void check(){
+    if (!knows)
+      refresh();
+  }
+
+  //////////////
+  // LISTING: //
+  //////////////
   
   private static String[] noFiles={};
   
@@ -118,6 +136,11 @@ public class SSHFile extends File {
     }
     return files;
   }
+  
+  /////////////////
+  // PATH STUFF: //
+  /////////////////
+  
   public @Override String getAbsolutePath(){
     return getSystemPath();
   }
