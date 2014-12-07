@@ -23,11 +23,11 @@ public class KLog {
   
   public KLog(OutputStream os){
     this.commandLineWriter=new PrintWriter(new OutputStreamWriter(os));
-    sdformat=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S ");
+    sdformat=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS ");
   }
   public KLog(KHome home, String pid){
     this.home=home;
-    sdformat=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S '"+pid+"\t'");
+    sdformat=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS '"+pid+"\t'");
   }
   public KLog setFailPopup(Setter<Throwable> a) {
     this.failPopup=a;

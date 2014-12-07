@@ -1,15 +1,18 @@
 package org.tmotte.klonk.ssh;
 import com.jcraft.jsch.*;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.ByteArrayOutputStream;
+import org.tmotte.klonk.config.msg.Setter;
 
 public class SSHExec {
   
   private SSH ssh;
-  public SSHExec(SSH ssh) {
+  private Setter<String> logger;
+  public SSHExec(SSH ssh, Setter<String> logger) {
     this.ssh=ssh;
+    this.logger=logger;
   }
   
   public SSH getSSH() {
@@ -40,11 +43,12 @@ public class SSHExec {
   }
   
   /** 
-   * @param sshErr DO NOT PASS SYSTEM.ERR/OUT TO THIS, IT WILL GET CHEWED TO PIECES.
+   * @param sshErr DO NOT PASS SYSTEM.ERR/OUT TO THIS, IT WILL GET CHEWED TO PIECES (i.e. it will be closed by 
+   *        the jsch library).
    * @return The output (typically 0,1,2) of the unix command, or -1 if we could not get a connection.
    */
   public int exec(String command, Appendable out, OutputStream sshErr) throws WrappedSSHException {
-    mylog("SSHExec: "+command);
+    mylog(command);
     try {
       Session session=ssh.getSession();
       if (session==null)
@@ -81,33 +85,8 @@ public class SSHExec {
   }
 
   private void mylog(String s) {
-    System.out.println(s);
+    logger.set("SSHExec: "+s);
   }
 
-  public static void main(String[] args) throws Exception {
-    /*
-    SSH ssh=SSH.cmdLine(args);
-    SSHExec exec=new SSHExec(ssh);
-    StringBuilder app=new StringBuilder();
-    for (int i=0; i<20; i++) {
-      app.setLength(0);
-      {
-        System.out.println("\n\n");
-        int fail=exec.exec("ls --file-type -a -1", app, app);
-        System.out.println(fail==0 ?"SUCCESS: " :"FAILED: ");
-        System.out.println(app);
-      }
-      {
-        System.out.println("\n\n");
-        int fail=exec.exec("ls /; echo '!!!mcshite!!!'", app, app);
-        System.out.println(fail==0 ?"SUCCESS: " :"FAILED: ");
-        System.out.println(app);
-      }
-    }
-    System.err.flush();
-    System.out.flush();
-    ssh.close();
-    */
-  }
   
 }

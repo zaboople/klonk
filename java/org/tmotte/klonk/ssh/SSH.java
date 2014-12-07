@@ -75,7 +75,7 @@ public class SSH {
   }
   public SSHExec getExec() {
     if (this.exec==null)
-      this.exec=new SSHExec(this);  
+      this.exec=new SSHExec(this, logger);  
     return exec;
   }
   public SSHExecResult exec(String command) throws WrappedSSHException {
