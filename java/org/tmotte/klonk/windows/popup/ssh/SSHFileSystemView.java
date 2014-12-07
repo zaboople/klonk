@@ -108,8 +108,6 @@ public class SSHFileSystemView extends FileSystemView {
     SSHFile dir=cast(fdir);
     if (dir==null)
       return defaultView.createFileObject(fdir, filename);
-    if (true)
-      throw new RuntimeException("FIXME");    
     return new SSHFile(
       dir.getSSH(), 
       dir,

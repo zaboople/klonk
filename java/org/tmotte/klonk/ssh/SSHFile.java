@@ -238,6 +238,22 @@ public class SSHFile extends File {
   public @Override File	getCanonicalFile(){
     return this;  
   }
+  /*Creates the directory named by this abstract pathname.*/
+  public @Override boolean mkdir(){
+    SSHExecResult res=ssh.exec("mkdir -p "+getAbsolutePath()); //FIXME quote the file
+    if (!res.success) 
+      mylog("Failed to create: "+this+" "+res.output);
+    return res.success;
+  }
+  /*Renames the file denoted by this abstract pathname.*/
+  public @Override boolean renameTo(File dest){
+    SSHExecResult res=ssh.exec("mv "+getAbsolutePath()+" "+dest.getAbsolutePath()); //FIXME quote the file
+    if (!res.success) 
+      mylog("Failed to rename: "+this+" to "+dest);
+    else
+      this.name=dest.getName();
+    return res.success;
+  }  
   
   
   ///////////////////////////////
@@ -260,18 +276,10 @@ public class SSHFile extends File {
     mylog("toPath");
     return super.toPath();
   }  
-  /*Creates the directory named by this abstract pathname.*/
-  public @Override boolean mkdir(){
-    throw new UnsupportedOperationException();
-  }
   /*Creates the directory named by this abstract pathname, including any necessary but nonexistent parent directories.*/
   public @Override boolean mkdirs(){
     throw new UnsupportedOperationException();
   }
-  /*Renames the file denoted by this abstract pathname.*/
-  public @Override boolean renameTo(File dest){
-    throw new UnsupportedOperationException();
-  }  
 
   /*Tests whether the application can execute the file denoted by this abstract pathname.*/
   public @Override boolean canExecute() {
