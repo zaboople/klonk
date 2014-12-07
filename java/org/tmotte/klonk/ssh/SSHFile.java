@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import org.tmotte.common.text.StringChunker;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.regex.Pattern;
 
 public class SSHFile extends File {
   
@@ -14,15 +15,15 @@ public class SSHFile extends File {
       return (SSHFile)f;
     return null;    
   }
- 
 
   protected SSHFile parent;
-  protected boolean isDir=false;  
   private final SSH ssh;
   private String name;
   
-  private boolean knows=false;
+  protected boolean isDir=false;  
   private boolean exists=false;
+  private long size=-1;
+  private long lastCheck=-1;
 
   
   public SSHFile(SSH ssh, SSHFile parent, String name) {
@@ -33,7 +34,6 @@ public class SSHFile extends File {
   }
   protected SSHFile(SSH ssh, SSHFile parent, String name, boolean isDir) {
     this(ssh, parent, name);
-    this.knows=true;
     this.isDir=isDir;
   }
 
@@ -61,10 +61,6 @@ public class SSHFile extends File {
   // LAZY LOAD ATTRIBUTES: //
   ///////////////////////////
   
-  public @Override boolean exists() {
-    check();
-    return exists;
-  }
   public @Override boolean isFile() {
     return !isDirectory();
   }
@@ -72,14 +68,27 @@ public class SSHFile extends File {
     check();
     return isDir;
   }
+  public @Override boolean exists() {
+    check();
+    return exists;
+  }
   private void refresh(){
     SSHExecResult res=ssh.exec("ls -lda "+getSystemPath());
-    knows=true;
-    isDir=res.success && res.output.startsWith("d");
+    exists=false;
+    if (res.success) {
+      SSHFileLongList list=new SSHFileLongList(res.output);
+      isDir=list.isDir;
+      exists=true;
+    }
   }
   private void check(){
-    if (!knows)
+    long currCheck=System.currentTimeMillis();
+    if (currCheck-lastCheck > 1000){
+      lastCheck=currCheck;
       refresh();
+    }
+    else
+      mylog("check() Cached "+this);
   }
 
   //////////////
@@ -272,7 +281,8 @@ public class SSHFile extends File {
   /*Tests whether the application can read the file denoted by this abstract pathname.*/
   public @Override boolean canRead() {
     mylog("canRead");
-    return super.canRead();
+    return true;
+    //return super.canRead();
   }  
   /*Tests whether the application can modify the file denoted by this abstract pathname.*/
   public @Override boolean canWrite() {

@@ -299,6 +299,14 @@ public class StringChunker{
     return getUpTo();
   }
   /** 
+   * Combines find() and getUpTo(). 
+   * @return text located during the find() 
+   */
+  public String getUpTo(Pattern lookFor) {
+    find(lookFor);
+    return getUpTo();
+  }
+  /** 
    * Combines find() and getIncluding(). 
    * @return text located during the find() 
    */
