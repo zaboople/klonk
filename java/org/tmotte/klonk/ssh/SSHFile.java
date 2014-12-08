@@ -32,9 +32,13 @@ public class SSHFile extends File {
     this.ssh=ssh;
     this.parent=parent;   
   }
-  protected SSHFile(SSH ssh, SSHFile parent, String name, boolean isDir) {
+  
+  /** Meant to only be called by listFiles() */
+  private SSHFile(SSH ssh, SSHFile parent, String name, boolean isDir) {
     this(ssh, parent, name);
     this.isDir=isDir;
+    this.exists=true;
+    this.lastCheck=System.currentTimeMillis();
   }
 
 
