@@ -13,7 +13,7 @@ import javax.swing.JTextArea;
 import javax.swing.text.Document;
 import org.tmotte.common.text.StringChunker;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
-
+import org.tmotte.klonk.ssh.SSHFile;
 
 public class KFileIO {
   private final static int bufSize=1024*64;
@@ -34,14 +34,13 @@ public class KFileIO {
   // LOAD: //
   ///////////
   
-  public static FileMetaData load(JTextArea jta, File file) throws Exception {
-    return load(jta.getDocument(), file);
-  }
-  
-  public static FileMetaData load(Document doc, final File file) throws Exception {
-    return load(doc, new KFileInputStreamer(){
+  public static FileMetaData load(JTextArea jta, final File file) throws Exception {
+    final SSHFile ssh=SSHFile.cast(file);
+    return load(jta.getDocument(), new KFileInputStreamer(){
       public InputStream getInputStream() throws Exception {
-        return new FileInputStream(file);
+        return ssh==null
+          ?new FileInputStream(file)
+          :ssh.getInputStream();
       }
     });
   }

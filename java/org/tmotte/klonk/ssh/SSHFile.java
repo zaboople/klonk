@@ -2,6 +2,7 @@ package org.tmotte.klonk.ssh;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.FileFilter;
+import java.io.InputStream;
 import java.nio.file.Path;
 import org.tmotte.common.text.StringChunker;
 import java.util.List;
@@ -44,6 +45,9 @@ public class SSHFile extends File {
 
   public SSH getSSH(){
     return ssh;
+  }
+  public InputStream getInputStream() throws Exception {
+    return ssh.getSFTP().getInputStream(getAbsolutePath());
   }
   
   public @Override String getName() {
@@ -380,9 +384,7 @@ public class SSHFile extends File {
         new SSHFile(
           null, 
           new SSHFile(
-            null, 
-            null, 
-            "/"
+            null, null, "/"
           ), 
           "home"
         ), 

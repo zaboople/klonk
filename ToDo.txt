@@ -1,6 +1,6 @@
 -Current
   -Right now
-    When we ask for a directory in TestSave we are not being told it's a directory and it becomes the target, bad; example "~/.ssh", or "/home/zaboople".
+    When we open a ~ file we have problems on SFTP. It doesn't recognize it.
 
   -Tabs & Indents allows invalid input - letters instead of numbers
   
