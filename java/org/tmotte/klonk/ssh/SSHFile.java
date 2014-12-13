@@ -32,7 +32,7 @@ public class SSHFile extends File {
     super(parent, name); 
     this.name=name;
     this.ssh=ssh;
-    this.parent=parent;   
+    this.parent=parent;
   }
   
   /** Meant to only be called by listFiles() */
@@ -48,10 +48,10 @@ public class SSHFile extends File {
     return ssh;
   }
   public InputStream getInputStream() throws Exception {
-    return ssh.getSFTP().getInputStream(getTildeFixPath());
+    return ssh.getInputStream(getTildeFixPath());
   }
   public OutputStream getOutputStream() throws Exception {
-    return ssh.getSFTP().getOutputStream(getTildeFixPath());
+    return ssh.getOutputStream(getTildeFixPath());
   }
   
   public @Override String getName() {

@@ -120,7 +120,7 @@ public class SSH {
       SSHExecResult res=exec("cd ~; pwd", true);
       if (!res.success)
         throw new RuntimeException("Could not get home directory");
-      tildeFix=res.output;
+      tildeFix=res.output.trim();
     }
     return tildeFix;
   }
@@ -132,6 +132,22 @@ public class SSH {
     return isConnected() 
       ?session
       :null;
+  }
+  protected InputStream getInputStream(String file) {
+    try {
+      return getSFTP().getInputStream(file);
+    } catch (Exception e) {
+      alertHandler.set("Could not load: "+file);
+      throw new RuntimeException(e);
+    }
+  }
+  protected OutputStream getOutputStream(String file) {
+    try {
+      return getSFTP().getOutputStream(file);
+    } catch (Exception e) {
+      alertHandler.set("Could not write: "+file);
+      throw new RuntimeException(e);
+    }
   }
   
   //////////////////////////////

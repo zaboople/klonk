@@ -195,7 +195,7 @@ public class KFileIO {
     int docLen=doc.getLength();
     StringChunker ch=new StringChunker().setRegex(delimOpt.pattern);
     try (
-        OutputStream os=new FileOutputStream(file);
+        OutputStream os=getOutputStream(file);
         OutputStreamWriter fw=new OutputStreamWriter(os, encoding);
         PrintWriter pw=new PrintWriter(fw);
       ) {
@@ -238,6 +238,12 @@ public class KFileIO {
         fw.flush();
       }
     } 
+  }
+  private static OutputStream getOutputStream(File file) throws Exception {
+    SSHFile sshFile=SSHFile.cast(file);
+    return sshFile==null
+      ?new FileOutputStream(file)
+      :sshFile.getOutputStream();
   }
   
 }
