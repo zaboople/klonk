@@ -47,7 +47,10 @@ public class SSHFile extends File {
     return ssh;
   }
   public InputStream getInputStream() throws Exception {
-    return ssh.getSFTP().getInputStream(getAbsolutePath());
+    String s=getAbsolutePath();
+    if (s.startsWith("~"))
+      s=s.replace("~", ssh.getTildeFix());
+    return ssh.getSFTP().getInputStream(s);
   }
   
   public @Override String getName() {

@@ -12,14 +12,22 @@ import org.tmotte.common.text.ArgHandler;
 
 public class SSHCommandLine {
   private ArgHandler argHandler;
-  public SSHCommandLine(ArgHandler argHandler) throws Exception {  
-    this.argHandler=argHandler;
-  }
+  
+  public SSH ssh;
+  public SSHConnections connections;
+  
   private void usage() {
-    System.err.println("Usage: -u user -h host -k knownhostsfile -p pass -r privatekeyfile "+argHandler.document());
+    System.err.println(
+      "Usage: -u user -h host -k knownhostsfile -p pass -r privatekeyfile "+
+      (argHandler==null ?"" :argHandler.document())
+    );
     System.exit(1);
   }
-  public SSHConnections process(String[] args) throws Exception {
+  public SSHCommandLine(String[] args) throws Exception {  
+    this(args, null);
+  }
+  public SSHCommandLine(String[] args, ArgHandler argHandler) throws Exception {
+    this.argHandler=argHandler;
     int max=0;
     String user=null, host=null, knownHosts=null, pass=null, privateKeys=null;
     for (int i=0; i<args.length && max<100; i++){
@@ -50,11 +58,11 @@ public class SSHCommandLine {
         if (complain) {
           System.err.println("Unexpected: "+arg);
           System.exit(1);
-          return null;
+          return;
         }
       }
     }
-    return 
+    this.connections= 
       new SSHConnections(
         new Setter<String>(){
           public void set(String s) {System.out.println(s);}
@@ -67,7 +75,10 @@ public class SSHCommandLine {
       .withLogin(new Login(user, pass))
       .withKnown(knownHosts)
       .withPrivateKeys(privateKeys);
-  }
+    if (user != null && host != null && (pass != null || privateKeys !=null))
+      ssh=connections.getOrCreate(user, host);
+  }//process()
+  
   
   private static class Login implements IUserPass {
     String user, pass;
@@ -101,12 +112,8 @@ public class SSHCommandLine {
         throw new RuntimeException(e);
       }
     }
-    public String getUser(){
-      return user;
-    }
-    public String getPass(){
-      return pass;
-    }  
+    public String getUser(){return user;}
+    public String getPass(){return pass;}  
   }
 
 }

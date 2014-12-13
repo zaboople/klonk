@@ -19,6 +19,7 @@ public class SSH {
   private boolean lastConnectAuthFail=false;
   private SFTP sftp;
   private SSHExec exec;
+  private String tildeFix;
   
   //DI UI components:
   private IUserPass iUserPass;
@@ -113,6 +114,15 @@ public class SSH {
   }
   public String toString() {
     return "SSH: user: "+user+" host: "+host+" knownHosts: "+knownHosts+" privateKeys: "+privateKeys;
+  }
+  public String getTildeFix() {
+    if (tildeFix==null) {
+      SSHExecResult res=exec("cd ~; pwd");
+      if (!res.success)
+        throw new RuntimeException("Could not get home directory");
+      tildeFix=res.output;
+    }
+    return tildeFix;
   }
 
   /** For locals only; SSHExec & SFTP */

@@ -7,7 +7,8 @@ import java.io.File;
 public class FileListing {
   public static void main(String[] args) throws Exception {
     FileGrab grab=new FileGrab();
-    SSHConnections conns=new SSHCommandLine(grab).process(args);
+    SSHCommandLine scl=new SSHCommandLine(args, grab);
+    SSHConnections conns=scl.connections;
     mylog("File: "+grab.file);
     File file=conns.getFile(grab.file);
     mylog("SSH File: "+file);
