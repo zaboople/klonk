@@ -11,30 +11,26 @@ import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.common.text.ArgHandler;
 
 public class SSHCommandLine {
-  private ArgHandler argHandler;
-  
+
   public SSH ssh;
   public SSHConnections connections;
+  public SSHFile sshFile;
+
+  private ArgHandler argHandler; 
   
-  private void usage() {
-    System.err.println(
-      "Usage: -u user -h host -k knownhostsfile -p pass -r privatekeyfile "+
-      (argHandler==null ?"" :argHandler.document())
-    );
-    System.exit(1);
-  }
   public SSHCommandLine(String[] args) throws Exception {  
     this(args, null);
   }
   public SSHCommandLine(String[] args, ArgHandler argHandler) throws Exception {
     this.argHandler=argHandler;
     int max=0;
-    String user=null, host=null, knownHosts=null, pass=null, privateKeys=null;
+    String user=null, host=null, knownHosts=null, pass=null, privateKeys=null, fileName=null;
     for (int i=0; i<args.length && max<100; i++){
       max++;
       String arg=args[i];
       if (arg.startsWith("-help"))
-        usage();
+        usage(null);
+      else
       if (arg.startsWith("-u"))
         user=args[++i];
       else
@@ -49,6 +45,9 @@ public class SSHCommandLine {
       else
       if (arg.startsWith("-r"))
         privateKeys=args[++i];
+      else
+      if (arg.startsWith("-f"))
+        fileName=args[++i];
       else {
         boolean complain=true;
         if (argHandler!=null) {
@@ -56,8 +55,7 @@ public class SSHCommandLine {
           complain=i==-1;
         }
         if (complain) {
-          System.err.println("Unexpected: "+arg);
-          System.exit(1);
+          usage("Unexpected: "+arg);
           return;
         }
       }
@@ -77,8 +75,24 @@ public class SSHCommandLine {
       .withPrivateKeys(privateKeys);
     if (user != null && host != null && (pass != null || privateKeys !=null))
       ssh=connections.getOrCreate(user, host);
+    if (fileName != null)
+      sshFile=connections.getFile(fileName);
   }//process()
   
+
+  private void usage(String error) {
+    if (error!=null)
+      System.err.println("\nERROR: "+error);
+    System.err.println(
+      "Usage: <[-f sshpath] [-h host] [-u user]> [-k knownhostsfile] [-p pass] [-r privatekeyfile] "+
+      (argHandler==null ?"" :argHandler.document())
+    );
+    System.exit(1);
+  }
+  
+  ////////////////////////
+  // INTERACTIVE LOGIN: //
+  ////////////////////////
   
   private static class Login implements IUserPass {
     String user, pass;

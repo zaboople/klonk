@@ -1,6 +1,7 @@
 -Current
   -Right now
     When we open a ~ file we have problems on SFTP. It doesn't recognize it.
+    Deal with blanks in file name.
 
   -Tabs & Indents allows invalid input - letters instead of numbers
   

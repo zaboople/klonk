@@ -9,8 +9,8 @@ import org.tmotte.klonk.config.msg.Setter;
 public class SSHExec {
   
   private SSH ssh;
-  private Setter<String> logger;
-  public SSHExec(SSH ssh, Setter<String> logger) {
+  private Setter<String> logger, alertHandler;
+  public SSHExec(SSH ssh, Setter<String> logger, Setter<String> alertHandler) {
     this.ssh=ssh;
     this.logger=logger;
   }
@@ -18,7 +18,7 @@ public class SSHExec {
   public SSH getSSH() {
     return ssh;
   }
-  public SSHExecResult exec(String command) {
+  public SSHExecResult exec(String command, boolean alertFail) {
     StringBuilder out=new StringBuilder();
     ByteArrayOutputStream err=new ByteArrayOutputStream(512);
     int result=exec(command, out, err);
@@ -26,6 +26,10 @@ public class SSHExec {
       try {
         out.append(err.toString("utf-8"));
         result=1;
+        String bad=out.toString();
+        if (alertFail)
+          alertHandler.set(bad);
+        mylog("Fail: "+bad);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

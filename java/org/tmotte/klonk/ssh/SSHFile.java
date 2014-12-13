@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.FileFilter;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import org.tmotte.common.text.StringChunker;
 import java.util.List;
@@ -47,10 +48,10 @@ public class SSHFile extends File {
     return ssh;
   }
   public InputStream getInputStream() throws Exception {
-    String s=getAbsolutePath();
-    if (s.startsWith("~"))
-      s=s.replace("~", ssh.getTildeFix());
-    return ssh.getSFTP().getInputStream(s);
+    return ssh.getSFTP().getInputStream(getTildeFixPath());
+  }
+  public OutputStream getOutputStream() throws Exception {
+    return ssh.getSFTP().getOutputStream(getTildeFixPath());
   }
   
   public @Override String getName() {
@@ -84,7 +85,7 @@ public class SSHFile extends File {
     return exists;
   }
   private void refresh(){
-    SSHExecResult res=ssh.exec("ls -lda "+getSystemPath());
+    SSHExecResult res=ssh.exec("ls -lda "+getSystemPath(), false);
     exists=false;
     if (res.success) {
       SSHFileLongList list=new SSHFileLongList(res.output);
@@ -111,7 +112,7 @@ public class SSHFile extends File {
   /*Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.*/
   public @Override String[] list(){
     String absolutePath=getSystemPath();
-    SSHExecResult res=ssh.exec("ls --file-type -1 "+absolutePath); //FIXME quote the file
+    SSHExecResult res=ssh.exec("ls --file-type -1 "+absolutePath, false); //FIXME quote the file
 
     //Fail, for whatever reason including nonexistence:
     if (!res.success) {
@@ -177,7 +178,7 @@ public class SSHFile extends File {
   public String getNetworkPath() {
     String user=getUser(), host=getHost();
     StringBuilder sb=new StringBuilder(20);
-    sb.append("ssh://");
+    sb.append("ssh:");
     sb.append(user==null ?""  :user+"@");
     sb.append(host==null ?":" :host+":");
     getSystemPath(sb);
@@ -196,6 +197,12 @@ public class SSHFile extends File {
         sb.append("/");
     }
     sb.append(getName());
+  }
+  private String getTildeFixPath(){
+    String s=getSystemPath();
+    if (s.startsWith("~"))
+      s=s.replace("~", ssh.getTildeFix());
+    return s;
   }
 
 
@@ -251,20 +258,23 @@ public class SSHFile extends File {
   }
   /*Creates the directory named by this abstract pathname.*/
   public @Override boolean mkdir(){
-    SSHExecResult res=ssh.exec("mkdir -p "+getAbsolutePath()); //FIXME quote the file
-    if (!res.success) 
-      mylog("Failed to create: "+this+" "+res.output);
-    return res.success;
+    return ssh.exec("mkdir -p "+getSystemPath(), true).success; //FIXME quote the file
   }
   /*Renames the file denoted by this abstract pathname.*/
   public @Override boolean renameTo(File dest){
-    SSHExecResult res=ssh.exec("mv "+getAbsolutePath()+" "+dest.getAbsolutePath()); //FIXME quote the file
-    if (!res.success) 
-      mylog("Failed to rename: "+this+" to "+dest);
-    else
+    SSHFile sshFile=cast(dest);
+    String otherName=sshFile==null
+      ?dest.getAbsolutePath()
+      :sshFile.getSystemPath();
+    boolean success=ssh.exec("mv "+getSystemPath()+" "+otherName, true).success; //FIXME quote the file
+    if (success) 
       this.name=dest.getName();
-    return res.success;
+    return success;
   }  
+  /*Deletes the file or directory denoted by this abstract pathname.*/
+  public @Override boolean delete(){
+    return ssh.exec("rm "+getSystemPath(),  true).success; //FIXME quote the file
+  }
   
   
   ///////////////////////////////
@@ -310,10 +320,6 @@ public class SSHFile extends File {
   }
   /*Atomically creates a new, empty file named by this abstract pathname if and only if a file with this name does not yet exist.*/
   public @Override boolean createNewFile(){
-    throw new RuntimeException("Not supported yet.");
-  }
-  /*Deletes the file or directory denoted by this abstract pathname.*/
-  public @Override boolean delete(){
     throw new RuntimeException("Not supported yet.");
   }
   /*Returns the absolute form of this abstract pathname.*/
@@ -376,23 +382,4 @@ public class SSHFile extends File {
     throw new UnsupportedOperationException();
   }
 
-  /////////////
-  //  TEST:  //
-  /////////////
-  
-  public static void main(String[] args) throws Exception {
-    SSHFile file=
-      new SSHFile(
-        null, 
-        new SSHFile(
-          null, 
-          new SSHFile(
-            null, null, "/"
-          ), 
-          "home"
-        ), 
-        "zaboople"
-      );
-    System.out.println(file.getAbsolutePath());
-  }
 }

@@ -76,11 +76,11 @@ public class SSH {
   }
   public SSHExec getExec() {
     if (this.exec==null)
-      this.exec=new SSHExec(this, logger);  
+      this.exec=new SSHExec(this, logger, alertHandler);  
     return exec;
   }
-  public SSHExecResult exec(String command) throws WrappedSSHException {
-    return getExec().exec(command);
+  public SSHExecResult exec(String command, boolean alertFail) throws WrappedSSHException {
+    return getExec().exec(command, alertFail);
   }
   public SFTP getSFTP() {
     if (this.sftp==null)
@@ -117,7 +117,7 @@ public class SSH {
   }
   public String getTildeFix() {
     if (tildeFix==null) {
-      SSHExecResult res=exec("cd ~; pwd");
+      SSHExecResult res=exec("cd ~; pwd", true);
       if (!res.success)
         throw new RuntimeException("Could not get home directory");
       tildeFix=res.output;
