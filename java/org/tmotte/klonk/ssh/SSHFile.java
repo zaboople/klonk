@@ -161,11 +161,11 @@ public class SSHFile extends File {
   /////////////////
   
   public @Override String getAbsolutePath(){
-    return getSystemPath();
+    return getNetworkPath();
   }
   /** This will get called when deciding what icon to display in a JFileChooser. Just warning about that. */
   public @Override String getCanonicalPath() {
-    return getSystemPath();
+    return getNetworkPath();
   }
   /*Converts this abstract pathname into a pathname string.*/
   public @Override String getPath() {

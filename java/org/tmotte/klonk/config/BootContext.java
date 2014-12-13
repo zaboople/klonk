@@ -100,8 +100,9 @@ public class BootContext {
   // INSTANCE VARIABLES AND CONSTRUCTOR: //
   /////////////////////////////////////////
 
-  //Inputs:
-  private String[] args;
+  //Command-line inputs:
+  private String argHomeDir;
+  private boolean argStdOut=false;
 
   //DI Components:
   private KHome home;
@@ -123,7 +124,17 @@ public class BootContext {
   private Setter<String> alerter;
   
   private BootContext(String [] args){
-    this.args=args;
+    for (int i=0; i<args.length; i++)
+      if (args[i].equals("-home") && i<args.length-1){
+        args[i]=null;
+        argHomeDir=args[++i].trim();
+        args[i]=null;
+      }
+      else
+      if (args[i].equals("-stdout")){
+        args[i]=null;
+        argStdOut=true;
+      }
     initLookFeel();
   }
   
@@ -151,21 +162,19 @@ public class BootContext {
     return popups;
   }
   private KHome getHome() {
-    if (home==null) {
-      String homeDir=KHome.nameIt(System.getProperty("user.home"), "klonk");
-      for (int i=0; i<args.length; i++)
-        if (args[i].equals("-home") && i<args.length-1){
-          args[i]=null;
-          homeDir=args[++i].trim();
-          args[i]=null;
-        }
-      home=new KHome(homeDir);
-    }
+    if (home==null) 
+      home=new KHome(
+        argHomeDir!=null
+          ?argHomeDir
+          :KHome.nameIt(System.getProperty("user.home"), "klonk")
+      );
     return home;
   }
   private KLog getLog() {
     if (log==null)
-      log=new KLog(getHome(), getProcessID());
+      log=argStdOut
+        ?new KLog(System.out)
+        :new KLog(getHome(), getProcessID());
     return log;
   }
   private KPersist getPersist() {

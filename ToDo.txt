@@ -1,14 +1,17 @@
 -Current
   -Right now
-    When we open a ~ file we have problems on SFTP. It doesn't recognize it.
+    File re-open doesn't work because we just new File() it    
+    File open from recent dir works sometimes, but not when you do it straight from boot
     Deal with blanks in file name.
 
   -Tabs & Indents allows invalid input - letters instead of numbers
   
+  -How about a "Log" in the menu next to print. L is unused as a shortcut.
+    -Hey and a File-Delete? With confirm of course. Hmph.
+  
   -SSH Login needs a list of open connections to select for closing.
 
   -SSH Todo:
-    We have got to have that channel thing be more persistent.
     We need a last user saved to persist so we can hotrod logins.
     SSHFileSystemView.createFileObject needs to be able to go to the cache.
     Save as

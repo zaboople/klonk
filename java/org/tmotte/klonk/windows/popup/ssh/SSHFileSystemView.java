@@ -169,6 +169,15 @@ public class SSHFileSystemView extends FileSystemView {
       return f.getParentFile()==null;
   }
 
+  public @Override javax.swing.Icon getSystemIcon(File f){
+    SSHFile sf=cast(f);
+    return defaultView.getSystemIcon(
+      sf==null 
+        ?f
+        :new File(sf.getSystemPath())
+    );
+  }
+
   ////// CRAP: ////////
   /* Used by UI classes to decide whether to display a special icon for a floppy disk.*/
   public @Override boolean isFloppyDrive(File dir){
@@ -213,10 +222,7 @@ public class SSHFileSystemView extends FileSystemView {
   public @Override File[] getRoots(){
     return defaultView.getRoots();
   }
-  /*
-  public @Override javax.swing.Icon getSystemIcon(File f){
-    return defaultView.getSystemIcon(f);
-  }
+
   /* Return the user's default starting directory for the file chooser.*/
   public @Override File getDefaultDirectory() {
     mylog("get Default directory");
