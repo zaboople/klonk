@@ -23,7 +23,7 @@ public class SSH {
   
   //DI UI components:
   private IUserPass iUserPass;
-  private Setter<String> alertHandler, logger;
+  protected Setter<String> alertHandler, logger;
    
   ////////////////////
   // INSTANTIATION: //

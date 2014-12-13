@@ -115,10 +115,8 @@ public class SSHFile extends File {
     SSHExecResult res=ssh.exec("ls --file-type -1 "+absolutePath, false); //FIXME quote the file
 
     //Fail, for whatever reason including nonexistence:
-    if (!res.success) {
-      mylog("Failed to list: "+res.output);
+    if (!res.success) 
       return noFiles;
-    }
       
     //List files & dirs:
     StringChunker sc=new StringChunker(res.output);
@@ -336,7 +334,10 @@ public class SSHFile extends File {
   }
   
   private void mylog(String s) {
-    System.out.println("SSHFile:"+s);
+    if (ssh!=null)
+      ssh.logger.set(s);
+    else
+      System.out.println("SSHFile:"+s);
   }
   
   ////////////////////////

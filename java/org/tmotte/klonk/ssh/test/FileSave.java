@@ -16,34 +16,36 @@ public class FileSave {
     SSHFile file=cmd.sshFile;
     try {
       char[] readBuffer=new char[1024 * 20];   
-      try (
-        OutputStream output=file.getOutputStream();
-        OutputStreamWriter outw=new OutputStreamWriter(output, "utf-8");
-        ){
-        for (int i=0; i<100; i++){
-          System.out.print(".");
-          System.out.flush();
-          outw.append("What oh "+i);
-          if (i % 11 == 0)
-            outw.append("\n");
+      for (int limit=1; limit<10; limit++){
+        try (
+          OutputStream output=file.getOutputStream();
+          OutputStreamWriter outw=new OutputStreamWriter(output, "utf-8");
+          ){
+          for (int i=0; i<limit*100; i++){
+            System.out.print(".");
+            System.out.flush();
+            outw.append("What oh "+i);
+            if (i % 11 == 0)
+              outw.append("\n");
+          }
         }
-      }
-      System.out.println("File written");    
-  
-      try (
-          InputStream istrm=file.getInputStream();
-          InputStreamReader istr=new InputStreamReader(istrm, "utf-8");
-        ) {     
-        int charsRead=0;
-        while ((charsRead=istr.read(readBuffer, 0, readBuffer.length))>0){
-          String s=new String(readBuffer, 0, charsRead);
-          System.out.print(s);
-          System.out.flush();
+        System.out.println("File written");    
+    
+        try (
+            InputStream istrm=file.getInputStream();
+            InputStreamReader istr=new InputStreamReader(istrm, "utf-8");
+          ) {     
+          int charsRead=0;
+          while ((charsRead=istr.read(readBuffer, 0, readBuffer.length))>0){
+            String s=new String(readBuffer, 0, charsRead);
+            System.out.print(s);
+            System.out.flush();
+          }
+          istr.close();
         }
-        istr.close();
+        System.out.println("File read");
+        file.delete();
       }
-      System.out.println("File read");
-      file.delete();
     } finally {
       cmd.connections.close();    
     }
