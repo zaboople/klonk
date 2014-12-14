@@ -10,24 +10,19 @@ import java.util.LinkedList;
 public class CtrlOther {
   private Popups popups;
   
-  public CtrlOther(
-      Popups popups
-    ) {
+  public CtrlOther(Popups popups) {
     this.popups=popups;
   }
 
   public void doShell() {
     popups.showShell();
   }
-
   public void doHelpShortcuts() {
     popups.showHelp();
   }
   public void doHelpAbout() {
     popups.showHelpAbout();
   }
-
-
   
  
 }

@@ -5,16 +5,17 @@ import org.tmotte.common.text.DelimitedString;
 import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.StatusUpdate;
-import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.klonk.config.msg.Setter;
 
 public class CtrlSelection {
   private Editors editors;
   private StatusUpdate status;
-  private Popups popups;
-  public CtrlSelection(Editors editors, Popups popups, StatusUpdate status) {
+  private Setter<String> alerter;
+  
+  public CtrlSelection(Editors editors, Setter<String> alerter, StatusUpdate status) {
     this.editors=editors;
     this.status=status;
-    this.popups=popups;
+    this.alerter=alerter;
   }
 
   public void doWeirdUpperCase() {
@@ -28,7 +29,7 @@ public class CtrlSelection {
       status.show("Only one line was selected for sort");
   }
   public void doWeirdSelectionSize() {
-    popups.alert("Selected text size: "+editors.getFirst().getSelection().length());
+    alerter.set("Selected text size: "+editors.getFirst().getSelection().length());
   }
   public void doWeirdAsciiValues() {
     String text=editors.getFirst().getSelection();
@@ -40,7 +41,7 @@ public class CtrlSelection {
     SimpleClipboard.set(r);
     if (r.length()>1000)
       r=r.substring(1000)+"...";
-    popups.alert("ASCII/UTF-8 values copied to Clipboard as: "+r);
+    alerter.set("ASCII/UTF-8 values copied to Clipboard as: "+r);
   }
   
 }

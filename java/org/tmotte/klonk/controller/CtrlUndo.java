@@ -3,20 +3,20 @@ import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.klonk.windows.popup.YesNoCancel;
 import java.util.LinkedList;
 
 public class CtrlUndo {
   private Editors editors;
   private StatusUpdate status;
-  private Popups popups;
   private KPersist persist;
   private boolean fastUndos=false;
+  private YesNoCancel yesNo;
   
-  public CtrlUndo(Editors editors, Popups popups, StatusUpdate status, KPersist persist) {
+  public CtrlUndo(Editors editors, YesNoCancel yesNo, StatusUpdate status, KPersist persist) {
     this.editors=editors;
+    this.yesNo=yesNo;
     this.status=status;
-    this.popups=popups;
     this.persist=persist;
     fastUndos=persist.getFastUndos();
   }
@@ -42,7 +42,7 @@ public class CtrlUndo {
       e.setFastUndos(fastUndos);
   }
   public void doClearUndos() {
-    if (popups.askYesNo("Clear undos?")){
+    if (yesNo.show("Clear undos?").isYes()){
       editors.getFirst().clearUndos();
       status.show("Undo stack cleared");
     }
@@ -50,7 +50,7 @@ public class CtrlUndo {
       status.showBad("Action cancelled");
   }
   public void doClearRedos() {
-    if (popups.askYesNo("Clear redos?")){
+    if (yesNo.show("Clear redos?").isYes()){
       editors.getFirst().clearRedos();
       status.show("Redo stack cleared");
     }
@@ -58,7 +58,7 @@ public class CtrlUndo {
       status.showBad("Action cancelled");
   }
   public void doClearUndosAndRedos() {
-    if (popups.askYesNo("Clear undos and redos?")){
+    if (yesNo.show("Clear undos and redos?").isYes()){
       editors.getFirst().clearUndos();
       editors.getFirst().clearRedos();
       status.show("Undos & redos cleared");

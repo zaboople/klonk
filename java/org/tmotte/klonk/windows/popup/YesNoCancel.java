@@ -27,12 +27,14 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import java.awt.FocusTraversalPolicy;
 
-class YesNoCancel {
+public class YesNoCancel {
   private int yesOrNoOrCancel=-1;
   private JDialog win;
   private JLabel msgLabel;
   private JFrame parentFrame;
   private JButton btnYes, btnNo, btnCancel;
+  private boolean haveCancel=true;
+  private boolean initialized=false;
 
   /////////////////////
   // INITIALIZATION: //
@@ -43,9 +45,7 @@ class YesNoCancel {
   }
   public YesNoCancel(JFrame frame, boolean haveCancel) {
     parentFrame=frame;
-    create(haveCancel);
-    layout();
-    listen();
+    this.haveCancel=haveCancel;
   }
   public void setMessage(String msg) {
     msgLabel.setText(msg);
@@ -67,6 +67,7 @@ class YesNoCancel {
     return show(x, y, null);
   }
   public YesNoCancelAnswer show(int x, int y, String message) {
+    init();
     if (message!=null)
       setMessage(message);
     win.setLocation(x, y);
@@ -90,6 +91,14 @@ class YesNoCancel {
   // PRIVATE METHODS: //
   //////////////////////
 
+  private void init() {
+    if (!initialized) {
+      create(haveCancel);
+      layout();
+      listen();
+      initialized=true;
+    }
+  }
   private void create(boolean doCancel) {
     win=new JDialog(parentFrame, true);
     msgLabel=new JLabel();

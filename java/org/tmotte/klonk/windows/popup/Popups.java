@@ -36,8 +36,6 @@ import org.tmotte.klonk.windows.popup.ssh.SSHFiles;
 public class Popups {
 
   //Frequently used popup windows:
-  private YesNoCancel yesNoCancel;
-  private YesNoCancel yesNo;
   private FindAndReplace findAndReplace;
   private GoToLine goToLinePicker;
   private Shell shell;
@@ -60,7 +58,6 @@ public class Popups {
   private final StatusUpdate statusBar;
   private final Image iconImagePopup;    
   private final Getter<String> currFileGetter;
-  private final SSHConnections sshConns;
   private final FileDialogWrapper fileDialogWrapper;
 
   //Other components. Well at least it's just this one:
@@ -79,7 +76,6 @@ public class Popups {
       Image iconImagePopup, 
       Getter<String> currFileGetter,
       Setter<String> alerter,
-      SSHConnections sshConns,
       FileDialogWrapper fileDialogWrapper
     ) {
     this.home             =home;
@@ -90,7 +86,6 @@ public class Popups {
     this.iconImagePopup   =iconImagePopup;
     this.currFileGetter   =currFileGetter;
     this.alerter          =alerter;
-    this.sshConns         =sshConns;
     this.fileDialogWrapper=fileDialogWrapper;
   }
 
@@ -120,20 +115,6 @@ public class Popups {
     getAbout().show();
   }
   
-  public void alert(String message) {
-    getAlerter().set(message);
-  }
-
-  public YesNoCancelAnswer askYesNoCancel(String message) {
-    if (yesNoCancel==null)
-      yesNoCancel=new YesNoCancel(mainFrame, true);
-    return yesNoCancel.show(message);
-  }
-  public boolean askYesNo(String message) {
-    if (yesNo==null)
-      yesNo=new YesNoCancel(mainFrame, false);
-    return yesNo.show(message).isYes();
-  }
 
   public boolean showTabAndIndentOptions(TabAndIndentOptions options) {
     return getTabsAndIndents().show(options);
@@ -171,15 +152,6 @@ public class Popups {
     getShell().show();
   }
   
-  public File showFileDialog(boolean forSave) {
-    return showFileDialog(forSave, null);
-  }
-  public File showFileDialog(boolean forSave, File startFile) {
-    return getFileDialog().show(forSave, startFile, null);
-  }
-  public File showFileDialogForDir(boolean forSave, File startDir) {
-    return getFileDialog().show(forSave, null, startDir);
-  }
   public boolean showSSHOptions(SSHOptions ssho) {
     return getSSHFiles().show(ssho);
   }

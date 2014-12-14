@@ -24,7 +24,8 @@ import org.tmotte.klonk.EditorListener;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
-import org.tmotte.klonk.windows.popup.Popups; 
+import org.tmotte.klonk.windows.popup.FileDialogWrapper;
+import org.tmotte.klonk.windows.popup.YesNoCancel;
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
 
 /** Refer to org.tmotte.klonk.config.Boot for application startup */
@@ -40,11 +41,13 @@ public class CtrlMain  {
 
   
   //DI-injected stuff:
-  private Popups popups;
   private KPersist persist;
   private StatusUpdate statusBar;
   private Setter<Throwable> failHandler;
+  private Setter<String> alerter;
   private Doer lockRemover, editorSwitchedListener;
+  private FileDialogWrapper fileDialog;
+  private YesNoCancel yesNo, yesNoCancel;
   private MainDisplay layout;
 
   //Editors list:
@@ -61,7 +64,10 @@ public class CtrlMain  {
   private Recents recents;
 
   //Constructor:
-  public CtrlMain(Setter<Throwable> failHandler, final KPersist persist) {
+  public CtrlMain(
+      Setter<Throwable> failHandler, 
+      final KPersist persist
+    ) {
     this.failHandler=failHandler;
     this.persist=persist;
     recents=new Recents(persist); 
@@ -77,8 +83,16 @@ public class CtrlMain  {
     this.layout=layout;
     this.statusBar=statusBar;
   }
-  public void setPopups(Popups p) {
-    this.popups=p;
+  public void setPopups(
+      Setter<String> alerter, 
+      FileDialogWrapper fileDialog,
+      YesNoCancel yesNoCancel,
+      YesNoCancel yesNo
+    ) {
+    this.alerter=alerter;
+    this.fileDialog=fileDialog;
+    this.yesNoCancel=yesNoCancel;
+    this.yesNo=yesNo;
   }
   public void setListeners(
       Doer lockRemover,
@@ -168,7 +182,7 @@ public class CtrlMain  {
   ////////////////
 
   public void doFileOpenDialog() {
-    File file=popups.showFileDialog(false);
+    File file=fileDialog.show(false);
     if (file!=null)
       loadFile(file);
   }
@@ -209,13 +223,13 @@ public class CtrlMain  {
   // FILE OPEN FROM: //
   public void doOpenFromDocDir() {
     File file;
-    if ((file=popups.showFileDialogForDir(false, editorMgr.getFirst().getFile().getParentFile()))!=null)
+    if ((file=fileDialog.showForDir(false, editorMgr.getFirst().getFile().getParentFile()))!=null)
       loadFile(file);
   }
   public void doOpenFrom(String dir) {
     File file;
     if ((
-      file=popups.showFileDialogForDir(false, new File(dir))
+      file=fileDialog.showForDir(false, new File(dir))
       )!=null)
       loadFile(file);
   }
@@ -260,7 +274,7 @@ public class CtrlMain  {
         return;
       }
     }
-    popups.alert(
+    alerter.set(
       editors.getFirst().hasUnsavedChanges()
         ?"No other files have unsaved changes."
         :"No files have unsaved changes."
@@ -360,23 +374,23 @@ public class CtrlMain  {
   private File showFileDialogForSave(File f, File dir) {
     File file;
     if (f!=null)
-      file=popups.showFileDialog(true,  f);
+      file=fileDialog.show(true,  f);
     else
     if (dir!=null)
-      file=popups.showFileDialogForDir(true, dir);
+      file=fileDialog.showForDir(true, dir);
     else
-      file=popups.showFileDialog(true);
+      file=fileDialog.show(true);
     if (file==null)
       return null;
     for (Editor e: editorMgr.forEach()) 
       if (e.sameFile(file)){
-        popups.alert("File is already open in another window; close it first: "+e.getTitle());
+        alerter.set("File is already open in another window; close it first: "+e.getTitle());
         return null;
       }
     //This is only needed if we are using JFileChooser. The AWT chooser will result in a question
     //courtesy of the OS: 
     if (file.exists()) {
-      if (!popups.askYesNo("Replace file "+file.getAbsolutePath()+"?"))
+      if (!yesNo.show("Replace file "+file.getAbsolutePath()+"?").isYes())
         return null;
       else
         file.delete();
@@ -402,7 +416,7 @@ public class CtrlMain  {
   private boolean fileClose(boolean forExit) {
     Editor e=editorMgr.getFirst();
     if (e.hasUnsavedChanges()) {
-      YesNoCancelAnswer result=popups.askYesNoCancel("Save changes to: "+e.getTitle()+"?");
+      YesNoCancelAnswer result=yesNoCancel.show("Save changes to: "+e.getTitle()+"?");
       if (result.isYes()){
         if (!fileSave(false))
           return false;
@@ -463,13 +477,13 @@ public class CtrlMain  {
   /** Makes sure file isn't already loaded, and finds an editor to load it into: **/
   private void loadFile(File file) {
     if (!file.exists()){
-      popups.alert("No such file: "+file);
+      alerter.set("No such file: "+file);
       return;
     }
     for (Editor ed: editorMgr.forEach()) 
       if (ed.sameFile(file)){
         editorSwitch(ed);
-        popups.alert("File is already open: "+ed.getTitle());
+        alerter.set("File is already open: "+ed.getTitle());
         return;
       }
     try {

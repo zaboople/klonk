@@ -61,6 +61,7 @@ public class MainLayout {
   private GridBug editorGB=new GridBug(pnlEditor);
   private Color noChangeColor;
   private boolean hasStatus=false;
+  private StatusUpdate statusUpdate;
   
 
   //Separated into constructor & init() because of stupid DI:
@@ -79,16 +80,18 @@ public class MainLayout {
   // DI STUFF //
   
   public StatusUpdate getStatusBar() {
-    return new StatusUpdate(){ //FIXME make the below methods private (the right hand methods)
-      public void show(String s)                    {MainLayout.this.showStatus(s, false); }
-      public void showBad(String s)                 {MainLayout.this.showStatus(s, true);}
-      public void showCapsLock(boolean b)           {MainLayout.this.showCapsLock(b);}
-      public void showNoStatus()                    {MainLayout.this.showNoStatus();}
-      public void showRowColumn(int row, int column){MainLayout.this.showRowColumn(row,column);}
-      public void showChangeThis(boolean b)         {MainLayout.this.showChangeThis(b);}
-      public void showChangeAny(boolean b)          {MainLayout.this.showChangeAny(b);}
-      public void showTitle(String title)           {MainLayout.this.showTitle(title);}    
-    };  
+    if (statusUpdate==null)
+      statusUpdate=new StatusUpdate(){ //FIXME make the below methods private (the right hand methods)
+        public void show(String s)                    {MainLayout.this.showStatus(s, false); }
+        public void showBad(String s)                 {MainLayout.this.showStatus(s, true);}
+        public void showCapsLock(boolean b)           {MainLayout.this.showCapsLock(b);}
+        public void showNoStatus()                    {MainLayout.this.showNoStatus();}
+        public void showRowColumn(int row, int column){MainLayout.this.showRowColumn(row,column);}
+        public void showChangeThis(boolean b)         {MainLayout.this.showChangeThis(b);}
+        public void showChangeAny(boolean b)          {MainLayout.this.showChangeAny(b);}
+        public void showTitle(String title)           {MainLayout.this.showTitle(title);}    
+      };  
+    return statusUpdate;
   }
   public MainDisplay getMainDisplay() {
     return new MainDisplay() {

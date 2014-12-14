@@ -32,14 +32,15 @@ import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.windows.MainLayout;
+import org.tmotte.klonk.windows.popup.FileDialogWrapper;
+import org.tmotte.klonk.windows.popup.KAlert;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
-import org.tmotte.klonk.windows.popup.FileDialogWrapper;
-import org.tmotte.klonk.windows.popup.ssh.SSHLogin;
+import org.tmotte.klonk.windows.popup.YesNoCancel;
+import org.tmotte.klonk.windows.popup.ssh.SSHFileDialogNoFileException;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
-import org.tmotte.klonk.windows.popup.ssh.SSHFileDialogNoFileException;
-import org.tmotte.klonk.windows.popup.KAlert;
+import org.tmotte.klonk.windows.popup.ssh.SSHLogin;
 import javax.swing.JMenuBar;
 
 /** 
@@ -88,10 +89,10 @@ public class BootContext {
     //Now we start doing things:
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        CtrlMain ctrlMain=context.getMainController();
-        ctrlMain.doNew();
-        ctrlMain.doLoadFiles(args);
-        context.getFileListener().startDirectoryListener(ctrlMain.getFileReceiver());
+        CtrlMain cm=context.getMainController();
+        cm.doNew();
+        cm.doLoadFiles(args);
+        context.getFileListener().startDirectoryListener(cm.getFileReceiver());
       }
     });
   }
@@ -122,6 +123,8 @@ public class BootContext {
   private IUserPass iUserPass;
   private FileDialogWrapper fileDialogWrapper;
   private Setter<String> alerter;
+  private YesNoCancel yesNoCancel;
+  private YesNoCancel yesNo;
   
   private BootContext(String [] args){
     for (int i=0; i<args.length; i++)
@@ -138,6 +141,15 @@ public class BootContext {
     initLookFeel();
   }
   
+
+  private java.util.Set<String> checks=new java.util.HashSet<String>();
+  private BootContext check(String s) {
+    if (checks.contains(s))
+      throw new RuntimeException("Recursed back to constructor from constructor: "+s);
+    checks.add(s);
+    return this;
+  }
+  
   //////////////////////////////////////////
   // CONCRETE CLASSES:                    //
   // Sure maybe everything should be an   //
@@ -146,7 +158,8 @@ public class BootContext {
   //////////////////////////////////////////
 
   private Popups getPopups() {
-    if (popups==null)
+    if (popups==null){
+      check("popups");
       popups=new Popups(
          getHome()
         ,getLog().getExceptionHandler()
@@ -156,37 +169,55 @@ public class BootContext {
         ,getPopupIcon() 
         ,getCurrFileNameGetter()
         ,getAlerter()
-        ,getSSHConnections()
         ,getFileDialog()
       );
+    }
     return popups;
   }
   private KHome getHome() {
-    if (home==null) 
+    if (home==null) {
+      check("home");
       home=new KHome(
         argHomeDir!=null
           ?argHomeDir
           :KHome.nameIt(System.getProperty("user.home"), "klonk")
       );
+    }
     return home;
   }
   private KLog getLog() {
-    if (log==null)
+    if (log==null){
+      check("log");
       log=argStdOut
         ?new KLog(System.out)
         :new KLog(getHome(), getProcessID());
+    }
     return log;
   }
   private KPersist getPersist() {
-    if (persist==null)
+    if (persist==null){
+      check("persist");
       persist=new KPersist(getHome(), getLog().getExceptionHandler());
+    }
     return persist;
   }
   private CtrlMain getMainController() {
     if (ctrlMain==null){
-      ctrlMain=new CtrlMain(getLog().getExceptionHandler(), getPersist());
-      ctrlMain.setLayout(getMainDisplay(), getStatusBar());
-      ctrlMain.setPopups(getPopups());
+      check("ctrlMain");
+      ctrlMain=new CtrlMain(
+        getLog().getExceptionHandler(), 
+        getPersist() 
+      );
+      ctrlMain.setLayout(
+        getMainDisplay(), 
+        getStatusBar()
+      );
+      ctrlMain.setPopups(
+        getAlerter(), 
+        getFileDialog(),
+        getYesNoCancel(),
+        getYesNo()
+      );
       ctrlMain.setListeners(
         getLockRemover(), 
         getEditorSwitchListener(),
@@ -201,6 +232,7 @@ public class BootContext {
   }
   private Menus getMenus() {
     if (menus==null) {
+      check("menus");
       menus=new Menus(getEditors());
       menus.setFastUndos(getPersist().getFastUndos())
            .setWordWrap( getPersist().getWordWrap());
@@ -209,11 +241,13 @@ public class BootContext {
       Popups pop=getPopups();
       KPersist per=getPersist();
       Favorites fave=getFavorites();
+      Setter<String> ale=getAlerter();
+      YesNoCancel yno=getYesNo();
       menus.setControllers(
         getMainController()
         ,new CtrlMarks    (ed, sup)
-        ,new CtrlSelection(ed, pop, sup)
-        ,new CtrlUndo     (ed, pop, sup, per)
+        ,new CtrlSelection(ed, ale, sup)
+        ,new CtrlUndo     (ed, yno, sup, per)
         ,new CtrlSearch   (ed, pop)
         ,new CtrlOptions  (ed, pop, sup, per, fave, getLineDelimiterListener())
         ,new CtrlFileOther(ed, sup, fave)
@@ -224,6 +258,7 @@ public class BootContext {
   }
   private MainLayout getLayout() {
     if (layout==null) {
+      check("layout");
       layout=new MainLayout();
       layout.init(getMainFrame());
       layout.setAppCloseListener(getAppCloseListener());
@@ -237,21 +272,26 @@ public class BootContext {
     return layout;
   }
   private Favorites getFavorites() {
-    if (favorites==null)
+    if (favorites==null){
+      check("favorites");
       favorites=new Favorites(
         persist, 
         getFavoriteFileListener(), 
         getFavoriteDirListener()
       );
+    }
     return favorites;
   }
   private FileListen getFileListener() {
-    if (fileListen==null) 
+    if (fileListen==null) {
+      check("fileListen");
       fileListen=new FileListen(getLog(), getProcessID(), getHome());    
+    }
     return fileListen;
   }
   private SSHConnections getSSHConnections() {
     if (sshConns==null){
+      check("sshConns");
       SSHOptions sshOpts=getPersist().getSSHOptions();
       sshConns=new SSHConnections(
           getLog().getLogger(),
@@ -264,14 +304,30 @@ public class BootContext {
     return sshConns;
   }
   private FileDialogWrapper getFileDialog() {
-    if (fileDialogWrapper==null)
+    if (fileDialogWrapper==null){
+      check("fileDialogWrapper");
       fileDialogWrapper=new FileDialogWrapper(
         mainFrame, 
-        new SSHFileSystemView(sshConns, getLog().getLogger()), 
+        new SSHFileSystemView(getSSHConnections(), getLog().getLogger()), 
         new SSHFileView()
       );
+    }
     return fileDialogWrapper;
   }  
+  private YesNoCancel getYesNoCancel() {
+    if (yesNoCancel==null){
+      check("yesNoCancel");
+      yesNoCancel=new YesNoCancel(mainFrame, true);
+    }
+    return yesNoCancel;
+  }
+  private YesNoCancel getYesNo() {
+    if (yesNo==null){
+      check("yesNo");
+      yesNo=new YesNoCancel(mainFrame, false);
+    }
+    return yesNo;
+  }
 
   /////////////////////////////////////////////
   // PURE INTERFACES, ABSTRACT CLASSES, AND: //
@@ -281,6 +337,7 @@ public class BootContext {
   //Abstracts:
   public JFrame getMainFrame() {
     if (mainFrame==null) {
+      check("mainFrame");
       mainFrame=new JFrame("Klonk");
       mainFrame.setIconImage(getAppIcon());
       mainFrame.setJMenuBar(getMenuBar());
@@ -293,19 +350,25 @@ public class BootContext {
   
   //Interfaces:
   private Setter<String> getAlerter() {
-    if (alerter==null)
+    if (alerter==null){
+      check("alerter");
       alerter=new KAlert(getMainFrame());
+    }
     return alerter;
   }
   private IUserPass getSSHLogin() {
-    if (iUserPass==null) 
+    if (iUserPass==null) {
+      check("iUserPass");
       iUserPass=new SSHLogin(getMainFrame(), getAlerter());
+    }
     return iUserPass;
   }
+
+  // Nested interfaces: For most of these, if the function gets called twice,
+  // a new object will be returned each time. If so, it's no big deal, because
+  // they are stateless objects. 
   private StatusUpdate getStatusBar() {
-    if (statusBar==null)
-      statusBar=getLayout().getStatusBar(); 
-    return statusBar;
+    return getLayout().getStatusBar(); 
   }
   private LineDelimiterListener getLineDelimiterListener() {
     return getMainController().getLineDelimiterListener();

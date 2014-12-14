@@ -75,7 +75,7 @@ public class KLog {
   private void logError(Throwable e) {
     if (failPopup!=null)
       failPopup.set(e);
-    e.printStackTrace();
+    //e.printStackTrace();
     PrintWriter pw=getWriter();
     if (pw!=null)
       try {

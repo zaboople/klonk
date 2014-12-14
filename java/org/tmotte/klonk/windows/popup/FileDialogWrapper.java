@@ -40,6 +40,16 @@ public class FileDialogWrapper {
   }
   
 
+  public File show(boolean forSave) {
+    return show(forSave, null);
+  }
+  public File show(boolean forSave, File startFile) {
+    return show(forSave, startFile, null);
+  }
+  public File showForDir(boolean forSave, File startDir) {
+    return show(forSave, null, startDir);
+  }
+
   public File show(boolean forSave, File startFile, File startDir) {
     init();
     if (fileChooser!=null) {
