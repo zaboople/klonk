@@ -1,10 +1,12 @@
 -Current
   -Right now
     File re-open doesn't work because we just new File() it    
-    File open from recent dir works sometimes, but not when you do it straight from boot
+      File open from recent dir works sometimes, but not when you do it straight from boot - because you aren't passing an SSHFILE
     Deal with blanks in file name.
 
   -Tabs & Indents allows invalid input - letters instead of numbers
+  
+  -Ctrl-W ought to just close the editor if no files are open. It makes no difference.
   
   -How about a "Log" in the menu next to print. L is unused as a shortcut.
     -Hey and a File-Delete? With confirm of course. Hmph.

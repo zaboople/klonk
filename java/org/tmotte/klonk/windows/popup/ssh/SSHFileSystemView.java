@@ -5,7 +5,6 @@ import org.tmotte.klonk.ssh.SSH;
 import org.tmotte.klonk.ssh.SSHExec;
 import org.tmotte.klonk.ssh.SSHFile;
 import org.tmotte.klonk.ssh.SSHConnections;
-import org.tmotte.klonk.ssh.ConnectionParseException;
 import org.tmotte.klonk.config.msg.Setter;
 import java.io.ByteArrayOutputStream;
 
@@ -51,10 +50,10 @@ public class SSHFileSystemView extends FileSystemView {
   }
 
   public @Override File[] getFiles(File fdir, boolean useFileHiding){
+    mylog("getFiles() "+fdir+" "+fdir.getClass());
     SSHFile dir=cast(fdir);
     if (dir==null)
       return defaultView.getFiles(fdir, useFileHiding);
-    mylog("getFiles() "+fdir);
     return dir.listFiles();
   }
   /* Returns true if the file (directory) can be visited. */
@@ -81,6 +80,7 @@ public class SSHFileSystemView extends FileSystemView {
 
   /* Creates a new File object for f with correct behavior for a file system root directory.*/
   protected File createFileSystemRoot(File f){
+    mylog("createFileSystemRoot: "+f);
     File ff=cast(f);
     if (ff==null)
       return super.createFileSystemRoot(f);
@@ -96,12 +96,17 @@ public class SSHFileSystemView extends FileSystemView {
     mylog("isParent() "+folder+" "+file);
     return true;
   }
-
-
-  ///////////////////
-  // QUESTIONABLE: //
-  ///////////////////
-
+  public @Override File createNewFolder(File containingDir){
+    mylog("createNewFolder: "+containingDir);
+    SSHFile dir=cast(containingDir);
+    if (dir==null) 
+      try {return defaultView.createNewFolder(containingDir);} catch (Exception e) {throw new RuntimeException(e);}
+    else {
+      File f=new SSHFile(dir.getSSH(), dir, "New-Folder");
+      f.mkdir();
+      return f;
+    }
+  }
   /* Returns a File object constructed in dir from the given filename. */
   public @Override File createFileObject(File fdir, String filename) {
     mylog("createFileObject(): Create file object for dir: "+fdir+" name "+filename);
@@ -114,17 +119,11 @@ public class SSHFileSystemView extends FileSystemView {
       filename
     );
   }
-  public @Override File createNewFolder(File containingDir){
-    mylog("createNewFolder: "+containingDir);
-    SSHFile dir=cast(containingDir);
-    if (dir==null) 
-      try {return defaultView.createNewFolder(containingDir);} catch (Exception e) {throw new RuntimeException(e);}
-    else {
-      File f=new SSHFile(dir.getSSH(), dir, "New-Folder");
-      f.mkdir();
-      return f;
-    }
-  }
+
+  ///////////////////
+  // QUESTIONABLE: //
+  ///////////////////
+
   public @Override File getChild(File parent, String fileName) {
     mylog("getChild() "+parent+" "+fileName);
     SSHFile dir=cast(parent);
