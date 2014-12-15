@@ -76,7 +76,7 @@ public class SSHCommandLine {
     if (user != null && host != null && (pass != null || privateKeys !=null))
       ssh=connections.getOrCreate(user, host);
     if (fileName != null)
-      sshFile=connections.getFile(fileName);
+      sshFile=connections.getSSHFile(fileName);
   }//process()
   
 

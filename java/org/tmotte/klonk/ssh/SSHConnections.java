@@ -1,8 +1,9 @@
 package org.tmotte.klonk.ssh;
+import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.regex.Pattern;
 import org.tmotte.common.text.StringChunker;
 import org.tmotte.klonk.config.msg.Setter;
@@ -60,7 +61,13 @@ public class SSHConnections {
       uri.startsWith("SSH:")
     );
   }
-  public SSHFile getFile(String uri) {
+  public File getFile(String uri) {
+    if (is(uri))
+      return getSSHFile(uri);
+    else
+      return new File(uri);
+  }
+  public SSHFile getSSHFile(String uri) {
     return parser.parse(this, uri);
   }
   public SSH getOrCreate(String user, String host) {
@@ -129,30 +136,4 @@ public class SSHConnections {
     return perHost.get(host);
   }
   
-  //////////////
-  // TESTING: //
-  //////////////
-
-  public static void main(String[] args) throws Exception {
-    SSHConnections conns=new SSHConnections(
-      new Setter<String>(){
-        public void set(String msg) {
-          System.err.println("LOG   "+msg);
-        }
-      }
-      ,
-      new Setter<String>(){
-        public void set(String error) {
-          System.err.println("ERROR "+error);
-        }
-      }
-    );
-    for (String s: args) {
-      SSHFile f=conns.getFile(s);
-      System.out.println(
-        "FILE: "+f+" "+(f==null ?"" :f.getSSH())
-      );
-    }
-    System.out.println("\n\n"+conns);
-  }
 }

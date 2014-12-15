@@ -21,6 +21,8 @@
     Reconnect after lost connection
     File size & date: You have no choice. Well use ls --full-time
 
+  -Load file & Find/replace are abusive. Fix them.
+    -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
   -It honestly would be handy to turn multiline off in find/repl. Just because ^.*?$ can cross multiple lines
 
   -File open ought to start off the session with the last directory opened. 

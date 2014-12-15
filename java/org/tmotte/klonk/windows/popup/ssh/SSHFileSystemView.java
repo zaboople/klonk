@@ -37,7 +37,7 @@ public class SSHFileSystemView extends FileSystemView {
     String logstring="createFileObject() ";
     mylog(logstring+path);
     if (conns.is(path)){
-      SSHFile file=conns.getFile(path);
+      SSHFile file=conns.getSSHFile(path);
       if (file!=null && !file.getSSH().verifyConnection()) 
         file=null;
       if (file==null)

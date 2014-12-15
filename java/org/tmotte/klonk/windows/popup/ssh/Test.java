@@ -78,7 +78,7 @@ class Test {
           {
             File dir=null, file=null;
             if (path!=null) {
-              SSHFile temp=conns.getFile(path);
+              SSHFile temp=conns.getSSHFile(path);
               if (temp.isDirectory())
                 dir=temp;
               else

@@ -64,10 +64,7 @@ public class CtrlMain  {
   private Recents recents;
 
   //Constructor:
-  public CtrlMain(
-      Setter<Throwable> failHandler, 
-      final KPersist persist
-    ) {
+  public CtrlMain(Setter<Throwable> failHandler, final KPersist persist) {
     this.failHandler=failHandler;
     this.persist=persist;
     recents=new Recents(persist); 

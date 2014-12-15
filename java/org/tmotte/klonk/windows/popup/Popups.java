@@ -31,7 +31,8 @@ import org.tmotte.klonk.windows.popup.ssh.SSHFiles;
  * internally amenable to lazy initialization with low overhead, since they don't
  * extend JFrame or similar ilk, but contain such instead. So I am regularly 
  * moving things backwards up to BootContext (which creates Popups) so that
- * we have one layer instead of two.
+ * we have one layer instead of two. Shell is the one class that demands a lot
+ * of resources and would be good to move next.
  */
 public class Popups {
 
