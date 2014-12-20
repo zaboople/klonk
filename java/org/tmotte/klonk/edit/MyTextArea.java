@@ -114,7 +114,7 @@ public class MyTextArea extends JTextArea {
   }
   public boolean goToLine(int line) {
     try {
-      if (line>getLineCount())
+      if (line>getLineCount()-1)
         return false;
       final int r=getLineStartOffset(line), e=getLineEndOffset(line)-1;
       doScrollIntoView(r, r);
