@@ -4,33 +4,34 @@ import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.popup.GoToLine;
-import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.klonk.windows.popup.FindAndReplace;
 
 public class CtrlSearch {
 
   private Editors editors;
-  private Popups popups;
+  private FindAndReplace findAndReplace;
   private GoToLine gtl;
   private StatusUpdate statusBar;
 
-  public CtrlSearch(Editors editors, StatusUpdate statusBar, Popups popups, GoToLine gtl) {
+  public CtrlSearch(Editors editors, StatusUpdate statusBar, FindAndReplace findAndReplace, GoToLine gtl) {
     this.statusBar=statusBar;
     this.editors=editors;
-    this.popups=popups;
+    this.findAndReplace=findAndReplace;
     this.gtl=gtl;
   }
   
+  
   public void doSearchFind(){
-    popups.doFind(editors.getFirst().getTextArea());
+    findAndReplace.doFind(editors.getFirst().getTextArea());
   }
   public void doSearchReplace(){
-    popups.doReplace(editors.getFirst().getTextArea());
+    findAndReplace.doReplace(editors.getFirst().getTextArea());
   }
   public void doSearchRepeat(){
-    popups.repeatFindReplace(editors.getFirst().getTextArea(), true);
+    findAndReplace.repeatFindReplace(editors.getFirst().getTextArea(), true);
   }
   public void doSearchRepeatBackwards(){
-    popups.repeatFindReplace(editors.getFirst().getTextArea(), false);
+    findAndReplace.repeatFindReplace(editors.getFirst().getTextArea(), false);
   }
   public void doSearchGoToLine() {
     MyTextArea target=editors.getFirst().getTextArea();

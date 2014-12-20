@@ -92,8 +92,8 @@ public class Favorites {
   ////////////////////////
 
   private void setFont(FontOptions f) {
+    this.fontOptions=f;
     if (initialized) {
-      this.fontOptions=f;
       setFont(mtaFiles);
       setFont(mtaDirs);
       //Makes the mta assert its designated row count:

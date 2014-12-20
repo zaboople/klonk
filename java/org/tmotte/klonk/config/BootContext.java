@@ -257,10 +257,11 @@ public class BootContext {
     if (ctrlOptions==null) {
       check("ctrlOptions");
       ctrlOptions=new CtrlOptions(
-        getEditors(), getPopups(), getStatusBar(), 
+        getEditors(), getStatusBar(), 
         getPersist(), getFavorites(), getCtrlFavorites(), 
         getLineDelimiterListener(), getFontListeners(),
-        getSSHOptionPicker()
+        getSSHOptionPicker(), getTabsAndIndents(),
+        getPopups()
       );
     }
     return ctrlOptions;
@@ -291,18 +292,16 @@ public class BootContext {
       Editors ed=getEditors();
       StatusUpdate sup=getStatusBar();
       Popups pop=getPopups();
-      KPersist per=getPersist();
-      CtrlFavorites fave=getCtrlFavorites();
       Setter<String> ale=getAlerter();
       YesNoCancel yno=getYesNo();
       menus.setControllers(
         getMainController()
         ,new CtrlMarks    (ed, sup)
         ,new CtrlSelection(ed, ale, sup)
-        ,new CtrlUndo     (ed, yno, sup, per)
-        ,new CtrlSearch   (ed, sup, pop, getGoToLine())
+        ,new CtrlUndo     (ed, yno, sup, getPersist())
+        ,new CtrlSearch   (ed, sup, getFindAndReplace(), getGoToLine())
         ,getCtrlOptions()
-        ,new CtrlFileOther(ed, sup, fave)
+        ,new CtrlFileOther(ed, sup, getCtrlFavorites())
         ,getCtrlOther()
       );
     }
@@ -358,7 +357,6 @@ public class BootContext {
       popups=new Popups(
          getMainFrame()
         ,getPersist()
-        ,getStatusBar()
         ,getAlerter()
       );
     }
@@ -424,6 +422,14 @@ public class BootContext {
     }
     return shell;
   }
+  private TabsAndIndents getTabsAndIndents() {
+    if (tabsAndIndents==null) {
+      check("tabsAndIndents");
+      tabsAndIndents=new TabsAndIndents(getMainFrame());
+    }
+    return tabsAndIndents;
+  }
+  
 
   /////////////////////////////////////////////
   // PURE INTERFACES, ABSTRACT CLASSES, AND: //
@@ -459,6 +465,15 @@ public class BootContext {
     }
     return iUserPass;
   }
+  private FindAndReplace getFindAndReplace() {
+    if (findAndReplace==null){
+      check("findAndReplace");
+      findAndReplace=new FindAndReplace(
+        getMainFrame(), getAlerter(), getStatusBar(), getPersist().getFontAndColors()
+      );
+    }
+    return findAndReplace;
+  }  
 
   // Nested interfaces: For many of these, if the function gets called twice,
   // a new object will be returned each time, but it's not a big deal. We should
@@ -478,6 +493,7 @@ public class BootContext {
     fl.add(getShell().getFontListener());
     fl.add(getFavorites().getFontListener());
     fl.add(getHelp().getFontListener());
+    fl.add(getFindAndReplace().getFontListener());
     return fl;
   }  
   private Doer getAppCloseListener() {

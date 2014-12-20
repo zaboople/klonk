@@ -1,17 +1,18 @@
 package org.tmotte.klonk.controller;
-import org.tmotte.klonk.Editor;
-import org.tmotte.klonk.config.msg.Setter;
-import org.tmotte.klonk.config.msg.StatusUpdate;
-import org.tmotte.klonk.config.msg.Editors;
-import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.windows.popup.Popups;
-import org.tmotte.klonk.windows.popup.Favorites;
 import java.util.LinkedList;
 import java.util.List;
+import org.tmotte.klonk.Editor;
+import org.tmotte.klonk.config.KPersist;
+import org.tmotte.klonk.config.msg.Editors;
+import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
+import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.klonk.windows.popup.Favorites;
+import org.tmotte.klonk.windows.popup.TabsAndIndents;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.ssh.SSHOptionPicker;
 
@@ -26,29 +27,33 @@ public class CtrlOptions {
   private SSHOptions sshOptions;
   private LineDelimiterListener delimListener;
   private List<Setter<FontOptions>> fontListeners;
-
   private Popups popups;
+
   private Favorites favorites;
   private SSHOptionPicker sshOptionPicker;
+  private TabsAndIndents tabsAndIndents;
   
   public CtrlOptions(
-      Editors editors, Popups popups, StatusUpdate statusBar, KPersist persist,
+      Editors editors, StatusUpdate statusBar, KPersist persist,
       Favorites favorites, CtrlFavorites ctrlFavorites, 
       LineDelimiterListener delimListener, List<Setter<FontOptions>> fontListeners,
-      SSHOptionPicker sshOptionPicker
+      SSHOptionPicker sshOptionPicker, TabsAndIndents tabsAndIndents,
+      Popups popups
     ) {
     this.editors=editors;
     this.statusBar=statusBar;
-    this.popups=popups;
     this.persist=persist;
     this.favorites=favorites;
     this.ctrlFavorites=ctrlFavorites;
-    this.taio=persist.getTabAndIndentOptions();
-    this.fontOptions=persist.getFontAndColors();
-    this.sshOptions=persist.getSSHOptions();
     this.delimListener=delimListener;
     this.fontListeners=fontListeners;
     this.sshOptionPicker=sshOptionPicker;
+    this.tabsAndIndents=tabsAndIndents;
+    this.popups=popups;
+
+    this.taio=persist.getTabAndIndentOptions();
+    this.fontOptions=persist.getFontAndColors();
+    this.sshOptions=persist.getSSHOptions();
   } 
   
   public void doWordWrap() {
@@ -61,7 +66,7 @@ public class CtrlOptions {
 
   public void doTabsAndIndents(){
     taio.indentionMode=editors.getFirst().getTabsOrSpaces();
-    if (popups.showTabAndIndentOptions(taio)){
+    if (tabsAndIndents.show(taio)){
       editors.getFirst().setTabsOrSpaces(taio.indentionMode);
       for (Editor e: editors.forEach())
         e.setTabAndIndentOptions(taio);
@@ -77,7 +82,6 @@ public class CtrlOptions {
       e.setFont(fontOptions);
     for (Setter<FontOptions> setter: fontListeners)
       setter.set(fontOptions);
-    popups.setFontAndColors(fontOptions);
     persist.setFontAndColors(fontOptions);
     persist.save();
   }

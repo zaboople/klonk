@@ -33,7 +33,6 @@ import org.tmotte.klonk.ssh.IUserPass;
  */
 public class Popups {
 
-  private FindAndReplace findAndReplace;
   private About about;
   private LineDelimiters kDelims;
   private TabsAndIndents tabsAndIndents;
@@ -43,7 +42,6 @@ public class Popups {
   private final Setter<String> alerter;
   private final JFrame mainFrame;
   private final KPersist persist;
-  private final StatusUpdate statusBar;
 
   //Other components. Well at least it's just this one:
   private FontOptions fontOptions; 
@@ -55,19 +53,15 @@ public class Popups {
   public Popups(
       JFrame mainFrame, 
       KPersist persist, 
-      StatusUpdate statusBar, 
       Setter<String> alerter
     ) {
     this.mainFrame        =mainFrame;
-    this.statusBar        =statusBar;
     this.persist          =persist;
     this.alerter          =alerter;
   }
 
   public void setFontAndColors(FontOptions fo) { //FIXME change this to a Setter<FontOptions>
     this.fontOptions=fo;
-    if (findAndReplace!=null)
-      findAndReplace.setFont(fontOptions);
   }
   public JFrame getMainFrame() {
     return mainFrame;
@@ -82,22 +76,10 @@ public class Popups {
   }
   
 
-  public boolean showTabAndIndentOptions(TabAndIndentOptions options) {
-    return getTabsAndIndents().show(options);
-  }
   public boolean doFontAndColors(FontOptions input) {
     return getFontPicker().show(input);
   }
   
-  public void doFind(MyTextArea target) {
-    getFindAndReplace().doFind(target);
-  }
-  public void doReplace(MyTextArea target) {
-    getFindAndReplace().doReplace(target);
-  }
-  public void repeatFindReplace(MyTextArea target, boolean forwards) {
-    getFindAndReplace().repeatFindReplace(target, forwards);
-  }
   public void showLineDelimiters(LineDelimiterOptions k, LineDelimiterListener k2){
     getLineDelimiters().show(k, k2);
   }
@@ -112,15 +94,6 @@ public class Popups {
   ///////////////////////////////////////////
   
   
-  private FindAndReplace getFindAndReplace() {
-    if (findAndReplace==null){
-      findAndReplace=new FindAndReplace(
-        mainFrame, getAlerter(), statusBar
-      );
-      findAndReplace.setFont(getFontOptions());
-    }
-    return findAndReplace;
-  }
   private FontOptions getFontOptions() {
     if (fontOptions==null) 
       fontOptions=persist.getFontAndColors();
@@ -145,10 +118,5 @@ public class Popups {
     if (kDelims==null)
       kDelims=new LineDelimiters(mainFrame);
     return kDelims;
-  }
-  private TabsAndIndents getTabsAndIndents() {
-    if (tabsAndIndents==null) 
-      tabsAndIndents=new TabsAndIndents(mainFrame);
-    return tabsAndIndents;
   }
 }

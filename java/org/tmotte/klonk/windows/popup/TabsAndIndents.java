@@ -43,13 +43,13 @@ public class TabsAndIndents {
   private JFrame parentFrame;
   private JDialog win;
   private boolean ok=false;
+  private boolean initialized=false;
   
   private JRadioButton jrbThisTabs, jrbThisSpaces, jrbDefTabs, jrbDefSpaces;
   private JSpinner jspSpacesSize;
   private JSpinner jspTabSize;
   private JCheckBox chkIndentOnHardReturn;
-  private JRadioButton jrbTabIndentsLine, jrbTabIsTab;
-  
+  private JRadioButton jrbTabIndentsLine, jrbTabIsTab;  
   private JButton btnOK, btnCancel;
     
   private TabAndIndentOptions options;
@@ -60,11 +60,9 @@ public class TabsAndIndents {
 
   public TabsAndIndents(JFrame parentFrame) {
     this.parentFrame=parentFrame;
-    create();
-    layout(); 
-    listen();
   }
   public boolean show(TabAndIndentOptions options) {
+    init();
     this.options=options;
     ok=false;
     
@@ -121,6 +119,14 @@ public class TabsAndIndents {
   // CREATE/LAYOUT/LISTEN: //
   ///////////////////////////
   
+  private void init() {
+    if (!initialized) {
+      create();
+      layout(); 
+      listen();
+      initialized=true;
+    }  
+  }
   private void create() {
     jrbThisTabs  =new JRadioButton("Tabs"); 
     jrbThisSpaces=new JRadioButton("Spaces");

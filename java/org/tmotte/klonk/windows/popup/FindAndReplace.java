@@ -56,15 +56,21 @@ public class FindAndReplace {
           btnCancel;
   JLabel lblFind;
   
+  //Fonts:
+  FontOptions fontOptions;
+  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
+    public void set(FontOptions fo){setFont(fo);}
+  };  
+  
   //Other windows. Yes we technically violate our singleton sort-of-a-rule here, creating
   //extra instances of YesNoCancel
   JFrame parentFrame;
   YesNoCancel popupAskReplace, popupAskReplaceAll;
   
-  //Only false when window has never been shown:
+  //Internal state:
   boolean everShown=false;
-  //Other state
   boolean skipReplace=false;
+  boolean initialized=false;
   
   //This is so we can send updates back to the main window ourselves, as well
   //as to an alert popup:
@@ -76,40 +82,30 @@ public class FindAndReplace {
   MyTextArea target;
   Finder finder=new Finder();
 
-
+  
 
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
 
-  public FindAndReplace(JFrame parentFrame, Setter<String> alerter, StatusUpdate statusBar) {
+  public FindAndReplace(
+      JFrame parentFrame, 
+      Setter<String> alerter, 
+      StatusUpdate statusBar, 
+      FontOptions fontOptions
+    ) {
     this.parentFrame=parentFrame;
     this.statusBar=statusBar;
     this.alerter=alerter;
-    create();
-    layout();
-    listen();
-    enableReplace();
+    this.fontOptions=fontOptions;
   }
-  public void setFont(FontOptions f) {
-    mtaFind.setFont(f.getFont());
-    mtaFind.setForeground(f.getColor());
-    mtaFind.setBackground(f.getBackgroundColor());
-    mtaFind.setCaretColor(f.getCaretColor());
-
-    mtaReplace.setFont(f.getFont());
-    mtaReplace.setForeground(f.getColor());
-    mtaReplace.setBackground(f.getBackgroundColor());
-    mtaReplace.setCaretColor(f.getCaretColor());
-
-    //Am doing this because otherwise it doesn't adjust to 
-    //our desired setting of rows elsewhere because we set
-    //font AFTER instantiation.
-    win.pack();
-  } 
+  public Setter<FontOptions> getFontListener() {
+    return fontListener;
+  }
   public void doFind(MyTextArea target)    {doFind(target, false);}
   public void doReplace(MyTextArea target) {doFind(target, true);}  
   public synchronized void repeatFindReplace(MyTextArea mta, boolean forwards) {
+    init();
     this.target=mta;
     finder.lastError=null;
     skipReplace=true;
@@ -133,6 +129,7 @@ public class FindAndReplace {
   //////////////////////
 
   private void doFind(MyTextArea mta, boolean replace) {
+    init();
     this.target=mta;
     chkReplace.setSelected(replace);
     //Previous line does not trigger an event, so:
@@ -385,6 +382,15 @@ public class FindAndReplace {
   //                                      //
   //////////////////////////////////////////
 
+  private void init() {
+    if (!initialized) {
+      create();
+      layout();
+      listen();
+      initialized=true;
+    }
+  }
+
   private void create() {
     Font fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
     win=new JDialog(parentFrame, true);
@@ -503,6 +509,9 @@ public class FindAndReplace {
     gb.insets.bottom=5;
     gb.addY(getBottomPanel());
     win.pack();
+    
+    enableReplace();
+    setFont();
   }
   private Container getBottomPanel() {
     GridBug gb=new GridBug(new JPanel());
@@ -550,6 +559,30 @@ public class FindAndReplace {
     gb.addX(btnCancel);
     return gb.container;
   }
+
+  private void setFont(FontOptions f) {
+    this.fontOptions=f;
+    setFont();
+  }
+  private void setFont() {
+    FontOptions f=fontOptions;
+    if (mtaFind!=null && mtaReplace!=null) {
+      mtaFind.setFont(f.getFont());
+      mtaFind.setForeground(f.getColor());
+      mtaFind.setBackground(f.getBackgroundColor());
+      mtaFind.setCaretColor(f.getCaretColor());
+  
+      mtaReplace.setFont(f.getFont());
+      mtaReplace.setForeground(f.getColor());
+      mtaReplace.setBackground(f.getBackgroundColor());
+      mtaReplace.setCaretColor(f.getCaretColor());
+  
+      //Am doing this because otherwise it doesn't adjust to 
+      //our desired setting of rows elsewhere because we set
+      //font AFTER instantiation.
+      win.pack();
+    }
+  } 
   
 
   /////////////

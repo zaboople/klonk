@@ -44,7 +44,7 @@ public class Help {
   private Container mtaContainer;
 
   private boolean initialized;
-  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
+  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){ //FIXME just abstract class this FontListener crap
     public void set(FontOptions fo){setFont(fo);}
   };
   
