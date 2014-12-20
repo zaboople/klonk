@@ -1,10 +1,12 @@
 package org.tmotte.klonk.controller;
 import org.tmotte.klonk.Editor;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.windows.popup.Popups;
 import java.util.LinkedList;
+import java.util.List;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.SSHOptions;
@@ -21,6 +23,7 @@ public class CtrlOptions {
   private FontOptions fontOptions;
   private SSHOptions sshOptions;
   private LineDelimiterListener delimListener;
+  private List<Setter<FontOptions>> fontListeners=new LinkedList<>();
   
   public CtrlOptions(
       Editors editors, Popups popups, StatusUpdate statusBar, KPersist persist,
@@ -36,6 +39,10 @@ public class CtrlOptions {
     this.sshOptions=persist.getSSHOptions();
     this.delimListener=delimListener;
   }
+  public void addFontListener(Setter<FontOptions> fo) {
+    fontListeners.add(fo);
+  }
+  
   
   public void doWordWrap() {
     boolean b=persist.getWordWrap();
@@ -61,6 +68,8 @@ public class CtrlOptions {
       return;
     for (Editor e: editors.forEach())
       e.setFont(fontOptions);
+    for (Setter<FontOptions> setter: fontListeners)
+      setter.set(fontOptions);
     popups.setFontAndColors(fontOptions);
     persist.setFontAndColors(fontOptions);
     persist.save();

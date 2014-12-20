@@ -31,15 +31,13 @@ import org.tmotte.klonk.windows.popup.ssh.SSHFiles;
  * internally amenable to lazy initialization with low overhead, since they don't
  * extend JFrame or similar ilk, but contain such instead. So I am regularly 
  * moving things backwards up to BootContext (which creates Popups) so that
- * we have one layer instead of two. Shell is the one class that demands a lot
- * of resources and would be good to move next.
+ * we have one layer instead of two. 
  */
 public class Popups {
 
   //Frequently used popup windows:
   private FindAndReplace findAndReplace;
   private GoToLine goToLinePicker;
-  private Shell shell;
   
   //Less frequently used:
   private Help help;
@@ -57,8 +55,6 @@ public class Popups {
   private final JFrame mainFrame;
   private final KPersist persist;
   private final StatusUpdate statusBar;
-  private final Image iconImagePopup;    
-  private final Getter<String> currFileGetter;
   private final FileDialogWrapper fileDialogWrapper;
 
   //Other components. Well at least it's just this one:
@@ -74,8 +70,6 @@ public class Popups {
       JFrame mainFrame, 
       KPersist persist, 
       StatusUpdate statusBar, 
-      Image iconImagePopup, 
-      Getter<String> currFileGetter,
       Setter<String> alerter,
       FileDialogWrapper fileDialogWrapper
     ) {
@@ -84,8 +78,6 @@ public class Popups {
     this.mainFrame        =mainFrame;
     this.statusBar        =statusBar;
     this.persist          =persist;
-    this.iconImagePopup   =iconImagePopup;
-    this.currFileGetter   =currFileGetter;
     this.alerter          =alerter;
     this.fileDialogWrapper=fileDialogWrapper;
   }
@@ -98,8 +90,6 @@ public class Popups {
       findAndReplace.setFont(fontOptions);
     if (favorites!=null)
       favorites.setFont(fontOptions);
-    if (shell!=null)
-      shell.setFont(fontOptions);
   }
   public JFrame getMainFrame() {
     return mainFrame;
@@ -149,9 +139,6 @@ public class Popups {
   public void showLineDelimiters(LineDelimiterOptions k, LineDelimiterListener k2){
     getLineDelimiters().show(k, k2);
   }
-  public void showShell() {
-    getShell().show();
-  }
   
   public boolean showSSHOptions(SSHOptions ssho) {
     return getSSHFiles().show(ssho);
@@ -181,20 +168,6 @@ public class Popups {
       findAndReplace.setFont(getFontOptions());
     }
     return findAndReplace;
-  }
-  private Shell getShell() {
-    if (shell==null) {
-      shell=new Shell(
-        mainFrame, 
-        logFail, 
-        persist, 
-        getFileDialog(), 
-        iconImagePopup, 
-        currFileGetter
-      );
-      shell.setFont(getFontOptions());
-    }
-    return shell;
   }
   private FileDialogWrapper getFileDialog() {
     return fileDialogWrapper;

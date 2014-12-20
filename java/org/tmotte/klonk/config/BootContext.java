@@ -36,6 +36,7 @@ import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.windows.popup.KAlert;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.klonk.windows.popup.Shell;
 import org.tmotte.klonk.windows.popup.YesNoCancel;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileDialogNoFileException;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
@@ -111,6 +112,8 @@ public class BootContext {
   private FileListen fileListen;
   private KPersist persist;
   private CtrlMain ctrlMain;
+  private CtrlOptions ctrlOptions;
+  private CtrlOther ctrlOther;
   private JFrame mainFrame;
   private MainLayout layout;
   private StatusUpdate statusBar;
@@ -118,6 +121,7 @@ public class BootContext {
   private Menus menus;
   private Favorites favorites;
   private MainDisplay mainDisplay;
+  private Shell shell;
   private String processID;
   private SSHConnections sshConns;
   private IUserPass iUserPass;
@@ -166,8 +170,6 @@ public class BootContext {
         ,getMainFrame()
         ,getPersist()
         ,getStatusBar()
-        ,getPopupIcon() 
-        ,getCurrFileNameGetter()
         ,getAlerter()
         ,getFileDialog()
       );
@@ -227,6 +229,24 @@ public class BootContext {
     }
     return ctrlMain;
   }
+  private CtrlOther getCtrlOther(){
+    if (ctrlOther==null) {
+      check("ctrlOther");
+      ctrlOther=new CtrlOther(getShell(), getPopups());
+    }
+    return ctrlOther;
+  }
+  private CtrlOptions getCtrlOptions(){
+    if (ctrlOptions==null) {
+      check("ctrlOptions");
+      ctrlOptions=new CtrlOptions(
+        getEditors(), getPopups(), getStatusBar(), 
+        getPersist(), getFavorites(), getLineDelimiterListener()
+      );
+      ctrlOptions.addFontListener(getShell().getFontListener());
+    }
+    return ctrlOptions;
+  }
   private Editors getEditors() {
     return getMainController().getEditors();
   }
@@ -249,9 +269,9 @@ public class BootContext {
         ,new CtrlSelection(ed, ale, sup)
         ,new CtrlUndo     (ed, yno, sup, per)
         ,new CtrlSearch   (ed, pop)
-        ,new CtrlOptions  (ed, pop, sup, per, fave, getLineDelimiterListener())
+        ,getCtrlOptions()
         ,new CtrlFileOther(ed, sup, fave)
-        ,new CtrlOther    (pop)
+        ,getCtrlOther()
       );
     }
     return menus;
@@ -327,6 +347,20 @@ public class BootContext {
       yesNo=new YesNoCancel(mainFrame, false);
     }
     return yesNo;
+  }
+  private Shell getShell() {
+    if (shell==null) {
+      check("shell");
+      shell=new Shell(
+         getMainFrame() 
+        ,getLog().getExceptionHandler()
+        ,getPersist()
+        ,getFileDialog()
+        ,getPopupIcon() 
+        ,getCurrFileNameGetter()
+      );
+    }
+    return shell;
   }
 
   /////////////////////////////////////////////

@@ -27,7 +27,7 @@ import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 
-class Shell {
+public class Shell {
 
   //DI components:
   private JFrame parentFrame;
@@ -37,6 +37,9 @@ class Shell {
   private Getter<String> currFileGetter;
   private Image icon;
   private FontOptions fontOptions=new FontOptions();
+  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
+    public void set(FontOptions fo){setFont(fo);}
+  };
 
   //Visual components:
   private JFrame win;
@@ -66,7 +69,12 @@ class Shell {
     this.icon=icon;
     this.currFileGetter=currFileGetter;
   }  
-  public void setFont(FontOptions f) {
+  public Setter<FontOptions> getFontListener() {
+    return fontListener;
+  }
+  
+  
+  public void setFont(FontOptions f) {//fixme hide
     this.fontOptions=f;
     if (initialized)
       setFont(f, mtaOutput);
@@ -265,6 +273,8 @@ class Shell {
     }
   }
   private void create(Image img){
+    fontOptions=persist.getFontAndColors();
+  
     jcbPreviousData=new DefaultComboBoxModel<>();
     fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
     persistedFiles=new LinkedList<>();
@@ -311,6 +321,7 @@ class Shell {
     mta.setLineWrap(true);
     mta.setWrapStyleWord(false);
     mta.setEditable(true);
+    mta.setFont(fontOptions.getFont());
     return mta;
   }
   
