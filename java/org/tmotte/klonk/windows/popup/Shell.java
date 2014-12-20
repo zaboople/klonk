@@ -118,9 +118,10 @@ public class Shell {
   private void setFont(FontOptions f) {//fixme hide
     this.fontOptions=f;
     if (initialized)
-      setFont(f, mtaOutput);
+      setFont(mtaOutput);
   }  
-  private void setFont(FontOptions f, JTextComponent mta) {
+  private void setFont(JTextComponent mta) {
+    FontOptions f=fontOptions;
     mta.setFont(f.getFont());
     mta.setForeground(f.getColor());
     mta.setBackground(f.getBackgroundColor());
@@ -319,7 +320,7 @@ public class Shell {
     mta.setLineWrap(true);
     mta.setWrapStyleWord(false);
     mta.setEditable(true);
-    mta.setFont(fontOptions.getFont());
+    setFont(mta);
     return mta;
   }
   
@@ -346,7 +347,7 @@ public class Shell {
     win.pack();
     win.setBounds(r);
     win.setPreferredSize(new Dimension(r.width, r.height));
-    setFont(fontOptions, mtaOutput);    
+    setFont(mtaOutput);
   }
   private Container getFileSelectPanel() {
     GridBug gb=new GridBug(new JPanel());

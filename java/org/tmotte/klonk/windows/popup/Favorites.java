@@ -68,12 +68,6 @@ public class Favorites {
   public Setter<FontOptions> getFontListener() {
     return fontListener;
   }
-  public void setFont(FontOptions f) {
-    setFont(f, mtaFiles);
-    setFont(f, mtaDirs);
-    //Makes the mta assert its designated row count:
-    win.pack();
-  }
   public boolean show(Collection<String> files, Collection<String> dirs) {
     init();
     result=false;
@@ -97,6 +91,15 @@ public class Favorites {
   //                    //
   ////////////////////////
 
+  private void setFont(FontOptions f) {
+    if (initialized) {
+      this.fontOptions=f;
+      setFont(mtaFiles);
+      setFont(mtaDirs);
+      //Makes the mta assert its designated row count:
+      win.pack();
+    }
+  }
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
     win.setVisible(false);  
@@ -130,7 +133,8 @@ public class Favorites {
     }
   }
 
-  private void setFont(FontOptions f, MyTextArea mta) {
+  private void setFont(MyTextArea mta) {
+    FontOptions f=fontOptions;
     mta.setFont(f.getFont());
     mta.setForeground(f.getColor());
     mta.setBackground(f.getBackgroundColor());
@@ -159,6 +163,8 @@ public class Favorites {
     btnOK.setMnemonic(KeyEvent.VK_K);
     btnCancel=new JButton("Cancel");
     btnCancel.setMnemonic(KeyEvent.VK_C);
+    setFont(mtaFiles);
+    setFont(mtaDirs);
   }
   private MyTextArea getMTA(){
     MyTextArea mta=new MyTextArea();
