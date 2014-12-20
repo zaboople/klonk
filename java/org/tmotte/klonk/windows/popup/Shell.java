@@ -35,6 +35,8 @@ class Shell {
   private FileDialogWrapper fdw;
   private KPersist persist;
   private Getter<String> currFileGetter;
+  private Image icon;
+  private FontOptions fontOptions=new FontOptions();
 
   //Visual components:
   private JFrame win;
@@ -47,6 +49,7 @@ class Shell {
   //State:
   private boolean shownBefore=false;
   private List<String> persistedFiles;
+  private boolean initialized=false;
 
   public Shell(
      JFrame parentFrame, 
@@ -60,16 +63,16 @@ class Shell {
     this.fail=fail;
     this.fdw=fdw;
     this.persist=persist;
+    this.icon=icon;
     this.currFileGetter=currFileGetter;
-    create(img);
-    layout(persist); 
-    listen();
   }  
   public void setFont(FontOptions f) {
-    setFont(f, mtaOutput);
-    win.pack();//To make rowcount work
+    this.fontOptions=f;
+    if (initialized)
+      setFont(f, mtaOutput);
   }
   public void show() {
+    init();
     if (!jcbPrevious.hasFocus() && !mtaOutput.hasFocus())
       jcbPrevious.requestFocusInWindow();
     Positioner.set(parentFrame, win, shownBefore || (win.getBounds().x>-1 && win.getBounds().y>-1));
@@ -116,6 +119,7 @@ class Shell {
     mta.setForeground(f.getColor());
     mta.setBackground(f.getBackgroundColor());
     mta.setCaretColor(f.getCaretColor());
+    win.pack();//To make rowcount work
   }
 
 
@@ -251,7 +255,15 @@ class Shell {
   // CREATE/LAYOUT/LISTEN: //  
   ///////////////////////////
 
-
+  private void init() {
+    if (!initialized) {
+      create(icon);
+      layout(persist); 
+      listen();    
+      icon=null;
+      initialized=true;
+    }
+  }
   private void create(Image img){
     jcbPreviousData=new DefaultComboBoxModel<>();
     fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
@@ -325,6 +337,7 @@ class Shell {
     win.pack();
     win.setBounds(r);
     win.setPreferredSize(new Dimension(r.width, r.height));
+    setFont(fontOptions, mtaOutput);    
   }
   private Container getFileSelectPanel() {
     GridBug gb=new GridBug(new JPanel());
