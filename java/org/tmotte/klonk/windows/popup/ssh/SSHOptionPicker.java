@@ -32,7 +32,7 @@ import org.tmotte.klonk.config.option.SSHOptions;
 /**
  * FIXME Kill connection?
  */
-public class SSHFiles {
+public class SSHOptionPicker {
 
   private JFrame parentFrame;
   private FileDialogWrapper fdw;
@@ -49,20 +49,16 @@ public class SSHFiles {
 
   private JDialog win;
   private JButton btnOK, btnCancel;
+  private boolean initialized;
 
   private boolean result=false;
 
-  public SSHFiles(
-     JFrame parentFrame, 
-     FileDialogWrapper fdw
-    ) {
+  public SSHOptionPicker(JFrame parentFrame, FileDialogWrapper fdw) {
     this.parentFrame=parentFrame;
     this.fdw=fdw;
-    create();
-    layout(); 
-    listen();
   }  
   public boolean show(SSHOptions options) {
+    init();
     result=false;
     {
       String knownHosts=ifEmpty(options.getKnownHostsFilename());
@@ -112,6 +108,18 @@ public class SSHFiles {
       }
   }
   
+  /////////////
+  // CREATE: //
+  /////////////
+  
+  private void init() {
+    if (!initialized) {
+      create();
+      layout(); 
+      listen();    
+      initialized=true;
+    }
+  }
   private void create(){
     win=new JDialog(parentFrame, true);
     win.setTitle("SSH Configuration");
@@ -265,7 +273,7 @@ public class SSHFiles {
       public void run() {
         try {
           JFrame parentFrame=PopupTestContext.makeMainFrame();
-          SSHFiles pop=new SSHFiles(parentFrame, new FileDialogWrapper(parentFrame));
+          SSHOptionPicker pop=new SSHOptionPicker(parentFrame, new FileDialogWrapper(parentFrame));
           SSHOptions sopt=new SSHOptions();
           //FIXME put default values in
           if (pop.show(sopt))

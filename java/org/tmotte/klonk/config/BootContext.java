@@ -2,23 +2,25 @@ package org.tmotte.klonk.config;
 import java.awt.Image;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 import org.tmotte.klonk.Menus;
-import org.tmotte.klonk.config.option.SSHOptions;
-import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.MainDisplay;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
+import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.option.SSHOptions;
+import org.tmotte.klonk.controller.CtrlFavorites;
 import org.tmotte.klonk.controller.CtrlFileOther;
 import org.tmotte.klonk.controller.CtrlMain;
 import org.tmotte.klonk.controller.CtrlMarks;
@@ -27,12 +29,11 @@ import org.tmotte.klonk.controller.CtrlOther;
 import org.tmotte.klonk.controller.CtrlSearch;
 import org.tmotte.klonk.controller.CtrlSelection;
 import org.tmotte.klonk.controller.CtrlUndo;
-import org.tmotte.klonk.controller.CtrlFavorites;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
-import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.IUserPass;
+import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.Favorites;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
@@ -45,7 +46,7 @@ import org.tmotte.klonk.windows.popup.ssh.SSHFileDialogNoFileException;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
 import org.tmotte.klonk.windows.popup.ssh.SSHLogin;
-import javax.swing.JMenuBar;
+import org.tmotte.klonk.windows.popup.ssh.SSHOptionPicker;
 
 /** 
  * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) architecture. 
@@ -135,6 +136,7 @@ public class BootContext {
   private IUserPass iUserPass;
   private FileDialogWrapper fileDialogWrapper;
   private Setter<String> alerter;
+  private SSHOptionPicker sshOptionPicker;
   private YesNoCancel yesNoCancel;
   private YesNoCancel yesNo;
   
@@ -243,10 +245,25 @@ public class BootContext {
       ctrlOptions=new CtrlOptions(
         getEditors(), getPopups(), getStatusBar(), 
         getPersist(), getFavorites(), getCtrlFavorites(), 
-        getLineDelimiterListener(), getFontListeners()
+        getLineDelimiterListener(), getFontListeners(),
+        getSSHOptionPicker()
       );
     }
     return ctrlOptions;
+  }
+  private SSHConnections getSSHConnections() {
+    if (sshConns==null){
+      check("sshConns");
+      SSHOptions sshOpts=getPersist().getSSHOptions();
+      sshConns=new SSHConnections(
+          getLog().getLogger(),
+          getAlerter()
+        )
+        .withLogin(getSSHLogin())
+        .withKnown(sshOpts.getKnownHostsFilename())
+        .withPrivateKeys(sshOpts.getPrivateKeysFilename());        
+    }
+    return sshConns;
   }
   private Editors getEditors() {
     return getMainController().getEditors();
@@ -330,25 +347,15 @@ public class BootContext {
         ,getPersist()
         ,getStatusBar()
         ,getAlerter()
-        ,getFileDialog()
       );
     }
     return popups;
   }
-  private SSHConnections getSSHConnections() {
-    if (sshConns==null){
-      check("sshConns");
-      SSHOptions sshOpts=getPersist().getSSHOptions();
-      sshConns=new SSHConnections(
-          getLog().getLogger(),
-          getAlerter()
-        )
-        .withLogin(getSSHLogin())
-        .withKnown(sshOpts.getKnownHostsFilename())
-        .withPrivateKeys(sshOpts.getPrivateKeysFilename());        
-    }
-    return sshConns;
-  }
+  private SSHOptionPicker getSSHOptionPicker() {
+    if (sshOptionPicker==null)
+      sshOptionPicker=new SSHOptionPicker(getMainFrame(), getFileDialog());
+    return sshOptionPicker;
+  } 
   private FileDialogWrapper getFileDialog() {
     if (fileDialogWrapper==null){
       check("fileDialogWrapper");

@@ -20,7 +20,6 @@ import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.IUserPass;
-import org.tmotte.klonk.windows.popup.ssh.SSHFiles;
 
 /**
  * This is a sort of sublayer in our DI/IoC setup. Rather than creating 
@@ -45,7 +44,6 @@ public class Popups {
   private LineDelimiters kDelims;
   private TabsAndIndents tabsAndIndents;
   private FontPicker fontPicker;
-  private SSHFiles sshFiles;  
 
   //DI resources for constructor:
   private final KHome home;
@@ -53,7 +51,6 @@ public class Popups {
   private final JFrame mainFrame;
   private final KPersist persist;
   private final StatusUpdate statusBar;
-  private final FileDialogWrapper fileDialogWrapper;
 
   //Other components. Well at least it's just this one:
   private FontOptions fontOptions; 
@@ -67,15 +64,13 @@ public class Popups {
       JFrame mainFrame, 
       KPersist persist, 
       StatusUpdate statusBar, 
-      Setter<String> alerter,
-      FileDialogWrapper fileDialogWrapper
+      Setter<String> alerter
     ) {
     this.home             =home;
     this.mainFrame        =mainFrame;
     this.statusBar        =statusBar;
     this.persist          =persist;
     this.alerter          =alerter;
-    this.fileDialogWrapper=fileDialogWrapper;
   }
 
   public void setFontAndColors(FontOptions fo) { //FIXME change this to a Setter<FontOptions>
@@ -130,11 +125,6 @@ public class Popups {
     getLineDelimiters().show(k, k2);
   }
   
-  public boolean showSSHOptions(SSHOptions ssho) {
-    return getSSHFiles().show(ssho);
-  }
-
-
   public Setter<String> getAlerter() {
     return alerter;
   }
@@ -158,9 +148,6 @@ public class Popups {
       findAndReplace.setFont(getFontOptions());
     }
     return findAndReplace;
-  }
-  private FileDialogWrapper getFileDialog() {
-    return fileDialogWrapper;
   }
   private FontOptions getFontOptions() {
     if (fontOptions==null) 
@@ -188,11 +175,6 @@ public class Popups {
     if (fontPicker==null)
       fontPicker=new FontPicker(mainFrame, getAlerter());
     return fontPicker;
-  }
-  private SSHFiles getSSHFiles() {
-    if (sshFiles==null)
-      sshFiles=new SSHFiles(getMainFrame(), getFileDialog());
-    return sshFiles;
   }
   private LineDelimiters getLineDelimiters() {
     if (kDelims==null)

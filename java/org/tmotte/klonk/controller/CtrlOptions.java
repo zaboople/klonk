@@ -13,6 +13,7 @@ import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
+import org.tmotte.klonk.windows.popup.ssh.SSHOptionPicker;
 
 public class CtrlOptions {
 
@@ -28,11 +29,13 @@ public class CtrlOptions {
 
   private Popups popups;
   private Favorites favorites;
+  private SSHOptionPicker sshOptionPicker;
   
   public CtrlOptions(
       Editors editors, Popups popups, StatusUpdate statusBar, KPersist persist,
       Favorites favorites, CtrlFavorites ctrlFavorites, 
-      LineDelimiterListener delimListener, List<Setter<FontOptions>> fontListeners
+      LineDelimiterListener delimListener, List<Setter<FontOptions>> fontListeners,
+      SSHOptionPicker sshOptionPicker
     ) {
     this.editors=editors;
     this.statusBar=statusBar;
@@ -45,6 +48,7 @@ public class CtrlOptions {
     this.sshOptions=persist.getSSHOptions();
     this.delimListener=delimListener;
     this.fontListeners=fontListeners;
+    this.sshOptionPicker=sshOptionPicker;
   } 
   
   public void doWordWrap() {
@@ -95,7 +99,7 @@ public class CtrlOptions {
   }
 
   public void doSSH(){ 
-    if (popups.showSSHOptions(sshOptions)){
+    if (sshOptionPicker.show(sshOptions)){
       persist.setSSHOptions(sshOptions);
       persist.save();
     }
