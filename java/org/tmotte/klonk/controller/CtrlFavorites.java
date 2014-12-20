@@ -9,7 +9,7 @@ import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Setter;
 
 /** This is a secondary controller; it is invoked by other controllers. */
-public class Favorites {
+public class CtrlFavorites {
 
   //DI resources:
   private KPersist persist;
@@ -18,7 +18,7 @@ public class Favorites {
   //Private data:
   private ArrayList<String> favoriteDirs, favoriteFiles;
   
-  public Favorites(
+  public CtrlFavorites(
       KPersist persist,
       Setter<List<String>> favoriteFileListener,
       Setter<List<String>> favoriteDirListener
@@ -46,5 +46,4 @@ public class Favorites {
     persist.save();
   }
 
-  
 }

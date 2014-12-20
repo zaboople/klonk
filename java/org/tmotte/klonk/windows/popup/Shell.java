@@ -36,7 +36,7 @@ public class Shell {
   private KPersist persist;
   private Getter<String> currFileGetter;
   private Image icon;
-  private FontOptions fontOptions=new FontOptions();
+  private FontOptions fontOptions;
   private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
     public void set(FontOptions fo){setFont(fo);}
   };
@@ -71,14 +71,7 @@ public class Shell {
   }  
   public Setter<FontOptions> getFontListener() {
     return fontListener;
-  }
-  
-  
-  public void setFont(FontOptions f) {//fixme hide
-    this.fontOptions=f;
-    if (initialized)
-      setFont(f, mtaOutput);
-  }
+  } 
   public void show() {
     init();
     if (!jcbPrevious.hasFocus() && !mtaOutput.hasFocus())
@@ -122,6 +115,11 @@ public class Shell {
   private void preserveBounds() {
     persist.setShellWindowBounds(win.getBounds());
   }
+  private void setFont(FontOptions f) {//fixme hide
+    this.fontOptions=f;
+    if (initialized)
+      setFont(f, mtaOutput);
+  }  
   private void setFont(FontOptions f, JTextComponent mta) {
     mta.setFont(f.getFont());
     mta.setForeground(f.getColor());
@@ -265,14 +263,13 @@ public class Shell {
 
   private void init() {
     if (!initialized) {
-      create(icon);
-      layout(persist); 
+      create();
+      layout(); 
       listen();    
-      icon=null;
       initialized=true;
     }
   }
-  private void create(Image img){
+  private void create(){
     fontOptions=persist.getFontAndColors();
   
     jcbPreviousData=new DefaultComboBoxModel<>();
@@ -286,7 +283,8 @@ public class Shell {
            bEnd="</b>";
 
     win=new JFrame("Klonk: Run batch program:");
-    win.setIconImage(img);
+    win.setIconImage(icon);
+    icon=null;//Don't need it after this
 
     btnSelectFile=new JButton("File...");
     btnSelectFile.setMnemonic(KeyEvent.VK_F);
@@ -325,7 +323,7 @@ public class Shell {
     return mta;
   }
   
-  private void layout(KPersist persist) {
+  private void layout() {
     GridBug gb=new GridBug(win);
     gb.gridXY(0);
     gb.weightXY(1, 0);

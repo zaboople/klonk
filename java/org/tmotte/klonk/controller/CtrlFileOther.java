@@ -10,14 +10,14 @@ import java.util.LinkedList;
 public class CtrlFileOther {
   private Editors editors;
   private StatusUpdate statusBar;
-  private Favorites favorites;
+  private CtrlFavorites ctrlFavorites;
   
   public CtrlFileOther(
-      Editors editors, StatusUpdate statusBar, Favorites favorites
+      Editors editors, StatusUpdate statusBar, CtrlFavorites ctrlFavorites
     ) {
     this.editors=editors;
     this.statusBar=statusBar;
-    this.favorites=favorites;
+    this.ctrlFavorites=ctrlFavorites;
   }
 
   public void doDocumentDirectoryMSWindows() {
@@ -50,15 +50,15 @@ public class CtrlFileOther {
 
   public void doAddCurrentToFaveDirs(){
     String s=ControllerUtils.getFullPath(editors.getFirst().getFile().getParentFile());
-    favorites.getDirs().add(s);
-    favorites.set();
+    ctrlFavorites.getDirs().add(s);
+    ctrlFavorites.set();
     statusBar.show("\""+s+"\" added to favorite directories.");
   }
 
   public void doAddCurrentToFaveFiles(){
     String s=ControllerUtils.getFullPath(editors.getFirst().getFile());
-    favorites.getFiles().add(s);
-    favorites.set();
+    ctrlFavorites.getFiles().add(s);
+    ctrlFavorites.set();
     statusBar.show("\""+s+"\" added to favorite files.");
   }
 

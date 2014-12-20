@@ -5,6 +5,7 @@ import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.klonk.windows.popup.Favorites;
 import java.util.LinkedList;
 import java.util.List;
 import org.tmotte.klonk.config.option.FontOptions;
@@ -14,35 +15,37 @@ import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 
 public class CtrlOptions {
+
   private Editors editors;
   private StatusUpdate statusBar;
-  private Popups popups;
   private KPersist persist;
-  private Favorites favorites;
+  private CtrlFavorites ctrlFavorites;
   private TabAndIndentOptions taio;
   private FontOptions fontOptions;
   private SSHOptions sshOptions;
   private LineDelimiterListener delimListener;
-  private List<Setter<FontOptions>> fontListeners=new LinkedList<>();
+  private List<Setter<FontOptions>> fontListeners;
+
+  private Popups popups;
+  private Favorites favorites;
   
   public CtrlOptions(
       Editors editors, Popups popups, StatusUpdate statusBar, KPersist persist,
-      Favorites favorites, LineDelimiterListener delimListener
+      Favorites favorites, CtrlFavorites ctrlFavorites, 
+      LineDelimiterListener delimListener, List<Setter<FontOptions>> fontListeners
     ) {
     this.editors=editors;
     this.statusBar=statusBar;
     this.popups=popups;
     this.persist=persist;
     this.favorites=favorites;
+    this.ctrlFavorites=ctrlFavorites;
     this.taio=persist.getTabAndIndentOptions();
     this.fontOptions=persist.getFontAndColors();
     this.sshOptions=persist.getSSHOptions();
     this.delimListener=delimListener;
-  }
-  public void addFontListener(Setter<FontOptions> fo) {
-    fontListeners.add(fo);
-  }
-  
+    this.fontListeners=fontListeners;
+  } 
   
   public void doWordWrap() {
     boolean b=persist.getWordWrap();
@@ -76,10 +79,10 @@ public class CtrlOptions {
   }
   
   public void doFavorites() {
-    if (!popups.showFavorites(favorites.getFiles(), favorites.getDirs())) 
+    if (!favorites.show(ctrlFavorites.getFiles(), ctrlFavorites.getDirs())) 
       statusBar.showBad("Changes to favorite files/directories cancelled");
     else {
-      favorites.set();
+      ctrlFavorites.set();
       statusBar.show("Changes to favorite files/directories saved");
     }
   }

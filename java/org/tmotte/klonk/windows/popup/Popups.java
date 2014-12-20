@@ -45,12 +45,10 @@ public class Popups {
   private LineDelimiters kDelims;
   private TabsAndIndents tabsAndIndents;
   private FontPicker fontPicker;
-  private Favorites favorites;
   private SSHFiles sshFiles;  
 
   //DI resources for constructor:
   private final KHome home;
-  private final Setter<Throwable> logFail;
   private final Setter<String> alerter;
   private final JFrame mainFrame;
   private final KPersist persist;
@@ -66,7 +64,6 @@ public class Popups {
   
   public Popups(
       KHome home, 
-      Setter<Throwable> logFail, 
       JFrame mainFrame, 
       KPersist persist, 
       StatusUpdate statusBar, 
@@ -74,7 +71,6 @@ public class Popups {
       FileDialogWrapper fileDialogWrapper
     ) {
     this.home             =home;
-    this.logFail          =logFail;
     this.mainFrame        =mainFrame;
     this.statusBar        =statusBar;
     this.persist          =persist;
@@ -88,8 +84,6 @@ public class Popups {
       help.setFont(fontOptions);
     if (findAndReplace!=null)
       findAndReplace.setFont(fontOptions);
-    if (favorites!=null)
-      favorites.setFont(fontOptions);
   }
   public JFrame getMainFrame() {
     return mainFrame;
@@ -114,10 +108,6 @@ public class Popups {
     return getFontPicker().show(input);
   }
   
-  public boolean showFavorites(Collection<String> favoriteFiles, Collection<String> favoriteDirs) {
-    return getFavorites().show(favoriteFiles, favoriteDirs);
-  }
-
   public void doFind(MyTextArea target) {
     getFindAndReplace().doFind(target, false);
   }
@@ -198,13 +188,6 @@ public class Popups {
     if (fontPicker==null)
       fontPicker=new FontPicker(mainFrame, getAlerter());
     return fontPicker;
-  }
-  private Favorites getFavorites() {
-    if (favorites==null){
-      favorites=new Favorites(mainFrame);
-      favorites.setFont(fontOptions);
-    }
-    return favorites;
   }
   private SSHFiles getSSHFiles() {
     if (sshFiles==null)

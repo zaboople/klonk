@@ -33,9 +33,10 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.windows.Positioner;
 
-class Favorites {
+public class Favorites {
 
   /////////////////////////
   // INSTANCE VARIABLES: //
@@ -43,23 +44,30 @@ class Favorites {
 
   private JFrame parentFrame;
 
+  private FontOptions fontOptions;
   private JDialog win;
   private MyTextArea mtaFiles, mtaDirs;
   private JButton btnOK, btnCancel;
   private Font fontBold;
+  private boolean initialized=false;
+  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
+    public void set(FontOptions fo){setFont(fo);}
+  };
 
   private boolean result;
+  
   
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
 
-  public Favorites(JFrame parentFrame) {
+  public Favorites(JFrame parentFrame, FontOptions fontOptions) {
     this.parentFrame=parentFrame;
-    create();
-    layout(); 
-    listen();
+    this.fontOptions=fontOptions;
   }  
+  public Setter<FontOptions> getFontListener() {
+    return fontListener;
+  }
   public void setFont(FontOptions f) {
     setFont(f, mtaFiles);
     setFont(f, mtaDirs);
@@ -67,6 +75,7 @@ class Favorites {
     win.pack();
   }
   public boolean show(Collection<String> files, Collection<String> dirs) {
+    init();
     result=false;
     load(mtaFiles, files);
     load(mtaDirs,  dirs);
@@ -131,7 +140,15 @@ class Favorites {
   ///////////////////////////
   // CREATE/LAYOUT/LISTEN: //  
   ///////////////////////////
-
+  
+  private void init() {
+    if (!initialized){
+      create();
+      layout(); 
+      listen();
+      initialized=true;
+    }
+  }
   private void create(){
     win=new JDialog(parentFrame, true);
     win.setTitle("Favorite files");
@@ -149,6 +166,7 @@ class Favorites {
     mta.setColumns(60);
     mta.setLineWrap(false);
     mta.setWrapStyleWord(false);
+    mta.setFont(fontOptions.getFont());
     return mta;
   }
   
@@ -291,7 +309,9 @@ class Favorites {
         files.add("bbbbb");
         files.add("CCCC/cc/c/c///ccc");
         dirs.add("dddddddddd");
-        new Favorites(PopupTestContext.makeMainFrame()).show(files, dirs);
+        new Favorites(
+          PopupTestContext.makeMainFrame(), new FontOptions()
+        ).show(files, dirs);
         System.out.println("\nFILES: ");
         for (String s: files)
           System.out.println(s);

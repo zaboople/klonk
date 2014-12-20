@@ -3,6 +3,7 @@ import java.awt.Image;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -11,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.tmotte.klonk.Menus;
 import org.tmotte.klonk.config.option.SSHOptions;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Getter;
@@ -25,13 +27,14 @@ import org.tmotte.klonk.controller.CtrlOther;
 import org.tmotte.klonk.controller.CtrlSearch;
 import org.tmotte.klonk.controller.CtrlSelection;
 import org.tmotte.klonk.controller.CtrlUndo;
-import org.tmotte.klonk.controller.Favorites;
+import org.tmotte.klonk.controller.CtrlFavorites;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.windows.MainLayout;
+import org.tmotte.klonk.windows.popup.Favorites;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.windows.popup.KAlert;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
@@ -106,23 +109,28 @@ public class BootContext {
   private String argHomeDir;
   private boolean argStdOut=false;
 
-  //DI Components:
+  //State-control components:
+  private String processID;
   private KHome home;
   private KLog log;
-  private FileListen fileListen;
   private KPersist persist;
+  private FileListen fileListen;
   private CtrlMain ctrlMain;
   private CtrlOptions ctrlOptions;
   private CtrlOther ctrlOther;
+  private CtrlFavorites ctrlFavorites;
+
+  //Main window components:
+  private Menus menus;
+  private StatusUpdate statusBar;
+  private MainDisplay mainDisplay;
+  
+  //Popup window components
+  private Favorites favorites;
+  private Popups popups;
   private JFrame mainFrame;
   private MainLayout layout;
-  private StatusUpdate statusBar;
-  private Popups popups;
-  private Menus menus;
-  private Favorites favorites;
-  private MainDisplay mainDisplay;
   private Shell shell;
-  private String processID;
   private SSHConnections sshConns;
   private IUserPass iUserPass;
   private FileDialogWrapper fileDialogWrapper;
@@ -145,8 +153,16 @@ public class BootContext {
     initLookFeel();
   }
   
+  /////////////////////////////////////////////////
+  // Stack overflow (and otherwise) prevention:  //
+  /////////////////////////////////////////////////
 
   private java.util.Set<String> checks=new java.util.HashSet<String>();
+  /** 
+   * Everything should call this during object assembly to prevent circular references
+   * from causing unexpected behavior. It will crash the boot process in the event
+   * that such happens.
+   */
   private BootContext check(String s) {
     if (checks.contains(s))
       throw new RuntimeException("Recursed back to constructor from constructor: "+s);
@@ -161,21 +177,6 @@ public class BootContext {
   // not worth it:                        //
   //////////////////////////////////////////
 
-  private Popups getPopups() {
-    if (popups==null){
-      check("popups");
-      popups=new Popups(
-         getHome()
-        ,getLog().getExceptionHandler()
-        ,getMainFrame()
-        ,getPersist()
-        ,getStatusBar()
-        ,getAlerter()
-        ,getFileDialog()
-      );
-    }
-    return popups;
-  }
   private KHome getHome() {
     if (home==null) {
       check("home");
@@ -241,9 +242,9 @@ public class BootContext {
       check("ctrlOptions");
       ctrlOptions=new CtrlOptions(
         getEditors(), getPopups(), getStatusBar(), 
-        getPersist(), getFavorites(), getLineDelimiterListener()
+        getPersist(), getFavorites(), getCtrlFavorites(), 
+        getLineDelimiterListener(), getFontListeners()
       );
-      ctrlOptions.addFontListener(getShell().getFontListener());
     }
     return ctrlOptions;
   }
@@ -260,7 +261,7 @@ public class BootContext {
       StatusUpdate sup=getStatusBar();
       Popups pop=getPopups();
       KPersist per=getPersist();
-      Favorites fave=getFavorites();
+      CtrlFavorites fave=getCtrlFavorites();
       Setter<String> ale=getAlerter();
       YesNoCancel yno=getYesNo();
       menus.setControllers(
@@ -291,16 +292,16 @@ public class BootContext {
     }
     return layout;
   }
-  private Favorites getFavorites() {
-    if (favorites==null){
-      check("favorites");
-      favorites=new Favorites(
+  private CtrlFavorites getCtrlFavorites() {
+    if (ctrlFavorites==null){
+      check("ctrlFavorites");
+      ctrlFavorites=new CtrlFavorites(
         persist, 
         getFavoriteFileListener(), 
         getFavoriteDirListener()
       );
     }
-    return favorites;
+    return ctrlFavorites;
   }
   private FileListen getFileListener() {
     if (fileListen==null) {
@@ -308,6 +309,31 @@ public class BootContext {
       fileListen=new FileListen(getLog(), getProcessID(), getHome());    
     }
     return fileListen;
+  }
+
+  private Favorites getFavorites() {
+    if (favorites==null){
+      check("favorites");
+      favorites=new Favorites(
+        getMainFrame(), 
+        getPersist().getFontAndColors()
+      );
+    }
+    return favorites;
+  }
+  private Popups getPopups() {
+    if (popups==null){
+      check("popups");
+      popups=new Popups(
+         getHome()
+        ,getMainFrame()
+        ,getPersist()
+        ,getStatusBar()
+        ,getAlerter()
+        ,getFileDialog()
+      );
+    }
+    return popups;
   }
   private SSHConnections getSSHConnections() {
     if (sshConns==null){
@@ -398,23 +424,30 @@ public class BootContext {
     return iUserPass;
   }
 
-  // Nested interfaces: For most of these, if the function gets called twice,
-  // a new object will be returned each time. If so, it's no big deal, because
-  // they are stateless objects. 
+  // Nested interfaces: For many of these, if the function gets called twice,
+  // a new object will be returned each time, but it's not a big deal. We should
+  // still try to avoid that however.
+  
+  private MainDisplay getMainDisplay() {
+    return getLayout().getMainDisplay();
+  }
   private StatusUpdate getStatusBar() {
     return getLayout().getStatusBar(); 
   }
   private LineDelimiterListener getLineDelimiterListener() {
     return getMainController().getLineDelimiterListener();
   }
+  private List<Setter<FontOptions>> getFontListeners() {
+    List<Setter<FontOptions>> fl=new java.util.ArrayList<>(10);
+    fl.add(getShell().getFontListener());
+    fl.add(getFavorites().getFontListener());
+    return fl;
+  }  
   private Doer getAppCloseListener() {
     return getMainController().getAppCloseListener();
   }
   private Getter<String> getCurrFileNameGetter() {
     return getMainController().getCurrFileNameGetter();
-  }
-  private MainDisplay getMainDisplay() {
-    return getLayout().getMainDisplay();
   }
   private Doer getLockRemover() {
     return getFileListener().getLockRemover();
