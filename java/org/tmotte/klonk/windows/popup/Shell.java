@@ -56,7 +56,7 @@ class Shell {
      Setter<Throwable> fail, 
      KPersist persist, 
      FileDialogWrapper fdw, 
-     Image img, 
+     Image icon, 
      Getter<String> currFileGetter
     ) {
     this.parentFrame=parentFrame;
