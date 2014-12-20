@@ -36,7 +36,6 @@ public class Popups {
 
   //Frequently used popup windows:
   private FindAndReplace findAndReplace;
-  private GoToLine goToLinePicker;
   
   //Less frequently used:
   private Help help;
@@ -112,15 +111,6 @@ public class Popups {
   public void repeatFindReplace(MyTextArea target, boolean forwards) {
     getFindAndReplace().repeatFindReplace(target, forwards);
   }
-  public void goToLine(MyTextArea target) {
-    GoToLine gtl=getGoToLine();
-    int i=gtl.show();
-    if (i==-1)
-      statusBar.showBad("Go to line cancelled.");
-    else
-    if (!target.goToLine(i-1))
-      statusBar.showBad("Line number "+i+" is out of range"); 
-  }
   public void showLineDelimiters(LineDelimiterOptions k, LineDelimiterListener k2){
     getLineDelimiters().show(k, k2);
   }
@@ -135,11 +125,6 @@ public class Popups {
   ///////////////////////////////////////////
   
   
-  private GoToLine getGoToLine() {
-    if (goToLinePicker==null)
-      goToLinePicker=new GoToLine(mainFrame, getAlerter());
-    return goToLinePicker;
-  }
   private FindAndReplace getFindAndReplace() {
     if (findAndReplace==null){
       findAndReplace=new FindAndReplace(

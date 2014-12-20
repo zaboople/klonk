@@ -114,6 +114,7 @@ public class MyTextArea extends JTextArea {
   }
   public boolean goToLine(int line) {
     try {
+      System.out.println("FUCKITY FUCK "+line);
       if (line>getLineCount())
         return false;
       final int r=getLineStartOffset(line), e=getLineEndOffset(line)-1;

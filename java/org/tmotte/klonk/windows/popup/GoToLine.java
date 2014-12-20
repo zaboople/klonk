@@ -29,10 +29,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.windows.Positioner;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.windows.Positioner;
 
-class GoToLine {
+
+public class GoToLine {
 
   /////////////////////////
   // INSTANCE VARIABLES: //
@@ -44,6 +45,7 @@ class GoToLine {
   private JDialog win;
   private JTextField jtfRow;
   private JButton btnOK, btnCancel;
+  private boolean initialized;
 
   private boolean badEntry=false, cancelled=false;
   private int result=-1;
@@ -55,11 +57,9 @@ class GoToLine {
   public GoToLine(JFrame parentFrame, Setter<String> complainer) {
     this.parentFrame=parentFrame;
     this.complainer=complainer;
-    create();
-    layout(); 
-    listen();
   }
   public int show() {
+    init();
     String s=jtfRow.getText();
     if (s!=null && !s.equals("")){
       jtfRow.setCaretPosition(0);
@@ -112,6 +112,15 @@ class GoToLine {
   ///////////////////////////
   // CREATE/LAYOUT/LISTEN: //  
   ///////////////////////////
+
+  private void init() {
+    if (!initialized) {
+      create();
+      layout(); 
+      listen();    
+      initialized=true;
+    }
+  }
 
   private void create(){
     win=new JDialog(parentFrame, true);

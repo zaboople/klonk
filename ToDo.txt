@@ -1,5 +1,6 @@
 -Current
   -Right now
+    GoToLine blows up when you go one past the last line in the file. So you have five lines, you ask for six, boom.
     File re-open doesn't work because we just new File() it    
       File open from recent dir works sometimes, but not when you do it straight from boot - because you aren't passing an SSHFILE
     Deal with blanks in file name.

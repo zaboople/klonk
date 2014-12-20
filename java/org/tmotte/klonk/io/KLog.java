@@ -82,7 +82,7 @@ public class KLog {
         e.printStackTrace(pw);
         pw.flush();
       } finally {
-        pw.close();
+        close(pw);
       }
   }
   private void logPlain(String s) {

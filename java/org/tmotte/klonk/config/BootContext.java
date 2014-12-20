@@ -37,6 +37,7 @@ import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.Favorites;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
+import org.tmotte.klonk.windows.popup.GoToLine;
 import org.tmotte.klonk.windows.popup.KAlert;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Popups;
@@ -128,17 +129,18 @@ public class BootContext {
   
   //Popup window components
   private Favorites favorites;
-  private Popups popups;
+  private FileDialogWrapper fileDialogWrapper;
+  private GoToLine goToLine;
+  private IUserPass iUserPass;
   private JFrame mainFrame;
   private MainLayout layout;
-  private Shell shell;
+  private Popups popups;
   private SSHConnections sshConns;
-  private IUserPass iUserPass;
-  private FileDialogWrapper fileDialogWrapper;
-  private Setter<String> alerter;
   private SSHOptionPicker sshOptionPicker;
-  private YesNoCancel yesNoCancel;
+  private Setter<String> alerter;
+  private Shell shell;
   private YesNoCancel yesNo;
+  private YesNoCancel yesNoCancel;
   
   private BootContext(String [] args){
     for (int i=0; i<args.length; i++)
@@ -286,7 +288,7 @@ public class BootContext {
         ,new CtrlMarks    (ed, sup)
         ,new CtrlSelection(ed, ale, sup)
         ,new CtrlUndo     (ed, yno, sup, per)
-        ,new CtrlSearch   (ed, pop)
+        ,new CtrlSearch   (ed, sup, pop, getGoToLine())
         ,getCtrlOptions()
         ,new CtrlFileOther(ed, sup, fave)
         ,getCtrlOther()
@@ -367,6 +369,11 @@ public class BootContext {
     }
     return fileDialogWrapper;
   }  
+  private GoToLine getGoToLine() {
+    if (goToLine==null)
+      goToLine=new GoToLine(getMainFrame(), getAlerter());
+    return goToLine;
+  }
   private YesNoCancel getYesNoCancel() {
     if (yesNoCancel==null){
       check("yesNoCancel");
