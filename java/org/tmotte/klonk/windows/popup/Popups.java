@@ -8,7 +8,6 @@ import java.awt.Window;
 import java.io.File;
 import java.util.Collection;
 import javax.swing.JFrame;
-import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
@@ -34,18 +33,13 @@ import org.tmotte.klonk.ssh.IUserPass;
  */
 public class Popups {
 
-  //Frequently used popup windows:
   private FindAndReplace findAndReplace;
-  
-  //Less frequently used:
-  private Help help;
   private About about;
   private LineDelimiters kDelims;
   private TabsAndIndents tabsAndIndents;
   private FontPicker fontPicker;
 
   //DI resources for constructor:
-  private final KHome home;
   private final Setter<String> alerter;
   private final JFrame mainFrame;
   private final KPersist persist;
@@ -59,13 +53,11 @@ public class Popups {
   ///////////////////////////////////////
   
   public Popups(
-      KHome home, 
       JFrame mainFrame, 
       KPersist persist, 
       StatusUpdate statusBar, 
       Setter<String> alerter
     ) {
-    this.home             =home;
     this.mainFrame        =mainFrame;
     this.statusBar        =statusBar;
     this.persist          =persist;
@@ -74,8 +66,6 @@ public class Popups {
 
   public void setFontAndColors(FontOptions fo) { //FIXME change this to a Setter<FontOptions>
     this.fontOptions=fo;
-    if (help!=null)
-      help.setFont(fontOptions);
     if (findAndReplace!=null)
       findAndReplace.setFont(fontOptions);
   }
@@ -87,9 +77,6 @@ public class Popups {
   // PUBLIC POPUP METHODS: //
   ///////////////////////////
 
-  public void showHelp() {
-    getHelp().show();
-  }
   public void showHelpAbout() {
     getAbout().show();
   }
@@ -103,10 +90,10 @@ public class Popups {
   }
   
   public void doFind(MyTextArea target) {
-    getFindAndReplace().doFind(target, false);
+    getFindAndReplace().doFind(target);
   }
   public void doReplace(MyTextArea target) {
-    getFindAndReplace().doFind(target, true);
+    getFindAndReplace().doReplace(target);
   }
   public void repeatFindReplace(MyTextArea target, boolean forwards) {
     getFindAndReplace().repeatFindReplace(target, forwards);
@@ -144,13 +131,6 @@ public class Popups {
   // PRIVATE getX() LESS FREQUENTLY USED:  //
   ///////////////////////////////////////////
   
-  private Help getHelp() {
-    if (help==null){
-      help=new Help(mainFrame, home.getUserHome());
-      help.setFont(fontOptions);
-    }
-    return help;
-  }
   private About getAbout() {
     if (about==null)
       about=new About(mainFrame);

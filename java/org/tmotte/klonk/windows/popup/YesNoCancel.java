@@ -47,15 +47,16 @@ public class YesNoCancel {
     parentFrame=frame;
     this.haveCancel=haveCancel;
   }
-  public void setMessage(String msg) {
-    msgLabel.setText(msg);
-    win.pack();
-  }
   
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
 
+  public void setMessage(String msg) {
+    init();
+    msgLabel.setText(msg);
+    win.pack();
+  }
   public YesNoCancelAnswer show() {
     return show(null);
   }
@@ -77,12 +78,15 @@ public class YesNoCancel {
     return new YesNoCancelAnswer(yesOrNoOrCancel);
   }
   public int getHeight() {
+    init();
     return win.getHeight();
   }
   public int getWidth() {
+    init();
     return win.getWidth();
   }
   public void setupForFindReplace() {
+    init();
     doF3Stuff();
   }
   

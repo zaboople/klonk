@@ -42,7 +42,7 @@ import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 
-class FontPicker {
+public class FontPicker {
 
   /////////////////////////
   // INSTANCE VARIABLES: //

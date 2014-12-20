@@ -34,7 +34,7 @@ import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 
-class TabsAndIndents {
+public class TabsAndIndents {
 
   /////////////////////////
   // INSTANCE VARIABLES: //

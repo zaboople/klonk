@@ -26,6 +26,7 @@ public class KPersist {
   private Setter<Throwable> logFail;
   private boolean hasChanges=false;
 
+  private FontOptions fontOptionsCache;
   private List<String> recentFilesCache, recentDirsCache;
   
   public KPersist(KHome home, Setter<Throwable> logFail) {
@@ -149,26 +150,31 @@ public class KPersist {
     setColor("EditorText.Font.Color", fo.getColor());
     setColor("EditorText.Background", fo.getBackgroundColor());
     setColor("EditorText.Caret.Color", fo.getCaretColor());
+    fontOptionsCache=null;
+    getFontAndColors();
     return this;
   }
   public FontOptions getFontAndColors() {
-    FontOptions fo=new FontOptions();
-    fo.setFontName(
-      get("EditorText.Font.Name", fo.getFontName())
-    );
-    fo.setFontSize(
-      getInt("EditorText.Font.Size", fo.getFontSize())
-    );
-    fo.setColor(
-      getColor("EditorText.Font.Color", fo.getColor())
-    );
-    fo.setBackgroundColor(
-      getColor("EditorText.Background", fo.getBackgroundColor())
-    );
-    fo.setCaretColor(
-      getColor("EditorText.Caret.Color", fo.getCaretColor())
-    );
-    return fo;
+    if (fontOptionsCache==null) {
+      fontOptionsCache=new FontOptions();
+      FontOptions fo=fontOptionsCache;
+      fo.setFontName(
+        get("EditorText.Font.Name", fo.getFontName())
+      );
+      fo.setFontSize(
+        getInt("EditorText.Font.Size", fo.getFontSize())
+      );
+      fo.setColor(
+        getColor("EditorText.Font.Color", fo.getColor())
+      );
+      fo.setBackgroundColor(
+        getColor("EditorText.Background", fo.getBackgroundColor())
+      );
+      fo.setCaretColor(
+        getColor("EditorText.Caret.Color", fo.getCaretColor())
+      );
+    }
+    return fontOptionsCache;
   }
 
   // RECENT FILES & DIRECTORIES & COMMANDS: //

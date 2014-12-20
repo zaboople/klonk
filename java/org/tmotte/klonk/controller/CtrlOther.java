@@ -4,6 +4,7 @@ import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.windows.popup.Shell;
+import org.tmotte.klonk.windows.popup.Help;
 import org.tmotte.klonk.windows.popup.Popups;
 import java.util.LinkedList;
 
@@ -11,9 +12,11 @@ import java.util.LinkedList;
 public class CtrlOther {
   private Popups popups;
   private Shell shell;
+  private Help help;
   
-  public CtrlOther(Shell shell, Popups popups) {
+  public CtrlOther(Shell shell, Help help, Popups popups) {
     this.shell=shell;
+    this.help=help;
     this.popups=popups;
   }
 
@@ -21,7 +24,7 @@ public class CtrlOther {
     shell.show();
   }
   public void doHelpShortcuts() {
-    popups.showHelp();
+    help.show();
   }
   public void doHelpAbout() {
     popups.showHelpAbout();

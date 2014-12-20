@@ -35,13 +35,19 @@ import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.windows.MainLayout;
+import org.tmotte.klonk.windows.popup.About;
 import org.tmotte.klonk.windows.popup.Favorites;
+import org.tmotte.klonk.windows.popup.FindAndReplace;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
+import org.tmotte.klonk.windows.popup.FontPicker;
 import org.tmotte.klonk.windows.popup.GoToLine;
 import org.tmotte.klonk.windows.popup.KAlert;
+import org.tmotte.klonk.windows.popup.LineDelimiters;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
+import org.tmotte.klonk.windows.popup.Help;
 import org.tmotte.klonk.windows.popup.Popups;
 import org.tmotte.klonk.windows.popup.Shell;
+import org.tmotte.klonk.windows.popup.TabsAndIndents;
 import org.tmotte.klonk.windows.popup.YesNoCancel;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileDialogNoFileException;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
@@ -128,17 +134,23 @@ public class BootContext {
   private MainDisplay mainDisplay;
   
   //Popup window components
+  private About about;
   private Favorites favorites;
   private FileDialogWrapper fileDialogWrapper;
+  private FindAndReplace findAndReplace;
+  private FontPicker fontPicker;
   private GoToLine goToLine;
+  private Help help;
   private IUserPass iUserPass;
   private JFrame mainFrame;
+  private LineDelimiters kDelims;
   private MainLayout layout;
   private Popups popups;
   private SSHConnections sshConns;
   private SSHOptionPicker sshOptionPicker;
   private Setter<String> alerter;
   private Shell shell;
+  private TabsAndIndents tabsAndIndents;
   private YesNoCancel yesNo;
   private YesNoCancel yesNoCancel;
   
@@ -237,7 +249,7 @@ public class BootContext {
   private CtrlOther getCtrlOther(){
     if (ctrlOther==null) {
       check("ctrlOther");
-      ctrlOther=new CtrlOther(getShell(), getPopups());
+      ctrlOther=new CtrlOther(getShell(), getHelp(), getPopups());
     }
     return ctrlOther;
   }
@@ -344,8 +356,7 @@ public class BootContext {
     if (popups==null){
       check("popups");
       popups=new Popups(
-         getHome()
-        ,getMainFrame()
+         getMainFrame()
         ,getPersist()
         ,getStatusBar()
         ,getAlerter()
@@ -353,9 +364,18 @@ public class BootContext {
     }
     return popups;
   }
+  private Help getHelp() {
+    if (help==null){
+      check("help");
+      help=new Help(mainFrame, home.getUserHome(), getPersist().getFontAndColors());
+    }
+    return help;
+  }
   private SSHOptionPicker getSSHOptionPicker() {
-    if (sshOptionPicker==null)
+    if (sshOptionPicker==null){
+      check("sshOptionPicker");
       sshOptionPicker=new SSHOptionPicker(getMainFrame(), getFileDialog());
+    }
     return sshOptionPicker;
   } 
   private FileDialogWrapper getFileDialog() {
@@ -370,8 +390,10 @@ public class BootContext {
     return fileDialogWrapper;
   }  
   private GoToLine getGoToLine() {
-    if (goToLine==null)
+    if (goToLine==null){
+      check("goToLine");
       goToLine=new GoToLine(getMainFrame(), getAlerter());
+    }
     return goToLine;
   }
   private YesNoCancel getYesNoCancel() {
@@ -440,7 +462,7 @@ public class BootContext {
 
   // Nested interfaces: For many of these, if the function gets called twice,
   // a new object will be returned each time, but it's not a big deal. We should
-  // still try to avoid that however.
+  // try to avoid that, however.
   
   private MainDisplay getMainDisplay() {
     return getLayout().getMainDisplay();
@@ -455,6 +477,7 @@ public class BootContext {
     List<Setter<FontOptions>> fl=new java.util.ArrayList<>(10);
     fl.add(getShell().getFontListener());
     fl.add(getFavorites().getFontListener());
+    fl.add(getHelp().getFontListener());
     return fl;
   }  
   private Doer getAppCloseListener() {

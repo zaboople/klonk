@@ -29,31 +29,37 @@ import javax.swing.JWindow;
 import org.tmotte.common.io.Loader;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 
-class Help {
+public class Help {
   private JFrame parentFrame;
+  private String homeDir;
+  private FontOptions fontOptions;
+
   private JButton btnOK;
   private JDialog win;
   private MyTextArea mta;
   private Container mtaContainer;
-  private String homeDir;
 
-  public Help(JFrame parentFrame, String homeDir) {
+  private boolean initialized;
+  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
+    public void set(FontOptions fo){setFont(fo);}
+  };
+  
+  
+  public Help(JFrame parentFrame, String homeDir, FontOptions fontOptions) {
     this.parentFrame=parentFrame;
     this.homeDir=homeDir;
-    create();
-    layout();
-    listen();
+    this.fontOptions=fontOptions;
   }
-  public void setFont(FontOptions f) {
-    mta.setFont(f.getFont());
-    mta.setForeground(f.getColor());
-    mta.setBackground(f.getBackgroundColor());
-    mta.setCaretColor(f.getCaretColor());
+  public Setter<FontOptions> getFontListener() {
+    return fontListener;
   }
+
   public void show() {
+    init();
     Point pt=parentFrame.getLocation();
     win.setLocation(pt.x+20, pt.y+20);
     win.setVisible(true);
@@ -69,6 +75,28 @@ class Help {
     win.setVisible(false);  
   }
 
+  private void init() {
+    if (!initialized) {
+      create();
+      layout(); 
+      listen();    
+      initialized=true;
+    }
+  }
+  private void setFont(FontOptions f) {
+    fontOptions=f;
+    setFont();
+  }
+  private void setFont() {
+    if (mta!=null) {
+      FontOptions f=fontOptions;
+      mta.setFont(f.getFont());
+      mta.setForeground(f.getColor());
+      mta.setBackground(f.getBackgroundColor());
+      mta.setCaretColor(f.getCaretColor());
+    }
+  }
+
   // CREATE/LAYOUT/LISTEN: //
   private void create() {
     win=new JDialog(parentFrame, true);
@@ -82,6 +110,7 @@ class Help {
     helpText=helpText.replace("$[Home]", homeDir);
     mta.setText(helpText);
     mta.setCaretPosition(0);
+    setFont();
 
     btnOK=new JButton("OK");
   }
@@ -130,7 +159,9 @@ class Help {
   public static void main(final String[] args) throws Exception{
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        new Help(PopupTestContext.makeMainFrame(), ".").show();
+        new Help(
+          PopupTestContext.makeMainFrame(), ".", new FontOptions()
+        ).show();
       }
     });  
       

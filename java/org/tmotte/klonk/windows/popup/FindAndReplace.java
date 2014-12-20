@@ -44,7 +44,7 @@ import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 
-class FindAndReplace {
+public class FindAndReplace {
 
   //Display components:
   JDialog win;
@@ -107,14 +107,8 @@ class FindAndReplace {
     //font AFTER instantiation.
     win.pack();
   } 
-  public void doFind(MyTextArea mta, boolean replace) {
-    setupForShow(mta, replace);
-    show();
-    while (finder.lastError!=null) {
-      alerter.set(finder.lastError);
-      show();
-    }
-  }
+  public void doFind(MyTextArea target)    {doFind(target, false);}
+  public void doReplace(MyTextArea target) {doFind(target, true);}  
   public synchronized void repeatFindReplace(MyTextArea mta, boolean forwards) {
     this.target=mta;
     finder.lastError=null;
@@ -138,7 +132,7 @@ class FindAndReplace {
   //                  //
   //////////////////////
 
-  private void setupForShow(MyTextArea mta, boolean replace) {
+  private void doFind(MyTextArea mta, boolean replace) {
     this.target=mta;
     chkReplace.setSelected(replace);
     //Previous line does not trigger an event, so:
@@ -147,6 +141,11 @@ class FindAndReplace {
     //Do all the rectangle/point/dimension stuff:
     Positioner.set(parentFrame, win, everShown);
     everShown|=true;
+    show();
+    while (finder.lastError!=null) {
+      alerter.set(finder.lastError);
+      show();
+    }
   }
   private void show() {
     finder.lastError=null;

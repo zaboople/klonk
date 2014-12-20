@@ -28,7 +28,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 
-class LineDelimiters {
+public class LineDelimiters {
 
   private JDialog win;
   private JFrame parentFrame;
