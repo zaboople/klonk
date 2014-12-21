@@ -5,16 +5,12 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 import org.tmotte.klonk.Menus;
-import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Editors;
-import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.MainDisplay;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
@@ -29,7 +25,6 @@ import org.tmotte.klonk.controller.CtrlOther;
 import org.tmotte.klonk.controller.CtrlSearch;
 import org.tmotte.klonk.controller.CtrlSelection;
 import org.tmotte.klonk.controller.CtrlUndo;
-import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.ssh.IUserPass;
@@ -100,7 +95,7 @@ public class BootContext {
     //Now we start doing things:
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        CtrlMain cm=context.getMainController();
+        CtrlMain cm=context.createMainController();
         cm.doNew();
         cm.doLoadFiles(args);
         context.getFileListener().startDirectoryListener(cm.getFileReceiver());
@@ -114,12 +109,11 @@ public class BootContext {
 
   private KHome home;
   private KLog log;
-  private String argHomeDir;
-  private boolean argStdOut=false;
-  private String processID;
   private FileListen fileListen;
  
   private BootContext(String [] args){
+    String argHomeDir=null;
+    boolean argStdOut=false;
     for (int i=0; i<args.length; i++)
       if (args[i].equals("-home") && i<args.length-1){
         args[i]=null;
@@ -132,39 +126,31 @@ public class BootContext {
         argStdOut=true;
       }
     initLookFeel();
+    home=new KHome(
+      argHomeDir!=null
+        ?argHomeDir
+        :KHome.nameIt(System.getProperty("user.home"), "klonk")
+    );
+    String pid=ManagementFactory.getRuntimeMXBean().getName();
+    String processID=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
+    log=argStdOut
+      ?new KLog(System.out)
+      :new KLog(home, processID);
+    fileListen=new FileListen(log, processID, home);    
   }
   
   
   private KHome getHome() {
-    if (home==null) 
-      home=new KHome(
-        argHomeDir!=null
-          ?argHomeDir
-          :KHome.nameIt(System.getProperty("user.home"), "klonk")
-      );
     return home;
   }
   private KLog getLog() {
-    if (log==null)
-      log=argStdOut
-        ?new KLog(System.out)
-        :new KLog(getHome(), getProcessID());
     return log;
   }
-  private String getProcessID() {
-    if (processID==null) {
-      String pid=ManagementFactory.getRuntimeMXBean().getName();
-      processID=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
-    }
-    return processID;
-  }
   private FileListen getFileListener() {
-    if (fileListen==null) 
-      fileListen=new FileListen(getLog(), getProcessID(), getHome());    
     return fileListen;
   }
 
-  private CtrlMain getMainController() {
+  private CtrlMain createMainController() {
   
     //The log:
     KLog log=getLog();
@@ -246,13 +232,6 @@ public class BootContext {
     Help help=new Help(mainFrame, home.getUserHome(), editorFont);
     About about=new About(mainFrame);
     
-    //Font listeners on the popups:
-    List<Setter<FontOptions>> fontListeners=new java.util.ArrayList<>(10);
-    fontListeners.add(shell.getFontListener());
-    fontListeners.add(favorites.getFontListener());
-    fontListeners.add(help.getFontListener());
-    fontListeners.add(findAndReplace.getFontListener());   
-
     //Push some controllers back to main controller:
     ctrlMain.setPopups(alerter, fileDialogWrapper, yesNoCancel, yesNo);
     
@@ -260,30 +239,43 @@ public class BootContext {
     // MENUS: //
     ////////////
 
-    Menus menus=new Menus(editors);
-    menus.setFastUndos(persist.getFastUndos())
-          .setWordWrap(persist.getWordWrap());
-    CtrlFavorites ctrlFavorites=new CtrlFavorites(
-      persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
-    );
-    menus.setControllers(
-      ctrlMain
-      ,new CtrlMarks    (editors, statusBar)
-      ,new CtrlSelection(editors, statusBar, alerter)
-      ,new CtrlUndo     (editors, statusBar, yesNo, persist)
-      ,new CtrlSearch   (editors, statusBar, findAndReplace, goToLine)
-      ,new CtrlFileOther(editors, statusBar, ctrlFavorites)
-      ,new CtrlOther    (shell, help, about)
-      ,new CtrlOptions  (
-        editors, statusBar, persist, ctrlFavorites, 
-        ctrlMain.getLineDelimiterListener(), fontListeners,
-        sshOptionPicker, tabsAndIndents, favorites, fontPicker, kDelims
-      )
-    );
+    
+    Menus menus=new Menus(editors);  
+    {
+      menus.setFastUndos(persist.getFastUndos())
+            .setWordWrap(persist.getWordWrap());
+      CtrlFavorites ctrlFavorites=new CtrlFavorites(
+        persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
+      );
+      List<Setter<FontOptions>> fontListeners=new java.util.ArrayList<>(10);
+      fontListeners.add(shell.getFontListener());
+      fontListeners.add(favorites.getFontListener());
+      fontListeners.add(help.getFontListener());
+      fontListeners.add(findAndReplace.getFontListener());
+  
+      menus.setControllers(
+        ctrlMain
+        ,new CtrlMarks    (editors, statusBar)
+        ,new CtrlSelection(editors, statusBar, alerter)
+        ,new CtrlUndo     (editors, statusBar, yesNo, persist)
+        ,new CtrlSearch   (editors, statusBar, findAndReplace, goToLine)
+        ,new CtrlFileOther(editors, statusBar, ctrlFavorites)
+        ,new CtrlOther    (shell, help, about)
+        ,new CtrlOptions  (
+          editors, statusBar, persist, ctrlFavorites, 
+          ctrlMain.getLineDelimiterListener(), fontListeners,
+          sshOptionPicker, tabsAndIndents, favorites, fontPicker, kDelims
+        )
+      );
+    }
     mainFrame.setJMenuBar(menus.getMenuBar());    
+    
+    ///////////////////////
+    // Back to CtrlMain: //
+    ///////////////////////
 
     ctrlMain.setListeners(
-      getFileListener().getLockRemover(), 
+      fileListen.getLockRemover(), 
       menus.getEditorSwitchListener(),
       menus.getRecentFileListener(),
       menus.getRecentDirListener()
@@ -292,8 +284,6 @@ public class BootContext {
     return ctrlMain;
   }
 
-
-  
   
   ////////////////
   // UTILITIES: //
