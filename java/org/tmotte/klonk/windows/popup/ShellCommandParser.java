@@ -13,8 +13,10 @@ class ShellCommandParser {
   }
   public static List<String> parse(String cmd, String currFileName) {
     List<String> results=new LinkedList<>();
+    System.out.println("FUCKING "+cmd+" "+currFileName);
     if (referencesCurrFile(cmd) & currFileName!=null)
       cmd=cmd.replace(currFileMarker, currFileName);
+    System.out.println("FUCKING "+cmd);
 
     //Maybe it's just one big command that references a real file, spaces or no spaces -
     //like C:\program files\booger hooger\foo.exe:
@@ -52,7 +54,7 @@ class ShellCommandParser {
   }
     
   private static boolean referencesCurrFile(String cmd) {
-    return currFileMarker.indexOf(currFileMarker)!=-1;
+    return cmd.indexOf(currFileMarker)!=-1;
   }
     
   private static List<String> getProgramArguments(List<String> results, StringChunker sc){
