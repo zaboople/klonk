@@ -2,7 +2,6 @@ package org.tmotte.klonk.controller;
 import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.msg.Editors;
-import org.tmotte.klonk.windows.popup.Popups;
 import org.tmotte.common.swang.SimpleClipboard;
 import org.tmotte.common.text.DelimitedString;
 import javax.swing.SwingUtilities;
@@ -11,7 +10,6 @@ import java.util.LinkedList;
 public class CtrlMarks {
   private Editors editors;
   private StatusUpdate status;
-  private Popups popups;
   public CtrlMarks(Editors editors, StatusUpdate status) {
     this.editors=editors;
     this.status=status;

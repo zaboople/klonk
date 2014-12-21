@@ -45,7 +45,6 @@ import org.tmotte.klonk.windows.popup.KAlert;
 import org.tmotte.klonk.windows.popup.LineDelimiters;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.Help;
-import org.tmotte.klonk.windows.popup.Popups;
 import org.tmotte.klonk.windows.popup.Shell;
 import org.tmotte.klonk.windows.popup.TabsAndIndents;
 import org.tmotte.klonk.windows.popup.YesNoCancel;
@@ -113,45 +112,13 @@ public class BootContext {
   // INSTANCE VARIABLES AND CONSTRUCTOR: //
   /////////////////////////////////////////
 
-  //Command-line inputs:
-  private String argHomeDir;
-  private boolean argStdOut=false;
-
-  //State-control components:
-  private String processID;
   private KHome home;
   private KLog log;
-  private KPersist persist;
+  private String argHomeDir;
+  private boolean argStdOut=false;
+  private String processID;
   private FileListen fileListen;
-  private CtrlMain ctrlMain;
-  private CtrlFavorites ctrlFavorites;
-
-  //Main window components:
-  private Menus menus;
-  private StatusUpdate statusBar;
-  private MainDisplay mainDisplay;
-  
-  //Popup window components
-  private About about;
-  private Favorites favorites;
-  private FileDialogWrapper fileDialogWrapper;
-  private FindAndReplace findAndReplace;
-  private FontPicker fontPicker;
-  private GoToLine goToLine;
-  private Help help;
-  private IUserPass iUserPass;
-  private JFrame mainFrame;
-  private LineDelimiters kDelims;
-  private MainLayout layout;
-  private Popups popups;
-  private SSHConnections sshConns;
-  private SSHOptionPicker sshOptionPicker;
-  private Setter<String> alerter;
-  private Shell shell;
-  private TabsAndIndents tabsAndIndents;
-  private YesNoCancel yesNo;
-  private YesNoCancel yesNoCancel;
-  
+ 
   private BootContext(String [] args){
     for (int i=0; i<args.length; i++)
       if (args[i].equals("-home") && i<args.length-1){
@@ -167,357 +134,22 @@ public class BootContext {
     initLookFeel();
   }
   
-  /////////////////////////////////////////////////
-  // Stack overflow (and otherwise) prevention:  //
-  /////////////////////////////////////////////////
-
-  private java.util.Set<String> checks=new java.util.HashSet<String>();
-  /** 
-   * Everything should call this during object assembly to prevent circular references
-   * from causing unexpected behavior. It will crash the boot process in the event
-   * that such happens.
-   */
-  private BootContext check(String s) {
-    if (checks.contains(s))
-      throw new RuntimeException("Recursed back to constructor from constructor: "+s);
-    checks.add(s);
-    return this;
-  }
   
-  //////////////////////////////////////////
-  // CONCRETE CLASSES:                    //
-  // Sure maybe everything should be an   //
-  // interface but sometimes that's just  //
-  // not worth it:                        //
-  //////////////////////////////////////////
-
   private KHome getHome() {
-    if (home==null) {
-      check("home");
+    if (home==null) 
       home=new KHome(
         argHomeDir!=null
           ?argHomeDir
           :KHome.nameIt(System.getProperty("user.home"), "klonk")
       );
-    }
     return home;
   }
   private KLog getLog() {
-    if (log==null){
-      check("log");
+    if (log==null)
       log=argStdOut
         ?new KLog(System.out)
         :new KLog(getHome(), getProcessID());
-    }
     return log;
-  }
-  private KPersist getPersist() {
-    if (persist==null){
-      check("persist");
-      persist=new KPersist(getHome(), getLog().getExceptionHandler());
-    }
-    return persist;
-  }
-  private CtrlMain getMainController() {
-    if (ctrlMain==null){
-      check("ctrlMain");
-      ctrlMain=new CtrlMain(
-        getLog().getExceptionHandler(), 
-        getPersist() 
-      );
-      ctrlMain.setLayout(
-        getMainDisplay(), 
-        getStatusBar()
-      );
-      ctrlMain.setPopups(
-        getAlerter(), 
-        getFileDialog(),
-        getYesNoCancel(),
-        getYesNo()
-      );
-      ctrlMain.setListeners(
-        getLockRemover(), 
-        getEditorSwitchListener(),
-        getRecentFileListener(),
-        getRecentDirListener()
-      );
-    }
-    return ctrlMain;
-  }
-  private SSHConnections getSSHConnections() {
-    if (sshConns==null){
-      check("sshConns");
-      SSHOptions sshOpts=getPersist().getSSHOptions();
-      sshConns=new SSHConnections(
-          getLog().getLogger(),
-          getAlerter()
-        )
-        .withLogin(getSSHLogin())
-        .withKnown(sshOpts.getKnownHostsFilename())
-        .withPrivateKeys(sshOpts.getPrivateKeysFilename());        
-    }
-    return sshConns;
-  }
-  private Editors getEditors() {
-    return getMainController().getEditors();
-  }
-  private Menus getMenus() {
-    if (menus==null) {
-      check("menus");
-      menus=new Menus(getEditors());
-      menus.setFastUndos(getPersist().getFastUndos())
-           .setWordWrap( getPersist().getWordWrap());
-      Editors ed=getEditors();
-      StatusUpdate sup=getStatusBar();
-      menus.setControllers(
-        getMainController()
-        ,new CtrlMarks    (ed, sup)
-        ,new CtrlSelection(ed, sup, getAlerter())
-        ,new CtrlUndo     (ed, sup, getYesNo(), getPersist())
-        ,new CtrlSearch   (ed, sup, getFindAndReplace(), getGoToLine())
-        ,new CtrlFileOther(ed, sup, getCtrlFavorites())
-        ,new CtrlOther    (getShell(), getHelp(), getAbout())
-        ,new CtrlOptions(
-          ed, sup,
-          getPersist(), getCtrlFavorites(), getLineDelimiterListener(), getFontListeners(),
-          getSSHOptionPicker(), getTabsAndIndents(), getFavorites(), getFontPicker(),
-          getPopups()
-        )
-      );
-    }
-    return menus;
-  }
-  private MainLayout getLayout() {
-    if (layout==null) {
-      check("layout");
-      layout=new MainLayout();
-      layout.init(getMainFrame());
-      layout.setAppCloseListener(getAppCloseListener());
-      layout.show(
-        getPersist().getWindowBounds(
-          new java.awt.Rectangle(10, 10, 300, 300)
-        ),
-        getPersist().getWindowMaximized()
-      );
-    }
-    return layout;
-  }
-  private CtrlFavorites getCtrlFavorites() {
-    if (ctrlFavorites==null){
-      check("ctrlFavorites");
-      ctrlFavorites=new CtrlFavorites(
-        persist, getFavoriteFileListener(), getFavoriteDirListener()
-      );
-    }
-    return ctrlFavorites;
-  }
-  private FileListen getFileListener() {
-    if (fileListen==null) {
-      check("fileListen");
-      fileListen=new FileListen(getLog(), getProcessID(), getHome());    
-    }
-    return fileListen;
-  }
-
-  private Favorites getFavorites() {
-    if (favorites==null){
-      check("favorites");
-      favorites=new Favorites(getMainFrame(), getPersist().getFontAndColors());
-    }
-    return favorites;
-  }
-  private Popups getPopups() {
-    if (popups==null){
-      check("popups");
-      popups=new Popups(getMainFrame() ,getAlerter());
-    }
-    return popups;
-  }
-  private Help getHelp() {
-    if (help==null){
-      check("help");
-      help=new Help(mainFrame, home.getUserHome(), getPersist().getFontAndColors());
-    }
-    return help;
-  }
-  private About getAbout() {
-    if (about==null){
-      check("about");
-      about=new About(mainFrame);
-    }
-    return about;
-  }
-  private LineDelimiters getLineDelimiters() {
-    if (kDelims==null){
-      check("kDelims");
-      kDelims=new LineDelimiters(getMainFrame());
-    }
-    return kDelims;
-  }  
-  private SSHOptionPicker getSSHOptionPicker() {
-    if (sshOptionPicker==null){
-      check("sshOptionPicker");
-      sshOptionPicker=new SSHOptionPicker(getMainFrame(), getFileDialog());
-    }
-    return sshOptionPicker;
-  } 
-  private FileDialogWrapper getFileDialog() {
-    if (fileDialogWrapper==null){
-      check("fileDialogWrapper");
-      fileDialogWrapper=new FileDialogWrapper(
-        mainFrame, 
-        new SSHFileSystemView(getSSHConnections(), getLog().getLogger()), 
-        new SSHFileView()
-      );
-    }
-    return fileDialogWrapper;
-  }  
-  private GoToLine getGoToLine() {
-    if (goToLine==null){
-      check("goToLine");
-      goToLine=new GoToLine(getMainFrame(), getAlerter());
-    }
-    return goToLine;
-  }
-  private YesNoCancel getYesNoCancel() {
-    if (yesNoCancel==null){
-      check("yesNoCancel");
-      yesNoCancel=new YesNoCancel(getMainFrame(), true);
-    }
-    return yesNoCancel;
-  }
-  private YesNoCancel getYesNo() {
-    if (yesNo==null){
-      check("yesNo");
-      yesNo=new YesNoCancel(mainFrame, false);
-    }
-    return yesNo;
-  }
-  private Shell getShell() {
-    if (shell==null) {
-      check("shell");
-      shell=new Shell(
-         getMainFrame() 
-        ,getLog().getExceptionHandler()
-        ,getPersist()
-        ,getFileDialog()
-        ,getPopupIcon() 
-        ,getCurrFileNameGetter()
-      );
-    }
-    return shell;
-  }
-  private TabsAndIndents getTabsAndIndents() {
-    if (tabsAndIndents==null) {
-      check("tabsAndIndents");
-      tabsAndIndents=new TabsAndIndents(getMainFrame());
-    }
-    return tabsAndIndents;
-  }
-  private FontPicker getFontPicker() {
-    if (fontPicker==null)
-      fontPicker=new FontPicker(getMainFrame(), getAlerter());
-    return fontPicker;
-  }
-  
-  
-
-  /////////////////////////////////////////////
-  // PURE INTERFACES, ABSTRACT CLASSES, AND: //
-  // VALUE OBJECTS:                          //
-  /////////////////////////////////////////////
-
-  //Abstracts:
-  public JFrame getMainFrame() {
-    if (mainFrame==null) {
-      check("mainFrame");
-      mainFrame=new JFrame("Klonk");
-      mainFrame.setIconImage(getAppIcon());
-      mainFrame.setJMenuBar(getMenuBar());
-    }
-    return mainFrame;
-  }
-  private JMenuBar getMenuBar() {
-    return getMenus().getMenuBar();
-  }
-  
-  //Interfaces:
-  private Setter<String> getAlerter() {
-    if (alerter==null){
-      check("alerter");
-      alerter=new KAlert(getMainFrame());
-    }
-    return alerter;
-  }
-  private IUserPass getSSHLogin() {
-    if (iUserPass==null) {
-      check("iUserPass");
-      iUserPass=new SSHLogin(getMainFrame(), getAlerter());
-    }
-    return iUserPass;
-  }
-  private FindAndReplace getFindAndReplace() {
-    if (findAndReplace==null){
-      check("findAndReplace");
-      findAndReplace=new FindAndReplace(
-        getMainFrame(), getAlerter(), getStatusBar(), getPersist().getFontAndColors()
-      );
-    }
-    return findAndReplace;
-  }  
-
-  // Nested interfaces: For many of these, if the function gets called twice,
-  // a new object will be returned each time, but it's not a big deal. We should
-  // try to avoid that, however.
-  
-  private MainDisplay getMainDisplay() {
-    return getLayout().getMainDisplay();
-  }
-  private StatusUpdate getStatusBar() {
-    return getLayout().getStatusBar(); 
-  }
-  private LineDelimiterListener getLineDelimiterListener() {
-    return getMainController().getLineDelimiterListener();
-  }
-  private List<Setter<FontOptions>> getFontListeners() {
-    List<Setter<FontOptions>> fl=new java.util.ArrayList<>(10);
-    fl.add(getShell().getFontListener());
-    fl.add(getFavorites().getFontListener());
-    fl.add(getHelp().getFontListener());
-    fl.add(getFindAndReplace().getFontListener());
-    return fl;
-  }  
-  private Doer getAppCloseListener() {
-    return getMainController().getAppCloseListener();
-  }
-  private Getter<String> getCurrFileNameGetter() {
-    return getMainController().getCurrFileNameGetter();
-  }
-  private Doer getLockRemover() {
-    return getFileListener().getLockRemover();
-  }
-  private Setter<List<String>> getFavoriteFileListener() {
-    return getMenus().getFavoriteFileListener();
-  }
-  private Setter<List<String>> getFavoriteDirListener() {
-    return getMenus().getFavoriteDirListener();
-  }
-  private Doer getEditorSwitchListener() {
-    return getMenus().getEditorSwitchListener();
-  }
-  private Setter<List<String>> getRecentFileListener() {
-    return getMenus().getRecentFileListener();
-  }
-  private Setter<List<String>> getRecentDirListener() {
-    return getMenus().getRecentDirListener();
-  }
-
-  //Concrete value objects:
-  private Image getPopupIcon() {
-    return getPopupIcon(this);
-  }
-  private Image getAppIcon() {
-    return getAppIcon(this);
   }
   private String getProcessID() {
     if (processID==null) {
@@ -526,6 +158,141 @@ public class BootContext {
     }
     return processID;
   }
+  private FileListen getFileListener() {
+    if (fileListen==null) 
+      fileListen=new FileListen(getLog(), getProcessID(), getHome());    
+    return fileListen;
+  }
+
+  private CtrlMain getMainController() {
+  
+    //The log:
+    KLog log=getLog();
+    Setter<Throwable> failHandler=log.getExceptionHandler();    
+  
+    //Persist:
+    KPersist persist=new KPersist(getHome(), failHandler);
+    FontOptions editorFont=persist.getFontAndColors();
+
+    //Main controller:
+    CtrlMain ctrlMain=new CtrlMain(failHandler, persist);
+    Editors editors=ctrlMain.getEditors();
+
+    /////////////////////////
+    // MAIN WINDOW LAYOUT: //
+    /////////////////////////
+
+    //Main frame:
+    JFrame mainFrame=new JFrame("Klonk");
+    mainFrame.setIconImage(getAppIcon(this));
+
+    //Main layout:
+    MainLayout layout=new MainLayout();
+    layout.init(mainFrame);
+    layout.setAppCloseListener(ctrlMain.getAppCloseListener());
+    layout.show(
+      persist.getWindowBounds(
+        new java.awt.Rectangle(10, 10, 300, 300)
+      ),
+      persist.getWindowMaximized()
+    );    
+    StatusUpdate statusBar=layout.getStatusBar();
+    ctrlMain.setLayout(layout.getMainDisplay(), statusBar);
+
+    ////////////////////
+    // POPUP WINDOWS: //
+    ////////////////////
+
+    //Our general purpose hello-ok, yes-no-cancel and yes-no popups:
+    KAlert alerter=new KAlert(mainFrame);    
+    YesNoCancel 
+      yesNoCancel=new YesNoCancel(mainFrame, true),
+      yesNo      =new YesNoCancel(mainFrame, false);        
+
+    //SSH Login:
+    IUserPass iUserPass=new SSHLogin(mainFrame, alerter);
+
+    //File dialog + SSH:
+    SSHOptions sshOpts=persist.getSSHOptions();
+    SSHConnections sshConns=new SSHConnections(log.getLogger(), alerter)
+      .withLogin(iUserPass)
+      .withKnown(sshOpts.getKnownHostsFilename())
+      .withPrivateKeys(sshOpts.getPrivateKeysFilename());
+    FileDialogWrapper fileDialogWrapper=new FileDialogWrapper(
+      mainFrame, 
+      new SSHFileSystemView(sshConns, log.getLogger()), 
+      new SSHFileView()
+    );
+  
+    //Search popups:
+    FindAndReplace findAndReplace=
+      new FindAndReplace(mainFrame, alerter, statusBar, editorFont);
+    GoToLine goToLine=new GoToLine(mainFrame, alerter);
+
+    //Shell:
+    Shell shell=new Shell(
+      mainFrame, failHandler, persist, fileDialogWrapper, 
+      getPopupIcon(this), ctrlMain.getCurrFileNameGetter()
+    );
+
+    //Various option popups:
+    Favorites favorites=new Favorites(mainFrame, editorFont);
+    TabsAndIndents tabsAndIndents=new TabsAndIndents(mainFrame);
+    FontPicker fontPicker=new FontPicker(mainFrame, alerter);
+    SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, fileDialogWrapper);
+    LineDelimiters kDelims=new LineDelimiters(mainFrame);
+    
+    //Help:
+    Help help=new Help(mainFrame, home.getUserHome(), editorFont);
+    About about=new About(mainFrame);
+    
+    //Font listeners on the popups:
+    List<Setter<FontOptions>> fontListeners=new java.util.ArrayList<>(10);
+    fontListeners.add(shell.getFontListener());
+    fontListeners.add(favorites.getFontListener());
+    fontListeners.add(help.getFontListener());
+    fontListeners.add(findAndReplace.getFontListener());   
+
+    //Push some controllers back to main controller:
+    ctrlMain.setPopups(alerter, fileDialogWrapper, yesNoCancel, yesNo);
+    
+    ////////////
+    // MENUS: //
+    ////////////
+
+    Menus menus=new Menus(editors);
+    menus.setFastUndos(persist.getFastUndos())
+          .setWordWrap(persist.getWordWrap());
+    CtrlFavorites ctrlFavorites=new CtrlFavorites(
+      persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
+    );
+    menus.setControllers(
+      ctrlMain
+      ,new CtrlMarks    (editors, statusBar)
+      ,new CtrlSelection(editors, statusBar, alerter)
+      ,new CtrlUndo     (editors, statusBar, yesNo, persist)
+      ,new CtrlSearch   (editors, statusBar, findAndReplace, goToLine)
+      ,new CtrlFileOther(editors, statusBar, ctrlFavorites)
+      ,new CtrlOther    (shell, help, about)
+      ,new CtrlOptions  (
+        editors, statusBar, persist, ctrlFavorites, 
+        ctrlMain.getLineDelimiterListener(), fontListeners,
+        sshOptionPicker, tabsAndIndents, favorites, fontPicker, kDelims
+      )
+    );
+    mainFrame.setJMenuBar(menus.getMenuBar());    
+
+    ctrlMain.setListeners(
+      getFileListener().getLockRemover(), 
+      menus.getEditorSwitchListener(),
+      menus.getRecentFileListener(),
+      menus.getRecentDirListener()
+    );
+
+    return ctrlMain;
+  }
+
+
   
   
   ////////////////
