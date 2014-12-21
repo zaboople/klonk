@@ -37,6 +37,7 @@ public class LineDelimiters {
   private JButton btnDefault, btnThis, btnClose;
   
   private LineDelimiterListener listener;
+  private boolean initialized=false;
 
   /////////////////////
   // INITIALIZATION: //
@@ -56,6 +57,7 @@ public class LineDelimiters {
   
 
   public void show(LineDelimiterOptions current, LineDelimiterListener listener) {
+    init();
     this.listener=listener;
     //These have to come before the other crap or it won't render. Which is stupid.
     jcbDefault.setSelectedIndex(getSelectedOption(current.defaultOption));
@@ -96,6 +98,15 @@ public class LineDelimiters {
   ///////////////////////////////
   // CREATE / LAYOUT / LISTEN: //
   ///////////////////////////////
+
+  private void init() {
+    if (!initialized){
+      create();
+      layout(); 
+      listen();
+      initialized=true;
+    }
+  }
   
   private void create() {
     jcOptions =getOptions();

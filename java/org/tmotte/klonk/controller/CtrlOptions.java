@@ -10,10 +10,11 @@ import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
-import org.tmotte.klonk.windows.popup.Popups;
 import org.tmotte.klonk.windows.popup.Favorites;
-import org.tmotte.klonk.windows.popup.TabsAndIndents;
+import org.tmotte.klonk.windows.popup.FontPicker;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
+import org.tmotte.klonk.windows.popup.Popups;
+import org.tmotte.klonk.windows.popup.TabsAndIndents;
 import org.tmotte.klonk.windows.popup.ssh.SSHOptionPicker;
 
 public class CtrlOptions {
@@ -32,12 +33,13 @@ public class CtrlOptions {
   private Favorites favorites;
   private SSHOptionPicker sshOptionPicker;
   private TabsAndIndents tabsAndIndents;
+  private FontPicker fontPicker;
   
   public CtrlOptions(
-      Editors editors, StatusUpdate statusBar, KPersist persist,
-      Favorites favorites, CtrlFavorites ctrlFavorites, 
+      Editors editors, StatusUpdate statusBar, KPersist persist, CtrlFavorites ctrlFavorites, 
       LineDelimiterListener delimListener, List<Setter<FontOptions>> fontListeners,
-      SSHOptionPicker sshOptionPicker, TabsAndIndents tabsAndIndents,
+      SSHOptionPicker sshOptionPicker, TabsAndIndents tabsAndIndents, 
+      Favorites favorites, FontPicker fontPicker,
       Popups popups
     ) {
     this.editors=editors;
@@ -49,6 +51,7 @@ public class CtrlOptions {
     this.fontListeners=fontListeners;
     this.sshOptionPicker=sshOptionPicker;
     this.tabsAndIndents=tabsAndIndents;
+    this.fontPicker=fontPicker;
     this.popups=popups;
 
     this.taio=persist.getTabAndIndentOptions();
@@ -76,7 +79,7 @@ public class CtrlOptions {
   }
   
   public void doFontAndColors() {
-    if (!popups.doFontAndColors(fontOptions))
+    if (!fontPicker.show(fontOptions))
       return;
     for (Editor e: editors.forEach())
       e.setFont(fontOptions);

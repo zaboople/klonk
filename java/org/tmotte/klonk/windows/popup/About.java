@@ -39,18 +39,18 @@ public class About {
   private JScrollPane jspLicense;
   private JButton btnOK; 
 
+  private boolean initialized=false;
+
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
   
   public About(JFrame frame) {
     this.parentFrame=frame;
-    create();
-    layout();
-    listen();
   }
 
   public void show() {
+    init();
     Positioner.set(parentFrame, win);
     btnOK.requestFocusInWindow();
     win.pack();
@@ -62,6 +62,16 @@ public class About {
   //////////////////////
   // PRIVATE METHODS: //
   //////////////////////
+  
+  private void init() {
+    if (!initialized){
+      create();
+      layout(); 
+      listen();
+      initialized=true;
+    }
+  }
+  
   private void create(){
     win=new JDialog(parentFrame, true);
     win.setTitle("About Klonk");

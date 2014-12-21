@@ -124,8 +124,6 @@ public class BootContext {
   private KPersist persist;
   private FileListen fileListen;
   private CtrlMain ctrlMain;
-  private CtrlOptions ctrlOptions;
-  private CtrlOther ctrlOther;
   private CtrlFavorites ctrlFavorites;
 
   //Main window components:
@@ -246,26 +244,6 @@ public class BootContext {
     }
     return ctrlMain;
   }
-  private CtrlOther getCtrlOther(){
-    if (ctrlOther==null) {
-      check("ctrlOther");
-      ctrlOther=new CtrlOther(getShell(), getHelp(), getPopups());
-    }
-    return ctrlOther;
-  }
-  private CtrlOptions getCtrlOptions(){
-    if (ctrlOptions==null) {
-      check("ctrlOptions");
-      ctrlOptions=new CtrlOptions(
-        getEditors(), getStatusBar(), 
-        getPersist(), getFavorites(), getCtrlFavorites(), 
-        getLineDelimiterListener(), getFontListeners(),
-        getSSHOptionPicker(), getTabsAndIndents(),
-        getPopups()
-      );
-    }
-    return ctrlOptions;
-  }
   private SSHConnections getSSHConnections() {
     if (sshConns==null){
       check("sshConns");
@@ -297,9 +275,14 @@ public class BootContext {
         ,new CtrlSelection(ed, sup, getAlerter())
         ,new CtrlUndo     (ed, sup, getYesNo(), getPersist())
         ,new CtrlSearch   (ed, sup, getFindAndReplace(), getGoToLine())
-        ,getCtrlOptions()
         ,new CtrlFileOther(ed, sup, getCtrlFavorites())
-        ,getCtrlOther()
+        ,new CtrlOther    (getShell(), getHelp(), getAbout())
+        ,new CtrlOptions(
+          ed, sup,
+          getPersist(), getCtrlFavorites(), getLineDelimiterListener(), getFontListeners(),
+          getSSHOptionPicker(), getTabsAndIndents(), getFavorites(), getFontPicker(),
+          getPopups()
+        )
       );
     }
     return menus;
@@ -357,6 +340,20 @@ public class BootContext {
     }
     return help;
   }
+  private About getAbout() {
+    if (about==null){
+      check("about");
+      about=new About(mainFrame);
+    }
+    return about;
+  }
+  private LineDelimiters getLineDelimiters() {
+    if (kDelims==null){
+      check("kDelims");
+      kDelims=new LineDelimiters(getMainFrame());
+    }
+    return kDelims;
+  }  
   private SSHOptionPicker getSSHOptionPicker() {
     if (sshOptionPicker==null){
       check("sshOptionPicker");
@@ -417,6 +414,12 @@ public class BootContext {
     }
     return tabsAndIndents;
   }
+  private FontPicker getFontPicker() {
+    if (fontPicker==null)
+      fontPicker=new FontPicker(getMainFrame(), getAlerter());
+    return fontPicker;
+  }
+  
   
 
   /////////////////////////////////////////////
@@ -549,6 +552,5 @@ public class BootContext {
       throw new RuntimeException(e);
     }
   }
-  
 
 }

@@ -96,9 +96,9 @@ public class Menus {
       ,CtrlSelection ctrlSelection
       ,CtrlUndo ctrlUndo  
       ,CtrlSearch ctrlSearch
-      ,CtrlOptions ctrlOptions
       ,CtrlFileOther ctrlFileOther
       ,CtrlOther ctrlOther
+      ,CtrlOptions ctrlOptions
     ){
     this.ctrlMain=ctrlMain;
     this.ctrlMarks=ctrlMarks;

@@ -51,10 +51,12 @@ public class FontPicker {
   private JFrame parentFrame;
   private JDialog win;
   private Setter<String> alerter;
+
   private FontOptions fontOptions;
   private boolean ok=false;
   private Map<String,Font> goodFonts, badFonts;
   private Color selectedForeground, selectedBackground, selectedCaret;
+  
 
   private DefaultListModel<String> fontNameData;
   private DefaultListModel<Integer> fontSizeData;
@@ -66,6 +68,7 @@ public class FontPicker {
   private MyTextArea mta;
   private JScrollPane jspMTA;
   private JRadioButton jrbForeground, jrbBackground, jrbCaret;
+  private boolean initialized=true;
   
   
   /////////////////////
@@ -75,11 +78,9 @@ public class FontPicker {
   public FontPicker(JFrame parentFrame, Setter<String> alerter) {
     this.parentFrame=parentFrame;
     this.alerter=alerter;
-    create();
-    layout(); 
-    listen();
   }
   public boolean show(FontOptions fontOptions) {
+    init();
     prepare(fontOptions);
     while (true){
       ok=false;
@@ -154,6 +155,15 @@ public class FontPicker {
   ///////////////////////////
   // CREATE/LAYOUT/LISTEN: //  
   ///////////////////////////
+
+  private void init() {
+    if (!initialized) {
+      create();
+      layout(); 
+      listen();    
+      initialized=true;
+    }
+  }
 
   private void create(){
     win=new JDialog(parentFrame, true);
