@@ -13,7 +13,7 @@ public class CtrlUndo {
   private boolean fastUndos=false;
   private YesNoCancel yesNo;
   
-  public CtrlUndo(Editors editors, YesNoCancel yesNo, StatusUpdate status, KPersist persist) {
+  public CtrlUndo(Editors editors, StatusUpdate status, YesNoCancel yesNo, KPersist persist) {
     this.editors=editors;
     this.yesNo=yesNo;
     this.status=status;

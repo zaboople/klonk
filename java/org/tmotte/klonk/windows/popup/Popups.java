@@ -35,16 +35,11 @@ public class Popups {
 
   private About about;
   private LineDelimiters kDelims;
-  private TabsAndIndents tabsAndIndents;
   private FontPicker fontPicker;
 
   //DI resources for constructor:
   private final Setter<String> alerter;
   private final JFrame mainFrame;
-  private final KPersist persist;
-
-  //Other components. Well at least it's just this one:
-  private FontOptions fontOptions; 
   
   ///////////////////////////////////////
   // INITIALIZATION AND CONFIGURATION: //
@@ -52,17 +47,12 @@ public class Popups {
   
   public Popups(
       JFrame mainFrame, 
-      KPersist persist, 
       Setter<String> alerter
     ) {
     this.mainFrame        =mainFrame;
-    this.persist          =persist;
     this.alerter          =alerter;
   }
 
-  public void setFontAndColors(FontOptions fo) { //FIXME change this to a Setter<FontOptions>
-    this.fontOptions=fo;
-  }
   public JFrame getMainFrame() {
     return mainFrame;
   }
@@ -88,18 +78,7 @@ public class Popups {
     return alerter;
   }
 
-  
-  ///////////////////////////////////////////
-  // PRIVATE getX() MORE FREQUENTLY USED:  //
-  ///////////////////////////////////////////
-  
-  
-  private FontOptions getFontOptions() {
-    if (fontOptions==null) 
-      fontOptions=persist.getFontAndColors();
-    return fontOptions;
-  }
-  
+   
   ///////////////////////////////////////////
   // PRIVATE getX() LESS FREQUENTLY USED:  //
   ///////////////////////////////////////////

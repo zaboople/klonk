@@ -12,7 +12,7 @@ public class CtrlSelection {
   private StatusUpdate status;
   private Setter<String> alerter;
   
-  public CtrlSelection(Editors editors, Setter<String> alerter, StatusUpdate status) {
+  public CtrlSelection(Editors editors, StatusUpdate status, Setter<String> alerter) {
     this.editors=editors;
     this.status=status;
     this.alerter=alerter;

@@ -291,14 +291,11 @@ public class BootContext {
            .setWordWrap( getPersist().getWordWrap());
       Editors ed=getEditors();
       StatusUpdate sup=getStatusBar();
-      Popups pop=getPopups();
-      Setter<String> ale=getAlerter();
-      YesNoCancel yno=getYesNo();
       menus.setControllers(
         getMainController()
         ,new CtrlMarks    (ed, sup)
-        ,new CtrlSelection(ed, ale, sup)
-        ,new CtrlUndo     (ed, yno, sup, getPersist())
+        ,new CtrlSelection(ed, sup, getAlerter())
+        ,new CtrlUndo     (ed, sup, getYesNo(), getPersist())
         ,new CtrlSearch   (ed, sup, getFindAndReplace(), getGoToLine())
         ,getCtrlOptions()
         ,new CtrlFileOther(ed, sup, getCtrlFavorites())
@@ -326,9 +323,7 @@ public class BootContext {
     if (ctrlFavorites==null){
       check("ctrlFavorites");
       ctrlFavorites=new CtrlFavorites(
-        persist, 
-        getFavoriteFileListener(), 
-        getFavoriteDirListener()
+        persist, getFavoriteFileListener(), getFavoriteDirListener()
       );
     }
     return ctrlFavorites;
@@ -344,21 +339,14 @@ public class BootContext {
   private Favorites getFavorites() {
     if (favorites==null){
       check("favorites");
-      favorites=new Favorites(
-        getMainFrame(), 
-        getPersist().getFontAndColors()
-      );
+      favorites=new Favorites(getMainFrame(), getPersist().getFontAndColors());
     }
     return favorites;
   }
   private Popups getPopups() {
     if (popups==null){
       check("popups");
-      popups=new Popups(
-         getMainFrame()
-        ,getPersist()
-        ,getAlerter()
-      );
+      popups=new Popups(getMainFrame() ,getAlerter());
     }
     return popups;
   }
@@ -397,7 +385,7 @@ public class BootContext {
   private YesNoCancel getYesNoCancel() {
     if (yesNoCancel==null){
       check("yesNoCancel");
-      yesNoCancel=new YesNoCancel(mainFrame, true);
+      yesNoCancel=new YesNoCancel(getMainFrame(), true);
     }
     return yesNoCancel;
   }
