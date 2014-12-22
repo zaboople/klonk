@@ -9,5 +9,4 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 
 REM run it:
 set CLASSPATH=build;lib/jar/jsch-0.1.51.jar
-echo %1 %2 %3
 java  -Xshare:off %1 %2 %3 %4 %5 %6 %7 %8 %9

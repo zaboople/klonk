@@ -20,7 +20,7 @@
     <value>off</value>
   </javaProperties>
 
-  <mainClassName>org.tmotte.klonk.config.Boot</mainClassName>
+  <mainClassName>org.tmotte.klonk.config.BootContext</mainClassName>
   <maximumMemoryHeap>-1</maximumMemoryHeap>
   <maximumVersion></maximumVersion>
   <minimumVersion></minimumVersion>

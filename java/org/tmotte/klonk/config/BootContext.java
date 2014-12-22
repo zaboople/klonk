@@ -7,11 +7,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 import org.tmotte.klonk.Menus;
 import org.tmotte.klonk.config.msg.Editors;
-import org.tmotte.klonk.config.msg.MainDisplay;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.option.FontOptions;
@@ -51,9 +49,8 @@ import org.tmotte.klonk.windows.popup.ssh.SSHOptionPicker;
 
 /** 
  * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) architecture. 
- * <br>
- * There are also a few public-static functions that are made available for testing popup windows without
- * booting the whole application. 
+ * There are two layers, an initial layer and a user interface layer. There is also some public-static stuff
+ * here for convenience.
  */
 public class BootContext {
 
@@ -61,11 +58,7 @@ public class BootContext {
   // STATIC BOOT: //
   //////////////////
 
-  public static void main(String[] args) {
-    bootApplication(args);
-  }
-
-  private static void bootApplication(final String[] args){
+  public static void main(final String[] args) {
 
     //Initialize the context object. If we can't get a home directory,
     //we're DOA, no point in logging:
@@ -92,7 +85,7 @@ public class BootContext {
       }
     );
     
-    //Now we start doing things:
+    //Starting the GUI up:
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         CtrlMain cm=context.createMainController();
@@ -103,6 +96,7 @@ public class BootContext {
     });
   }
 
+
   /////////////////////////////////////////
   // INSTANCE VARIABLES AND CONSTRUCTOR: //
   /////////////////////////////////////////
@@ -111,6 +105,10 @@ public class BootContext {
   private KLog log;
   private FileListen fileListen;
  
+  /**
+   * This gives us the 1st layer of the application, enough to 
+   * get thru a minimal boot and die informatively when things go wrong:
+   */
   private BootContext(String [] args){
     String argHomeDir=null;
     boolean argStdOut=false;
@@ -125,7 +123,6 @@ public class BootContext {
         args[i]=null;
         argStdOut=true;
       }
-    initLookFeel();
     home=new KHome(
       argHomeDir!=null
         ?argHomeDir
@@ -137,42 +134,37 @@ public class BootContext {
       ?new KLog(System.out)
       :new KLog(home, processID);
     fileListen=new FileListen(log, processID, home);    
-  }
-  
-  
-  private KHome getHome() {
-    return home;
-  }
-  private KLog getLog() {
-    return log;
-  }
-  private FileListen getFileListener() {
-    return fileListen;
-  }
+  } 
+  private KHome getHome() { return home; }
+  private KLog getLog()   { return log;  }
+  private FileListen getFileListener() { return fileListen; }
 
+  
+  //////////////////////////
+  // USER INTERFACE BOOT: //
+  //////////////////////////
+
+  /**
+   * This provides the 2nd layer of the application, focused on the user interface.
+   */
   private CtrlMain createMainController() {
+
+    initLookFeel();
   
-    //The log:
-    KLog log=getLog();
+    // Basic logging & persistence:
     Setter<Throwable> failHandler=log.getExceptionHandler();    
-  
-    //Persist:
-    KPersist persist=new KPersist(getHome(), failHandler);
+    KPersist persist=new KPersist(home, failHandler);
     FontOptions editorFont=persist.getFontAndColors();
 
     //Main controller:
     CtrlMain ctrlMain=new CtrlMain(failHandler, persist);
     Editors editors=ctrlMain.getEditors();
 
-    /////////////////////////
-    // MAIN WINDOW LAYOUT: //
-    /////////////////////////
 
-    //Main frame:
+    // MAIN WINDOW LAYOUT: //
+
     JFrame mainFrame=new JFrame("Klonk");
     mainFrame.setIconImage(getAppIcon(this));
-
-    //Main layout:
     MainLayout layout=new MainLayout();
     layout.init(mainFrame);
     layout.setAppCloseListener(ctrlMain.getAppCloseListener());
@@ -185,9 +177,8 @@ public class BootContext {
     StatusUpdate statusBar=layout.getStatusBar();
     ctrlMain.setLayout(layout.getMainDisplay(), statusBar);
 
-    ////////////////////
+
     // POPUP WINDOWS: //
-    ////////////////////
 
     //Our general purpose hello-ok, yes-no-cancel and yes-no popups:
     KAlert alerter=new KAlert(mainFrame);    
@@ -235,15 +226,13 @@ public class BootContext {
     //Push some controllers back to main controller:
     ctrlMain.setPopups(alerter, fileDialogWrapper, yesNoCancel, yesNo);
     
-    ////////////
-    // MENUS: //
-    ////////////
 
+    // MENUS: //
     
     Menus menus=new Menus(editors);  
+    menus.setFastUndos(persist.getFastUndos())
+          .setWordWrap(persist.getWordWrap());
     {
-      menus.setFastUndos(persist.getFastUndos())
-            .setWordWrap(persist.getWordWrap());
       CtrlFavorites ctrlFavorites=new CtrlFavorites(
         persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
       );
@@ -270,10 +259,6 @@ public class BootContext {
     }
     mainFrame.setJMenuBar(menus.getMenuBar());    
     
-    ///////////////////////
-    // Back to CtrlMain: //
-    ///////////////////////
-
     ctrlMain.setListeners(
       fileListen.getLockRemover(), 
       menus.getEditorSwitchListener(),
@@ -285,10 +270,11 @@ public class BootContext {
   }
 
   
-  ////////////////
-  // UTILITIES: //
-  ////////////////
-
+  ///////////////////////////////////////
+  // STATIC UTILITIES:                 //
+  // These are public because they are //
+  // used in testing:                  //
+  ///////////////////////////////////////
 
   public static Image getIcon(Object o, String filename) {
     URL url=o.getClass().getClassLoader().getResource(filename);
