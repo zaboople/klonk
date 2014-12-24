@@ -167,7 +167,6 @@ public class BootContext {
     mainFrame.setIconImage(getAppIcon(this));
     MainLayout layout=new MainLayout();
     layout.init(mainFrame);
-    layout.setAppCloseListener(ctrlMain.getAppCloseListener());
     layout.show(
       persist.getWindowBounds(
         new java.awt.Rectangle(10, 10, 300, 300)
@@ -175,8 +174,10 @@ public class BootContext {
       persist.getWindowMaximized()
     );    
     StatusUpdate statusBar=layout.getStatusBar();
-    ctrlMain.setLayout(layout.getMainDisplay(), statusBar);
 
+    //Layout/CtrlMain integration:
+    layout.setAppCloseListener(ctrlMain.getAppCloseListener());
+    ctrlMain.setLayout(layout.getMainDisplay(), statusBar);
 
     // POPUP WINDOWS: //
 

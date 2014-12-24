@@ -10,15 +10,12 @@ public class SSHExec {
   
   private SSH ssh;
   private Setter<String> logger, alertHandler;
-  public SSHExec(SSH ssh, Setter<String> logger, Setter<String> alertHandler) {
+  SSHExec(SSH ssh, Setter<String> logger, Setter<String> alertHandler) {
     this.ssh=ssh;
     this.logger=logger;
   }
   
-  public SSH getSSH() {
-    return ssh;
-  }
-  public SSHExecResult exec(String command, boolean alertFail) {
+  SSHExecResult exec(String command, boolean alertFail) {
     StringBuilder out=new StringBuilder();
     ByteArrayOutputStream err=new ByteArrayOutputStream(512);
     int result=exec(command, out, err);
@@ -35,7 +32,7 @@ public class SSHExec {
       }
     return new SSHExecResult(result==0, out.toString());
   }
-  public int exec(String command, Appendable out, Appendable err) throws WrappedSSHException {
+  int exec(String command, Appendable out, Appendable err) throws WrappedSSHException {
     ByteArrayOutputStream baos=new ByteArrayOutputStream(512);
     int result=exec(command, out, baos);
     try {
@@ -51,7 +48,7 @@ public class SSHExec {
    *        the jsch library).
    * @return The output (typically 0,1,2) of the unix command, or -1 if we could not get a connection.
    */
-  public int exec(String command, Appendable out, OutputStream sshErr) throws WrappedSSHException {
+  int exec(String command, Appendable out, OutputStream sshErr) throws WrappedSSHException {
     mylog(command);
     try {
       Session session=ssh.getSession();

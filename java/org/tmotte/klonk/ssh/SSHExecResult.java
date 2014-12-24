@@ -1,8 +1,8 @@
 package org.tmotte.klonk.ssh;
-public class SSHExecResult {
+class SSHExecResult {
   final boolean success;
   final String output;
-  public SSHExecResult(boolean success, String output){
+  SSHExecResult(boolean success, String output){
     this.success=success;
     this.output=output;
     logFail();

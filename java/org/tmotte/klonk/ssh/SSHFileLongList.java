@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
 
-public class SSHFileLongList  {
+class SSHFileLongList  {
   
   private static Pattern blankPattern=Pattern.compile(" +");
   public final String perms;
@@ -18,7 +18,7 @@ public class SSHFileLongList  {
   public final String yearTime;
   public final boolean isDir;
 
-  public SSHFileLongList(String value){
+  SSHFileLongList(String value){
     isDir=value.startsWith("d");
     StringChunker sc=new StringChunker(value);
     perms=sc.getUpTo(blankPattern);

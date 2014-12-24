@@ -74,19 +74,6 @@ public class SSH {
   public String getUser() {
     return user;
   }
-  public SSHExec getExec() {
-    if (this.exec==null)
-      this.exec=new SSHExec(this, logger, alertHandler);  
-    return exec;
-  }
-  public SSHExecResult exec(String command, boolean alertFail) throws WrappedSSHException {
-    return getExec().exec(command, alertFail);
-  }
-  public SFTP getSFTP() {
-    if (this.sftp==null)
-      this.sftp=new SFTP(this);  
-    return sftp;
-  }
   public boolean isConnected(){
     if (session!=null) {
       if (session.isConnected())
@@ -107,17 +94,12 @@ public class SSH {
     session=null;
     connected=false;
   }
-  public boolean matches(String user, String host) {
-    return 
-      (user==null || user.equals(this.user)) && 
-      host.equals(this.host);
-  }
   public String toString() {
     return "SSH: user: "+user+" host: "+host+" knownHosts: "+knownHosts+" privateKeys: "+privateKeys;
   }
   public String getTildeFix() {
     if (tildeFix==null) {
-      SSHExecResult res=exec("cd ~; pwd", true);
+      SSHExecResult res=exec("cd ~; pwd");
       if (!res.success)
         throw new RuntimeException("Could not get home directory");
       tildeFix=res.output.trim();
@@ -125,15 +107,11 @@ public class SSH {
     return tildeFix;
   }
 
-  /** For locals only; SSHExec & SFTP */
-  protected Session getSession() {
-    if (!isConnected())
-      connect();
-    return isConnected() 
-      ?session
-      :null;
-  }
-  protected InputStream getInputStream(String file) {
+  ////////////////////////////////
+  // PACKAGE-PRIVATE FUNCTIONS: //
+  ////////////////////////////////
+
+  InputStream getInputStream(String file) {
     try {
       return getSFTP().getInputStream(file);
     } catch (Exception e) {
@@ -141,7 +119,7 @@ public class SSH {
       throw new RuntimeException(e);
     }
   }
-  protected OutputStream getOutputStream(String file) {
+  OutputStream getOutputStream(String file) {
     try {
       return getSFTP().getOutputStream(file);
     } catch (Exception e) {
@@ -149,10 +127,38 @@ public class SSH {
       throw new RuntimeException(e);
     }
   }
-  
+
+  SSHExecResult exec(String command) throws WrappedSSHException {
+    return exec(command, false);
+  }
+  SSHExecResult exec(String command, boolean alertFail) throws WrappedSSHException {
+    return getExec().exec(command, alertFail);
+  }
+
+  /** For locals only; SSHExec & SFTP */
+  Session getSession() {
+    if (!isConnected())
+      connect();
+    return isConnected() 
+      ?session
+      :null;
+  }
+
   //////////////////////////////
   // PRIVATE CONNECT METHODS: //
   ////////////////////////////// 
+
+  private SFTP getSFTP() {
+    if (this.sftp==null)
+      this.sftp=new SFTP(this);  
+    return sftp;
+  }
+
+  private SSHExec getExec() {
+    if (this.exec==null)
+      this.exec=new SSHExec(this, logger, alertHandler);  
+    return exec;
+  }
   
   private boolean connect() {
     try {

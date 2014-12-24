@@ -8,23 +8,20 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-public class SFTP {
+class SFTP {
   
   private SSH ssh;
   private ChannelSftp channel;
-  public SFTP(SSH ssh) {
+  SFTP(SSH ssh) {
     this.ssh=ssh;
   }
-  public SSH getSSH() {
-    return ssh;
-  }
-  public InputStream getInputStream(String file) throws Exception {
+  InputStream getInputStream(String file) throws Exception {
     return getChannel().get(file);
   }
-  public OutputStream getOutputStream(String file) throws Exception {    
+  OutputStream getOutputStream(String file) throws Exception {    
     return getChannel().put(file);
   }
-  public void close() throws Exception {
+  void close() throws Exception {
     if (channel!=null && channel.isConnected())
       channel.disconnect();
   }

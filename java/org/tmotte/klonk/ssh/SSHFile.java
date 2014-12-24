@@ -112,7 +112,7 @@ public class SSHFile extends File {
   /*Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.*/
   public @Override String[] list(){
     String absolutePath=getSystemPath();
-    SSHExecResult res=ssh.exec("ls --file-type -1 "+absolutePath, false); //FIXME quote the file
+    SSHExecResult res=ssh.exec("ls --file-type -1 "+absolutePath); //FIXME quote the file
 
     //Fail, for whatever reason including nonexistence:
     if (!res.success) 
