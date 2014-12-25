@@ -1,10 +1,5 @@
 -Current
 
-  -Right now
-    LINE DELIMITERS ARE BROKEN
-    Deal with blanks in file name.
-
-  -Tabs & Indents allows invalid input - letters instead of numbers
   
   -FAVORITE COMMANDS. OH MAN DO I NEED THAT
   
@@ -14,6 +9,8 @@
     -Hey and a File-Delete? With confirm of course. Hmph.
   
   -SSH Todo:
+    Deal with blanks in file name. Problem?
+    Alt-f-d can't work with ssh and needs to be disabled.
     SSH Options needs a list of open connections to select for closing.
     the datafoundry server is f'd, not everybody supports --file-type
     We need a last user saved to persist so we can hotrod logins.
@@ -26,6 +23,8 @@
 
   -File open ought to start off the session with the last directory opened. 
    It's annoying when it defaults to my stupid home directory. Well ...ssh. Ugh.
+
+  -Tabs & Indents allows invalid input - letters instead of numbers
       
   -New Klonk Bug
   Also consider the idea offered at bottom of this page:
