@@ -13,7 +13,6 @@ class ConnectionParse {
   private final Pattern sshPattern=Pattern.compile("ssh:/*", Pattern.CASE_INSENSITIVE);
   private final StringChunker chunker=new StringChunker();
 
-  /** FIXME no ConnectionParseExceptions */
   protected SSHFile parse(SSHConnections connMgr, String uri) {
     String user=null, host=null, dirFile=null;
     chunker.reset(uri);
@@ -57,12 +56,10 @@ class ConnectionParse {
     if (!left.find("/")){
       String remains=left.getRest();
       if (remains==null) 
-        //FIXME find out if the file is a dir or file
         return parent;
       else {
         remains=remains.trim();
         if (remains.equals(""))
-          //FIXME find out if the file is a dir or file
           return parent;
         if (parent!=null)
           parent.isDir=true;

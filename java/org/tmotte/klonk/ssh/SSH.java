@@ -128,10 +128,10 @@ public class SSH {
     }
   }
 
-  SSHExecResult exec(String command) throws WrappedSSHException {
+  SSHExecResult exec(String command) {
     return exec(command, false);
   }
-  SSHExecResult exec(String command, boolean alertFail) throws WrappedSSHException {
+  SSHExecResult exec(String command, boolean alertFail) {
     return getExec().exec(command, alertFail);
   }
 

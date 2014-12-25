@@ -32,7 +32,7 @@ public class SSHExec {
       }
     return new SSHExecResult(result==0, out.toString());
   }
-  int exec(String command, Appendable out, Appendable err) throws WrappedSSHException {
+  int exec(String command, Appendable out, Appendable err) throws Exception {
     ByteArrayOutputStream baos=new ByteArrayOutputStream(512);
     int result=exec(command, out, baos);
     try {
@@ -48,7 +48,7 @@ public class SSHExec {
    *        the jsch library).
    * @return The output (typically 0,1,2) of the unix command, or -1 if we could not get a connection.
    */
-  int exec(String command, Appendable out, OutputStream sshErr) throws WrappedSSHException {
+  int exec(String command, Appendable out, OutputStream sshErr) {
     mylog(command);
     try {
       Session session=ssh.getSession();
@@ -81,7 +81,7 @@ public class SSHExec {
         //in.close(); 
       }
     } catch (Exception e) {
-      throw new WrappedSSHException("Failed to execute: "+command, e);
+      throw new RuntimeException("Failed to execute: "+command, e);
     }
   }
 
