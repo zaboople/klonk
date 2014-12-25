@@ -264,6 +264,6 @@ public class LineDelimiters {
         );
         System.out.println(kdo);
       }
-    });  
+    });
   }
 }
