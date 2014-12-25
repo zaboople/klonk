@@ -31,7 +31,7 @@ class SSHFileLongList  {
     yearTime=sc.getUpTo(blankPattern);
   }
   public String toString() {
-    return perms+" "+size;
+    return "Directory:"+isDir+" month:"+month+" day:"+day+" yearTime:"+yearTime+" size:"+size+" perms: "+perms;
   }
 
   /////////////
