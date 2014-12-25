@@ -45,14 +45,6 @@ public class LineDelimiters {
 
   public LineDelimiters(JFrame frame) {
     parentFrame=frame;
-    win=new JDialog(frame, true);
-    win.setTitle("Line delimiters");
-    
-    create();
-    layout();
-    listen();
-
-    win.pack();
   }
   
 
@@ -109,6 +101,8 @@ public class LineDelimiters {
   }
   
   private void create() {
+    win=new JDialog(parentFrame, true);
+    win.setTitle("Line delimiters");
     jcOptions =getOptions();
     jcbDefault=new JComboBox<String>(jcOptions);
     jcbThis   =new JComboBox<String>(jcOptions);
@@ -150,6 +144,7 @@ public class LineDelimiters {
     gb.anchor=gb.CENTER;
     gb.addY(btnClose);
   
+    win.pack();
   }
   private Component getFirstLabel() {
     GridBug gb=new GridBug(new JPanel());
@@ -164,7 +159,7 @@ public class LineDelimiters {
       .weightXY(1);
     gb.anchor=gb.CENTER;
     gb.add(jcbDefault);
-    gb.insets.left=4;
+    gb.insets.left=8;
     gb.addX(btnDefault);
     return gb.container;
   }
@@ -183,7 +178,7 @@ public class LineDelimiters {
     gb.weightx=1.0;
     gb.anchor=gb.CENTER;
     gb.add(jcbThis);
-    gb.insets.left=4;
+    gb.insets.left=8;
     gb.addX(btnThis);
     return gb.container;
   }

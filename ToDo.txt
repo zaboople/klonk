@@ -13,7 +13,6 @@
   -How about a "Log" in the menu next to print. L is unused as a shortcut.
     -Hey and a File-Delete? With confirm of course. Hmph.
   
-
   -SSH Todo:
     SSH Options needs a list of open connections to select for closing.
     the datafoundry server is f'd, not everybody supports --file-type
