@@ -445,13 +445,13 @@ public class CtrlMain  {
   // FILE LOAD: //
   ////////////////
 
-  private void doLoadAsync(final List<String> fileNames) { //FIXME this uses Swing. Bad.
-    //Do nothing in the doInBackground() thread, since it is not
-    //a GUI thread. Do it all in done(), which is sync'd to GUI events,
-    //IE EventDispatch.
-    new SwingWorker<String, Object>() {
-      @Override public String doInBackground() {return "";}
-      @Override protected void done(){
+  /** 
+   * Called when the directory listener discovers other app isntances want files needs to be loaded by this one,
+   * schedules this onto the event dispatch thread with invokeLater.
+   */
+  private void doLoadAsync(final List<String> fileNames) { 
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
         try {
           loadFiles(fileNames);
         } catch (Exception e) {
@@ -459,7 +459,7 @@ public class CtrlMain  {
         }
         fileNames.clear();
       }
-    }.execute();
+    });
   }
   
   private void loadFiles(String[] args) {
