@@ -6,6 +6,8 @@
 
   -Tabs & Indents allows invalid input - letters instead of numbers
   
+  -FAVORITE COMMANDS. OH MAN DO I NEED THAT
+  
   -Ctrl-W ought to just close the editor if no files are open. It makes no difference.
   
   -How about a "Log" in the menu next to print. L is unused as a shortcut.

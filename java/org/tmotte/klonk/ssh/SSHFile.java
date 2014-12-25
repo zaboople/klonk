@@ -169,7 +169,7 @@ public class SSHFile extends File {
   }
   /*Converts this abstract pathname into a pathname string.*/
   public @Override String getPath() {
-    return getSystemPath();
+    return getNetworkPath();
   }
 
   /** Includes the ssh://name@host: in the path */
@@ -210,37 +210,36 @@ public class SSHFile extends File {
   }
 
   private String getUser() {
-    return ssh==null 
-      ?null
-      :ssh.getUser();
+    return ssh==null  ?null :ssh.getUser();
   }
   private String getHost() {
-    return ssh==null 
-      ?null
-      :ssh.getHost();
+    return ssh==null  ?null :ssh.getHost();
   }
+  
   
   
   public @Override SSHFile getParentFile() {
     return parent;
   }
 
+  private static boolean cmp(Object a, Object b) {
+    if (a==null) 
+      return b==null;
+    else
+    if (b==null)
+      return a==null;
+    else
+      return a.equals(b);
+  }
   /*Tests this abstract pathname for equality with the given object.*/
   public @Override boolean equals(Object obj){
     if (obj==null || !(obj instanceof SSHFile))
-      return false;
-      
+      return false;     
     SSHFile other=(SSHFile)obj;
-    if (!this.getName().equals(other.getName()))
-      return false;
-    else
-    if (other.parent==null)
-      return this.parent==null;
-    else
-    if (this.parent==null)
-      return false;
-    else
-      return this.parent.equals(other.parent);
+    return cmp(this.getName(), other.getName())
+      &&   cmp(this.parent,    other.parent)
+      &&   cmp(this.getUser(), other.getUser())
+      &&   cmp(this.getHost(), other.getHost());
   }
   /*Computes a hash code for this abstract pathname.*/
   public @Override int hashCode(){
