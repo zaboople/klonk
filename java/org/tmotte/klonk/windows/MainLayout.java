@@ -64,9 +64,9 @@ public class MainLayout {
   private StatusUpdate statusUpdate;
   
 
-  //Separated into constructor & init() because of stupid DI:
-  public void init(JFrame frame){
+  public MainLayout(JFrame frame, Doer appCloseListener) {
     this.frame=frame;
+    this.appCloseListener=appCloseListener;
     doEvents();
     layout();
   }
@@ -106,10 +106,6 @@ public class MainLayout {
       }
     };
   }
-  public void setAppCloseListener(Doer appCloseListener) {
-    this.appCloseListener=appCloseListener;
-  }
-
   
 
   public void show(Rectangle rect, boolean maximized) {

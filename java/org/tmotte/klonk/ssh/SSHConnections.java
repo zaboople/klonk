@@ -18,6 +18,12 @@ public class SSHConnections {
   private String knownHosts, privateKeys;
   private IUserPass iUserPass;
   private Setter<String> logger, errorHandler;
+  private IFileGet iFileGet=new IFileGet(){
+    public File get(String uri) {
+      if (is(uri)) return getSSHFile(uri);
+      else         return new File(uri);
+    }
+  };
 
   /////////////
   // CREATE: //
@@ -61,12 +67,6 @@ public class SSHConnections {
       uri.startsWith("SSH:")
     );
   }
-  public File getFile(String uri) {
-    if (is(uri))
-      return getSSHFile(uri);
-    else
-      return new File(uri);
-  }
   public SSHFile getSSHFile(String uri) {
     return parser.parse(this, uri);
   }
@@ -84,6 +84,9 @@ public class SSHConnections {
   }
   public String toString() {
     return conns.toString();
+  }
+  public IFileGet getFileResolver() {
+    return iFileGet;
   }
 
   ////////////////

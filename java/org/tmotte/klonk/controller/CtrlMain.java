@@ -23,13 +23,16 @@ import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.EditorListener;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
+import org.tmotte.klonk.ssh.IFileGet;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.windows.popup.YesNoCancel;
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
 
-/** Refer to org.tmotte.klonk.config.Boot for application startup */
-
+/** 
+ * THE critical path in the application. Everything DI-injected is an interface, if that helps. Mostly concerned with
+ * opening files and editors that contain them.
+ */
 public class CtrlMain  {
 
 
@@ -46,6 +49,7 @@ public class CtrlMain  {
   private Setter<Throwable> failHandler;
   private Setter<String> alerter;
   private Doer lockRemover, editorSwitchedListener;
+  private IFileGet fileResolver;
   private FileDialogWrapper fileDialog;
   private YesNoCancel yesNo, yesNoCancel;
   private MainDisplay layout;
@@ -76,16 +80,16 @@ public class CtrlMain  {
   
   // DI SET: //
   
-  public void setLayout(MainDisplay layout, StatusUpdate statusBar) {
-    this.layout=layout;
-    this.statusBar=statusBar;
-  }
-  public void setPopups(
+  public void setLayoutAndPopups(
+      MainDisplay layout, 
+      StatusUpdate statusBar,
       Setter<String> alerter, 
       FileDialogWrapper fileDialog,
       YesNoCancel yesNoCancel,
       YesNoCancel yesNo
     ) {
+    this.layout=layout;
+    this.statusBar=statusBar;
     this.alerter=alerter;
     this.fileDialog=fileDialog;
     this.yesNoCancel=yesNoCancel;
@@ -93,11 +97,13 @@ public class CtrlMain  {
   }
   public void setListeners(
       Doer lockRemover,
+      IFileGet fileResolver,
       Doer editorSwitchListener,
       Setter<List<String>> recentFileListener,
       Setter<List<String>> recentDirListener
     ) {  
     this.lockRemover=lockRemover;
+    this.fileResolver=fileResolver;
     this.editorSwitchedListener=editorSwitchListener;
     this.recents.setFileListener(recentFileListener);
     this.recents.setDirListener(recentDirListener);
@@ -214,7 +220,7 @@ public class CtrlMain  {
     fileClose(false);
   }
   public void doLoadFile(String file) {
-    loadFile(new File(file));
+    loadFile(fileResolver.get(file));
   }
  
   // FILE OPEN FROM: //
@@ -226,7 +232,7 @@ public class CtrlMain  {
   public void doOpenFrom(String dir) {
     File file;
     if ((
-      file=fileDialog.showForDir(false, new File(dir))
+      file=fileDialog.showForDir(false, fileResolver.get(dir))
       )!=null)
       loadFile(file);
   }
@@ -241,7 +247,7 @@ public class CtrlMain  {
   public void doSaveTo(String dir) {
     File file;
     if ((
-      file=showFileDialogForSave(null, new File(dir)) 
+      file=showFileDialogForSave(null, fileResolver.get(dir)) 
       )!=null)
       fileSave(editorMgr.getFirst(), file, true);
   }
@@ -339,7 +345,7 @@ public class CtrlMain  {
     File file=null, oldFile=e.getFile();
     if (forceNewFile || oldFile==null) {
       File dir=oldFile==null && recents.hasDirs()
-        ?new File(recents.getFirstDir())
+        ?fileResolver.get(recents.getFirstDir())
         :null;
       if ((file=showFileDialogForSave(oldFile, dir))==null){
         statusBar.showBad("File save cancelled");
@@ -469,7 +475,7 @@ public class CtrlMain  {
     for (String s: fileNames) loadFile(s);
   }
   private void loadFile(String fileName) {
-    loadFile(new File(fileName));
+    loadFile(fileResolver.get(fileName));
   }
   /** Makes sure file isn't already loaded, and finds an editor to load it into: **/
   private void loadFile(File file) {

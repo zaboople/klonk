@@ -165,8 +165,7 @@ public class BootContext {
 
     JFrame mainFrame=new JFrame("Klonk");
     mainFrame.setIconImage(getAppIcon(this));
-    MainLayout layout=new MainLayout();
-    layout.init(mainFrame);
+    MainLayout layout=new MainLayout(mainFrame, ctrlMain.getAppCloseListener());
     layout.show(
       persist.getWindowBounds(
         new java.awt.Rectangle(10, 10, 300, 300)
@@ -175,9 +174,6 @@ public class BootContext {
     );    
     StatusUpdate statusBar=layout.getStatusBar();
 
-    //Layout/CtrlMain integration:
-    layout.setAppCloseListener(ctrlMain.getAppCloseListener());
-    ctrlMain.setLayout(layout.getMainDisplay(), statusBar);
 
     // POPUP WINDOWS: //
 
@@ -224,9 +220,6 @@ public class BootContext {
     Help help=new Help(mainFrame, home.getUserHome(), editorFont);
     About about=new About(mainFrame);
     
-    //Push some controllers back to main controller:
-    ctrlMain.setPopups(alerter, fileDialogWrapper, yesNoCancel, yesNo);
-    
 
     // MENUS: //
     
@@ -234,15 +227,16 @@ public class BootContext {
     menus.setFastUndos(persist.getFastUndos())
           .setWordWrap(persist.getWordWrap());
     {
-      CtrlFavorites ctrlFavorites=new CtrlFavorites(
-        persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
-      );
+      //This cannot be an array because of "generic array creation" compiler fail:
       List<Setter<FontOptions>> fontListeners=new java.util.ArrayList<>(10);
       fontListeners.add(shell.getFontListener());
       fontListeners.add(favorites.getFontListener());
       fontListeners.add(help.getFontListener());
       fontListeners.add(findAndReplace.getFontListener());
   
+      CtrlFavorites ctrlFavorites=new CtrlFavorites(
+        persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
+      );
       menus.setControllers(
         ctrlMain
         ,new CtrlMarks    (editors, statusBar)
@@ -259,14 +253,25 @@ public class BootContext {
       );
     }
     mainFrame.setJMenuBar(menus.getMenuBar());    
-    
+
+    // PUSH THINGS BACK TO MAIN CONTROLLER: //
+    // AND RETURN:                          //
+
+    ctrlMain.setLayoutAndPopups(
+      layout.getMainDisplay(), 
+      statusBar,
+      alerter, 
+      fileDialogWrapper, 
+      yesNoCancel, 
+      yesNo
+    );
     ctrlMain.setListeners(
       fileListen.getLockRemover(), 
+      sshConns.getFileResolver(),
       menus.getEditorSwitchListener(),
       menus.getRecentFileListener(),
       menus.getRecentDirListener()
     );
-
     return ctrlMain;
   }
 
