@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project name="exe" basedir=".">
+  <property environment="env"/>  
   <echo> 
     Using JSmooth home: ${env.JSMOOTH_HOME}
   </echo>
-  <property environment="env"/>  
   <target name="exe">
     <jsmoothgen project="./lib/config.jsmooth"  
       skeletonroot="${env.JSMOOTH_HOME}/skeletons"/>

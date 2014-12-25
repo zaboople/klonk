@@ -79,6 +79,7 @@ public class SSHConnections {
         .withPrivateKeys(privateKeys)
         .withIUserPass(iUserPass);
       perHost.put(user, ssh);
+      users.add(user);
     }
     return ssh;
   }
@@ -95,7 +96,7 @@ public class SSHConnections {
 
   /** This is here only for the connection parser: */
   protected String inferUserForHost(String host) {
-    
+    System.out.println("WELL FUCKING USER "+users);
     //If there is only one user so far, assume it's them:
     if (users.size()==1)      
       return users.iterator().next();      
@@ -121,11 +122,6 @@ public class SSHConnections {
   // PRIVATE FUNCTIONS: //
   ////////////////////////
   
-  private void put(String user, String host, SSH ssh) {
-    users.add(user);
-    Map<String,SSH> perHost=getForHost(host);
-    perHost.put(user, ssh);
-  } 
   private Map<String,SSH> getForHost(String host) {
     Map<String,SSH> perHost=conns.get(host);
     if (perHost==null){

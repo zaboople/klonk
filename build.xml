@@ -106,7 +106,8 @@
           debug="true" 
           failonerror="true"
           deprecation="on"
-          srcdir="${java.dir}">
+          srcdir="${java.dir}"
+          includeantruntime="false">
       <compilerarg value="-Xlint:unchecked"/>
       <classpath refid="classpath"/>
     </javac>

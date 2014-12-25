@@ -1,7 +1,6 @@
 -Current
   -Right now
-    File re-open doesn't work because we just new File() it    
-      File open from recent dir works sometimes, but not when you do it straight from boot - because you aren't passing an SSHFILE
+    LINE DELIMITERS ARE BROKEN
     Deal with blanks in file name.
 
   -Tabs & Indents allows invalid input - letters instead of numbers
@@ -13,13 +12,11 @@
   -How about a "Log" in the menu next to print. L is unused as a shortcut.
     -Hey and a File-Delete? With confirm of course. Hmph.
   
-  -SSH Login needs a list of open connections to select for closing.
 
   -SSH Todo:
+    SSH Options needs a list of open connections to select for closing.
+    the datafoundry server is f'd, not everybody supports --file-type
     We need a last user saved to persist so we can hotrod logins.
-    SSHFileSystemView.createFileObject needs to be able to go to the cache.
-    Save as
-    File open 
     Reconnect after lost connection
     File size & date: You have no choice. Well use ls --full-time
 
