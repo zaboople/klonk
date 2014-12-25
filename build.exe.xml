@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
 <project name="exe" basedir=".">
-
-  <property file="build.exe.properties"/>
+  <echo> 
+    Using JSmooth home: ${env.JSMOOTH_HOME}
+  </echo>
+  <property environment="env"/>  
   <target name="exe">
     <jsmoothgen project="./lib/config.jsmooth"  
-      skeletonroot="${jsmooth.home}/skeletons"/>
+      skeletonroot="${env.JSMOOTH_HOME}/skeletons"/>
   </target>
   <taskdef name="jsmoothgen" 
      classname="net.charabia.jsmoothgen.ant.JSmoothGen"
-     classpath="${jsmooth.home}/lib/jsmoothgen-ant.jar">
+     classpath="${env.JSMOOTH_HOME}/lib/jsmoothgen-ant.jar">
   </taskdef>
   
 </project>

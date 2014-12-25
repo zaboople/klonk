@@ -52,7 +52,7 @@
     configured.
   exe:
     Generates a windows executable using jsmoothgen. To use this target, you will need to download
-    jsmoothgen, then edit the build.exe.properties in this directory and set it up to point to the correct
+    jsmoothgen, then set a JSMOOTH_HOME environment variable to point to the correct
     directory of your jsmooth install. The actual build is controlled by build.exe.xml.
     
     Note that the windows executable will *still* require a Java installation; it only makes 
