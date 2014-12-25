@@ -147,39 +147,31 @@ public class LineDelimiters {
     win.pack();
   }
   private Component getFirstLabel() {
-    GridBug gb=new GridBug(new JPanel());
-    gb.add(
-      new JLabel("<html>Set <b>default</b> delimiter to: </html>")
-    );
-    return gb.container;
+    return getLabel("<html>Set <b>default</b> delimiter to: </html>");
   }
   private Component getFirstPicker() {
-    GridBug gb=new GridBug(new JPanel());
-    gb.gridXY(0)
-      .weightXY(1);
-    gb.anchor=gb.CENTER;
-    gb.add(jcbDefault);
-    gb.insets.left=8;
-    gb.addX(btnDefault);
-    return gb.container;
+    return getPicker(jcbDefault, btnDefault);
   }
   private Component getSecondLabel() {
-    GridBug gb=new GridBug(new JPanel());
-    gb.anchor=gb.WEST;
-    gb.gridy=0;
-    gb.add(
-      new JLabel("<html>Change <b>this file's</b> delimiter to:</html>")
-    );
-    return gb.container;
+    return getLabel("<html>Change <b>this file's</b> delimiter to:</html>");
   }
   private Component getSecondPicker() {
+    return getPicker(jcbThis, btnThis);
+  }
+  private Component getLabel(String name) {
+    GridBug gb=new GridBug(new JPanel());
+    gb.add(new JLabel(name));
+    return gb.container;
+  }
+  private Component getPicker(Component jcb, Component btn) {
     GridBug gb=new GridBug(new JPanel());
     gb.gridXY(0);
     gb.weightx=1.0;
-    gb.anchor=gb.CENTER;
-    gb.add(jcbThis);
+    gb.insets.top=2;
+    gb.anchor=gb.SOUTH;
+    gb.add(jcb);
     gb.insets.left=8;
-    gb.addX(btnThis);
+    gb.addX(btn);
     return gb.container;
   }
   
