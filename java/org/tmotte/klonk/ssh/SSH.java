@@ -115,16 +115,14 @@ public class SSH {
     try {
       return getSFTP().getInputStream(file);
     } catch (Exception e) {
-      alertHandler.set("Could not load: "+file);
-      throw new RuntimeException(e);
+      alertHandler.set("Could not load: "+file+": "+e.getMessage());
     }
   }
   OutputStream getOutputStream(String file) {
     try {
       return getSFTP().getOutputStream(file);
     } catch (Exception e) {
-      alertHandler.set("Could not write: "+file);
-      throw new RuntimeException(e);
+      alertHandler.set("Could not load: "+file+": "+e.getMessage());
     }
   }
 

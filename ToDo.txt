@@ -9,6 +9,7 @@
     -Hey and a File-Delete? With confirm of course. Hmph.
   
   -SSH Todo:
+    Symbolic links can't be accessed as directories
     Deal with blanks in file name. Problem?
     Alt-f-d can't work with ssh and needs to be disabled.
     SSH Options needs a list of open connections to select for closing.
