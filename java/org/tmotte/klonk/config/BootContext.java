@@ -254,6 +254,8 @@ public class BootContext {
     }
     mainFrame.setJMenuBar(menus.getMenuBar());    
 
+    log.setFailPopup(alerter.getErrorHandler());
+    
     // PUSH THINGS BACK TO MAIN CONTROLLER: //
     // AND RETURN:                          //
 

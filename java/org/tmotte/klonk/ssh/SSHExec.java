@@ -13,6 +13,7 @@ public class SSHExec {
   SSHExec(SSH ssh, Setter<String> logger, Setter<String> alertHandler) {
     this.ssh=ssh;
     this.logger=logger;
+    this.alertHandler=alertHandler;
   }
   
   SSHExecResult exec(String command, boolean alertFail) {
