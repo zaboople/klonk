@@ -96,7 +96,7 @@ public class SSHConnections {
 
   /** This is here only for the connection parser: */
   protected String inferUserForHost(String host) {
-    System.out.println("WELL FUCKING USER "+users);
+
     //If there is only one user so far, assume it's them:
     if (users.size()==1)      
       return users.iterator().next();      
