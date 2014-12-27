@@ -11,7 +11,5 @@ class SSHExecResult {
     return success+" "+output;
   }
   private void logFail() {
-    if (!success)
-      System.out.println("SSHExec failed: "+output);
   }
 }
