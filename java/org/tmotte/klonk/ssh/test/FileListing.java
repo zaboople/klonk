@@ -11,7 +11,12 @@ public class FileListing {
     mylog("SSH File: "+file);
     mylog("Is directory: "+file.isDirectory());
     for (File f: file.listFiles())
-      mylog("File: "+f); 
+      mylog("File: "+f+" "+f.isDirectory()); 
+    while ((file=file.getParentFile())!=null) {    
+      mylog("Parent "+file+" "+file.isDirectory());
+      for (File f: file.listFiles())
+        mylog("File: "+f+" "+f.isDirectory()); 
+    }
     cmd.connections.close();
   }
   private static void mylog(String msg) {
