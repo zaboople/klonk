@@ -26,6 +26,7 @@ public class MeatCounter {
   
   public void unlock() {
     next++;
+    //System.out.println("UNLOCK "+next+" "+Thread.currentThread().hashCode());
   }
   
   /** 
@@ -35,9 +36,10 @@ public class MeatCounter {
    */
   public boolean lock(String name) {
     final int myTurn=++waiting; 
+    //System.out.println("LOCKING "+myTurn+" "+Thread.currentThread().hashCode()+" "+name);
     boolean interrupted=false;
     while (next!=myTurn) {
-      //System.out.print("WAIT "+name);
+      //System.out.println("WAIT "+myTurn+" "+Thread.currentThread().hashCode()+" "+name);
       if (spintime>0)
         try {Thread.sleep(spintime);} 
         catch (Exception e) {
@@ -46,6 +48,7 @@ public class MeatCounter {
           interrupted=true;
         }
     }
+    //System.out.println("GOT "+myTurn+" "+Thread.currentThread().hashCode()+" "+name);
     return interrupted;
   }
   
