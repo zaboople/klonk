@@ -73,8 +73,6 @@ public class KLog {
   //////////////////////
 
   private void logError(Throwable e) {
-    if (failPopup!=null)
-      failPopup.set(e);
     //e.printStackTrace();
     PrintWriter pw=getWriter();
     if (pw!=null)
@@ -84,6 +82,8 @@ public class KLog {
       } finally {
         close(pw);
       }
+    if (failPopup!=null)
+      failPopup.set(e);
   }
   private void logPlain(String s) {
     PrintWriter pw=getWriter();
