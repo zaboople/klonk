@@ -7,8 +7,11 @@
   
   -How about a "Log" in the menu next to print. L is unused as a shortcut.
     -Hey and a File-Delete? With confirm of course. Hmph.
+    
+  -All these setters for log/alert/exception are silly. Just have one interface for logging.
   
   -SSH Todo:
+    When you enter a name/pass and you don't really need a pass, you need a name
     Symbolic links can't be accessed as directories
     Deal with blanks in file name. Problem?
     Alt-f-d can't work with ssh and needs to be disabled.
