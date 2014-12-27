@@ -5,7 +5,6 @@ import java.io.FileFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
-import org.tmotte.common.text.StringChunker;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
@@ -35,14 +34,6 @@ public class SSHFile extends File {
     this.parent=parent;
   }
   
-  /** Meant to only be called by listFiles() */
-  private SSHFile(SSH ssh, SSHFile parent, String name, boolean isDir) {
-    this(ssh, parent, name);
-    this.isDir=isDir;
-    this.exists=true;
-    this.lastCheck=System.currentTimeMillis();
-  }
-
 
   public SSH getSSH(){
     return ssh;
@@ -85,6 +76,9 @@ public class SSHFile extends File {
     return exists;
   }
   private void refresh(){
+    isDir=ssh.isDirectory(getSystemPath().trim());
+    exists=true;    
+    /* Alternate means
     SSHExecResult res=ssh.exec("ls -lda "+getSystemPath(), false);
     exists=false;
     if (res.success) {
@@ -92,50 +86,23 @@ public class SSHFile extends File {
       isDir=list.isDir;
       exists=true;
     }
+    */
   }
   private void check(){
     long currCheck=System.currentTimeMillis();
-    if (currCheck-lastCheck > 2000){
+    if (currCheck-lastCheck > 1300){
       lastCheck=currCheck;
       refresh();
     }
-    else
-      mylog("check() Cached "+this);
   }
 
   //////////////
   // LISTING: //
   //////////////
   
-  private static String[] noFiles={};
-  
   /*Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.*/
   public @Override String[] list(){
-    String absolutePath=getSystemPath();
-    SSHExecResult res=ssh.exec("ls --file-type -1 "+absolutePath); //FIXME quote the file
-
-    //Fail, for whatever reason including nonexistence:
-    if (!res.success) 
-      return noFiles;
-      
-    //List files & dirs:
-    StringChunker sc=new StringChunker(res.output);
-    List<String> lFiles=new LinkedList<>();
-    while (sc.find("\n"))
-      lFiles.add(sc.getUpTo().trim());
-    String last=sc.getRest().trim();
-    if (!last.equals(""))
-      lFiles.add(last);
-      
-    //This happens when it's not a directory, it's a file and you just ls'd it anyhow:
-    if (lFiles.size()==1 && lFiles.get(0).equals(absolutePath))
-      return noFiles;
-      
-    //Copy into results:
-    String[] files=new String[lFiles.size()];
-    for (int i=0; i<lFiles.size(); i++) 
-      files[i]=lFiles.get(i);
-    return files;
+    return ssh.list(getSystemPath());
   }
   /*Returns an array of abstract pathnames denoting the files in the directory denoted by this abstract pathname.*/
   public @Override File[] listFiles(){
@@ -147,10 +114,7 @@ public class SSHFile extends File {
       files[i]=new SSHFile(
         ssh, 
         this, 
-        endsWithSlash 
-          ?f.substring(0, f.length()-1)
-          :f, 
-        endsWithSlash
+        f
       );
     }
     return files;

@@ -10,6 +10,7 @@ public class SSHExec {
   
   private SSH ssh;
   private Setter<String> logger, alertHandler;
+  
   SSHExec(SSH ssh, Setter<String> logger, Setter<String> alertHandler) {
     this.ssh=ssh;
     this.logger=logger;
@@ -24,16 +25,16 @@ public class SSHExec {
       try {
         out.append(err.toString("utf-8"));
         result=1;
-        String bad=out.toString();
+        String bad="SSH Failure: "+out.toString();
         if (alertFail)
           alertHandler.set(bad);
-        mylog("Fail: "+bad);
+        mylog(bad);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     return new SSHExecResult(result==0, out.toString());
   }
-  int exec(String command, Appendable out, Appendable err) throws Exception {
+  private int exec(String command, Appendable out, Appendable err) throws Exception {
     ByteArrayOutputStream baos=new ByteArrayOutputStream(512);
     int result=exec(command, out, baos);
     try {
@@ -49,13 +50,12 @@ public class SSHExec {
    *        the jsch library).
    * @return The output (typically 0,1,2) of the unix command, or -1 if we could not get a connection.
    */
-  int exec(String command, Appendable out, OutputStream sshErr) {
-    mylog(command);
+  private int exec(String command, Appendable out, OutputStream sshErr) {
+    mylog(Thread.currentThread().hashCode()+" "+command);
+    ChannelExec channel=getChannel(command);
+    if (channel==null)
+      return -1;
     try {
-      Session session=ssh.getSession();
-      if (session==null)
-        return -1;
-      ChannelExec channel=(ChannelExec)session.openChannel("exec");
       channel.setCommand(command);      
       channel.setErrStream(sshErr);
       channel.setOutputStream(null);
@@ -75,16 +75,54 @@ public class SSHExec {
         }
         int result=channel.getExitStatus();
         sshErr.flush();
+        //mylog(ssh.hashCode()+" "+command+" complete "+result);
         return result;
+      } catch (Exception e) {
+        closeOnFail();
+        throw new RuntimeException(e);
       } finally {
-        channel.disconnect();  
+        releaseChannel(channel);
         //Doing this will cause output to be lost which doesn't make sense. Let's blame the compiler:
         //in.close(); 
       }
     } catch (Exception e) {
       throw new RuntimeException("Failed to execute: "+command, e);
+    } 
+  }
+
+
+  private ChannelExec channel;
+  private ChannelExec getChannel(String cmd)  {
+    try {
+      ssh.lock(cmd);
+      //if (channel==null) channel=makeChannel();
+      return makeChannel();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
+  private void releaseChannel(ChannelExec channel)  {
+    try {
+      channel.disconnect();
+      //this.channel=null;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      ssh.unlock();
+    }
+  }  
+  private void closeOnFail() {
+    if (channel!=null)
+      channel.disconnect();
+    channel=null;
+  }
+  private ChannelExec makeChannel() throws Exception{
+    Session session=ssh.getSession();
+    if (session==null)
+      return null;
+    return (ChannelExec)session.openChannel("exec");
+  }
+
 
   private void mylog(String s) {
     logger.set("SSHExec: "+s);

@@ -1,11 +1,14 @@
 package org.tmotte.klonk.ssh;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
+import java.util.LinkedList;
+import java.util.List;
+import org.tmotte.common.text.StringChunker;
 import org.tmotte.klonk.config.msg.Setter;
 
 //FIXME reconnect verify health
@@ -18,12 +21,22 @@ public class SSH {
   private boolean connected=false;
   private boolean lastConnectAuthFail=false;
   private SFTP sftp;
+  private SFTP sftp2;
   private SSHExec exec;
   private String tildeFix;
   
   //DI UI components:
   private IUserPass iUserPass;
   protected Setter<String> alertHandler, logger;
+
+  //For SSHExec & SFTP:
+  private MeatCounter takeANumber=new MeatCounter(50);
+  void unlock() {
+    takeANumber.unlock();
+  }
+  void lock(String name) {
+    takeANumber.lock(name);
+  }
    
   ////////////////////
   // INSTANTIATION: //
@@ -111,11 +124,21 @@ public class SSH {
   // PACKAGE-PRIVATE FUNCTIONS: //
   ////////////////////////////////
 
+  
+  boolean isDirectory(String path) {
+    return getSFTP().isDirectory(path);
+  }
+  String[] list(String path) {
+    return sftpList(path);
+  }
+
+
   InputStream getInputStream(String file) {
     try {
       return getSFTP().getInputStream(file);
     } catch (Exception e) {
       alertHandler.set("Could not load: "+file+": "+e.getMessage());
+      return null; //FIXME will probably blow up on the other end
     }
   }
   OutputStream getOutputStream(String file) {
@@ -123,6 +146,7 @@ public class SSH {
       return getSFTP().getOutputStream(file);
     } catch (Exception e) {
       alertHandler.set("Could not load: "+file+": "+e.getMessage());
+      return null;
     }
   }
 
@@ -142,6 +166,7 @@ public class SSH {
       :null;
   }
 
+
   //////////////////////////////
   // PRIVATE CONNECT METHODS: //
   ////////////////////////////// 
@@ -152,11 +177,19 @@ public class SSH {
     return sftp;
   }
 
+  private SFTP getSFTP2() {
+    if (this.sftp2==null)
+      this.sftp2=new SFTP(this);  
+    return sftp2;
+  }
+
   private SSHExec getExec() {
     if (this.exec==null)
       this.exec=new SSHExec(this, logger, alertHandler);  
     return exec;
   }
+
+
   
   private boolean connect() {
     try {
@@ -257,6 +290,41 @@ public class SSH {
   }
   private void myLog(String s) {
     logger.set("SSH: "+s);
+  }
+  
+  /////////////////////////
+  // INTERNAL INTERNALS: //
+  /////////////////////////
+
+  private String[] sftpList(String path) {
+    return getSFTP2().listFiles(path);
+  }
+
+  private static String[] noFiles={};
+  private String[] sshexecList(String path) {
+    SSHExecResult res=exec("ls -1 "+path, true); //FIXME quote the file
+    //Fail, for whatever reason including nonexistence:
+    if (!res.success) 
+      return noFiles;
+        
+    //List files & dirs:
+    StringChunker sc=new StringChunker(res.output);
+    List<String> lFiles=new LinkedList<>();
+    while (sc.find("\n"))
+      lFiles.add(sc.getUpTo().trim());
+    String last=sc.getRest().trim();
+    if (!last.equals(""))
+      lFiles.add(last);
+      
+    //This happens when it's not a directory, it's a file and you just ls'd it anyhow:
+    if (lFiles.size()==1 && lFiles.get(0).equals(path))
+      return noFiles;
+      
+    //Copy into results:
+    String[] files=new String[lFiles.size()];
+    for (int i=0; i<lFiles.size(); i++) 
+      files[i]=lFiles.get(i);
+    return files;
   }
   
   ////////////////////////
