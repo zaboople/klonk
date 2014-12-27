@@ -48,7 +48,7 @@ class ConnectionParse {
     SSHFile result=parse(ssh, null, chunker);
     if (result==null) 
       //No name given, default to "~"
-      result=new SSHFile(ssh, null, "~");
+      result=new SSHFile(ssh, null, ssh.getTildeFix());
     return result;
   }
   
