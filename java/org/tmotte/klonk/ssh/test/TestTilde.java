@@ -7,7 +7,7 @@ import java.io.File;
 
 public class TestTilde {
   public static void main(String[] args) throws Exception {
-    testFinally();
+    test(args);
   }
   
   
@@ -20,15 +20,5 @@ public class TestTilde {
   }
   
   
-  private static void testFinally() throws Exception {
-    try {
-      if (true)
-        throw new Exception("BANG");
-    } catch (Exception e) {
-      throw new RuntimeException("RETHROW FROM CATCH", e);
-    } finally {
-      System.out.println("NO MATTER WHAT");
-    }
-  }
 
 }

@@ -1,8 +1,8 @@
 package org.tmotte.klonk.ssh;
 
 /**
- * This implements the take-a-number system at the grocery store. It uses the volatile keyword 
- * and Thread.sleep() to sneak around any need for synchronization. <em>However:</em>
+ * This implements the take-a-number system at the grocery store, thus preventing 
+ * "thread starvation". It's very clever, <em>but:</em>
  * <br>
  * Everyone must play nice and answer when their number is called. 
  * If a thread fails to call unlock(), the whole system seizes up thereafter, so lock()
@@ -12,8 +12,8 @@ package org.tmotte.klonk.ssh;
 public class MeatCounter {
 
   //Yes, these ints will eventually wrap around to Integer.MIN_VALUE, which is ok:
-  private volatile int next=1;
-  private volatile int waiting=0;
+  private volatile int nextUp=1;
+  private int lastTicket=0;
   private final long spintime;
 
   /** 
@@ -24,9 +24,10 @@ public class MeatCounter {
     this.spintime=spintime;
   }
   
+  /** Unsynchronized because it should only be called when you hold the lock. */
   public void unlock() {
-    next++;
-    //System.out.println("UNLOCK "+next+" "+Thread.currentThread().hashCode());
+    nextUp++;
+    //System.out.println("UNLOCK "+nextUp+" "+Thread.currentThread().hashCode());
   }
   
   /** 
@@ -35,10 +36,10 @@ public class MeatCounter {
    *  keep sleeping until we get the lock, however.
    */
   public boolean lock(String name) {
-    final int myTurn=++waiting; 
+    final int myTurn=takeANumber();
     //System.out.println("LOCKING "+myTurn+" "+Thread.currentThread().hashCode()+" "+name);
     boolean interrupted=false;
-    while (next!=myTurn) {
+    while (nextUp!=myTurn) {
       //System.out.println("WAIT "+myTurn+" "+Thread.currentThread().hashCode()+" "+name);
       if (spintime>0)
         try {Thread.sleep(spintime);} 
@@ -50,6 +51,14 @@ public class MeatCounter {
     }
     //System.out.println("GOT "+myTurn+" "+Thread.currentThread().hashCode()+" "+name);
     return interrupted;
+  }
+  
+  /** 
+   * This must be synchronized because the ++ operator is not atomic,
+   * nor is it "more atomic" just because you toss in a volatile keyword.
+   */
+  private synchronized int takeANumber() {
+    return ++lastTicket;
   }
   
 }
