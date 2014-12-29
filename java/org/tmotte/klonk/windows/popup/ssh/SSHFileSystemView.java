@@ -91,10 +91,15 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* On Windows, a file can appear in multiple folders, other than its parent directory in the filesystem. */
   public @Override boolean isParent(File folder, File file){
-    if (cast(folder)==null || cast(file)==null)
-      return defaultView.isParent(folder, file);
     mylog("isParent() "+folder+" "+file);
-    return true;
+    SSHFile sFolder=cast(folder), sFile=cast(file);   
+    if (folder==null && file==null)
+      return defaultView.isParent(folder, file);
+    else
+    if (folder!=null)
+      return folder.equals(file);
+    else
+      return false;    
   }
   public @Override File createNewFolder(File containingDir){
     mylog("createNewFolder: "+containingDir);

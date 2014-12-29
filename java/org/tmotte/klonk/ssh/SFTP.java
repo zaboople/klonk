@@ -46,7 +46,7 @@ class SFTP {
     }
   }
   boolean isDirectory(String file) {
-    ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file);
+    //ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file);
     try {      
       ChannelSftp ch=getChannel(file);
       Boolean res=ch.stat(file).isDir();
@@ -58,14 +58,14 @@ class SFTP {
       else
         throw new RuntimeException("Failed to get stat on: "+file, e);
     } finally {
-      ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
+      //ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
       ssh.unlock();
     }
   }
   
   private static String[] noFiles={};
   String[] listFiles(String file) {
-    //ssh.logger.set("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file);
+    ssh.logger.set("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file);
     ChannelSftp ch=getChannel(file);
     try {
       List vv=ch.ls(file);
@@ -96,7 +96,7 @@ class SFTP {
       else
         throw new RuntimeException("Failed to get stat on: "+file, e);
     } finally {
-      //ssh.logger.set("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
+      ssh.logger.set("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
       ssh.unlock();
     }
   }
