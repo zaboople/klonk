@@ -21,7 +21,7 @@ public class SSH {
   private boolean connected=false;
   private boolean lastConnectAuthFail=false;
   private SFTP sftp;
-  private SFTP sftp2;
+  private SFTP sftpStreaming;
   private SSHExec exec;
   private String tildeFix;
   
@@ -129,13 +129,13 @@ public class SSH {
     return getSFTP().isDirectory(path);
   }
   String[] list(String path) {
-    return sftpList(path);
+    return getSFTP().listFiles(path);
   }
 
 
   InputStream getInputStream(String file) {
     try {
-      return getSFTP().getInputStream(file);
+      return getSFTPStreaming().getInputStream(file);
     } catch (Exception e) {
       alertHandler.set("Could not load: "+file+": "+e.getMessage());
       return null; //FIXME will probably blow up on the other end
@@ -143,7 +143,7 @@ public class SSH {
   }
   OutputStream getOutputStream(String file) {
     try {
-      return getSFTP().getOutputStream(file);
+      return getSFTPStreaming().getOutputStream(file);
     } catch (Exception e) {
       alertHandler.set("Could not load: "+file+": "+e.getMessage());
       return null;
@@ -177,10 +177,10 @@ public class SSH {
     return sftp;
   }
 
-  private SFTP getSFTP2() {
-    if (this.sftp2==null)
-      this.sftp2=new SFTP(this);  
-    return sftp2;
+  private SFTP getSFTPStreaming() {
+    if (this.sftpStreaming==null)
+      this.sftpStreaming=new SFTP(this);  
+    return sftpStreaming;
   }
 
   private SSHExec getExec() {
@@ -298,9 +298,6 @@ public class SSH {
   // INTERNAL INTERNALS: //
   /////////////////////////
 
-  private String[] sftpList(String path) {
-    return getSFTP2().listFiles(path);
-  }
 
   private static String[] noFiles={};
   private String[] sshexecList(String path) {
