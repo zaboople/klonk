@@ -147,6 +147,8 @@ class SFTP {
 
   private ChannelSftp makeChannel() throws Exception {
     Session session=ssh.getSession();
+    if (session==null)
+      return null;
     session.setConfig("compression.s2c", "zlib@openssh.com,zlib,none");//FIXME doesnt work otherwise
     session.setConfig("compression.c2s", "zlib@openssh.com,zlib,none");
     ChannelSftp c=(ChannelSftp)session.openChannel("sftp");

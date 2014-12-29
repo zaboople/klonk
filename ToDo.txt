@@ -16,7 +16,6 @@
     Deal with blanks in file name. Problem?
     Alt-f-d can't work with ssh and needs to be disabled.
     SSH Options needs a list of open connections to select for closing.
-    the datafoundry server is f'd, not everybody supports --file-type
     We need a last user saved to persist so we can hotrod logins.
     Reconnect after lost connection
     File size & date: You have no choice. Well use ls --full-time

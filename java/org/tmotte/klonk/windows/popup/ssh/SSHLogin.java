@@ -76,16 +76,17 @@ public class SSHLogin implements IUserPass {
       ?new String(jpfPass.getPassword())
       :null;
   } 
-  public @Override boolean get(String user, String host, boolean authFail) {  
-    return show(user, host, authFail);
+  public @Override boolean get(String user, String host, boolean authFail, boolean needsPassword) {  
+    return show(user, host, authFail, needsPassword);
   }
-  public boolean show(String user, String host, boolean authFail) {
+  public boolean show(String user, String host, boolean authFail, boolean needsPassword) {
     
     //Initialize:
     init();
     if (user!=null)
       jtfUsername.setText(user);
-    jpfPass.setText("");    
+    jpfPass.setText("");
+    jpfPass.setEnabled(needsPassword);
     lblHost.setText(host);
     lblError.setVisible(authFail);
     lblErrorText.setVisible(authFail);
@@ -230,7 +231,10 @@ public class SSHLogin implements IUserPass {
         (
         jtfUsername.getText().trim().equals("") 
         || 
-        new String(jpfPass.getPassword()).trim().equals("")
+        (
+          jpfPass.isEnabled()==true 
+          && 
+          new String(jpfPass.getPassword()).trim().equals(""))
         )
       ){
       badEntry=true;
@@ -260,11 +264,13 @@ public class SSHLogin implements IUserPass {
       public void run() {
         JFrame m=PopupTestContext.makeMainFrame();
         SSHLogin win=new SSHLogin(m, new KAlert(m));
-        System.out.println("RESULT: "+win.show("aname", "test1.youknowthat.server.danglblangdingdongwhat.com", false));
+        System.out.println("RESULT: "+win.show("aname", "test1.youknowthat.server.danglblangdingdongwhat.com", false, false));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
-        System.out.println("RESULT: "+win.show("aname", "test2.who.perv.com", true));
+        
+        System.out.println("RESULT: "+win.show("aname", "test2.who.perv.com", true, true));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
-        System.out.println("RESULT: "+win.show(null, "test3.bleagh.com", false));
+        
+        System.out.println("RESULT: "+win.show(null, "test3.bleagh.com", false, true));
         System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
       }
     });  

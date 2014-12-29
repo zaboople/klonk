@@ -247,7 +247,7 @@ public class SSH {
 
     //Try calling a user interface to get it. If the user gives
     //us a bad password
-    while (iUserPass!=null && iUserPass.get(user, host, lastConnectAuthFail)){ 
+    while (iUserPass!=null && iUserPass.get(user, host, lastConnectAuthFail && pass!=null, true)){ 
       String newUser=iUserPass.getUser();
       if (!newUser.equals(user)) { 
         user=newUser;
@@ -283,6 +283,7 @@ public class SSH {
     }    
   }
   private Session makeNewSession() throws Exception {
+    myLog("Creating session for "+user+" "+host);
     Session temp=jsch.getSession(user, host, 22);
     if (knownHosts==null)
       temp.setConfig("StrictHostKeyChecking", "no");    

@@ -105,13 +105,19 @@ public class SSHConnections {
     //use the user for it; else tell them to just log in.
     //Note that when they login, they may use a new password.
     Map<String,SSH> perHost=getForHost(host);
-    if (perHost.size()==1)
-      return perHost.values().iterator().next().getUser();
-    else 
-    if (iUserPass!=null && iUserPass.get(null, host, false)){ //FIXME I don't like this let's nuke it. You can type a user
+    if (perHost.size()==1){
+      SSH ssh=perHost.values().iterator().next();
+      String s=ssh.getUser();
+      if (s!=null) 
+        return s;
+    }
+
+    if (iUserPass!=null && iUserPass.get(null, host, false, privateKeys==null)){ 
       String user=iUserPass.getUser();
       SSH ssh=getOrCreate(user, host);
-      ssh.withPassword(iUserPass.getPass());//FIXME now we have a problem of not needing a password but asking for it
+      String pass=iUserPass.getPass();
+      if (pass!=null && !pass.trim().equals(""))
+        ssh.withPassword(pass);
       return user;
     }
     else
