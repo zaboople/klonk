@@ -229,12 +229,13 @@ public class SSH {
     //OK close:
     close();
     session=makeNewSession();
+    if (session==null)
+      return false;
            
     //Try the password we have:
     if (pass!=null){
       session.setPassword(pass);
-      if (tryConnect2())
-        return true;
+      return tryConnect2();
     }
 
     //Try private keys:

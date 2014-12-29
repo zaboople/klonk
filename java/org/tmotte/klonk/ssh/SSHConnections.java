@@ -78,6 +78,8 @@ public class SSHConnections {
         .withKnown(knownHosts)
         .withPrivateKeys(privateKeys)
         .withIUserPass(iUserPass);
+      if (!ssh.verifyConnection())
+        return null;
       perHost.put(user, ssh);
       users.add(user);
     }

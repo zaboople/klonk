@@ -44,6 +44,9 @@ class ConnectionParse {
   
     //Now make the SSh object & get file name:
     SSH ssh=connMgr.getOrCreate(user, host);
+    if (!ssh.verifyConnection())
+      return null;
+      
     chunker.reset(chunker.getRest());    
     SSHFile result=parse(ssh, null, chunker);
     if (result==null) 

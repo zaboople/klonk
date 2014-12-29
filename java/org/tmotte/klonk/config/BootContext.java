@@ -178,7 +178,7 @@ public class BootContext {
     // POPUP WINDOWS: //
 
     //Our general purpose hello-ok, yes-no-cancel and yes-no popups:
-    KAlert alerter=new KAlert(mainFrame);    
+    final KAlert alerter=new KAlert(mainFrame);
     YesNoCancel 
       yesNoCancel=new YesNoCancel(mainFrame, true),
       yesNo      =new YesNoCancel(mainFrame, false);        
@@ -254,7 +254,11 @@ public class BootContext {
     }
     mainFrame.setJMenuBar(menus.getMenuBar());    
 
-    log.setFailPopup(alerter.getErrorHandler());
+    log.setFailPopup(new Setter<Throwable>() {
+      public void set(Throwable t) {
+        alerter.show("System error; see log for details: "+t.getMessage());
+      }
+    });
     
     // PUSH THINGS BACK TO MAIN CONTROLLER: //
     // AND RETURN:                          //

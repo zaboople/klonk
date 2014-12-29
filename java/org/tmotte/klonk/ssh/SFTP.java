@@ -13,8 +13,9 @@ import java.util.ArrayList;
 
 
 /** 
- * SFTP in jsch is so flaky that you cannot even use synchronized's to keep it from destroying itself.
- * It will release your locks. 
+ * SFTP in jsch is not thread-safe. Worse yet, you can try to use synchronized blocks to ameliorate, but it will go right around them. 
+ * So I have a locking system in place to work around this, and it's pretty good. The only catch is that getInputStream() & getOutputStream()
+ * get called from far away and it's hard to lock them down.
  */
 class SFTP {
   
@@ -80,13 +81,13 @@ class SFTP {
               values[ii]=s;
             }
           }
-        }   
+        }
       String[] realVals=new String[count];
       for (int i=values.length-1; i>-1; i--)
         if (values[i]!=null){
           realVals[count-1]=values[i];
           count--;
-        }        
+        }
       return realVals;
     } catch (Exception e) {
       try {close();} catch (Exception e2) {}//FIXME log that      
@@ -112,16 +113,21 @@ class SFTP {
   ////////////////////////
 
   /**
-   * As we overload the connection, random stuff blows up but we can ignore it. 
+   * As we overload the connection, random stuff blows up but we can ignore it. It just plain
+   * sucks but no matter what if I stack up enough requests on jsch, it's gonna puke.
    */
   private boolean canIgnore(Throwable e, String file) {
-    //FIXME what about "no such file"?
     e=getCause(e);
     String msg=e.getMessage();
-    if ((e instanceof java.lang.InterruptedException) || 
+    if (
+        (e instanceof java.lang.InterruptedException) || 
         (e instanceof java.io.InterruptedIOException) ||
-         (msg!=null && msg.contains("Permission denied"))
-        ){
+        (e instanceof java.lang.IndexOutOfBoundsException) ||
+        (msg!=null && (
+          msg.contains("Permission denied") ||
+          msg.contains("No such file")      
+        ))
+      ){
       ssh.logger.set("SFTP: "+e+" ..."+file);
       return true;
     }
@@ -153,7 +159,7 @@ class SFTP {
     session.setConfig("compression.c2s", "zlib@openssh.com,zlib,none");
     ChannelSftp c=(ChannelSftp)session.openChannel("sftp");
     //setBulkRequests() seems to help... not sure. Might be making things worse:
-    c.setBulkRequests(1);
+    c.setBulkRequests(100);
     c.connect();      
     return c;
   }    

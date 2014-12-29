@@ -45,7 +45,7 @@ public class KFileIO {
     });
   }
   
-  public static FileMetaData load(Document doc, KFileInputStreamer streamer) throws Exception {  
+  private static FileMetaData load(Document doc, KFileInputStreamer streamer) throws Exception {  
 
     //Initialize:
     doc.remove(0, doc.getLength());

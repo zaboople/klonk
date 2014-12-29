@@ -101,7 +101,7 @@ public class SSHCommandLine {
       this.pass=pass;
     }
     final BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
-    public boolean get(String u, String host, boolean authFail) {
+    public boolean get(String u, String host, boolean authFail, boolean needsPassword) {
       user=u;
       if (user!=null && pass !=null) 
         return true;

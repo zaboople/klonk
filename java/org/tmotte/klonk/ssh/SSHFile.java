@@ -179,6 +179,12 @@ public class SSHFile extends File {
   private String getHost() {
     return ssh==null  ?null :ssh.getHost();
   }
+  private void mylog(String s) {
+    if (ssh!=null)
+      ssh.logger.set(s);
+    else
+      System.out.println("SSHFile:"+s);
+  }
   
   
   
@@ -295,14 +301,7 @@ public class SSHFile extends File {
     mylog("lastModified: FIXME "+this);
     return 1;
   }
-  
-  private void mylog(String s) {
-    if (ssh!=null)
-      ssh.logger.set(s);
-    else
-      System.out.println("SSHFile:"+s);
-  }
-  
+   
   ////////////////////////
   //  APPARENTLY JUNK:  //
   ////////////////////////

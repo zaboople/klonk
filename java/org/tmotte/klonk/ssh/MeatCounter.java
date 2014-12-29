@@ -27,7 +27,7 @@ public class MeatCounter {
   /** Unsynchronized because it should only be called when you hold the lock. */
   public void unlock() {
     nextUp++;
-    //System.out.println("UNLOCK "+nextUp+" "+Thread.currentThread().hashCode());
+    mylog(nextUp, "UNLOCK ");
   }
   
   /** 
@@ -37,10 +37,10 @@ public class MeatCounter {
    */
   public boolean lock(String name) {
     final int myTurn=takeANumber();
-    //System.out.println("LOCKING "+myTurn+" "+Thread.currentThread().hashCode()+" "+name);
+    mylog(myTurn, "PICKED: "+name);
     boolean interrupted=false;
     while (nextUp!=myTurn) {
-      //System.out.println("WAIT "+myTurn+" "+Thread.currentThread().hashCode()+" "+name);
+      mylog(myTurn, "WAIT:   "+name);
       if (spintime>0)
         try {Thread.sleep(spintime);} 
         catch (Exception e) {
@@ -49,7 +49,7 @@ public class MeatCounter {
           interrupted=true;
         }
     }
-    //System.out.println("GOT "+myTurn+" "+Thread.currentThread().hashCode()+" "+name);
+    mylog(myTurn, "LOCKED: "+name);
     return interrupted;
   }
   
@@ -59,6 +59,9 @@ public class MeatCounter {
    */
   private synchronized int takeANumber() {
     return ++lastTicket;
+  }
+  private static void mylog(int number, String msg) {
+    System.out.println("MeatCounter: "+number+" "+msg);
   }
   
 }
