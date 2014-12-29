@@ -34,18 +34,19 @@ public class KFileIO {
   // LOAD: //
   ///////////
   
-  public static FileMetaData load(JTextArea jta, final File file) throws Exception {
-    final SSHFile ssh=SSHFile.cast(file);
-    return load(jta.getDocument(), new KFileInputStreamer(){
-      public InputStream getInputStream() throws Exception {
-        return ssh==null
-          ?new FileInputStream(file)
-          :ssh.getInputStream();
-      }
-    });
-  }
   
-  private static FileMetaData load(Document doc, KFileInputStreamer streamer) throws Exception {  
+  private static InputStream getInputStream(File file) throws Exception {
+    final SSHFile ssh=SSHFile.cast(file);
+    return ssh==null
+      ?new FileInputStream(file)
+      :ssh.getInputStream();
+  }
+
+  public static FileMetaData load(JTextArea jta, final File file) throws Exception {
+    return load(jta.getDocument(), file);
+  }
+
+  public static FileMetaData load(Document doc, File file) throws Exception {  
 
     //Initialize:
     doc.remove(0, doc.getLength());
@@ -63,13 +64,13 @@ public class KFileIO {
     //Read file and try to get delimiter:
     FileMetaData fmData=null;
     try (
-      InputStream istr=streamer.getInputStream();
+      InputStream istr=getInputStream(file);
       ) {
       fmData=getEncoding(istr);
     }
 
     try (
-        InputStream istrm=streamer.getInputStream();
+        InputStream istrm=getInputStream(file);
         InputStreamReader br=new InputStreamReader(istrm, fmData.encoding);
       ) {
       if (fmData.readOffset>0)
