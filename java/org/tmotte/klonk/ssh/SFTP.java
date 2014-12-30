@@ -47,16 +47,15 @@ class SFTP {
       unlock();
     }
   }
-  boolean isDirectory(String file) {
+  SSHFileAttr getAttributes(String file) {
     ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file);
     try {      
       ChannelSftp ch=getChannel(file);
-      Boolean res=ch.stat(file).isDir();
-      return res;
+      return new SSHFileAttr(ch.stat(file));
     } catch (Exception e) {
       try {close();} catch (Exception e2) {}//FIXME log that
       if (canIgnore(e, file))
-        return false;
+        return null;
       else
         throw new RuntimeException("Failed to get stat on: "+file, e);
     } finally {

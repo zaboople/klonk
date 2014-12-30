@@ -21,10 +21,8 @@ public class SSHFile extends File {
   private final SSH ssh;
   private String name;
   
-  protected boolean isDir=false;  
-  private boolean exists=false;
-  private long size=-1;
   private long lastCheck=-1;
+  private SSHFileAttr attributes=null;
 
   
   public SSHFile(SSH ssh, SSHFile parent, String name) {
@@ -65,19 +63,18 @@ public class SSHFile extends File {
   ///////////////////////////
   
   public @Override boolean isFile() {
-    return !isDirectory();
+    return attributes!=null && !attributes.isDirectory;
   }
   public @Override boolean isDirectory() {
     check();
-    return isDir;
+    return attributes!=null && attributes.isDirectory;
   }
   public @Override boolean exists() {
     check();
-    return exists;
+    return attributes!=null;
   }
   private void refresh(){
-    isDir=ssh.isDirectory(getSystemPath().trim());
-    exists=true;    
+    attributes=ssh.getAttributes(getSystemPath().trim());
     // Alternate means
     //SSHExecResult res=ssh.exec("ls -lda "+getSystemPath(), false);
     //exists=false;
@@ -250,8 +247,11 @@ public class SSHFile extends File {
 
   /*Returns the length of the file denoted by this abstract pathname.*/
   public @Override long length(){
-    mylog("FIXME SSHFile.length()");
-    return 100;
+    return attributes==null ?0 :attributes.size;
+  }
+  /*Returns the time that the file denoted by this abstract pathname was last modified.*/
+  public @Override long	lastModified() {
+    return attributes==null ?1 :attributes.getLastModified();
   }
   
   
@@ -295,11 +295,6 @@ public class SSHFile extends File {
   }
   
   
-  /*Returns the time that the file denoted by this abstract pathname was last modified.*/
-  public @Override long	lastModified() {
-    mylog("lastModified: FIXME "+this);
-    return 1;
-  }
    
   ////////////////////////
   //  APPARENTLY JUNK:  //

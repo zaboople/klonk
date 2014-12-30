@@ -64,14 +64,10 @@ class ConnectionParse {
         remains=remains.trim();
         if (remains.equals(""))
           return parent;
-        if (parent!=null)
-          parent.isDir=true;
         return new SSHFile(ssh, parent, remains);
       }
     }
     else {
-      if (parent!=null)
-        parent.isDir=true;
       String name=left.getUpTo();
       if (name.equals("") && parent==null)
         name="/";

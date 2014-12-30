@@ -119,8 +119,8 @@ public class SSH {
   ////////////////////////////////
 
   
-  boolean isDirectory(String path) {
-    return getSFTP().isDirectory(path);
+  SSHFileAttr getAttributes(String path) {
+    return getSFTP().getAttributes(path);
   }
   String[] list(String path) {
     return getSFTP().listFiles(path);

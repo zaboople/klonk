@@ -11,9 +11,7 @@
   -All these setters for log/alert/exception are silly. Just have one interface for logging.
   
   -SSH Todo:
-    It is possible to click a file and SSH thinks the file doesn't exist because it thinks you're in
-      another directory.
-    When you enter a name/pass and you don't really need a pass, you need a name
+    Save-as: It thinks the directory already exists because isDir returns false on fail.
     Symbolic links can't be accessed as directories
     Deal with blanks in file name. Problem?
     Alt-f-d can't work with ssh and needs to be disabled.
