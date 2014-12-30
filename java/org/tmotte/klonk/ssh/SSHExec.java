@@ -10,9 +10,11 @@ public class SSHExec {
   
   private SSH ssh;
   private Setter<String> logger, alertHandler;
+  private MeatCounter mc;
   
-  SSHExec(SSH ssh, Setter<String> logger, Setter<String> alertHandler) {
+  SSHExec(SSH ssh, MeatCounter mc, Setter<String> logger, Setter<String> alertHandler) {
     this.ssh=ssh;
+    this.mc=mc;
     this.logger=logger;
     this.alertHandler=alertHandler;
   }
@@ -93,11 +95,12 @@ public class SSHExec {
 
   private ChannelExec channel;
   private ChannelExec getChannel(String cmd)  {
+    mc.lock(cmd);
     try {
-      ssh.lock(cmd);
       //if (channel==null) channel=makeChannel();
       return makeChannel();
     } catch (Exception e) {
+      mc.unlock();
       throw new RuntimeException(e);
     }
   }
@@ -108,7 +111,7 @@ public class SSHExec {
     } catch (Exception e) {
       throw new RuntimeException(e);
     } finally {
-      ssh.unlock();
+      mc.unlock();
     }
   }  
   private void closeOnFail() {

@@ -31,12 +31,6 @@ public class SSH {
 
   //For SSHExec & SFTP:
   private MeatCounter takeANumber=new MeatCounter(50);
-  void unlock() {
-    takeANumber.unlock();
-  }
-  void lock(String name) {
-    takeANumber.lock(name);
-  }
    
   ////////////////////
   // INSTANTIATION: //
@@ -173,19 +167,35 @@ public class SSH {
 
   private SFTP getSFTP() {
     if (this.sftp==null)
-      this.sftp=new SFTP(this);  
+      this.sftp=new SFTP(this, new MeatCounter(30));  
     return sftp;
   }
+  //private SFTP[] sftps;
+  //private int sftpCounter=-1;
+  //private SFTP getSFTP() {
+  //  if (this.sftps==null){
+  //    sftps=new SFTP[7];
+  //    for (int i=0; i<sftps.length; i++)
+  //      sftps[i]=new SFTP(this, new MeatCounter(30));  
+  //  }
+  //  synchronized (sftps) {
+  //    sftpCounter++;
+  //    if (sftpCounter>6)
+  //      sftpCounter=0;
+  //    System.out.println("Counter: "+sftpCounter);
+  //    return sftps[sftpCounter];
+  //  }
+  //}
 
   private SFTP getSFTPStreaming() {
     if (this.sftpStreaming==null)
-      this.sftpStreaming=new SFTP(this);  
+      this.sftpStreaming=new SFTP(this, new MeatCounter(30));  
     return sftpStreaming;
   }
 
   private SSHExec getExec() {
     if (this.exec==null)
-      this.exec=new SSHExec(this, logger, alertHandler);  
+      this.exec=new SSHExec(this, new MeatCounter(30), logger, alertHandler);  
     return exec;
   }
 

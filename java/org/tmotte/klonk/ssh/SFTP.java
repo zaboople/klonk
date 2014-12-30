@@ -21,9 +21,11 @@ class SFTP {
   
   private SSH ssh;
   private ChannelSftp channel;
+  private MeatCounter mc;
   
-  SFTP(SSH ssh) {
+  SFTP(SSH ssh, MeatCounter mc) {
     this.ssh=ssh;
+    this.mc=mc;
   }
   
   ////////////////////////////////
@@ -35,18 +37,18 @@ class SFTP {
     try {
       return getChannel(file).get(file);
     } finally {
-      ssh.unlock();
+      unlock();
     }
   }
   OutputStream getOutputStream(String file) throws Exception {    
     try {
       return getChannel(file).put(file);
     } finally {
-      ssh.unlock();
+      unlock();
     }
   }
   boolean isDirectory(String file) {
-    //ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file);
+    ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file);
     try {      
       ChannelSftp ch=getChannel(file);
       Boolean res=ch.stat(file).isDir();
@@ -58,8 +60,8 @@ class SFTP {
       else
         throw new RuntimeException("Failed to get stat on: "+file, e);
     } finally {
-      //ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
-      ssh.unlock();
+      ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
+      unlock();
     }
   }
   
@@ -97,7 +99,7 @@ class SFTP {
         throw new RuntimeException("Failed to get stat on: "+file, e);
     } finally {
       ssh.logger.set("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
-      ssh.unlock();
+      unlock();
     }
   }
 
@@ -141,11 +143,11 @@ class SFTP {
 
   
   private ChannelSftp getChannel(String file) {
-    ssh.lock(file);
+    lock(file);
     try {
       if (channel==null) channel=makeChannel();
     } catch (Exception e) {
-      ssh.unlock();
+      unlock();
       throw new RuntimeException(e);
     }
     return channel;
@@ -163,5 +165,11 @@ class SFTP {
     c.connect();      
     return c;
   }    
- 
+
+  private void lock(String file) {
+    mc.lock(file);
+  }
+  private void unlock() {
+    mc.unlock();
+  }
 }

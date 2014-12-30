@@ -78,15 +78,14 @@ public class SSHFile extends File {
   private void refresh(){
     isDir=ssh.isDirectory(getSystemPath().trim());
     exists=true;    
-    /* Alternate means
-    SSHExecResult res=ssh.exec("ls -lda "+getSystemPath(), false);
-    exists=false;
-    if (res.success) {
-      SSHFileLongList list=new SSHFileLongList(res.output);
-      isDir=list.isDir;
-      exists=true;
-    }
-    */
+    // Alternate means
+    //SSHExecResult res=ssh.exec("ls -lda "+getSystemPath(), false);
+    //exists=false;
+    //if (res.success) {
+    //  SSHFileLongList list=new SSHFileLongList(res.output);
+    //  isDir=list.isDir;
+    //  exists=true;
+    //}
   }
   private void check(){
     long currCheck=System.currentTimeMillis();
