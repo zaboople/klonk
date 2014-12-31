@@ -10,9 +10,10 @@
     -Hey and a File-Delete? With confirm of course. Hmph.
     
   -All these setters for log/alert/exception are silly. Just have one interface for logging.
+    -Needs an option for thread-safe logging since we are not on the event dispatch thread in ssh
   
   -SSH Todo:
-    When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore
+    When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore    
     What about when a host key changes or is missing? Will we blow up?
     Symbolic links can't be accessed as directories
     Deal with blanks in file name. Problem?
