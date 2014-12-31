@@ -24,6 +24,7 @@ public class SSH {
   private SFTP sftpStreaming;
   private SSHExec exec;
   private String tildeFix;
+  //private long lastConnectTest=0;
   
   //DI UI components:
   private IUserPass iUserPass;
@@ -81,23 +82,19 @@ public class SSH {
   public String getUser() {
     return user;
   }
-  public boolean isConnected(){
-    if (session!=null) {
-      if (session.isConnected())
-        return true;
-      session=null;
-    }
-    return false;
-  }
   public boolean verifyConnection() {
     getSession();
     return isConnected();
   }
-  public void close() throws Exception {
-    if (sftp!=null)
-      sftp.close();
-    if (session!=null) 
-      try {session.disconnect();} catch (Exception e2) {}
+  public void close() {
+    try {
+      if (sftpStreaming!=null)
+        sftpStreaming.close();
+      if (sftp!=null)
+        sftp.close();
+      if (session!=null) 
+        session.disconnect();
+    } catch (Exception e2) {}
     session=null;
     connected=false;
   }
@@ -131,14 +128,16 @@ public class SSH {
     try {
       return getSFTPStreaming().getInputStream(file);
     } catch (Exception e) {
+      close();
       alertHandler.set("Could not load: "+file+": "+e.getMessage());
-      return null; //FIXME will probably blow up on the other end
+      return null; //FIXME will probably blow up on the other end 
     }
   }
   OutputStream getOutputStream(String file) {
     try {
       return getSFTPStreaming().getOutputStream(file);
     } catch (Exception e) {
+      close();
       alertHandler.set("Could not load: "+file+": "+e.getMessage());
       return null;
     }
@@ -201,6 +200,13 @@ public class SSH {
 
 
   
+  private boolean isConnected(){
+    System.out.println("SSH.isConnected() "+session);
+    if (session!=null && session.isConnected())
+      return true;
+    session=null;
+    return false;
+  }
   private boolean connect() {
     try {
       return tryConnect1();
@@ -282,6 +288,7 @@ public class SSH {
     try {
       myLog("Connecting...");
       session.connect(); 
+      //lastConnectTest=System.currentTimeMillis();
       return connected=true;
     } catch (Exception e) {          
       myLog("Didn't.");

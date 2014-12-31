@@ -48,7 +48,7 @@ class SFTP {
     }
   }
   SSHFileAttr getAttributes(String file) {
-    ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file);
+    ssh.logger.set("SFTP.getAttributes "+Thread.currentThread().hashCode()+" "+file);
     try {      
       ChannelSftp ch=getChannel(file);
       return new SSHFileAttr(ch.stat(file));
@@ -59,7 +59,7 @@ class SFTP {
       else
         throw new RuntimeException("Failed to get stat on: "+file, e);
     } finally {
-      ssh.logger.set("SFTP.isDirectory "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
+      //ssh.logger.set("SFTP.getAttributes "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
       unlock();
     }
   }
@@ -97,14 +97,15 @@ class SFTP {
       else
         throw new RuntimeException("Failed to get stat on: "+file, e);
     } finally {
-      ssh.logger.set("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
+      //ssh.logger.set("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
       unlock();
     }
   }
 
   void close() throws Exception {
-    if (channel!=null && channel.isConnected()){
-      channel.disconnect();
+    if (channel!=null) { 
+      if (channel.isConnected())
+        try {channel.disconnect();} catch (Exception e) {}
       channel=null;
     }
   }
@@ -129,9 +130,14 @@ class SFTP {
           msg.contains("No such file")      
         ))
       ){
-      ssh.logger.set("SFTP: "+e+" ..."+file);
+      ssh.logger.set("SFTP Hidden fail: "+e+" ..."+file);
       return true;
     }
+    else if ((e instanceof java.io.IOException) && e.getMessage().equals("Pipe closed")){
+      ssh.logger.set("SFTP Apparently closed: "+e+" ..."+file);
+      try {ssh.close();} catch (Exception e2) {}
+      return false;
+    }    
     else
       return false;
   }
@@ -144,7 +150,8 @@ class SFTP {
   private ChannelSftp getChannel(String file) {
     lock(file);
     try {
-      if (channel==null) channel=makeChannel();
+      if (channel==null || !channel.isConnected()) 
+        channel=makeChannel();
     } catch (Exception e) {
       unlock();
       throw new RuntimeException(e);

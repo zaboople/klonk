@@ -1,5 +1,6 @@
 -Current
-
+  
+  -SERIOUS: Font Options dialog nullpointers when shown because no font options defined yet.
   
   -FAVORITE COMMANDS. OH MAN DO I NEED THAT
   
@@ -11,7 +12,8 @@
   -All these setters for log/alert/exception are silly. Just have one interface for logging.
   
   -SSH Todo:
-    Save-as: It thinks the directory already exists because isDir returns false on fail.
+    When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore
+    What about when a host key changes or is missing? Will we blow up?
     Symbolic links can't be accessed as directories
     Deal with blanks in file name. Problem?
     Alt-f-d can't work with ssh and needs to be disabled.
