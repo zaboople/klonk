@@ -4,19 +4,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.UserNotify;
 
 public class SSHExec {
   
   private SSH ssh;
-  private Setter<String> logger, alertHandler;
   private MeatCounter mc;
+  protected UserNotify userNotify;  
   
-  SSHExec(SSH ssh, MeatCounter mc, Setter<String> logger, Setter<String> alertHandler) {
+  SSHExec(SSH ssh, MeatCounter mc, UserNotify userNotify) {
     this.ssh=ssh;
     this.mc=mc;
-    this.logger=logger;
-    this.alertHandler=alertHandler;
+    this.userNotify=userNotify;
   }
   
   SSHExecResult exec(String command, boolean alertFail) {
@@ -29,7 +28,7 @@ public class SSHExec {
         result=1;
         String bad="SSH Failure: "+out.toString();
         if (alertFail)
-          alertHandler.set(bad);
+          userNotify.alert(bad);
         mylog(bad);
       } catch (Exception e) {
         throw new RuntimeException(e);
@@ -128,7 +127,7 @@ public class SSHExec {
 
 
   private void mylog(String s) {
-    logger.set("SSHExec: "+s);
+    userNotify.log("SSHExec: "+s);
   }
 
   

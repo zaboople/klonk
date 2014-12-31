@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.tmotte.common.text.StringChunker;
-import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.UserNotify;
 
 /** This does not establish a connection. It only collects potential connections. Not thread-safe. */
 public class SSHConnections {
@@ -17,7 +17,7 @@ public class SSHConnections {
   
   private String knownHosts, privateKeys;
   private IUserPass iUserPass;
-  private Setter<String> logger, errorHandler;
+  private UserNotify userNotify;
   private IFileGet iFileGet=new IFileGet(){
     public File get(String uri) {
       if (is(uri)) return getSSHFile(uri);
@@ -29,9 +29,8 @@ public class SSHConnections {
   // CREATE: //
   /////////////
 
-  public SSHConnections (Setter<String> logger, Setter<String> errorHandler) {
-    this.logger=logger;
-    this.errorHandler=errorHandler;
+  public SSHConnections (UserNotify userNotify) {
+    this.userNotify=userNotify;
   }  
   public SSHConnections withKnown(String hostsFile) {
     this.knownHosts=hostsFile;
@@ -74,7 +73,7 @@ public class SSHConnections {
     Map<String,SSH> perHost=getForHost(host);
     SSH ssh=perHost.get(user);
     if (ssh==null) {
-      ssh=new SSH(user, host, logger, errorHandler)
+      ssh=new SSH(user, host, userNotify)
         .withKnown(knownHosts)
         .withPrivateKeys(privateKeys)
         .withIUserPass(iUserPass);

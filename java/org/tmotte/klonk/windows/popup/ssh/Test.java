@@ -1,7 +1,7 @@
 package org.tmotte.klonk.windows.popup.ssh;
 import java.io.File;
 import javax.swing.JFrame;
-import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.UserNotify;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.ssh.SSH;
 import org.tmotte.klonk.ssh.SSHConnections;
@@ -58,12 +58,10 @@ class Test {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          Setter<String> logger=new Setter<String>(){
-            public void set(String s) {System.out.println(Thread.currentThread()+" "+s);}
-          };
+          UserNotify notifier=new UserNotify(System.out);
           JFrame m=ptc.getMainFrame();
           KAlert alerter=new KAlert(m);
-          SSHConnections conns=new SSHConnections(logger, alerter)
+          SSHConnections conns=new SSHConnections(notifier)
             .withKnown(options.getKnownHostsFilename())
             .withPrivateKeys(options.getPrivateKeysFilename())
             .withLogin(
@@ -72,7 +70,7 @@ class Test {
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
             new org.tmotte.klonk.windows.popup.FileDialogWrapper(
               m,
-              new SSHFileSystemView(conns, logger),
+              new SSHFileSystemView(conns, notifier),
               new SSHFileView()
             );
           {

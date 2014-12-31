@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import org.tmotte.common.text.StringChunker;
-import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.UserNotify;
 
 //FIXME reconnect verify health
 public class SSH {
@@ -28,7 +28,7 @@ public class SSH {
   
   //DI UI components:
   private IUserPass iUserPass;
-  protected Setter<String> alertHandler, logger;
+  protected UserNotify userNotify;
 
   //For SSHExec & SFTP:
   private MeatCounter takeANumber=new MeatCounter(50);
@@ -37,11 +37,10 @@ public class SSH {
   // INSTANTIATION: //
   ////////////////////
    
-  public SSH(String user, String host, Setter<String> logger, Setter<String> alertHandler) {
+  public SSH(String user, String host, UserNotify userNotify) {
     this.user=user;
     this.host=host;
-    this.logger=logger;
-    this.alertHandler=alertHandler;
+    this.userNotify=userNotify;
   }
   public SSH(String host) {
     this.host=host;
@@ -129,7 +128,7 @@ public class SSH {
       return getSFTPStreaming().getInputStream(file);
     } catch (Exception e) {
       close();
-      alertHandler.set("Could not load: "+file+": "+e.getMessage());
+      userNotify.alert(e, "Could not load: "+file+":");//FIXME handle file permission failure
       return null; //FIXME will probably blow up on the other end 
     }
   }
@@ -138,8 +137,8 @@ public class SSH {
       return getSFTPStreaming().getOutputStream(file);
     } catch (Exception e) {
       close();
-      alertHandler.set("Could not load: "+file+": "+e.getMessage());
-      return null;
+      userNotify.alert(e, "Could not write to: "+file+":");//FIXME handle file permission failure
+      return null; //FIXME will probably blow up on the other end 
     }
   }
 
@@ -194,7 +193,7 @@ public class SSH {
 
   private SSHExec getExec() {
     if (this.exec==null)
-      this.exec=new SSHExec(this, new MeatCounter(30), logger, alertHandler);  
+      this.exec=new SSHExec(this, new MeatCounter(30), userNotify);  
     return exec;
   }
 
@@ -212,24 +211,17 @@ public class SSH {
       return tryConnect1();
     } catch (java.io.IOException e) {
       //Includes java.net.NoRouteToHostException and some others:
-      alertHandler.set(e.getMessage());
+      userNotify.alert(e);
       return false;
     } catch (com.jcraft.jsch.JSchException e) {
-      alertHandler.set(e.getMessage());
+      userNotify.alert(e);
       return false;
     } catch (Exception e) {
       Throwable internal=e.getCause();
-      if (internal!=null){
-        if ((internal instanceof java.net.UnknownHostException)) {
-          alertHandler.set(internal.toString());
-          return false;
-        }
-      }
-      e.printStackTrace();//FIXME print to standard handler
-      String s=e.getMessage();
-      if (s==null)
-        s=e.toString();
-      alertHandler.set(s);
+      if (internal!=null && (internal instanceof java.net.UnknownHostException)) 
+        userNotify.alert(internal);
+      else
+        userNotify.alert(e);
       return false;
     }
   }
@@ -293,9 +285,8 @@ public class SSH {
     } catch (Exception e) {          
       myLog("Didn't.");
       close();
-      if (e.getMessage().equals("Auth fail")) {
+      if (e.getMessage().equals("Auth fail")) 
         return connected=!(lastConnectAuthFail=true);
-      }
       else
         throw e;
     }    
@@ -308,7 +299,7 @@ public class SSH {
     return temp;
   }
   private void myLog(String s) {
-    logger.set("SSH: "+s);
+    userNotify.log("SSH: "+s);
   }
   
   /////////////////////////

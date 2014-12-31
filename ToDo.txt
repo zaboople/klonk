@@ -1,6 +1,6 @@
 -Current
   
-  -SERIOUS: Font Options dialog nullpointers when shown because no font options defined yet.
+  -When I switch windows the cursor position frequently goes somewhere else
   
   -FAVORITE COMMANDS. OH MAN DO I NEED THAT
   

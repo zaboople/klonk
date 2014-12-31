@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Iterator;
-import javax.swing.SwingWorker;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;

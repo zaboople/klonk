@@ -12,6 +12,7 @@ import org.tmotte.klonk.Menus;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
+import org.tmotte.klonk.config.msg.UserNotify;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.controller.CtrlFavorites;
@@ -102,8 +103,9 @@ public class BootContext {
   /////////////////////////////////////////
 
   private KHome home;
-  private KLog log;
   private FileListen fileListen;
+  private KLog klog;
+  private UserNotify userNotify;
  
   /**
    * This gives us the 1st layer of the application, enough to 
@@ -130,13 +132,14 @@ public class BootContext {
     );
     String pid=ManagementFactory.getRuntimeMXBean().getName();
     String processID=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
-    log=argStdOut
+    klog=argStdOut
       ?new KLog(System.out)
       :new KLog(home, processID);
-    fileListen=new FileListen(log, processID, home);    
+    userNotify=new UserNotify(klog);
+    fileListen=new FileListen(klog, processID, home);    
   } 
   private KHome getHome() { return home; }
-  private KLog getLog()   { return log;  }
+  private UserNotify getLog()   { return userNotify;  }
   private FileListen getFileListener() { return fileListen; }
 
   
@@ -152,7 +155,7 @@ public class BootContext {
     initLookFeel();
   
     // Basic logging & persistence:
-    Setter<Throwable> failHandler=log.getExceptionHandler();    
+    Setter<Throwable> failHandler=userNotify.getExceptionHandler();
     KPersist persist=new KPersist(home, failHandler);
     FontOptions editorFont=persist.getFontAndColors();
 
@@ -177,24 +180,29 @@ public class BootContext {
 
     // POPUP WINDOWS: //
 
-    //Our general purpose hello-ok, yes-no-cancel and yes-no popups:
+    // Our general purpose hello-ok, yes-no-cancel and yes-no popups;
+    // Also backfills alerter into our general-purpose notifier:
     final KAlert alerter=new KAlert(mainFrame);
     YesNoCancel 
       yesNoCancel=new YesNoCancel(mainFrame, true),
-      yesNo      =new YesNoCancel(mainFrame, false);        
+      yesNo      =new YesNoCancel(mainFrame, false);
+    userNotify.setUI(alerter, false);
 
     //SSH Login:
     IUserPass iUserPass=new SSHLogin(mainFrame, alerter);
 
-    //File dialog + SSH:
+    // File dialog + SSH:
+    // This gets a special user notifier that schedules thread-safe alerts 
+    // because most of the work is done without the Swing event dispatch thread:
+    UserNotify sshUN=new UserNotify(klog).setUI(alerter, true);
     SSHOptions sshOpts=persist.getSSHOptions();
-    SSHConnections sshConns=new SSHConnections(log.getLogger(), alerter)
+    SSHConnections sshConns=new SSHConnections(sshUN)
       .withLogin(iUserPass)
       .withKnown(sshOpts.getKnownHostsFilename())
       .withPrivateKeys(sshOpts.getPrivateKeysFilename());
     FileDialogWrapper fileDialogWrapper=new FileDialogWrapper(
       mainFrame, 
-      new SSHFileSystemView(sshConns, log.getLogger()), 
+      new SSHFileSystemView(sshConns, sshUN), 
       new SSHFileView()
     );
   
@@ -253,13 +261,7 @@ public class BootContext {
       );
     }
     mainFrame.setJMenuBar(menus.getMenuBar());    
-
-    log.setFailPopup(new Setter<Throwable>() {
-      public void set(Throwable t) {
-        alerter.show("System error; see log for details: "+t.getMessage());
-      }
-    });
-    
+        
     // PUSH THINGS BACK TO MAIN CONTROLLER: //
     // AND RETURN:                          //
 

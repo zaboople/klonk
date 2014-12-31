@@ -5,7 +5,7 @@ import org.tmotte.klonk.ssh.SSH;
 import org.tmotte.klonk.ssh.SSHExec;
 import org.tmotte.klonk.ssh.SSHFile;
 import org.tmotte.klonk.ssh.SSHConnections;
-import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.UserNotify;
 import java.io.ByteArrayOutputStream;
 
 /** 
@@ -22,14 +22,14 @@ public class SSHFileSystemView extends FileSystemView {
   private final ByteArrayOutputStream sshErr=new ByteArrayOutputStream(1024*24);
   private final StringBuilder sshOut=new StringBuilder();
   private final SSHConnections conns;
-  private final Setter<String> logger;
+  private final UserNotify userNotify;
 
   private final static File[] noFiles=new File[]{};
   
-  public SSHFileSystemView(SSHConnections conns, Setter<String> logger) {
+  public SSHFileSystemView(SSHConnections conns, UserNotify userNotify) {
     super();
     this.conns=conns;
-    this.logger=logger;
+    this.userNotify=userNotify;
   }
   
   /* This gets called when you just bang in a path name or press enter on  a path name. FIXME */
@@ -211,7 +211,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
   private void mylog(String s) {
     if (true)
-      logger.set("SSHFileSystemView."+s);
+      userNotify.log("SSHFileSystemView."+s);
   }
  
   /////////////////

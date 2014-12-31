@@ -48,10 +48,12 @@ class SFTP {
     }
   }
   SSHFileAttr getAttributes(String file) {
-    ssh.logger.set("SFTP.getAttributes "+Thread.currentThread().hashCode()+" "+file);
+    ssh.userNotify.log("SFTP.getAttributes "+Thread.currentThread().hashCode()+" "+file);
     try {      
       ChannelSftp ch=getChannel(file);
-      return new SSHFileAttr(ch.stat(file));
+      return ch==null 
+        ?null
+        :new SSHFileAttr(ch.stat(file));
     } catch (Exception e) {
       try {close();} catch (Exception e2) {}//FIXME log that
       if (canIgnore(e, file))
@@ -59,14 +61,14 @@ class SFTP {
       else
         throw new RuntimeException("Failed to get stat on: "+file, e);
     } finally {
-      //ssh.logger.set("SFTP.getAttributes "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
+      //ssh.userNotify.log("SFTP.getAttributes "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
       unlock();
     }
   }
   
   private static String[] noFiles={};
   String[] listFiles(String file) {
-    ssh.logger.set("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file);
+    ssh.userNotify.log("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file);
     ChannelSftp ch=getChannel(file);
     try {
       List vv=ch.ls(file);
@@ -92,12 +94,11 @@ class SFTP {
       return realVals;
     } catch (Exception e) {
       try {close();} catch (Exception e2) {}//FIXME log that      
-      if (canIgnore(e, file))
-        return noFiles;
-      else
-        throw new RuntimeException("Failed to get stat on: "+file, e);
+      if (!canIgnore(e, file))
+        ssh.userNotify.alert(e, "Failed to get stat on: "+file);
+      return noFiles;
     } finally {
-      //ssh.logger.set("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
+      //ssh.userNotify.log("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");
       unlock();
     }
   }
@@ -130,11 +131,11 @@ class SFTP {
           msg.contains("No such file")      
         ))
       ){
-      ssh.logger.set("SFTP Hidden fail: "+e+" ..."+file);
+      ssh.userNotify.log("SFTP Hidden fail: "+e+" ..."+file);
       return true;
     }
     else if ((e instanceof java.io.IOException) && e.getMessage().equals("Pipe closed")){
-      ssh.logger.set("SFTP Apparently closed: "+e+" ..."+file);
+      ssh.userNotify.log("SFTP Apparently closed: "+e+" ..."+file);
       try {ssh.close();} catch (Exception e2) {}
       return false;
     }    

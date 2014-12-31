@@ -7,7 +7,7 @@ import java.io.FileFilter;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.LinkedList;
-import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.UserNotify;
 import org.tmotte.common.text.ArgHandler;
 
 public class SSHCommandLine {
@@ -61,18 +61,10 @@ public class SSHCommandLine {
       }
     }
     this.connections= 
-      new SSHConnections(
-        new Setter<String>(){
-          public void set(String s) {System.out.println(s);}
-        }
-        ,
-        new Setter<String>(){
-          public void set(String err) {System.err.println(err);}
-        }
-      )
-      .withLogin(new Login(user, pass))
-      .withKnown(knownHosts)
-      .withPrivateKeys(privateKeys);
+      new SSHConnections(new UserNotify(System.out))
+        .withLogin(new Login(user, pass))
+        .withKnown(knownHosts)
+        .withPrivateKeys(privateKeys);
     if (user != null && host != null && (pass != null || privateKeys !=null))
       ssh=connections.getOrCreate(user, host);
     if (fileName != null)

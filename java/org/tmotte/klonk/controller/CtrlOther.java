@@ -1,5 +1,4 @@
 package org.tmotte.klonk.controller;
-import org.tmotte.common.swang.SimpleClipboard;
 import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.msg.Editors;

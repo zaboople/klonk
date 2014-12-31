@@ -2,7 +2,6 @@ package org.tmotte.klonk.controller;
 import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.msg.Editors;
-import org.tmotte.common.swang.SimpleClipboard;
 import org.tmotte.common.text.DelimitedString;
 import javax.swing.SwingUtilities;
 import java.util.LinkedList;

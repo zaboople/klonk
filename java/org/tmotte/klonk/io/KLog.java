@@ -1,21 +1,13 @@
 package org.tmotte.klonk.io;
 import java.io.*;
 import org.tmotte.klonk.config.KHome;
-import org.tmotte.klonk.config.msg.Setter;
 
 public class KLog {
   
   private final long start=System.nanoTime();
   private KHome home;
   private PrintWriter commandLineWriter;
-  private Setter<Throwable> failPopup;
   private java.text.SimpleDateFormat sdformat;  
-  private Setter<Throwable> failer=new Setter<Throwable>(){
-    public void set(Throwable t) {log(t);}
-  };
-  private Setter<String> ilogger=new Setter<String>(){
-    public void set(String s) {log(s);}
-  };
   
   //////////////////
   // CONSTRUCTOR: //
@@ -29,22 +21,7 @@ public class KLog {
     this.home=home;
     sdformat=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS '"+pid+"\t'");
   }
-  public KLog setFailPopup(Setter<Throwable> a) {
-    this.failPopup=a;
-    return this;
-  }
   
-  /////////////////
-  // INTERFACES: //
-  /////////////////
-
-  public Setter<Throwable> getExceptionHandler(){
-    return failer;
-  }
-  public Setter<String> getLogger(){
-    return ilogger;
-  }
-
   ///////////////////////
   // PUBLIC FUNCTIONS: //
   ///////////////////////
@@ -73,7 +50,6 @@ public class KLog {
   //////////////////////
 
   private void logError(Throwable e) {
-    //e.printStackTrace();
     PrintWriter pw=getWriter();
     if (pw!=null)
       try {
@@ -82,8 +58,6 @@ public class KLog {
       } finally {
         close(pw);
       }
-    if (failPopup!=null)
-      failPopup.set(e);
   }
   private void logPlain(String s) {
     PrintWriter pw=getWriter();

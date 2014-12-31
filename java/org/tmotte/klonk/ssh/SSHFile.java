@@ -131,20 +131,26 @@ public class SSHFile extends File {
   public @Override String getPath() {
     return getNetworkPath();
   }
+  /** Just the path on the remote system, not including ssh/server/user info */
+  public String getSystemPath() {
+    StringBuilder sb=new StringBuilder();
+    getSystemPath(sb);
+    return sb.toString();
+  }
+  /*Returns the canonical form of this abstract pathname.*/
+  public @Override File	getCanonicalFile(){
+    return this;  
+  }
 
+  // PRIVATE: //
+  
   /** Includes the ssh://name@host: in the path */
-  public String getNetworkPath() {
+  private String getNetworkPath() {
     String user=getUser(), host=getHost();
     StringBuilder sb=new StringBuilder(20);
     sb.append("ssh:");
     sb.append(user==null ?""  :user+"@");
     sb.append(host==null ?":" :host+":");
-    getSystemPath(sb);
-    return sb.toString();
-  }
-  /** Just the path on the remote system, not including ssh/server/user info */
-  public String getSystemPath() {
-    StringBuilder sb=new StringBuilder();
     getSystemPath(sb);
     return sb.toString();
   }
@@ -162,32 +168,15 @@ public class SSHFile extends File {
       s=s.replace("~", ssh.getTildeFix());
     return s;
   }
-
+  
+  //////////////
+  // COMPARE: //
+  //////////////
 
   /*Compares two abstract pathnames lexicographically.*/
   public @Override int compareTo(File other){
     return getAbsolutePath().compareTo(other.getAbsolutePath()); 
   }
-
-  private String getUser() {
-    return ssh==null  ?null :ssh.getUser();
-  }
-  private String getHost() {
-    return ssh==null  ?null :ssh.getHost();
-  }
-  private void mylog(String s) {
-    if (ssh!=null)
-      ssh.logger.set(s);
-    else
-      System.out.println("SSHFile:"+s);
-  }
-  
-  
-  
-  public @Override SSHFile getParentFile() {
-    return parent;
-  }
-
   private static boolean cmp(Object a, Object b) {
     if (a==null) 
       return b==null;
@@ -210,15 +199,29 @@ public class SSHFile extends File {
   /*Computes a hash code for this abstract pathname.*/
   public @Override int hashCode(){
     return getNetworkPath().hashCode();
-  }
-  
+  }  
   public @Override String toString() {
     return getNetworkPath();
   }
-  /*Returns the canonical form of this abstract pathname.*/
-  public @Override File	getCanonicalFile(){
-    return this;  
+
+
+  private String getUser() {
+    return ssh==null  ?null :ssh.getUser();
   }
+  private String getHost() {
+    return ssh==null  ?null :ssh.getHost();
+  }
+  private void mylog(String s) {
+    ssh.userNotify.log(s);
+  }
+
+
+  
+  ///////////////////////////
+  // FILE MODIFICATION:    //
+  // mkdir, rename, delete //
+  /////////////////////////// 
+  
   /*Creates the directory named by this abstract pathname.*/
   public @Override boolean mkdir(){
     return ssh.exec("mkdir -p "+getSystemPath(), true).success; //FIXME quote the file
@@ -238,13 +241,14 @@ public class SSHFile extends File {
   public @Override boolean delete(){
     return ssh.exec("rm "+getSystemPath(),  true).success; //FIXME quote the file
   }
-  
-  
-  ///////////////////////////////
-  // NOT PROPERLY IMPLEMENTED: //
-  ///////////////////////////////
 
+  //////////////////////
+  // OTHER OVERRIDES: //
+  //////////////////////
 
+  public @Override SSHFile getParentFile() {
+    return parent;
+  }
   /*Returns the length of the file denoted by this abstract pathname.*/
   public @Override long length(){
     return attributes==null ?0 :attributes.size;
@@ -255,8 +259,10 @@ public class SSHFile extends File {
   }
   
   
-  
-  
+  ///////////////////////////////
+  // NOT PROPERLY IMPLEMENTED: //
+  ///////////////////////////////
+
   
   /*Returns a java.nio.file.Path object constructed from the this abstract path.*/
   public @Override Path toPath() {
