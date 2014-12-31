@@ -68,7 +68,7 @@ public class FontPicker {
   private MyTextArea mta;
   private JScrollPane jspMTA;
   private JRadioButton jrbForeground, jrbBackground, jrbCaret;
-  private boolean initialized=true;
+  private boolean initialized=false;
   
   
   /////////////////////
@@ -168,7 +168,7 @@ public class FontPicker {
   private void create(){
     win=new JDialog(parentFrame, true);
     win.setTitle("Font Options");
-    
+
     goodFonts=new HashMap<>();
     badFonts =new HashMap<>();       
     fontNameData=new DefaultListModel<>();
