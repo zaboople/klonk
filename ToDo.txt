@@ -1,17 +1,10 @@
 -Current
   
-  -When I switch windows the cursor position frequently goes somewhere else
   
   -FAVORITE COMMANDS. OH MAN DO I NEED THAT
   
   -Ctrl-W ought to just close the editor if no files are open. It makes no difference.
-  
-  -How about a "Log" in the menu next to print. L is unused as a shortcut.
-    -Hey and a File-Delete? With confirm of course. Hmph.
     
-  -All these setters for log/alert/exception are silly. Just have one interface for logging.
-    -Needs an option for thread-safe logging since we are not on the event dispatch thread in ssh
-  
   -SSH Todo:
     When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore    
     What about when a host key changes or is missing? Will we blow up?
@@ -25,12 +18,17 @@
 
   -Load file & Find/replace are abusive. Fix them.
     -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
+  
   -It honestly would be handy to turn multiline off in find/repl. Just because ^.*?$ can cross multiple lines
+
+  -When I switch windows the cursor position frequently goes somewhere else
 
   -File open ought to start off the session with the last directory opened. 
    It's annoying when it defaults to my stupid home directory. Well ...ssh. Ugh.
 
   -Tabs & Indents allows invalid input - letters instead of numbers
+
+  -Hey and a menu item for File-Delete? With confirm of course. Hmph.
       
   -New Klonk Bug
   Also consider the idea offered at bottom of this page:
