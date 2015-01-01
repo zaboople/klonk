@@ -50,7 +50,7 @@ Also, the auto-indent and tab-indents-line features found in the main editor do 
 
 The "Undo" menu describes a variety of undo options, but the most important operations, undo and redo, are in the text editor's right-click/context menu; their shortcuts are Ctrl-Z and Shift-Ctrl-Z (as is common elsewhere). 
 
-Klonk's most unusual feature is its "unlimited" undo capability, where all edit states are preserved. Like most editors, when you undo a series of edits, you have the option to redo them, undo them again, and so on, backwards and forwards; but in Klonk if you undo and start making new edits, the redos are preserved by converting them into undos. So if you type
+Unlike most editors & IDE's, Klonk allows "unlimited" undo capability, where all edit states are preserved. Like most editors, when you undo a series of edits, you have the option to redo them, undo them again, and so on, backwards and forwards; but in Klonk if you undo and start making new edits, the redos are preserved by converting them into undos. So if you type
   ABCD
 then undo to 
   AB
