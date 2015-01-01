@@ -43,6 +43,13 @@ class SFTP {
   OutputStream getOutputStream(String file) throws Exception {    
     try {
       return getChannel(file).put(file);
+    } catch (Exception e) {
+      if (e.getMessage().contains("Permission denied")) {
+        ssh.userNotify.alert("Permission denied");
+        return null;
+      }
+      else
+        throw e;
     } finally {
       unlock();
     }
