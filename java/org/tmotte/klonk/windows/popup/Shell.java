@@ -215,22 +215,20 @@ public class Shell {
         List<String> commands=ShellCommandParser.parse(input, currFileGetter.get());
         for (int i=0; i<commands.size(); i++)
           if (i==0)
-            publish("Command: "+commands.get(i));
+            publish("Command: "+commands.get(i)+"\n");
           else
-            publish("  Parameter: "+commands.get(i));
+            publish("  Parameter: "+commands.get(i)+"\n");
         ProcessBuilder pb=new ProcessBuilder(commands);
         pb.redirectErrorStream(true);
-        process=pb.start();
+        process=pb.start();       
         try (
             InputStream istr=process.getInputStream();
             InputStreamReader isr=new InputStreamReader(istr);
-            BufferedReader br=new BufferedReader(isr);
           ){
-          String line;
-          //publish() invokes a delayed process():
-          while (!kill && (line=br.readLine())!=null)
-            if (!kill)
-              publish(line);
+          int charsRead=0;
+          char[] readBuffer=new char[1024 * 64];
+          while (!kill && (charsRead=isr.read(readBuffer, 0, readBuffer.length))>0)
+            publish(new String(readBuffer, 0, charsRead));
         }
       } catch (Exception e) {
         failed=true;
@@ -241,10 +239,8 @@ public class Shell {
     }
     @Override protected void process(List<String> lines){
       if (!kill)
-        for (String s: lines) {
+        for (String s: lines) 
           mtaOutput.append(s);
-          mtaOutput.append("\n");
-        }
     }
     @Override protected void done() {
       btnRun.setEnabled(true);
