@@ -2,116 +2,97 @@ package org.tmotte.klonk.ssh;
 import java.util.HashMap;
 import java.util.ArrayList;
 
-class WrapMap<B> {
+/** 
+ * This implements a basic Map cache where items are expired by age. When overcrowding occurs, 
+ * the oldest go overboard first.
+ */
+public class WrapMap<B> {
   private final int max;
   private final long ageLimit;
-  private final HashMap<String,B> data;
+  private final HashMap<String,IndexVal> data;
 
   private final String[] names;
-  private final long[] ages;  
-  private int zeroStop=0;//point of last zero
   private int limIndex=0;
+
+  private final class IndexVal {
+    B value;
+    int index;
+    long time;
+  }
 
   public WrapMap(int max, long ageLimit) {
     this.max=max;
     this.ageLimit=ageLimit;
-    names=new String[this.max];
-    ages=new long[this.max];
     data=new HashMap<>(this.max);
-
-    limIndex=0;
-    zeroStop=max-1;
+    names=new String[this.max];
   }
   
   
   public synchronized B get(String a) {    
-    clean();
-    return data.get(a);
+    IndexVal vi=data.get(a);
+    if (vi==null) 
+      return null;
+    else
+    if (System.currentTimeMillis()-vi.time > ageLimit){
+      data.remove(a);
+      names[vi.index]=null;
+      return null;
+    }
+    else
+      return vi.value;
   }
 
   public synchronized void put(String name, B b) {
-    clean();
-    if (data.containsKey(name))
-      killKey(name);
-    if (names[limIndex]!=null) 
-      data.remove(names[limIndex]);
+    String other=names[limIndex];
+    if (other!=null) 
+      data.remove(other);
+  
+    IndexVal vi=data.get(name);
+    if (vi!=null)
+      names[vi.index]=null;
+    else {
+      vi=new IndexVal();
+      data.put(name, vi);
+    }
+
+    vi.value=b;
+    vi.time=System.currentTimeMillis();
+    vi.index=limIndex;
     names[limIndex]=name;
-    ages[limIndex]=System.currentTimeMillis();
-    limIndex++;
-    if (limIndex==max) limIndex=0;
-    data.put(name, b);
+    limIndex++; if (limIndex==max) limIndex=0;
   }
   public synchronized int size(){
     return data.size();
   }
 
   public synchronized void reset() {
-    for (int i=0; i<names.length; i++){
+    for (int i=0; i<names.length; i++)
       names[i]=null;
-      ages[i]=0;
-    }
     data.clear();
     limIndex=0;
-    zeroStop=max-1;
   }
   
-  private void killKey(String name) {
-    int i=zeroStop;
-    for (int count=0; count<max; count++){
-      i++; if (i==max) i=0;
-      if (name.equals(names[i])){
-        names[i]=null;
-        ages[i]=1;
-        return;
-      }
-    }  
-    throw new RuntimeException("Could not kill duplicate key "+name);
-  }
-  private int distanceToZero(int i) {
-    int distance=zeroStop-i;
-    if (distance<0) distance=max+distance;
-    return distance;
-  }
-  private void clean() {
-    int i=limIndex;
-    long currTime=System.currentTimeMillis();
-    for (int count=0; count<max; count++) {
-      i++; if (i==max) i=0;
-      long date=ages[i];
-      if (date==0) {
-        count+=distanceToZero(i);
-        i=zeroStop;
-      }
-      else 
-      if (date==1) {
-        //Reclaimed slot from duplicate key
-      }
-      else
-      if (currTime-date>ageLimit){
-        System.out.print("Yanking "+ages[i]);
-        ages[i]=0;
-        zeroStop=i;
-        data.remove(names[i]);
-        names[i]=null;
-      }
-    }
-  }
   
-  //QUICK TEST:
-  
-  public static void main(String[] args) throws Exception {
-    WrapMap<Integer> wc=new WrapMap<>(100, 200);
-    for (int i=0; i<105; i++){
-      Thread.sleep(i);
-      wc.put(""+i, i);
-      System.out.print(" p"+wc.size()+" ");
-      System.out.flush();
+  public void debug(java.io.PrintStream ps, String formatStr, int perLine) {
+    long time=System.currentTimeMillis();
+    for (int i=0; i<names.length; i++) {
+      String name=names[i];
+      IndexVal vi=data.get(name);
+      if (name!=null && vi==null) throw new RuntimeException("Where did "+name+" go?");
+      ps.print(
+        String.format(
+          formatStr,
+          name!=null ?name :"-",
+          vi==null
+            ?"-"
+            :System.currentTimeMillis()-vi.time
+        )
+      );
+      int count=i+1;
+      if (count>=perLine && count%perLine==0)
+        ps.println();
     }
-    System.out.println();
-    for (int i=0; i<105; i++){
-      Integer x=wc.get(""+i);
-      if (x!=null)
-        System.out.print(x+" ");
-    }
+    ps.println();
   }
+
 }
