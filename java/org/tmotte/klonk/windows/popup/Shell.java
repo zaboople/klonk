@@ -115,7 +115,7 @@ public class Shell {
   private void preserveBounds() {
     persist.setShellWindowBounds(win.getBounds());
   }
-  private void setFont(FontOptions f) {//fixme hide
+  private void setFont(FontOptions f) {
     this.fontOptions=f;
     if (initialized)
       setFont(mtaOutput);
