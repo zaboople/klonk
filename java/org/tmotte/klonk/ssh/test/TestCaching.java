@@ -6,14 +6,14 @@ public class TestCaching {
     java.util.Random random=new java.util.Random(System.currentTimeMillis());
     
     int maxSize=100;
-    int maxTime=1700;
+    int maxTime=200;
     int maxSleep=100;
-    int tries=525;
-    int maxval=800;    
+    int tries=200;
+    int maxval=199;    
     String formatStr="%5s-%-6s ";
     int perLine=10;
     
-    WrapMap<Integer> wc=new WrapMap<>(100, 2000);
+    WrapMap<Integer> wc=new WrapMap<>(maxSize, maxTime);
     {
       for (int count=0; count<tries; count++){
         Thread.sleep(random.nextInt(maxSleep));

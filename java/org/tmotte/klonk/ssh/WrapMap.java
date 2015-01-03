@@ -1,16 +1,16 @@
 package org.tmotte.klonk.ssh;
 import java.util.HashMap;
-import java.util.ArrayList;
 
 /** 
  * This implements a basic Map cache where items are expired by age. When overcrowding occurs, 
- * the oldest go overboard first.
+ * the oldest go overboard first. This would use generic types for both key & value, but we have
+ * an internal array and those don't allow generics, thanks java :/
  */
 public class WrapMap<B> {
   private final int max;
   private final long ageLimit;
+  
   private final HashMap<String,IndexVal> data;
-
   private final String[] names;
   private int limIndex=0;
 
@@ -58,6 +58,7 @@ public class WrapMap<B> {
     vi.value=b;
     vi.time=System.currentTimeMillis();
     vi.index=limIndex;
+    
     names[limIndex]=name;
     limIndex++; if (limIndex==max) limIndex=0;
   }
@@ -71,7 +72,11 @@ public class WrapMap<B> {
     data.clear();
     limIndex=0;
   }
-  
+ 
+  ///////////////////////////////
+  // TESTING:                  //
+  // Kind of fun to watch too. //
+  ///////////////////////////////
   
   public void debug(java.io.PrintStream ps, String formatStr, int perLine) {
     long time=System.currentTimeMillis();
