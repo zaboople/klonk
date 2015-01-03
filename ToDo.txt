@@ -1,7 +1,6 @@
 -Current
-  
-  
-  -FAVORITE COMMANDS. OH MAN DO I NEED THAT
+    
+  -Favorite commands. oh man do i need that
   
   -Ctrl-W ought to just close the editor if no files are open. It makes no difference.
     
