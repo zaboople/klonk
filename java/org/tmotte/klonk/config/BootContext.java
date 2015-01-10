@@ -255,7 +255,7 @@ public class BootContext {
         ,new CtrlOther    (shell, help, about)
         ,new CtrlOptions  (
           editors, statusBar, persist, ctrlFavorites, 
-          ctrlMain.getLineDelimiterListener(), fontListeners,
+          ctrlMain.getLineDelimiterListener(), fontListeners, sshConns,
           sshOptionPicker, tabsAndIndents, favorites, fontPicker, kDelims
         )
       );

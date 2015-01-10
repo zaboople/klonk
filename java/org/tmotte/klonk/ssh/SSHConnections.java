@@ -2,6 +2,8 @@ package org.tmotte.klonk.ssh;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -10,7 +12,7 @@ import org.tmotte.klonk.config.msg.UserNotify;
 
 /** This does not establish a connection. It only collects potential connections. Not thread-safe. */
 public class SSHConnections {
-
+  
   private final Map<String, Map<String, SSH>> conns=new HashMap<>();
   private final ConnectionParse parser=new ConnectionParse();
   private Set<String> users=new HashSet<>();
@@ -49,6 +51,11 @@ public class SSHConnections {
   // PUBLIC: //
   /////////////
 
+  public void close(String host) {
+    Map<String, SSH> perHost=conns.get(host);
+    for (SSH ssh: perHost.values())
+      ssh.close();
+  }
   public void close() throws Exception {
     for (String host: conns.keySet()){
       Map<String,SSH> forHost=conns.get(host);
@@ -90,13 +97,25 @@ public class SSHConnections {
   public IFileGet getFileResolver() {
     return iFileGet;
   }
+  public List<String> getConnectedHosts() {
+    List<String> h=new LinkedList<>();
+    for (String s: conns.keySet()){
+      Map<String, SSH> zzz=conns.get(s);
+      boolean is=false;
+      for (String u: zzz.keySet())
+        if (!is && zzz.get(u).isConnected())
+          is=true;
+      if (is) h.add(s);
+    }
+    return h;
+  }
 
-  ////////////////
-  // PROTECTED: //
-  ////////////////
+  //////////////////////
+  // PACKAGE PRIVATE: //
+  //////////////////////
 
   /** This is here only for the connection parser: */
-  protected String inferUserForHost(String host) {
+  String inferUserForHost(String host) {
 
     //If there is only one user so far, assume it's them:
     if (users.size()==1)      

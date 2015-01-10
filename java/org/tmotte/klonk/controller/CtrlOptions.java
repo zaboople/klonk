@@ -2,6 +2,7 @@ package org.tmotte.klonk.controller;
 import java.util.LinkedList;
 import java.util.List;
 import org.tmotte.klonk.Editor;
+import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Setter;
@@ -29,6 +30,7 @@ public class CtrlOptions {
   private LineDelimiterListener delimListener;
   private List<Setter<FontOptions>> fontListeners;
   private LineDelimiters lineDelimiters;
+  private SSHConnections sshConns;
 
   private Favorites favorites;
   private SSHOptionPicker sshOptionPicker;
@@ -37,19 +39,21 @@ public class CtrlOptions {
   
   public CtrlOptions(
       Editors editors, StatusUpdate statusBar, KPersist persist, CtrlFavorites ctrlFavorites, 
-      LineDelimiterListener delimListener, List<Setter<FontOptions>> fontListeners,
+      LineDelimiterListener delimListener, List<Setter<FontOptions>> fontListeners, SSHConnections sshConns,
       SSHOptionPicker sshOptionPicker, TabsAndIndents tabsAndIndents, 
       Favorites favorites, FontPicker fontPicker, LineDelimiters lineDelimiters
     ) {
     this.editors=editors;
     this.statusBar=statusBar;
     this.persist=persist;
-    this.favorites=favorites;
     this.ctrlFavorites=ctrlFavorites;
     this.delimListener=delimListener;
     this.fontListeners=fontListeners;
+    this.sshConns=sshConns;
+    
     this.sshOptionPicker=sshOptionPicker;
     this.tabsAndIndents=tabsAndIndents;
+    this.favorites=favorites;
     this.fontPicker=fontPicker;
     this.lineDelimiters=lineDelimiters;
 
@@ -105,9 +109,12 @@ public class CtrlOptions {
   }
 
   public void doSSH(){ 
-    if (sshOptionPicker.show(sshOptions)){
+    List<String> hosts=sshConns.getConnectedHosts();
+    if (sshOptionPicker.show(sshOptions, hosts)){
       persist.setSSHOptions(sshOptions);
       persist.save();
+      for (String dis: hosts)
+        sshConns.close(dis);
     }
     else
       statusBar.show("Cancelled.");

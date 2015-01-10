@@ -55,6 +55,19 @@ class SFTP {
       unlock();
     }
   }
+  boolean chmod(String file, int attributes) { //FIXME am i even using this
+    try {      
+      ChannelSftp ch=getChannel(file);      
+      if (ch==null)
+        return false;
+      ch.chmod(attributes, file);
+      return true;
+    } catch (Exception e) {
+      throw new RuntimeException("Could not chmod "+file, e);
+    } finally {
+      unlock();
+    }
+  }
   SSHFileAttr getAttributes(String file) {
     ssh.userNotify.log("SFTP.getAttributes "+Thread.currentThread().hashCode()+" "+file);
     SSHFileAttr res=null;//attrCache.get(file);
@@ -110,7 +123,7 @@ class SFTP {
     } catch (Exception e) {
       try {close();} catch (Exception e2) {}//FIXME log that      
       if (!canIgnore(e, file))
-        ssh.userNotify.alert(e, "Failed to get stat on: "+file);
+        ssh.userNotify.alert(e, "Failed to list files for: "+file);
       return noFiles;
     } finally {
       //ssh.userNotify.log("SFTP.listFiles "+Thread.currentThread().hashCode()+" "+file+" COMPLETE ");

@@ -137,9 +137,12 @@ public class SSH {
       return getSFTPStreaming().getOutputStream(file);
     } catch (Exception e) {
       close();
-      userNotify.alert(e, "Could not write to: "+file+":");//FIXME handle file permission failure
-      return null; //FIXME will probably blow up on the other end 
+      throw new RuntimeException("Could not write to: "+file+":", e);
     }
+  }
+  
+  void makeFile(String path) {
+    exec("touch "+path+"; chmod u+rwx "+path+"; chmod g+rwx "+path+"; chmod o-rwx "+path);
   }
 
   SSHExecResult exec(String command) {
@@ -156,6 +159,14 @@ public class SSH {
     return isConnected() 
       ?session
       :null;
+  }
+
+  boolean isConnected(){
+    System.out.println("SSH.isConnected() "+session);
+    if (session!=null && session.isConnected())
+      return true;
+    session=null;
+    return false;
   }
 
 
@@ -199,13 +210,6 @@ public class SSH {
 
 
   
-  private boolean isConnected(){
-    System.out.println("SSH.isConnected() "+session);
-    if (session!=null && session.isConnected())
-      return true;
-    session=null;
-    return false;
-  }
   private boolean connect() {
     try {
       return tryConnect1();

@@ -10,6 +10,9 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Window;
 
+/** 
+ * User gridwidth and gridheight to make a component span extra columns/rows
+ */
 public class GridBug extends GridBagConstraints {
 
   public GridBagLayout gbl=new GridBagLayout();

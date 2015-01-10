@@ -21,6 +21,8 @@ public class FileSave {
           OutputStream output=file.getOutputStream();
           OutputStreamWriter outw=new OutputStreamWriter(output, "utf-8");
           ){
+          if (!file.exists())
+            throw new RuntimeException("What do you mean it doesn't exist");
           for (int i=0; i<limit*100; i++){
             System.out.print(".");
             System.out.flush();
@@ -44,8 +46,8 @@ public class FileSave {
           istr.close();
         }
         System.out.println("File read");
-        file.delete();
       }
+      file.delete();
     } finally {
       cmd.connections.close();    
     }

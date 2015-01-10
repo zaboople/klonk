@@ -16,6 +16,7 @@ public class SSHFile extends File {
       return (SSHFile)f;
     return null;    
   }
+  private static Pattern blankPattern=Pattern.compile(" ");
 
   protected SSHFile parent;
   private final SSH ssh;
@@ -25,9 +26,9 @@ public class SSHFile extends File {
   private SSHFileAttr attributes=null;
 
   
-  public SSHFile(SSH ssh, SSHFile parent, String name) {
-    super(parent, name); 
-    this.name=name;
+  public SSHFile(SSH ssh, SSHFile parent, String filename) {
+    super(parent, filename); 
+    this.name=filename;
     this.ssh=ssh;
     this.parent=parent;
   }
@@ -40,6 +41,8 @@ public class SSHFile extends File {
     return ssh.getInputStream(getTildeFixPath());
   }
   public OutputStream getOutputStream() throws Exception {
+    if (!exists()) 
+      ssh.makeFile(getQuotedPath());
     return ssh.getOutputStream(getTildeFixPath());
   }
   
@@ -76,7 +79,7 @@ public class SSHFile extends File {
   private void refresh(){
     attributes=ssh.getAttributes(getSystemPath().trim());
     // Alternate means
-    //SSHExecResult res=ssh.exec("ls -lda "+getSystemPath(), false);
+    //SSHExecResult res=ssh.exec("ls -lda "+getQuotedPath(), false);
     //exists=false;
     //if (res.success) {
     //  SSHFileLongList list=new SSHFileLongList(res.output);
@@ -168,6 +171,12 @@ public class SSHFile extends File {
       s=s.replace("~", ssh.getTildeFix());
     return s;
   }
+  private String getQuotedPath(){
+    String s=getSystemPath();
+    if (s.contains(" "))
+      s=blankPattern.matcher(s).replaceAll("\\\\ ");
+    return s;
+  }
   
   //////////////
   // COMPARE: //
@@ -224,7 +233,7 @@ public class SSHFile extends File {
   
   /*Creates the directory named by this abstract pathname.*/
   public @Override boolean mkdir(){
-    return ssh.exec("mkdir -p "+getSystemPath(), true).success; //FIXME quote the file
+    return ssh.exec("mkdir -p "+getQuotedPath(), true).success; 
   }
   /*Renames the file denoted by this abstract pathname.*/
   public @Override boolean renameTo(File dest){
@@ -232,14 +241,14 @@ public class SSHFile extends File {
     String otherName=sshFile==null
       ?dest.getAbsolutePath()
       :sshFile.getSystemPath();
-    boolean success=ssh.exec("mv "+getSystemPath()+" "+otherName, true).success; //FIXME quote the file
+    boolean success=ssh.exec("mv "+getQuotedPath()+" "+otherName, true).success; 
     if (success) 
       this.name=dest.getName();
     return success;
   }  
   /*Deletes the file or directory denoted by this abstract pathname.*/
   public @Override boolean delete(){
-    return ssh.exec("rm "+getSystemPath(),  true).success; //FIXME quote the file
+    return ssh.exec("rm "+getQuotedPath(),  true).success; 
   }
 
   //////////////////////

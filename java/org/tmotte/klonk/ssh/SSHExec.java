@@ -17,7 +17,7 @@ public class SSHExec {
     this.mc=mc;
     this.userNotify=userNotify;
   }
-  
+ 
   SSHExecResult exec(String command, boolean alertFail) {
     StringBuilder out=new StringBuilder();
     ByteArrayOutputStream err=new ByteArrayOutputStream(512);
