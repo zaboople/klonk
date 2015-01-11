@@ -199,7 +199,10 @@ public class SSHOptionPicker {
       j.setForeground(new Color(200,200,200));
       gb.addY(j);
     }
+    gb.insets.top=10;
+    gb.insets.bottom=10;
     gb.addY(getAccessPanel());
+    gb.insets.top=5;
     {
       JSeparator j=new JSeparator(JSeparator.HORIZONTAL);
       j.setForeground(new Color(200,200,200));
@@ -278,41 +281,30 @@ public class SSHOptionPicker {
 
     gb.setX(0);  
     gb.weightx=0;
-    gb.insets.left=20;
     gb.addY(new JLabel(""));    
+    gb.insets.left=6;
     gb.addX(new JLabel("Read   "));
     gb.addX(new JLabel("Write   "));
     gb.weightx=1;
     gb.addX(new JLabel("Execute"));
-    gb.setX(0);
     
-    gb.weightx=0;
-    gb.addY(new JLabel("User"));
-    gb.addX(tcUser.read);
-    gb.addX(tcUser.write);
-    gb.weightx=1;
-    gb.addX(tcUser.execute);
-
-    gb.weightx=0;
-    gb.setX(0);
-    gb.addY(new JLabel("Group"));
-    gb.addX(tcGroup.read);
-    gb.addX(tcGroup.write);
-    gb.weightx=1;
-    gb.addX(tcGroup.execute);
-        
-
-    gb.weightx=0;
-    gb.setX(0);
-    gb.addY(new JLabel("Other"));
-    gb.addX(tcOther.read);
-    gb.addX(tcOther.write);
-    gb.weightx=1;
-    gb.addX(tcOther.execute);
+    addAccessTriple(gb, tcUser, "User");
+    addAccessTriple(gb, tcGroup, "Group");
+    addAccessTriple(gb, tcOther, "Other");
 
     return jp;
   }
-
+  private void addAccessTriple(GridBug gb, TripleCheck tc, String name) {
+    gb.insets.left=0;
+    gb.weightx=0;
+    gb.setX(0);
+    gb.addY(new JLabel(name));
+    gb.insets.left=6;
+    gb.addX(tc.read);
+    gb.addX(tc.write);
+    gb.weightx=1;
+    gb.addX(tc.execute);
+  }
 
   private JPanel getKillConnsPanel() {
     JPanel jp=new JPanel();
