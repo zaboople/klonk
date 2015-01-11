@@ -1,8 +1,6 @@
 -Current
 
   Right now    
-    -SSH disconnect dialogue
-      Problem: You can reconnect without ssh connections knowing it, because you're tied to a file.
     -SSH need a default umask
       -public void chmod(int permissions, String path) throws SftpException{
     -SSH caching

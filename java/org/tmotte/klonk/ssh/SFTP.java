@@ -22,7 +22,6 @@ class SFTP {
   private SSH ssh;
   private ChannelSftp channel;
   private MeatCounter mc;
-  private WrapMap<SSHFileAttr> attrCache=new WrapMap<>(5000, 1500);//FIXME do we need the file-level caching as well?
    
   SFTP(SSH ssh, MeatCounter mc) {
     this.ssh=ssh;
@@ -70,18 +69,11 @@ class SFTP {
   }
   SSHFileAttr getAttributes(String file) {
     ssh.userNotify.log("SFTP.getAttributes "+Thread.currentThread().hashCode()+" "+file);
-    SSHFileAttr res=null;//attrCache.get(file);
-    if (res!=null){
-      ssh.userNotify.log("SFTP.getAttributes cache hit");
-      return res;
-    }
     try {      
       ChannelSftp ch=getChannel(file);
       if (ch==null)
         return null;
-      res=new SSHFileAttr(ch.stat(file));
-      //attrCache.put(file, res);
-      return res;
+      return new SSHFileAttr(ch.stat(file));
     } catch (Exception e) {
       try {close();} catch (Exception e2) {}//FIXME log that
       if (canIgnore(e, file))

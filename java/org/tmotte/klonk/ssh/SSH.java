@@ -32,6 +32,8 @@ public class SSH {
 
   //For SSHExec & SFTP:
   private MeatCounter takeANumber=new MeatCounter(50);
+  private WrapMap<SSHFileAttr> attrCache=new WrapMap<>(500, 10000);//FIXME do we need the file-level caching as well?
+  
    
   ////////////////////
   // INSTANTIATION: //
@@ -116,7 +118,14 @@ public class SSH {
 
   
   SSHFileAttr getAttributes(String path) {
-    return getSFTP().getAttributes(path);
+    SSHFileAttr sfa=attrCache.get(path);
+    if (sfa!=null) 
+      myLog("Cache hit "+path);
+    else {
+      sfa=getSFTP().getAttributes(path);
+      attrCache.put(path, sfa);
+    }
+    return sfa;  
   }
   String[] list(String path) {
     return getSFTP().listFiles(path);

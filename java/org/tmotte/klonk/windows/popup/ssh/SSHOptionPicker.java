@@ -39,8 +39,9 @@ import org.tmotte.klonk.config.option.SSHOptions;
 public class SSHOptionPicker {
 
   private JFrame parentFrame;
-  private FileDialogWrapper fdw;
-  
+  private FileDialogWrapper fdw; 
+
+  private JDialog win;  
   private JCheckBox 
     jcbKnownHosts, 
     jcbPrivateKeys,
@@ -53,14 +54,16 @@ public class SSHOptionPicker {
     btnPrivateKeys;
   private JPanel jpConns;
   private GridBug gbConns;
-  private List<JCheckBox> listCBConns;
-    
   private JLabel lblOpenConns;
+  private List<JCheckBox> listCBConns;
+  private static class TripleCheck {
+    JCheckBox read=new JCheckBox(" "), write=new JCheckBox(" "), execute=new JCheckBox(" ");
+  }
+  private TripleCheck tcUser, tcGroup, tcOther;
 
-  private JDialog win;
   private JButton btnOK, btnCancel;
-  private boolean initialized;
 
+  private boolean initialized;
   private boolean result=false;
 
   public SSHOptionPicker(JFrame parentFrame, FileDialogWrapper fdw) {
@@ -174,6 +177,10 @@ public class SSHOptionPicker {
     jpConns=new JPanel();
     gbConns=new GridBug(jpConns);
     listCBConns=new LinkedList<JCheckBox>();
+    
+    tcUser=new TripleCheck();
+    tcGroup=new TripleCheck();
+    tcOther=new TripleCheck();
   }
   private void layout(){
     GridBug gb=new GridBug(win);
@@ -187,14 +194,22 @@ public class SSHOptionPicker {
     gb.insets.left=8;
     gb.insets.right=8;
     gb.insets.bottom=4;
-    JSeparator j=new JSeparator(JSeparator.HORIZONTAL);
-    j.setForeground(new Color(200,200,200));
-    gb.addY(j);
+    {
+      JSeparator j=new JSeparator(JSeparator.HORIZONTAL);
+      j.setForeground(new Color(200,200,200));
+      gb.addY(j);
+    }
+    gb.addY(getAccessPanel());
+    {
+      JSeparator j=new JSeparator(JSeparator.HORIZONTAL);
+      j.setForeground(new Color(200,200,200));
+      gb.addY(j);
+    }    
     gb.insets.top=2;
     gb.insets.left=4;
     gb.insets.right=4;
     gb.insets.bottom=0;
-    
+
     gb.addY(getKillConnsPanel());
     gb.weightXY(1);
     gb.addY(getButtons());
@@ -246,6 +261,59 @@ public class SSHOptionPicker {
     
     return jp;
   }
+
+  private JPanel getAccessPanel() {
+    JPanel jp=new JPanel();
+    
+    GridBug gb=new GridBug(jp);
+    gb.weightXY(0).gridXY(0);
+    gb.anchor=gb.WEST;
+    gb.insets.top=4;
+    gb.insets.bottom=2;
+    gb.insets.left=2;
+    gb.weightx=1;
+    gb.gridwidth=4;
+    gb.add(new JLabel("<html><body><b>Default access for new files</b></body></html>"));    
+    gb.gridwidth=1;
+
+    gb.setX(0);  
+    gb.weightx=0;
+    gb.insets.left=20;
+    gb.addY(new JLabel(""));    
+    gb.addX(new JLabel("Read   "));
+    gb.addX(new JLabel("Write   "));
+    gb.weightx=1;
+    gb.addX(new JLabel("Execute"));
+    gb.setX(0);
+    
+    gb.weightx=0;
+    gb.addY(new JLabel("User"));
+    gb.addX(tcUser.read);
+    gb.addX(tcUser.write);
+    gb.weightx=1;
+    gb.addX(tcUser.execute);
+
+    gb.weightx=0;
+    gb.setX(0);
+    gb.addY(new JLabel("Group"));
+    gb.addX(tcGroup.read);
+    gb.addX(tcGroup.write);
+    gb.weightx=1;
+    gb.addX(tcGroup.execute);
+        
+
+    gb.weightx=0;
+    gb.setX(0);
+    gb.addY(new JLabel("Other"));
+    gb.addX(tcOther.read);
+    gb.addX(tcOther.write);
+    gb.weightx=1;
+    gb.addX(tcOther.execute);
+
+    return jp;
+  }
+
+
   private JPanel getKillConnsPanel() {
     JPanel jp=new JPanel();
     //jp.setBackground(Color.GREEN);

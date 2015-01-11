@@ -22,7 +22,6 @@ public class SSHFile extends File {
   private final SSH ssh;
   private String name;
   
-  private long lastCheck=-1;
   private SSHFileAttr attributes=null;
 
   
@@ -77,7 +76,7 @@ public class SSHFile extends File {
     return attributes!=null;
   }
   private void refresh(){
-    attributes=ssh.getAttributes(getSystemPath().trim());
+    attributes=ssh.getAttributes(getTildeFixPath().trim());
     // Alternate means
     //SSHExecResult res=ssh.exec("ls -lda "+getQuotedPath(), false);
     //exists=false;
@@ -88,11 +87,7 @@ public class SSHFile extends File {
     //}
   }
   private void check(){
-    long currCheck=System.currentTimeMillis();
-    if (currCheck-lastCheck > 1300){
-      lastCheck=currCheck;
-      refresh();
-    }
+    refresh();
   }
 
   //////////////
@@ -101,7 +96,7 @@ public class SSHFile extends File {
   
   /*Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.*/
   public @Override String[] list(){
-    return ssh.list(getSystemPath());
+    return ssh.list(getTildeFixPath());
   }
   /*Returns an array of abstract pathnames denoting the files in the directory denoted by this abstract pathname.*/
   public @Override File[] listFiles(){
