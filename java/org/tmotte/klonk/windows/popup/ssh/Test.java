@@ -62,8 +62,7 @@ class Test {
           JFrame m=ptc.getMainFrame();
           KAlert alerter=new KAlert(m);
           SSHConnections conns=new SSHConnections(notifier)
-            .withKnown(options.getKnownHostsFilename())
-            .withPrivateKeys(options.getPrivateKeysFilename())
+            .withOptions(options)
             .withLogin(
               new SSHLogin(m, alerter)
             );

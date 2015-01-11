@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.common.text.StringChunker;
 import org.tmotte.klonk.config.msg.UserNotify;
 
@@ -18,8 +19,10 @@ public class SSHConnections {
   private Set<String> users=new HashSet<>();
   
   private String knownHosts, privateKeys;
+  private String defaultFilePerms, defaultDirPerms;
   private IUserPass iUserPass;
   private UserNotify userNotify;
+  
   private IFileGet iFileGet=new IFileGet(){
     public File get(String uri) {
       if (is(uri)) return getSSHFile(uri);
@@ -34,12 +37,14 @@ public class SSHConnections {
   public SSHConnections (UserNotify userNotify) {
     this.userNotify=userNotify;
   }  
-  public SSHConnections withKnown(String hostsFile) {
-    this.knownHosts=hostsFile;
-    return this;
-  }
-  public SSHConnections withPrivateKeys(String privateKeysFile) {
-    this.privateKeys=privateKeysFile;
+  public SSHConnections withOptions(SSHOptions opts){
+    this.knownHosts=opts.getKnownHostsFilename();
+    this.privateKeys=opts.getPrivateKeysFilename();
+    this.defaultFilePerms=opts.getDefaultFilePermissions();
+    this.defaultDirPerms=opts.getDefaultDirPermissions();
+    for (Map<String,SSH> map: conns.values())
+      for (SSH ssh: map.values()) 
+        configure(ssh);
     return this;
   }
   public SSHConnections withLogin(IUserPass iUserPass) {
@@ -80,9 +85,8 @@ public class SSHConnections {
     Map<String,SSH> perHost=getForHost(host);
     SSH ssh=perHost.get(user);
     if (ssh==null) {
-      ssh=new SSH(user, host, userNotify)
-        .withKnown(knownHosts)
-        .withPrivateKeys(privateKeys)
+      ssh=
+        configure(new SSH(user, host, userNotify))
         .withIUserPass(iUserPass);
       if (!ssh.verifyConnection())
         return null;
@@ -147,7 +151,14 @@ public class SSHConnections {
   ////////////////////////
   // PRIVATE FUNCTIONS: //
   ////////////////////////
-  
+
+  private SSH configure(SSH ssh) {
+    ssh
+      .withKnown(knownHosts)
+      .withPrivateKeys(privateKeys)
+      .withDefaultPerms(defaultFilePerms, defaultDirPerms);
+    return ssh;
+  }
   private Map<String,SSH> getForHost(String host) {
     Map<String,SSH> perHost=conns.get(host);
     if (perHost==null){

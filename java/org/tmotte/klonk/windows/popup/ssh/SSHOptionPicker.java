@@ -74,16 +74,27 @@ public class SSHOptionPicker {
     init();
     result=false;
     {
+      //Pre-set inputs:
+      
+      //Known hosts:
       String knownHosts=ifEmpty(options.getKnownHostsFilename());
       if (knownHosts!=null)
         jtfKnownHosts.setText(knownHosts);
       jcbKnownHosts.setSelected( knownHosts !=null);
       
+      //Private keys:
       String privateKeys=ifEmpty(options.getPrivateKeysFilename());
       if (privateKeys!=null)
         jtfPrivateKeys.setText(privateKeys);
       jcbPrivateKeys.setSelected( privateKeys !=null);
       
+      //Default permissions:
+      System.out.println("FUCKING GODDAMMIT "+options);
+      setChecked(tcUser, options.dur, options.duw, options.dux);
+      setChecked(tcGroup, options.dgr, options.dgw, options.dgx);
+      setChecked(tcOther, options.dor, options.dow, options.dox);
+      
+      //Kill connections:
       boolean kk=servers.size()>0;
       jcbSelectAllConns.setEnabled(kk);
       if (kk) 
@@ -116,10 +127,19 @@ public class SSHOptionPicker {
           ?ifEmpty(jtfPrivateKeys)
           :""
       );    
+      options.dur=tcUser.read.isSelected();
+      options.duw=tcUser.write.isSelected();
+      options.dux=tcUser.execute.isSelected();
+      options.dgr=tcGroup.read.isSelected();
+      options.dgw=tcGroup.write.isSelected();
+      options.dgx=tcGroup.execute.isSelected();
+      options.dor=tcOther.read.isSelected();
+      options.dow=tcOther.write.isSelected();
+      options.dox=tcOther.execute.isSelected();
     }
     return result;
   }
-  /** For looping */
+  /** For looping... well ok we aren't but so what */
   private void doShow() {
     Positioner.set(parentFrame, win);
     win.setVisible(true);
@@ -199,21 +219,26 @@ public class SSHOptionPicker {
       j.setForeground(new Color(200,200,200));
       gb.addY(j);
     }
+    
+    gb.insets.left=6;
     gb.insets.top=10;
     gb.insets.bottom=10;
     gb.addY(getAccessPanel());
+
+    gb.insets.left=8;
     gb.insets.top=5;
     {
       JSeparator j=new JSeparator(JSeparator.HORIZONTAL);
       j.setForeground(new Color(200,200,200));
       gb.addY(j);
     }    
+
     gb.insets.top=2;
     gb.insets.left=4;
     gb.insets.right=4;
     gb.insets.bottom=0;
-
     gb.addY(getKillConnsPanel());
+
     gb.weightXY(1);
     gb.addY(getButtons());
     win.pack();
@@ -273,18 +298,19 @@ public class SSHOptionPicker {
     gb.anchor=gb.WEST;
     gb.insets.top=4;
     gb.insets.bottom=2;
-    gb.insets.left=2;
+    gb.insets.left=0;
     gb.weightx=1;
     gb.gridwidth=4;
-    gb.add(new JLabel("<html><body><b>Default access for new files</b></body></html>"));    
+    gb.add(new JLabel("<html><body><b>Default access for new files/directories:</b></body></html>"));    
+    gb.addY(new JLabel("(Note: Read permission on directory will be treated as execute also)"));    
     gb.gridwidth=1;
 
     gb.setX(0);  
     gb.weightx=0;
     gb.addY(new JLabel(""));    
     gb.insets.left=6;
-    gb.addX(new JLabel("Read   "));
-    gb.addX(new JLabel("Write   "));
+    gb.addX(new JLabel("Read"));
+    gb.addX(new JLabel("Write"));
     gb.weightx=1;
     gb.addX(new JLabel("Execute"));
     
@@ -429,6 +455,11 @@ public class SSHOptionPicker {
       ?null
       :s.trim();
   }
+  private void setChecked(TripleCheck tc, boolean read, boolean write, boolean execute) {
+    tc.read.setSelected(read);
+    tc.write.setSelected(write);
+    tc.execute.setSelected(execute);
+  }
   
   ///////////
   // TEST: //
@@ -442,6 +473,8 @@ public class SSHOptionPicker {
           SSHOptionPicker pop=new SSHOptionPicker(parentFrame, new FileDialogWrapper(parentFrame));
           SSHOptions sopt=new SSHOptions();
           List<String> servers=new ArrayList<>();
+
+          System.out.println("OPTIONS BEFORE:\n"+sopt);
           
           servers.add("hoopty.doopty.com");
           servers.add("braindamage.waffles.org");
@@ -461,7 +494,7 @@ public class SSHOptionPicker {
     });  
   }  
   private static void debugTestResult(boolean result, SSHOptions sopt, List<String> servers){
-    System.out.println("\n");
+    System.out.println("\nResult: ");
     if (result){
       System.out.println(sopt);
       for (String s: servers) 

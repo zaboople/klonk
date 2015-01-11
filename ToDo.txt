@@ -2,7 +2,7 @@
 
   Right now    
     -SSH need a default umask
-      -public void chmod(int permissions, String path) throws SftpException{
+      -It's not getting set when I change it in flight
     -SSH caching
     -The sshconnections object isn't gonna get updated by CtrlOptions
     

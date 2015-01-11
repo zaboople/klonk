@@ -111,10 +111,11 @@ public class CtrlOptions {
   public void doSSH(){ 
     List<String> hosts=sshConns.getConnectedHosts();
     if (sshOptionPicker.show(sshOptions, hosts)){
-      persist.setSSHOptions(sshOptions);
+      persist.writeSSHOptions();
       persist.save();
       for (String dis: hosts)
         sshConns.close(dis);
+      sshConns.withOptions(sshOptions);
     }
     else
       statusBar.show("Cancelled.");

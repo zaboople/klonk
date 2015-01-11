@@ -27,6 +27,7 @@ public class KPersist {
   private boolean hasChanges=false;
 
   private FontOptions fontOptionsCache;
+  private SSHOptions sshOptionsCache;
   private List<String> recentFilesCache, recentDirsCache;
   
   public KPersist(KHome home, Setter<Throwable> logFail) {
@@ -118,15 +119,34 @@ public class KPersist {
   // SSH OPTIONS: //
   
   public SSHOptions getSSHOptions(){
-    SSHOptions opts=new SSHOptions();
-    opts.setKnownHostsFilename(get("SSH.KnownHosts", null));
-    opts.setPrivateKeysFilename(get("SSH.PrivateKeys", null));
-    return opts;
+    if (sshOptionsCache==null) {
+      SSHOptions opts=new SSHOptions();
+      opts.setKnownHostsFilename(get("SSH.KnownHosts", null));
+      opts.setPrivateKeysFilename(get("SSH.PrivateKeys", null));
+      String user=get("SSH.Default.User",  "rw-"),
+            group=get("SSH.Default.Group", "r--"),
+            other=get("SSH.Default.Other", "---");
+      opts.dur=user.contains("r");
+      opts.duw=user.contains("w");
+      opts.dux=user.contains("x");
+      opts.dgr=group.contains("r");
+      opts.dgw=group.contains("w");
+      opts.dgx=group.contains("x");
+      opts.dor=other.contains("r");
+      opts.dow=other.contains("w");
+      opts.dox=other.contains("x");
+      sshOptionsCache=opts;
+    }
+    return sshOptionsCache;
   }
-  public void setSSHOptions(SSHOptions opts){
-    set("SSH.KnownHosts", opts.getKnownHostsFilename());
-    set("SSH.PrivateKeys", opts.getPrivateKeysFilename());
-  }
+  public void writeSSHOptions(){
+    SSHOptions opts=getSSHOptions();
+    set("SSH.KnownHosts",    opts.getKnownHostsFilename());
+    set("SSH.PrivateKeys",   opts.getPrivateKeysFilename());
+    set("SSH.Default.User",  opts.getRWXUser());
+    set("SSH.Default.Group", opts.getRWXGroup());
+    set("SSH.Default.Other", opts.getRWXOther());
+  }  
 
   // LINE DELIMITERS: //
 

@@ -16,8 +16,7 @@ public class SSH {
 
   private JSch jsch=new JSch();
   private Session session;
-  private boolean debug;
-  private String user, pass, host, knownHosts, privateKeys;
+  private String user, pass, host, knownHosts, privateKeys, defaultFilePerms, defaultDirPerms;
   private boolean connected=false;
   private boolean lastConnectAuthFail=false;
   private SFTP sftp;
@@ -39,36 +38,37 @@ public class SSH {
   // INSTANTIATION: //
   ////////////////////
    
-  public SSH(String user, String host, UserNotify userNotify) {
+  SSH(String user, String host, UserNotify userNotify) {
     this.user=user;
     this.host=host;
     this.userNotify=userNotify;
   }
-  public SSH(String host) {
+  SSH(String host) {
     this.host=host;
   }
-  public SSH withPassword(String pass) {
+  SSH withPassword(String pass) {
     this.pass=pass;
     return this;
   }
-  public SSH withUser(String user) {
+  SSH withUser(String user) {
     this.user=user;
     return this;
   }
-  public SSH withDebug(boolean debug) {
-    this.debug=true;
-    return this;
-  }
-  public SSH withKnown(String hosts) {
+  SSH withKnown(String hosts) {
     this.knownHosts=hosts;
     return this;
   }
-  public SSH withPrivateKeys(String privateKeys) {
+  SSH withPrivateKeys(String privateKeys) {
     this.privateKeys=privateKeys;
     return this;
   }
-  public SSH withIUserPass(IUserPass iUserPass) {
+  SSH withIUserPass(IUserPass iUserPass) {
     this.iUserPass=iUserPass;
+    return this;
+  }
+  SSH withDefaultPerms(String filePerms, String dirPerms) {
+    this.defaultFilePerms=filePerms;
+    this.defaultDirPerms=dirPerms;
     return this;
   }
   
@@ -77,10 +77,10 @@ public class SSH {
   // USE: //
   //////////
 
-  public String getHost() {
+  String getHost() {
     return host;
   }
-  public String getUser() {
+  String getUser() {
     return user;
   }
   public boolean verifyConnection() {
@@ -131,14 +131,12 @@ public class SSH {
     return getSFTP().listFiles(path);
   }
 
-
   InputStream getInputStream(String file) {
     try {
       return getSFTPStreaming().getInputStream(file);
     } catch (Exception e) {
-      close();
-      userNotify.alert(e, "Could not load: "+file+":");//FIXME handle file permission failure
-      return null; //FIXME will probably blow up on the other end 
+      close(); 
+      throw new RuntimeException("Could not load: "+file, e);//FIXME handle file permission failure
     }
   }
   OutputStream getOutputStream(String file) {
@@ -146,12 +144,18 @@ public class SSH {
       return getSFTPStreaming().getOutputStream(file);
     } catch (Exception e) {
       close();
-      throw new RuntimeException("Could not write to: "+file+":", e);
+      throw new RuntimeException("Could not write to: "+file+":", e);//FIXME handle file permission failure
     }
   }
   
   void makeFile(String path) {
-    exec("touch "+path+"; chmod u+rwx "+path+"; chmod g+rwx "+path+"; chmod o-rwx "+path);
+    exec("touch "+path+"; chmod "+defaultFilePerms+" "+path, true);
+  }
+  boolean mkdir(String path) {
+    return
+      exec("mkdir -p "+path, true).success 
+      &&
+      exec("chmod "+defaultDirPerms+" "+path, true).success ;  
   }
 
   SSHExecResult exec(String command) {
@@ -243,7 +247,7 @@ public class SSH {
     //Set known hosts:
     if (knownHosts!=null) {
       jsch.setKnownHosts(knownHosts);
-      if (debug)
+      if (false)
         printHostKeys(jsch);
     }
 

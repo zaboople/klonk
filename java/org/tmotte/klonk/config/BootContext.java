@@ -198,8 +198,7 @@ public class BootContext {
     SSHOptions sshOpts=persist.getSSHOptions();
     SSHConnections sshConns=new SSHConnections(sshUN)
       .withLogin(iUserPass)
-      .withKnown(sshOpts.getKnownHostsFilename())
-      .withPrivateKeys(sshOpts.getPrivateKeysFilename());
+      .withOptions(sshOpts);
     FileDialogWrapper fileDialogWrapper=new FileDialogWrapper(
       mainFrame, 
       new SSHFileSystemView(sshConns, sshUN), 

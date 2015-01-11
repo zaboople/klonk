@@ -226,9 +226,9 @@ public class SSHFile extends File {
   // mkdir, rename, delete //
   /////////////////////////// 
   
-  /*Creates the directory named by this abstract pathname.*/
+  /*Creates the directory named by this abstract pathname. */
   public @Override boolean mkdir(){
-    return ssh.exec("mkdir -p "+getQuotedPath(), true).success; 
+    return ssh.mkdir(getQuotedPath());
   }
   /*Renames the file denoted by this abstract pathname.*/
   public @Override boolean renameTo(File dest){

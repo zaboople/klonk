@@ -7,6 +7,7 @@ import java.io.FileFilter;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.LinkedList;
+import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.msg.UserNotify;
 import org.tmotte.common.text.ArgHandler;
 
@@ -60,11 +61,13 @@ public class SSHCommandLine {
         }
       }
     }
+    SSHOptions opts=new SSHOptions();
+    opts.setKnownHostsFilename(knownHosts);
+    opts.setPrivateKeysFilename(privateKeys);
     this.connections= 
       new SSHConnections(new UserNotify(System.out))
-        .withLogin(new Login(user, pass))
-        .withKnown(knownHosts)
-        .withPrivateKeys(privateKeys);
+        .withOptions(opts)
+        .withLogin(new Login(user, pass));
     if (user != null && host != null && (pass != null || privateKeys !=null))
       ssh=connections.getOrCreate(user, host);
     if (fileName != null)
