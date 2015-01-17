@@ -1,10 +1,10 @@
 -Current
 
   Right now    
-    -SSH need a default umask
-      -It's not getting set when I change it in flight
+    -mkdir doesn't work right when there is already a "New-Folder"
     -SSH caching
     -The sshconnections object isn't gonna get updated by CtrlOptions
+    -I am wondering why I did all that crap with permissions now when touch & mkdir will both do what I need via exec
     
     
   -Favorite commands. oh man do i need that

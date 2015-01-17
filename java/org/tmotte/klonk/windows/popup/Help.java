@@ -25,13 +25,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.JWindow;
+import javax.swing.ScrollPaneConstants;
 import org.tmotte.common.io.Loader;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.edit.MyTextArea;
 
 public class Help {
   private JFrame parentFrame;
@@ -40,7 +41,8 @@ public class Help {
 
   private JButton btnOK;
   private JDialog win;
-  private MyTextArea mta;
+  private JTextPane jtp;
+  private JScrollPane jsp;
   private Container mtaContainer;
 
   private boolean initialized;
@@ -59,8 +61,13 @@ public class Help {
   }
 
   public void show() {
+    show(null);
+  }
+  public void show(Rectangle bounds) {
     init();
     Point pt=parentFrame.getLocation();
+    if (bounds!=null)
+      win.setBounds(bounds);
     win.setLocation(pt.x+20, pt.y+20);
     win.setVisible(true);
     win.paintAll(win.getGraphics());
@@ -83,34 +90,26 @@ public class Help {
       initialized=true;
     }
   }
-  private void setFont(FontOptions f) {
-    fontOptions=f;
-    setFont();
-  }
-  private void setFont() {
-    if (mta!=null) {
-      FontOptions f=fontOptions;
-      mta.setFont(f.getFont());
-      mta.setForeground(f.getColor());
-      mta.setBackground(f.getBackgroundColor());
-      mta.setCaretColor(f.getCaretColor());
-    }
+  private void setFont(FontOptions f) { //FIXME
   }
 
   // CREATE/LAYOUT/LISTEN: //
   private void create() {
     win=new JDialog(parentFrame, true);
     
-    mta=new MyTextArea();
-    mtaContainer=mta.makeVerticalScrollable();
-    mta.setEditable(false);
-    mta.setLineWrap(true);
-    mta.setWrapStyleWord(true);
+    jtp=new JTextPane();
+    jtp.setEditable(false); 
+    jtp.setBorder(null);       
+    jtp.setOpaque(false);
+    jtp.setContentType("text/html");
+    
     String helpText=Loader.loadUTF8String(getClass(), "Help.txt");
     helpText=helpText.replace("$[Home]", homeDir);
-    mta.setText(helpText);
-    mta.setCaretPosition(0);
-    setFont();
+    jtp.setText(helpText);
+    jsp=new JScrollPane(jtp);
+    jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    //Force the stupid thing to scroll to top:
+    jtp.setCaretPosition(0);
 
     btnOK=new JButton("OK");
   }
@@ -119,7 +118,7 @@ public class Help {
     gb.gridy=0;
     gb.weightXY(1, 1);
     gb.fill=gb.BOTH;
-    gb.add(mtaContainer);
+    gb.add(jsp);
 
     gb.weighty=0.0;
     gb.insets.top=5;
@@ -144,7 +143,7 @@ public class Help {
     btnOK.addActionListener(okAction);
     KeyMapper.accel(btnOK, okAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
     KeyMapper.accel(btnOK, okAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
-    mta.addKeyListener(new KeyAdapter() {
+    jtp.addKeyListener(new KeyAdapter() {
       public void keyPressed(KeyEvent ke) {
         if (ke.getKeyCode()==KeyEvent.VK_TAB)
           btnOK.requestFocusInWindow();
@@ -159,9 +158,10 @@ public class Help {
   public static void main(final String[] args) throws Exception{
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        new Help(
+        Help h=new Help(
           PopupTestContext.makeMainFrame(), ".", new FontOptions()
-        ).show();
+        );
+        h.show(new Rectangle(800,400));
       }
     });  
       

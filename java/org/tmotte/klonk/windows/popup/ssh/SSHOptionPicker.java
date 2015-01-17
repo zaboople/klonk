@@ -89,7 +89,6 @@ public class SSHOptionPicker {
       jcbPrivateKeys.setSelected( privateKeys !=null);
       
       //Default permissions:
-      System.out.println("FUCKING GODDAMMIT "+options);
       setChecked(tcUser, options.dur, options.duw, options.dux);
       setChecked(tcGroup, options.dgr, options.dgw, options.dgx);
       setChecked(tcOther, options.dor, options.dow, options.dox);

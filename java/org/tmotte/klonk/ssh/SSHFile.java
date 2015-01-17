@@ -10,6 +10,10 @@ import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 public class SSHFile extends File {
+
+  ///////////////////////
+  // STATIC UTILITIES: //
+  ///////////////////////
   
   public static SSHFile cast(File f) {
     if (f instanceof SSHFile)
@@ -18,12 +22,14 @@ public class SSHFile extends File {
   }
   private static Pattern blankPattern=Pattern.compile(" ");
 
+  ///////////////////////////////////////
+  // INSTANCE VARIABLES / CONSTRUCTOR: //
+  ///////////////////////////////////////
+
   protected SSHFile parent;
   private final SSH ssh;
-  private String name;
-  
+  private String name;  
   private SSHFileAttr attributes=null;
-
   
   public SSHFile(SSH ssh, SSHFile parent, String filename) {
     super(parent, filename); 
@@ -68,26 +74,15 @@ public class SSHFile extends File {
     return attributes!=null && !attributes.isDirectory;
   }
   public @Override boolean isDirectory() {
-    check();
+    refresh();
     return attributes!=null && attributes.isDirectory;
   }
   public @Override boolean exists() {
-    check();
+    refresh();
     return attributes!=null;
   }
   private void refresh(){
     attributes=ssh.getAttributes(getTildeFixPath().trim());
-    // Alternate means
-    //SSHExecResult res=ssh.exec("ls -lda "+getQuotedPath(), false);
-    //exists=false;
-    //if (res.success) {
-    //  SSHFileLongList list=new SSHFileLongList(res.output);
-    //  isDir=list.isDir;
-    //  exists=true;
-    //}
-  }
-  private void check(){
-    refresh();
   }
 
   //////////////
@@ -218,8 +213,6 @@ public class SSHFile extends File {
   private void mylog(String s) {
     ssh.userNotify.log(s);
   }
-
-
   
   ///////////////////////////
   // FILE MODIFICATION:    //
@@ -270,7 +263,7 @@ public class SSHFile extends File {
   
   /*Returns a java.nio.file.Path object constructed from the this abstract path.*/
   public @Override Path toPath() {
-    mylog("toPath");
+    mylog(getSystemPath()+"toPath");
     return super.toPath();
   }  
   /*Creates the directory named by this abstract pathname, including any necessary but nonexistent parent directories.*/

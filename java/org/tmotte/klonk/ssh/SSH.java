@@ -31,7 +31,7 @@ public class SSH {
 
   //For SSHExec & SFTP:
   private MeatCounter takeANumber=new MeatCounter(50);
-  private WrapMap<SSHFileAttr> attrCache=new WrapMap<>(500, 10000);//FIXME do we need the file-level caching as well?
+  private WrapMap<SSHFileAttr> attrCache=new WrapMap<>(1000, 10000);//FIXME do we need the file-level caching as well?
   
    
   ////////////////////
@@ -155,7 +155,8 @@ public class SSH {
     return
       exec("mkdir -p "+path, true).success 
       &&
-      exec("chmod "+defaultDirPerms+" "+path, true).success ;  
+      exec("chmod "+defaultDirPerms+" "+path, true).success 
+      ;  
   }
 
   SSHExecResult exec(String command) {
