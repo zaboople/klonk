@@ -108,6 +108,9 @@ public class SSHFileSystemView extends FileSystemView {
       try {return defaultView.createNewFolder(containingDir);} catch (Exception e) {throw new RuntimeException(e);}
     else {
       File f=new SSHFile(dir.getSSH(), dir, "New-Folder");
+      int i=1;
+      while (f.exists())
+        f=new SSHFile(dir.getSSH(), dir, "New-Folder"+(i++));
       f.mkdir();
       return f;
     }
