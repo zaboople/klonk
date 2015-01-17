@@ -50,7 +50,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
 
   public @Override File[] getFiles(File fdir, boolean useFileHiding){
-    mylog("getFiles() "+fdir+" "+fdir.getClass());
+    //mylog("getFiles() "+fdir+" "+fdir.getClass());
     SSHFile dir=cast(fdir);
     if (dir==null)
       return defaultView.getFiles(fdir, useFileHiding);
@@ -91,7 +91,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* On Windows, a file can appear in multiple folders, other than its parent directory in the filesystem. */
   public @Override boolean isParent(File folder, File file){
-    mylog("isParent() "+folder+" "+file);
+    //mylog("isParent() "+folder+" "+file);
     SSHFile sFolder=cast(folder), sFile=cast(file);   
     if (folder==null && file==null)
       return defaultView.isParent(folder, file);
@@ -133,10 +133,10 @@ public class SSHFileSystemView extends FileSystemView {
   ///////////////////
 
   public @Override File getChild(File parent, String fileName) {
-    mylog("getChild() "+parent+" "+fileName);
     SSHFile dir=cast(parent);
     if (dir==null)
       return defaultView.getChild(parent, fileName);
+    mylog("getChild() "+parent+" "+fileName);
     return new SSHFile(dir.getSSH(), dir, fileName);
   }
   
@@ -145,12 +145,11 @@ public class SSHFileSystemView extends FileSystemView {
   }
   /* Returns the parent directory of dir. */
   public @Override File getParentDirectory(File fdir){
-    mylog("getParentDirectory: "+fdir);
     File dir=cast(fdir);
     if (dir==null)
       return defaultView.getParentDirectory(fdir);    
-    else
-      return dir.getParentFile();
+    mylog("getParentDirectory: "+fdir);
+    return dir.getParentFile();
   }
   /* Name of a file, directory, or folder as it would be displayed in a system file browser. */
   public @Override String getSystemDisplayName(File f){
