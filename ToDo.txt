@@ -5,18 +5,18 @@
     
   -Load file & Find/replace are abusive. Fix them.
     -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
+
+  -Hey and a menu item for File-Delete? With confirm of course. Hmph.
     
   -SSH Todo:
-    Deal with blanks in file name. Problem?
+    Single quotes in the filename are a bit of a problem, and double quotes, and whatever else.
     Alt-f-d can't work with ssh and needs to be disabled.
     We need a last user saved to persist so we can hotrod logins.
     When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore    
     What about when a host key changes or is missing? Will we blow up?
 
   -Tabs & Indents allows invalid input - letters instead of numbers
-
-  -Hey and a menu item for File-Delete? With confirm of course. Hmph.
-  
+ 
   -It honestly would be handy to turn multiline off in find/repl. Just because ^.*?$ can cross multiple lines
 
   -When I switch windows the cursor position frequently goes somewhere else

@@ -81,7 +81,7 @@ public class MainLayout {
   
   public StatusUpdate getStatusBar() {
     if (statusUpdate==null)
-      statusUpdate=new StatusUpdate(){ //FIXME make the below methods private (the right hand methods)
+      statusUpdate=new StatusUpdate(){ 
         public void show(String s)                    {MainLayout.this.showStatus(s, false); }
         public void showBad(String s)                 {MainLayout.this.showStatus(s, true);}
         public void showCapsLock(boolean b)           {MainLayout.this.showCapsLock(b);}

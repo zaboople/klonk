@@ -229,7 +229,7 @@ public class Editor {
     return file;
   }
   public boolean sameFile(File file) {
-    return path!=null && path.equals(file.toPath().toAbsolutePath());
+    return path!=null && path.equals(file.toPath().toAbsolutePath()); //FIXME why not just use File functions instead
   }
   public boolean isUsed() {
     return used;

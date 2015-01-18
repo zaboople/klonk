@@ -57,7 +57,7 @@ public class SSHFile extends File {
   
   
   
-  /*Tests whether this abstract pathname is absolute. FIXME what happens with ~? */
+  /*Tests whether this abstract pathname is absolute. */
   public @Override boolean isAbsolute() {
     return true;
   }
@@ -228,7 +228,7 @@ public class SSHFile extends File {
     SSHFile sshFile=cast(dest);
     String otherName=sshFile==null
       ?dest.getAbsolutePath()
-      :sshFile.getSystemPath();
+      :sshFile.getQuotedPath();
     boolean success=ssh.exec("mv "+getQuotedPath()+" "+otherName, true).success; 
     if (success) 
       this.name=dest.getName();
@@ -261,16 +261,15 @@ public class SSHFile extends File {
   ///////////////////////////////
 
   
-  /*Returns a java.nio.file.Path object constructed from the this abstract path.*/
+  /**
+   * Returns a java.nio.file.Path object constructed from the this abstract path.
+   * This is a little bit of a problem as Editor uses it to check for "sameness".
+   * Not sure why it can't use absolutePath() instead.
+   */
   public @Override Path toPath() {
     mylog(getSystemPath()+"toPath");
     return super.toPath();
   }  
-  /*Creates the directory named by this abstract pathname, including any necessary but nonexistent parent directories.*/
-  public @Override boolean mkdirs(){
-    throw new UnsupportedOperationException();
-  }
-
   /*Tests whether the application can execute the file denoted by this abstract pathname.*/
   public @Override boolean canExecute() {
     mylog("canExecute");
@@ -287,22 +286,26 @@ public class SSHFile extends File {
     mylog("canWrite");
     return true;
   }
-  /*Atomically creates a new, empty file named by this abstract pathname if and only if a file with this name does not yet exist.*/
-  public @Override boolean createNewFile(){
-    throw new RuntimeException("Not supported yet.");
-  }
   /*Returns the absolute form of this abstract pathname.*/
   public @Override File	getAbsoluteFile(){
-    mylog("getAbsoluteFile: FIXME "+getName());
+    mylog("getAbsoluteFile: "+getName());
     return this;  
   }
   
   
    
-  ////////////////////////
-  //  APPARENTLY JUNK:  //
-  ////////////////////////
+  ////////////////////
+  //  UNSUPPORTED:  //
+  ////////////////////
 
+  /*Atomically creates a new, empty file named by this abstract pathname if and only if a file with this name does not yet exist.*/
+  public @Override boolean createNewFile(){
+    throw new UnsupportedOperationException();
+  }
+  /*Creates the directory named by this abstract pathname, including any necessary but nonexistent parent directories.*/
+  public @Override boolean mkdirs(){
+    throw new UnsupportedOperationException();
+  }
   /*Requests that the file or directory denoted by this abstract pathname be deleted when the virtual machine terminates.*/
   public @Override void deleteOnExit(){
     throw new UnsupportedOperationException();
@@ -319,7 +322,6 @@ public class SSHFile extends File {
   public @Override long	getUsableSpace(){
     throw new UnsupportedOperationException();
   }
-
   /** 
    * Returns an array of strings naming the files and directories in the directory denoted by this 
    * abstract pathname that satisfy the specified filter.
