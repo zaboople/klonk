@@ -167,9 +167,5 @@ public class SSHConnections {
     }
     return perHost;
   }
-  private SSH get(String user, String host) { //FIXME I don't think anything is going to use this
-    Map<String,SSH> perHost=getForHost(user);
-    return perHost.get(host);
-  }
   
 }

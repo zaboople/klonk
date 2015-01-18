@@ -129,12 +129,12 @@ public class SSH {
     return getSFTP().listFiles(path);
   }
 
-  InputStream getInputStream(String file) {
+  InputStream getInputStream(String file) throws Exception {
     try {
       return getSFTPStreaming().getInputStream(file);
     } catch (Exception e) {
       close(); 
-      throw new RuntimeException("Could not load: "+file, e);//FIXME handle file permission failure
+      throw e;
     }
   }
   OutputStream getOutputStream(String file) throws Exception {
@@ -316,38 +316,6 @@ public class SSH {
   }
   private void myLog(String s) {
     userNotify.log("SSH: "+s);
-  }
-  
-  /////////////////////////
-  // INTERNAL INTERNALS: //
-  /////////////////////////
-
-
-  private static String[] noFiles={};
-  private String[] sshexecList(String path) {
-    SSHExecResult res=exec("ls -1 "+path, true); //FIXME quote the file
-    //Fail, for whatever reason including nonexistence:
-    if (!res.success) 
-      return noFiles;
-        
-    //List files & dirs:
-    StringChunker sc=new StringChunker(res.output);
-    List<String> lFiles=new LinkedList<>();
-    while (sc.find("\n"))
-      lFiles.add(sc.getUpTo().trim());
-    String last=sc.getRest().trim();
-    if (!last.equals(""))
-      lFiles.add(last);
-      
-    //This happens when it's not a directory, it's a file and you just ls'd it anyhow:
-    if (lFiles.size()==1 && lFiles.get(0).equals(path))
-      return noFiles;
-      
-    //Copy into results:
-    String[] files=new String[lFiles.size()];
-    for (int i=0; i<lFiles.size(); i++) 
-      files[i]=lFiles.get(i);
-    return files;
   }
   
   ////////////////////////

@@ -42,7 +42,7 @@ class ConnectionParse {
     if (user==null)
       return null;
   
-    //Now make the SSh object & get file name:
+    //Now make the SSH object & get file name:
     SSH ssh=connMgr.getOrCreate(user, host);
     if (ssh==null || !ssh.verifyConnection())
       return null;
