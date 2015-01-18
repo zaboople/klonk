@@ -7,16 +7,11 @@
     -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
     
   -SSH Todo:
-    When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore    
-    What about when a host key changes or is missing? Will we blow up?
-    Symbolic links can't be accessed as directories
     Deal with blanks in file name. Problem?
     Alt-f-d can't work with ssh and needs to be disabled.
-    SSH Options needs a list of open connections to select for closing.
     We need a last user saved to persist so we can hotrod logins.
-    Reconnect after lost connection
-    File size & date: You have no choice. Well use ls --full-time
-
+    When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore    
+    What about when a host key changes or is missing? Will we blow up?
 
   -Tabs & Indents allows invalid input - letters instead of numbers
 
