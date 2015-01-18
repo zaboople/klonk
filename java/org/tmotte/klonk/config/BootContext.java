@@ -238,7 +238,6 @@ public class BootContext {
       List<Setter<FontOptions>> fontListeners=new java.util.ArrayList<>(10);
       fontListeners.add(shell.getFontListener());
       fontListeners.add(favorites.getFontListener());
-      fontListeners.add(help.getFontListener());
       fontListeners.add(findAndReplace.getFontListener());
   
       CtrlFavorites ctrlFavorites=new CtrlFavorites(

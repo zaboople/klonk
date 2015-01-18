@@ -46,9 +46,6 @@ public class Help {
   private Container mtaContainer;
 
   private boolean initialized;
-  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){ //FIXME just abstract class this FontListener crap
-    public void set(FontOptions fo){setFont(fo);}
-  };
   
   
   public Help(JFrame parentFrame, String homeDir, FontOptions fontOptions) {
@@ -56,10 +53,6 @@ public class Help {
     this.homeDir=homeDir;
     this.fontOptions=fontOptions;
   }
-  public Setter<FontOptions> getFontListener() {
-    return fontListener;
-  }
-
   public void show() {
     show(null);
   }
@@ -89,8 +82,6 @@ public class Help {
       listen();    
       initialized=true;
     }
-  }
-  private void setFont(FontOptions f) { //FIXME
   }
 
   // CREATE/LAYOUT/LISTEN: //

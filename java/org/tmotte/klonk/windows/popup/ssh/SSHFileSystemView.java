@@ -12,7 +12,6 @@ import java.io.ByteArrayOutputStream;
   Meant to be used with FileDialogWrapper. This is actually a FileSystemView that can do both local 
   files and ssh files.
   
-  FIXME a lot of stuff being created that only needs to be created once.
   FIXME a lot of functions implemented that probably don't need to be.
   FIXME handle ..'s and .'s
 */
@@ -135,9 +134,16 @@ public class SSHFileSystemView extends FileSystemView {
   public @Override File getChild(File parent, String fileName) {
     SSHFile dir=cast(parent);
     if (dir==null)
-      return defaultView.getChild(parent, fileName);
+      return defaultView.getChild(parent, fileName);    
     mylog("getChild() "+parent+" "+fileName);
-    return new SSHFile(dir.getSSH(), dir, fileName);
+    fileName=fileName.trim();
+    if (fileName.equals("."))
+      return parent;
+    else
+    if (fileName.equals(".."))
+      return parent.getParentFile();
+    else
+      return new SSHFile(dir.getSSH(), dir, fileName);
   }
   
   public @Override File getHomeDirectory() {

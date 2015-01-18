@@ -9,8 +9,8 @@
   -Hey and a menu item for File-Delete? With confirm of course. Hmph.
     
   -SSH Todo:
-    Single quotes in the filename are a bit of a problem, and double quotes, and whatever else.
     Alt-f-d can't work with ssh and needs to be disabled.
+    Single quotes in the filename are a bit of a problem, and double quotes, and whatever else.
     We need a last user saved to persist so we can hotrod logins.
     When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore    
     What about when a host key changes or is missing? Will we blow up?
