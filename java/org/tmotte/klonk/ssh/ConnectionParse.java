@@ -47,14 +47,18 @@ class ConnectionParse {
     if (ssh==null || !ssh.verifyConnection())
       return null;
       
-    chunker.reset(chunker.getRest());    
-    SSHFile result=parse(ssh, null, chunker);
+    return startParse(ssh, chunker.getRest(), chunker);
+  }
+
+  private SSHFile startParse(SSH ssh, String toParse, StringChunker reuse) {
+    if (toParse.contains("~"))
+      toParse=toParse.replace("~", ssh.getTildeFix());
+    SSHFile result=parse(ssh, null, reuse.reset(toParse));
     if (result==null) 
       //No name given, default to "~"
       result=new SSHFile(ssh, null, ssh.getTildeFix());
     return result;
   }
-  
   private SSHFile parse(SSH ssh, SSHFile parent, StringChunker left) {
     if (!left.find("/")){
       String remains=left.getRest();
