@@ -1,15 +1,10 @@
 -Current
 
   Right now    
-    -mkdir doesn't work right when there is already a "New-Folder"
-    -SSH caching
     -The sshconnections object isn't gonna get updated by CtrlOptions
-    -I am wondering why I did all that crap with permissions now when touch & mkdir will both do what I need via exec
     
-    
-  -Favorite commands. oh man do i need that
-  
-  -Ctrl-W ought to just close the editor if no files are open. It makes no difference.
+  -Load file & Find/replace are abusive. Fix them.
+    -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
     
   -SSH Todo:
     When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore    
@@ -22,8 +17,10 @@
     Reconnect after lost connection
     File size & date: You have no choice. Well use ls --full-time
 
-  -Load file & Find/replace are abusive. Fix them.
-    -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
+
+  -Tabs & Indents allows invalid input - letters instead of numbers
+
+  -Hey and a menu item for File-Delete? With confirm of course. Hmph.
   
   -It honestly would be handy to turn multiline off in find/repl. Just because ^.*?$ can cross multiple lines
 
@@ -32,9 +29,9 @@
   -File open ought to start off the session with the last directory opened. 
    It's annoying when it defaults to my stupid home directory. Well ...ssh. Ugh.
 
-  -Tabs & Indents allows invalid input - letters instead of numbers
-
-  -Hey and a menu item for File-Delete? With confirm of course. Hmph.
+  -Favorite commands. oh man do i need that
+  
+  -Ctrl-W ought to just close the editor if no files are open. It makes no difference.
       
   -New Klonk Bug
   Also consider the idea offered at bottom of this page:

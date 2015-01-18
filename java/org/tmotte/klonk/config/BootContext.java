@@ -81,7 +81,7 @@ public class BootContext {
           //SSHFileDialogNoFileException is thrown by our nasty
           //SSHFileSystemView and can be ignored:
           if (!(e instanceof SSHFileDialogNoFileException))
-            context.getLog().log(e);//FIXME make this blow up when sending an alert
+            context.getLog().alert(e, "Unexpected error");
         }
       }
     );
@@ -160,7 +160,7 @@ public class BootContext {
     FontOptions editorFont=persist.getFontAndColors();
 
     //Main controller:
-    CtrlMain ctrlMain=new CtrlMain(failHandler, persist);
+    CtrlMain ctrlMain=new CtrlMain(userNotify, persist);
     Editors editors=ctrlMain.getEditors();
 
 
@@ -267,7 +267,6 @@ public class BootContext {
     ctrlMain.setLayoutAndPopups(
       layout.getMainDisplay(), 
       statusBar,
-      alerter, 
       fileDialogWrapper, 
       yesNoCancel, 
       yesNo

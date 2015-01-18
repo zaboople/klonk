@@ -43,26 +43,6 @@ class SFTP {
   OutputStream getOutputStream(String file) throws Exception {    
     try {
       return getChannel(file).put(file);
-    } catch (Exception e) {
-      if (e.getMessage().contains("Permission denied")) {
-        ssh.userNotify.alert("Permission denied");
-        return null;
-      }
-      else
-        throw e;
-    } finally {
-      unlock();
-    }
-  }
-  boolean chmod(String file, int attributes) { //FIXME am i even using this
-    try {      
-      ChannelSftp ch=getChannel(file);      
-      if (ch==null)
-        return false;
-      ch.chmod(attributes, file);
-      return true;
-    } catch (Exception e) {
-      throw new RuntimeException("Could not chmod "+file, e);
     } finally {
       unlock();
     }
@@ -75,7 +55,7 @@ class SFTP {
         return null;
       return new SSHFileAttr(ch.stat(file));
     } catch (Exception e) {
-      try {close();} catch (Exception e2) {}//FIXME log that
+      try {close();} catch (Exception e2) {ssh.userNotify.log(e2);}
       if (canIgnore(e, file))
         return null;
       else
@@ -113,7 +93,7 @@ class SFTP {
         }
       return realVals;
     } catch (Exception e) {
-      try {close();} catch (Exception e2) {}//FIXME log that      
+      try {close();} catch (Exception e2) {ssh.userNotify.log(e2);}
       if (!canIgnore(e, file))
         ssh.userNotify.alert(e, "Failed to list files for: "+file);
       return noFiles;
@@ -136,8 +116,8 @@ class SFTP {
   ////////////////////////
 
   /**
-   * As we overload the connection, random stuff blows up but we can ignore it. It just plain
-   * sucks but no matter what if I stack up enough requests on jsch, it's gonna puke.
+   * As we overload the connection, random stuff blows up but we can ignore it because
+   * this is just the file chooser whacking us over the head and it will be just fine.
    */
   private boolean canIgnore(Throwable e, String file) {
     e=getCause(e);
@@ -148,7 +128,8 @@ class SFTP {
         (e instanceof java.lang.IndexOutOfBoundsException) ||
         (msg!=null && (
           msg.contains("Permission denied") ||
-          msg.contains("No such file")      
+          msg.contains("No such file")      ||
+          msg.contains("inputstream is closed")      
         ))
       ){
       ssh.userNotify.log("SFTP Hidden fail: "+e+" ..."+file);
@@ -156,7 +137,7 @@ class SFTP {
     }
     else if ((e instanceof java.io.IOException) && e.getMessage().equals("Pipe closed")){
       ssh.userNotify.log("SFTP Apparently closed: "+e+" ..."+file);
-      try {ssh.close();} catch (Exception e2) {}
+      try {ssh.close();} catch (Exception e2) {ssh.userNotify.log(e2);}
       return false;
     }    
     else

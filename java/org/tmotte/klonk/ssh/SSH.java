@@ -31,7 +31,7 @@ public class SSH {
 
   //For SSHExec & SFTP:
   private MeatCounter takeANumber=new MeatCounter(50);
-  private WrapMap<SSHFileAttr> attrCache=new WrapMap<>(1000, 10000);//FIXME do we need the file-level caching as well?
+  private WrapMap<SSHFileAttr> attrCache=new WrapMap<>(1000, 10000);
   
    
   ////////////////////
@@ -119,9 +119,7 @@ public class SSH {
   
   SSHFileAttr getAttributes(String path) {
     SSHFileAttr sfa=attrCache.get(path);
-    if (sfa!=null) 
-      myLog("Cache hit "+path);
-    else {
+    if (sfa==null) {
       sfa=getSFTP().getAttributes(path);
       attrCache.put(path, sfa);
     }
@@ -139,12 +137,12 @@ public class SSH {
       throw new RuntimeException("Could not load: "+file, e);//FIXME handle file permission failure
     }
   }
-  OutputStream getOutputStream(String file) {
+  OutputStream getOutputStream(String file) throws Exception {
     try {
       return getSFTPStreaming().getOutputStream(file);
     } catch (Exception e) {
       close();
-      throw new RuntimeException("Could not write to: "+file+":", e);//FIXME handle file permission failure
+      throw e;
     }
   }
   

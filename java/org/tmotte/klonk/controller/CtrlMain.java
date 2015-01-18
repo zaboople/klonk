@@ -5,26 +5,27 @@ import java.awt.Image;
 import java.awt.Window;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Iterator;
-import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.config.option.LineDelimiterOptions;
-import org.tmotte.klonk.config.option.TabAndIndentOptions;
-import org.tmotte.klonk.config.msg.Doer;
-import org.tmotte.klonk.config.msg.Editors;
-import org.tmotte.klonk.config.msg.MainDisplay;
-import org.tmotte.klonk.config.msg.Getter;
-import org.tmotte.klonk.config.msg.Setter;
-import org.tmotte.klonk.config.msg.StatusUpdate;
-import org.tmotte.klonk.controller.Recents;
 import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.EditorListener;
+import org.tmotte.klonk.config.KPersist;
+import org.tmotte.klonk.config.msg.Doer;
+import org.tmotte.klonk.config.msg.Editors;
+import org.tmotte.klonk.config.msg.Getter;
+import org.tmotte.klonk.config.msg.MainDisplay;
+import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.StatusUpdate;
+import org.tmotte.klonk.config.msg.UserNotify;
+import org.tmotte.klonk.config.option.LineDelimiterOptions;
+import org.tmotte.klonk.config.option.TabAndIndentOptions;
+import org.tmotte.klonk.controller.Recents;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.ssh.IFileGet;
-import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
+import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.YesNoCancel;
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
 
@@ -45,8 +46,7 @@ public class CtrlMain  {
   //DI-injected stuff:
   private KPersist persist;
   private StatusUpdate statusBar;
-  private Setter<Throwable> failHandler;
-  private Setter<String> alerter;
+  private UserNotify userNotify;
   private Doer lockRemover, editorSwitchedListener;
   private IFileGet fileResolver;
   private FileDialogWrapper fileDialog;
@@ -67,8 +67,8 @@ public class CtrlMain  {
   private Recents recents;
 
   //Constructor:
-  public CtrlMain(Setter<Throwable> failHandler, final KPersist persist) {
-    this.failHandler=failHandler;
+  public CtrlMain(UserNotify userNotify, final KPersist persist) {
+    this.userNotify=userNotify;
     this.persist=persist;
     recents=new Recents(persist); 
   }
@@ -82,14 +82,12 @@ public class CtrlMain  {
   public void setLayoutAndPopups(
       MainDisplay layout, 
       StatusUpdate statusBar,
-      Setter<String> alerter, 
       FileDialogWrapper fileDialog,
       YesNoCancel yesNoCancel,
       YesNoCancel yesNo
     ) {
     this.layout=layout;
     this.statusBar=statusBar;
-    this.alerter=alerter;
     this.fileDialog=fileDialog;
     this.yesNoCancel=yesNoCancel;
     this.yesNo=yesNo;
@@ -276,7 +274,7 @@ public class CtrlMain  {
         return;
       }
     }
-    alerter.set(
+    userNotify.alert(
       editors.getFirst().hasUnsavedChanges()
         ?"No other files have unsaved changes."
         :"No files have unsaved changes."
@@ -365,7 +363,7 @@ public class CtrlMain  {
       statusBar.show("Saving...");
       e.saveFile(file);
     } catch (Exception ex) {
-      failHandler.set(ex);
+      checkIOError(ex);
       statusBar.showBad("Save failed.");
       return false;
     }
@@ -386,7 +384,7 @@ public class CtrlMain  {
       return null;
     for (Editor e: editorMgr.forEach()) 
       if (e.sameFile(file)){
-        alerter.set("File is already open in another window; close it first: "+e.getTitle());
+        userNotify.alert("File is already open in another window; close it first: "+e.getTitle());
         return null;
       }
     //This is only needed if we are using JFileChooser. The AWT chooser will result in a question
@@ -454,7 +452,7 @@ public class CtrlMain  {
         try {
           loadFiles(fileNames);
         } catch (Exception e) {
-          failHandler.set(e);
+          userNotify.alert(e);
         }
         fileNames.clear();
       }
@@ -479,13 +477,13 @@ public class CtrlMain  {
   /** Makes sure file isn't already loaded, and finds an editor to load it into: **/
   private void loadFile(File file) {
     if (!file.exists()){
-      alerter.set("No such file: "+file);
+      userNotify.alert("No such file: "+file);
       return;
     }
     for (Editor ed: editorMgr.forEach()) 
       if (ed.sameFile(file)){
         editorSwitch(ed);
-        alerter.set("File is already open: "+ed.getTitle());
+        userNotify.alert("File is already open: "+ed.getTitle());
         return;
       }
     try {
@@ -500,7 +498,7 @@ public class CtrlMain  {
         toUse=newEditor();
       loadFile(toUse, file);
     } catch (Exception e) {
-      failHandler.set(e);
+      userNotify.alert(e);
     }
   }
   private boolean loadFile(Editor e, File file) {
@@ -508,13 +506,26 @@ public class CtrlMain  {
       statusBar.show("Loading: "+file+"...");
       e.loadFile(file, persist.getDefaultLineDelimiter());
     } catch (Exception ex) {
-      failHandler.set(ex);
+      checkIOError(ex);
       statusBar.showBad("Load failed");
       return false;
     }
     fileIsLoaded(e, file);
     return true;
   }
+  
+  private void checkIOError(Exception ex) {
+    String msg=getCause(ex).getMessage();
+    if (msg!=null && msg.contains("Permission denied"))
+      userNotify.alert(msg);
+    else 
+      userNotify.alert(ex);
+  }
+  private Throwable getCause(Throwable e) {
+    Throwable e1=e.getCause();
+    return e1==null ?e :getCause(e1);
+  }
+  
 
 
   ////////////////////////
@@ -528,8 +539,11 @@ public class CtrlMain  {
   }
   private Editor newEditor(){
     Editor e=new Editor(
-      failHandler, editorListener, myUndoListener, 
-      persist.getDefaultLineDelimiter(), persist.getWordWrap()
+      userNotify.getExceptionHandler(), 
+      editorListener, 
+      myUndoListener, 
+      persist.getDefaultLineDelimiter(), 
+      persist.getWordWrap()
     ); 
     e.setFastUndos(persist.getFastUndos());
     e.setTitle(getUnusedTitle());
@@ -635,7 +649,7 @@ public class CtrlMain  {
     try {
       return file.getCanonicalPath();
     } catch (Exception e) {
-      failHandler.set(e);
+      userNotify.alert(e);
       return null;
     }
   }

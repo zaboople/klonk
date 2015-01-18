@@ -70,7 +70,7 @@ public class UserNotify {
     else
       alerter.set(s);
   }
-  public void alert(Throwable t, final String s) { //FIXME opposed to the other definition, log(t,s)
+  public void alert(Throwable t, final String s) { 
     log(t);
     alert(s+" (see log for details) "+t);
   }
