@@ -107,7 +107,6 @@ public class About {
     jspLicense.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     //Force the stupid thing to scroll to top:
     jtpLicense.setCaretPosition(0);
-    win.pack();//FIXME why are you doing that here?
 
     btnOK.setText("OK");
     btnOK.setMnemonic(KeyEvent.VK_K);
