@@ -1,7 +1,7 @@
 -Current
 
-  Right now    
-    -The sshconnections object isn't gonna get updated by CtrlOptions
+  -Right now:
+    nothing
     
   -Load file & Find/replace are abusive. Fix them.
     -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
