@@ -33,9 +33,6 @@ import org.tmotte.klonk.windows.popup.PopupTestContext;
 import org.tmotte.klonk.config.option.SSHOptions;
 
 
-/**
- * FIXME Kill connection?
- */
 public class SSHOptionPicker {
 
   private JFrame parentFrame;

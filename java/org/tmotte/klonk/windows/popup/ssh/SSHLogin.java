@@ -39,8 +39,6 @@ import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.windows.popup.KAlert;
 import org.tmotte.klonk.windows.popup.PopupTestContext;
 
-//FIXME default focus to password if we already have a user
-//FIXME what is deal with closing window not escaping?? If I close the window that's an ESC
 public class SSHLogin implements IUserPass {
 
   /////////////////////////
@@ -103,6 +101,8 @@ public class SSHLogin implements IUserPass {
     badEntry=true;
     ok=true;
     win.pack();
+    if (user!=null && jpfPass.isEnabled())
+      jpfPass.requestFocusInWindow();
     win.setVisible(true);
     win.toFront();
     return ok;  
@@ -263,17 +263,17 @@ public class SSHLogin implements IUserPass {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         JFrame m=PopupTestContext.makeMainFrame();
-        SSHLogin win=new SSHLogin(m, new KAlert(m));
-        System.out.println("RESULT: "+win.show("aname", "test1.youknowthat.server.danglblangdingdongwhat.com", false, false));
-        System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
-        
-        System.out.println("RESULT: "+win.show("aname", "test2.who.perv.com", true, true));
-        System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
-        
-        System.out.println("RESULT: "+win.show(null, "test3.bleagh.com", false, true));
-        System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
+        testWindow(m, "aname", "test1.youknowthat.server.danglblangdingdongwhat.com", false, false);
+        testWindow(m, "aname", "test2.who.perv.com", true, true);
+        testWindow(m, "aname", "needs.password.only.com", false, true);
+        testWindow(m, null, "test3.bleagh.com", false, true);
       }
     });  
+  }
+  private static void testWindow(JFrame m, String user, String host, boolean authFail, boolean needsPassword) {
+    SSHLogin win=new SSHLogin(m, new KAlert(m));
+    System.out.println("RESULT: "+win.show(user, host, authFail, needsPassword));
+    System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
   }
   
 }

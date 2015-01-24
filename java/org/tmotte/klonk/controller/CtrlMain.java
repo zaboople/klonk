@@ -283,15 +283,13 @@ public class CtrlMain  {
   public void doSwitch(Editor editor) {
     editorSwitch(editor);
   }
-
-  
+ 
 
   ///////////////////////
   //                   //
   //  PRIVATE METHODS: //
   //                   //
   ///////////////////////
-
 
   private void tryExit() {
     while (editorMgr.size()>0)
