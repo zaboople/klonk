@@ -11,9 +11,6 @@ import java.io.ByteArrayOutputStream;
 /** 
   Meant to be used with FileDialogWrapper. This is actually a FileSystemView that can do both local 
   files and ssh files.
-  
-  FIXME a lot of functions implemented that probably don't need to be.
-  FIXME handle ..'s and .'s
 */
 public class SSHFileSystemView extends FileSystemView {
 
@@ -31,7 +28,7 @@ public class SSHFileSystemView extends FileSystemView {
     this.userNotify=userNotify;
   }
   
-  /* This gets called when you just bang in a path name or press enter on  a path name. FIXME */
+  /* This gets called when you just bang in a path name or press enter on  a path name. */
   public @Override File createFileObject(String path){
     String logstring="createFileObject() ";
     mylog(logstring+path);
@@ -135,7 +132,7 @@ public class SSHFileSystemView extends FileSystemView {
     SSHFile dir=cast(parent);
     if (dir==null)
       return defaultView.getChild(parent, fileName);    
-    mylog("getChild() "+parent+" "+fileName);
+    mylog("getChild() "+parent+" : "+fileName);
     fileName=fileName.trim();
     if (fileName.equals("."))
       return parent;
@@ -173,7 +170,7 @@ public class SSHFileSystemView extends FileSystemView {
   }
 
 
-  /* Determines if the given file is a root in the navigatable tree(s). FIXME watch out for /foo/.. */
+  /* Determines if the given file is a root in the navigatable tree(s). */
   public @Override boolean isRoot(File f) {
     if (cast(f)==null)
       return defaultView.isRoot(f);
