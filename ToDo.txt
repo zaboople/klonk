@@ -1,13 +1,10 @@
 -Current
+ 
+  -Hey and a menu item for File-Delete? With confirm of course. Hmph.
 
-  -Right now:
-    nothing
-    
   -Load file & Find/replace are abusive. Fix them.
     -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
-
-  -Hey and a menu item for File-Delete? With confirm of course. Hmph.
-    
+  
   -SSH Todo:
     Alt-f-d can't work with ssh and needs to be disabled.
     Single quotes in the filename are a bit of a problem, and double quotes, and whatever else.

@@ -71,15 +71,16 @@ public class SSHFile extends File {
   ///////////////////////////
   
   public @Override boolean isFile() {
-    return attributes!=null && !attributes.isDirectory;
+    refresh();
+    return attributes!=null && attributes.exists && !attributes.isDirectory;
   }
   public @Override boolean isDirectory() {
     refresh();
-    return attributes!=null && attributes.isDirectory;
+    return attributes!=null && attributes.exists && attributes.isDirectory;
   }
   public @Override boolean exists() {
     refresh();
-    return attributes!=null;
+    return attributes!=null && attributes.exists;
   }
   private void refresh(){
     attributes=ssh.getAttributes(getTildeFixPath().trim());
@@ -221,6 +222,7 @@ public class SSHFile extends File {
   
   /*Creates the directory named by this abstract pathname. */
   public @Override boolean mkdir(){
+    ssh.uncache(getTildeFixPath());
     return ssh.mkdir(getQuotedPath());
   }
   /*Renames the file denoted by this abstract pathname.*/
@@ -229,14 +231,16 @@ public class SSHFile extends File {
     String otherName=sshFile==null
       ?dest.getAbsolutePath()
       :sshFile.getQuotedPath();
-    boolean success=ssh.exec("mv "+getQuotedPath()+" "+otherName, true).success; 
+    boolean success=ssh.rename(getQuotedPath(), otherName); 
+    ssh.uncache(getTildeFixPath());
     if (success) 
       this.name=dest.getName();
     return success;
   }  
   /*Deletes the file or directory denoted by this abstract pathname.*/
   public @Override boolean delete(){
-    return ssh.exec("rm "+getQuotedPath(),  true).success; 
+    ssh.uncache(getTildeFixPath());
+    return ssh.remove(getQuotedPath());
   }
 
   //////////////////////

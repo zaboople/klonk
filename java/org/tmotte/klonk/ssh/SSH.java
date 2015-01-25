@@ -11,7 +11,6 @@ import java.util.List;
 import org.tmotte.common.text.StringChunker;
 import org.tmotte.klonk.config.msg.UserNotify;
 
-//FIXME reconnect verify health
 public class SSH {
 
   private JSch jsch=new JSch();
@@ -23,7 +22,7 @@ public class SSH {
   private SFTP sftpStreaming;
   private SSHExec exec;
   private String tildeFix;
-  //private long lastConnectTest=0;
+
   
   //DI UI components:
   private IUserPass iUserPass;
@@ -146,25 +145,28 @@ public class SSH {
     }
   }
   
+
+  void uncache(String actualPath) {
+    attrCache.remove(actualPath);
+  }
   void makeFile(String path) {
     exec("touch "+path+"; chmod "+defaultFilePerms+" "+path, true);
   }
-  boolean mkdir(String path) {
+  boolean mkdir(String quotedPath) {
     return
-      exec("mkdir -p "+path, true).success 
+      exec("mkdir -p "+quotedPath, true).success 
       &&
-      exec("chmod "+defaultDirPerms+" "+path, true).success 
+      exec("chmod "+defaultDirPerms+" "+quotedPath, true).success 
       ;  
   }
-
-  SSHExecResult exec(String command) {
-    return exec(command, false);
+  boolean rename(String quotedPath, String otherName) {
+    return exec("mv "+quotedPath+" "+otherName, true).success; 
   }
-  SSHExecResult exec(String command, boolean alertFail) {
-    return getExec().exec(command, alertFail);
+  boolean remove(String quotedPath) {
+    return exec("rm "+quotedPath,  true).success; 
   }
 
-  /** For locals only; SSHExec & SFTP */
+
   Session getSession() {
     if (!isConnected())
       connect();
@@ -174,7 +176,7 @@ public class SSH {
   }
 
   boolean isConnected(){
-    System.out.println("SSH.isConnected() "+session);
+    myLog("SSH.isConnected() "+session);
     if (session!=null && session.isConnected())
       return true;
     session=null;
@@ -186,6 +188,12 @@ public class SSH {
   // PRIVATE CONNECT METHODS: //
   ////////////////////////////// 
 
+  private SSHExecResult exec(String command) {
+    return exec(command, false);
+  }
+  private SSHExecResult exec(String command, boolean alertFail) {
+    return getExec().exec(command, alertFail);
+  }
   private SFTP getSFTP() {
     if (this.sftp==null)
       this.sftp=new SFTP(this, new MeatCounter(30));  

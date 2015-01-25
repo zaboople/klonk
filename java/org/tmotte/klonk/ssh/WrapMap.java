@@ -41,6 +41,13 @@ public class WrapMap<B> {
     else
       return vi.value;
   }
+  public synchronized void remove(String a) {    
+    IndexVal vi=data.get(a);
+    if (vi!=null) {
+      data.remove(a);
+      names[vi.index]=null;
+    }
+  }
 
   public synchronized void put(String name, B b) {
     String other=names[limIndex];

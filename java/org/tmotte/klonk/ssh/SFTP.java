@@ -48,15 +48,26 @@ class SFTP {
     }
   }
   SSHFileAttr getAttributes(String file) {
-    ssh.userNotify.log("SFTP.getAttributes "+Thread.currentThread().hashCode()+" "+file);
+    ssh.userNotify.log("SFTP.getAttributes "+file);
     try {      
       ChannelSftp ch=getChannel(file);
       if (ch==null)
         return null;
-      return new SSHFileAttr(ch.stat(file));
+      SSHFileAttr sfa=new SSHFileAttr(ch.stat(file));
+      ssh.userNotify.log(sfa.toString());
+      return sfa;
     } catch (Exception e) {
       try {close();} catch (Exception e2) {ssh.userNotify.log(e2);}
-      if (canIgnore(e, file))
+      String msg=e.getMessage();
+      if (msg!=null && msg.equals("No such file")){
+        ssh.userNotify.log(msg+file);
+        return null;
+        //This never worked out, just made a mess with ->new folder ->rename in file dialog. Unfortunately
+        //it also means that we call this function again & again because we have null and want a value.
+        //return new SSHFileAttr();
+      }
+      else
+      if (canIgnore(e, file, "getAttributes"))
         return null;
       else
         throw new RuntimeException("Failed to get stat on: "+file, e);
@@ -94,7 +105,7 @@ class SFTP {
       return realVals;
     } catch (Exception e) {
       try {close();} catch (Exception e2) {ssh.userNotify.log(e2);}
-      if (!canIgnore(e, file))
+      if (!canIgnore(e, file, "listFiles"))
         ssh.userNotify.alert(e, "Failed to list files for: "+file);
       return noFiles;
     } finally {
@@ -119,7 +130,7 @@ class SFTP {
    * As we overload the connection, random stuff blows up but we can ignore it because
    * this is just the file chooser whacking us over the head and it will be just fine.
    */
-  private boolean canIgnore(Throwable e, String file) {
+  private boolean canIgnore(Throwable e, String file, String function) {
     e=getCause(e);
     String msg=e.getMessage();
     if (
@@ -132,7 +143,8 @@ class SFTP {
           msg.contains("inputstream is closed")      
         ))
       ){
-      ssh.userNotify.log("SFTP Hidden fail: "+e+" ..."+file);
+      ssh.userNotify.log("SFTP Hidden fail: "+function+" "+e+" ..."+file);
+      ssh.userNotify.log(e);
       return true;
     }
     else if ((e instanceof java.io.IOException) && e.getMessage().equals("Pipe closed")){

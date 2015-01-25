@@ -177,7 +177,7 @@ public class SSHFileSystemView extends FileSystemView {
   public @Override boolean isRoot(File f) {
     if (cast(f)==null)
       return defaultView.isRoot(f);
-    else
+    else 
       return f.getParentFile()==null;
   }
 
@@ -190,7 +190,37 @@ public class SSHFileSystemView extends FileSystemView {
     );
   }
 
-  ////// CRAP: ////////
+  ////////////////////////
+  // Private utilities: //
+  ////////////////////////
+
+  private static SSHFile cast(File f) {
+    return SSHFile.cast(f);
+  }
+  private void mylog(String s) {
+    if (true)
+      userNotify.log("SSHFileSystemView."+s);
+  }
+
+ 
+  /////////////////
+  // TOTAL CRAP: //
+  /////////////////
+
+  /* Type description for a file, directory, or folder as it would be displayed in a system file browser. */
+  public @Override String getSystemTypeDescription(File f){
+    String s=defaultView.getSystemTypeDescription(f);
+    System.out.println(s+" "+f);
+    return s;
+  }
+  /* Returns all root partitions on this system.*/
+  public @Override File[] getRoots(){
+    return defaultView.getRoots();
+  }
+  /* Return the user's default starting directory for the file chooser.*/
+  public @Override File getDefaultDirectory() {
+    return defaultView.getDefaultDirectory();
+  }
   /* Used by UI classes to decide whether to display a special icon for a floppy disk.*/
   public @Override boolean isFloppyDrive(File dir){
     if (cast(dir)==null)
@@ -208,37 +238,6 @@ public class SSHFileSystemView extends FileSystemView {
     if (cast(f)==null)
       return defaultView.isFileSystem(f);  
     return true;
-  }
-
-  ////////////////////////
-  // Private utilities: //
-  ////////////////////////
-
-  private static SSHFile cast(File f) {
-    return SSHFile.cast(f);
-  }
-  private void mylog(String s) {
-    if (true)
-      userNotify.log("SSHFileSystemView."+s);
-  }
- 
-  /////////////////
-  // TOTAL CRAP: //
-  /////////////////
-
-  /* Type description for a file, directory, or folder as it would be displayed in a system file browser. */
-  public @Override String getSystemTypeDescription(File f){
-    return defaultView.getSystemTypeDescription(f);
-  }
-  /* Returns all root partitions on this system.*/
-  public @Override File[] getRoots(){
-    return defaultView.getRoots();
-  }
-
-  /* Return the user's default starting directory for the file chooser.*/
-  public @Override File getDefaultDirectory() {
-    mylog("get Default directory");
-    return defaultView.getDefaultDirectory();
   }
   
 }

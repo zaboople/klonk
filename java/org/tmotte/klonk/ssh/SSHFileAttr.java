@@ -13,16 +13,27 @@ class SSHFileAttr  {
   
   public final boolean isDirectory;
   public final long size;
+  public final boolean exists;
   private final long lastMod;//This is the time without milliseconds
 
   SSHFileAttr(SftpATTRS orig){
     isDirectory=orig.isDir();
     lastMod=orig.getMTime();
     size=orig.getSize();
+    exists=true;
+  }
+  SSHFileAttr(){
+    isDirectory=false;
+    this.exists=false;
+    this.size=0;
+    this.lastMod=0;
   }
   
   long getLastModified() {
     return lastMod*1000;
   }  
 
+  public String toString() {
+    return exists+" "+isDirectory+" "+size+" "+lastMod;
+  }
 }
