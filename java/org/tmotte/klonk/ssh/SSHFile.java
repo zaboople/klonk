@@ -191,10 +191,12 @@ public class SSHFile extends File {
     if (obj==null || !(obj instanceof SSHFile))
       return false;     
     SSHFile other=(SSHFile)obj;
-    return cmp(this.getName(), other.getName())
-      &&   cmp(this.parent,    other.parent)
-      &&   cmp(this.getUser(), other.getUser())
-      &&   cmp(this.getHost(), other.getHost());
+    if (!cmp(this.getName(), other.getName()))
+      return false;
+    if (this.parent==null && other.parent==null) 
+      return cmp(this.getUser(), other.getUser())
+        &&   cmp(this.getHost(), other.getHost());
+    return cmp(this.parent, other.parent);
   }
   /*Computes a hash code for this abstract pathname.*/
   public @Override int hashCode(){

@@ -28,19 +28,11 @@ public class KFileIO {
       r[i]=(byte)vals[i];
     return r;
   }
-
-
+  
   ///////////
   // LOAD: //
   ///////////
   
-  
-  private static InputStream getInputStream(File file) throws Exception {
-    final SSHFile ssh=SSHFile.cast(file);
-    return ssh==null
-      ?new FileInputStream(file)
-      :ssh.getInputStream();
-  }
 
   public static FileMetaData load(JTextArea jta, final File file) throws Exception {
     return load(jta.getDocument(), file);
@@ -240,11 +232,22 @@ public class KFileIO {
       }
     } 
   }
+  
+  ////////////////////////
+  // PRIVATE UTILITIES: //
+  ////////////////////////
+  
   private static OutputStream getOutputStream(File file) throws Exception {
     SSHFile sshFile=SSHFile.cast(file);
     return sshFile==null
       ?new FileOutputStream(file)
       :sshFile.getOutputStream();
+  }
+  private static InputStream getInputStream(File file) throws Exception {
+    final SSHFile ssh=SSHFile.cast(file);
+    return ssh==null
+      ?new FileInputStream(file)
+      :ssh.getInputStream();
   }
   
 }

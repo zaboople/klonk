@@ -16,7 +16,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -61,7 +60,6 @@ public class Editor {
   private boolean unsavedChanges=false;
   private String title="Untitled";
   private File file;
-  private Path path;
 
  
   /////////////////////////
@@ -228,8 +226,8 @@ public class Editor {
   public File getFile() {
     return file;
   }
-  public boolean sameFile(File file) {
-    return path!=null && path.equals(file.toPath().toAbsolutePath()); //FIXME why not just use File functions instead
+  public boolean sameFile(File other) {
+    return file!=null && file.equals(other);
   }
   public boolean isUsed() {
     return used;
@@ -727,7 +725,6 @@ public class Editor {
   }
   private void setFile(File newFile) {
     file=newFile;
-    path=file.toPath().toAbsolutePath();
     try {
       title=file.getCanonicalPath();
     } catch (Exception e) {
