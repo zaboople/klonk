@@ -67,6 +67,9 @@ public class BootContext {
     if (!context.getHome().ready)
       return;  
       
+    //Turn off direct 3d on windows, seems to cause exceptions rendering our yes/no/cancel window
+    System.setProperty("sun.java2d.d3d", "false");
+      
     //Find out if the application is already running:
     if (!context.getFileListener().lockOrSignal(args)) {
       context.getLog().log("Klonk is handing off to another process.");
