@@ -177,7 +177,7 @@ class SFTP {
     Session session=ssh.getSession();
     if (session==null)
       return null;
-    session.setConfig("compression.s2c", "zlib@openssh.com,zlib,none");//FIXME doesnt work otherwise
+    session.setConfig("compression.s2c", "zlib@openssh.com,zlib,none");//Fails if we don't do this - not that I understand it
     session.setConfig("compression.c2s", "zlib@openssh.com,zlib,none");
     ChannelSftp c=(ChannelSftp)session.openChannel("sftp");
     //setBulkRequests() seems to help... not sure. Might be making things worse:

@@ -21,7 +21,7 @@ class ConnectionParse {
     if (!chunker.find(sshPattern))
       throw new RuntimeException(uri+" does not contain "+sshPattern);
           
-    //Optionally get user@...:  FIXME TEST WITH MULTIPLE USERS
+    //Optionally get user@:  
     if (chunker.find("@")) 
       user=chunker.getUpTo();          
       
