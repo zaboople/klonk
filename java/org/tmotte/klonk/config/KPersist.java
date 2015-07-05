@@ -10,8 +10,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Properties;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.UserServer;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
@@ -29,6 +31,7 @@ public class KPersist {
   private FontOptions fontOptionsCache;
   private SSHOptions sshOptionsCache;
   private List<String> recentFilesCache, recentDirsCache;
+  private List<UserServer> recentSSHCache;
   
   public KPersist(KHome home, Setter<Throwable> logFail) {
     this.logFail=logFail;
@@ -215,6 +218,17 @@ public class KPersist {
     getFiles(recentFiles,  "File.RecentFiles.",    maxRecent);
     getFiles(recentDirs,   "File.RecentDirs." ,    maxRecent);
   }
+  public void getRecentSSH(List<UserServer> recent) {
+    recent.clear();
+    List<String> r=new ArrayList<>(maxRecent);
+    getFiles(r,  "File.Recent.SSH.", maxRecent);
+    for (String item: r) {
+      String[] s=item.split("@");
+      if (s.length != 2)
+        throw new RuntimeException("File.Recent.SSH.## is corrupted, should be name@server on each entry, check your home directory");
+      recent.add(new UserServer(s[0], s[1]));
+    }
+  }
   
   public void setRecentFiles(List<String> files) {
     recentFilesCache=files;
@@ -222,13 +236,15 @@ public class KPersist {
   public void setRecentDirs(List<String> dirs) {
     recentDirsCache=dirs;
   }
+  public void setRecentSSH(List<UserServer> sshs) {
+    recentSSHCache=sshs;
+  }
   public void setFavoriteFiles(List<String> files) {
     setFiles(files, "File.Favorite.Files.", maxFavorite);
   }
   public void setFavoriteDirs(List<String> dirs) {
     setFiles(dirs,  "File.Favorite.Dirs.",  maxFavorite);
   }
-
 
 
   // FAST UNDOS: //
@@ -261,6 +277,13 @@ public class KPersist {
     if (recentDirsCache!=null) {
       setFiles(recentDirsCache,    "File.RecentDirs.",     maxRecent);
       recentDirsCache=null;
+    }
+    if (recentSSHCache!=null) {
+      List<String> r=new ArrayList<>(recentSSHCache.size());
+      for (UserServer us : recentSSHCache)
+        r.add(us.user+"@"+us.server);
+      setFiles(r,    "File.Recent.SSH.",     maxRecent);
+      recentSSHCache=null;
     }
     
     // 2. Save everything

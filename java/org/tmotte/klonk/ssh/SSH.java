@@ -76,10 +76,10 @@ public class SSH {
   // USE: //
   //////////
 
-  String getHost() {
+  public String getHost() {
     return host;
   }
-  String getUser() {
+  public String getUser() {
     return user;
   }
   public boolean verifyConnection() {

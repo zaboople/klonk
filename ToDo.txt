@@ -1,4 +1,10 @@
 -Current
+
+  -SSH needs some way to do an open from server and you give the path, as inputting a /sequence/etc in the dialog doesn't know you're implying ssh - what if you just type ssh:/sequence/etc?
+  
+  -Switching from tabs to spaces 
+  
+  -SSH Alt-f-d doesn't work with ssh and needs to be disabled.
  
   -Hey and a menu item for File-Delete? With confirm of course. Hmph.
 
@@ -6,7 +12,6 @@
     -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
   
   -SSH Todo:
-    Alt-f-d can't work with ssh and needs to be disabled.
     Single quotes in the filename are a bit of a problem, and double quotes, and whatever else.
     We need a last user saved to persist so we can hotrod logins.
     When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore    
@@ -18,16 +23,9 @@
 
   -When I switch windows the cursor position frequently goes somewhere else
 
-  -File open ought to start off the session with the last directory opened. 
-   It's annoying when it defaults to my stupid home directory. Well ...ssh. Ugh.
-
-  -Favorite commands. oh man do i need that
-  
-  -Ctrl-W ought to just close the editor if no files are open. It makes no difference.
-      
-  -New Klonk Bug
-  Also consider the idea offered at bottom of this page:
-  http://stackoverflow.com/questions/6436944/java-illegalstateexception-buffers-have-not-been-created
+     
+  -New Klonk Bug - I have a fix in place per the ideas offered on stacko:
+  Also consider the idea offered at bottom of this page:  http://stackoverflow.com/questions/6436944/java-illegalstateexception-buffers-have-not-been-created
   java.lang.IllegalStateException: Buffers have not been created
           at sun.awt.windows.WComponentPeer.getBackBuffer(Unknown Source)
           at java.awt.Component$FlipBufferStrategy.getBackBuffer(Unknown Source)
@@ -60,6 +58,13 @@
 
 
 -Maybe  
+  -File open ought to start off the session with the last directory opened. 
+   It's annoying when it defaults to my stupid home directory. Well ...ssh. Ugh.
+   
+  -Favorite commands. oh man do i need that
+  
+  -Ctrl-W ought to just close the editor if no files are open. It makes no difference.
+
   -Maybe a more sophisticated version of find/replace, where I break up the String? It is pretty slow on an 8MB file.
     -Loop thru 20000 characters at a time, appending last searchFor.length() from previous to first. 
     -Note that java.util.regex.Matcher does have the ability to tell you that the end of a string is a partial match.
