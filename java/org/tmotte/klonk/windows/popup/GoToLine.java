@@ -1,11 +1,5 @@
 package org.tmotte.klonk.windows.popup;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,15 +11,11 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
@@ -110,7 +100,7 @@ public class GoToLine {
   }
 
   ///////////////////////////
-  // CREATE/LAYOUT/LISTEN: //  
+  // CREATE/LAYOUT/LISTEN: //
   ///////////////////////////
 
   private void init() {

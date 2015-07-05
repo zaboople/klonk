@@ -113,7 +113,7 @@ class Recents {
             break;
           }
         }
-        if (!isFirst){
+        if (!isFirst) {
           recentSSH.add(0, new UserServer(user, host));
           if (recentSSH.size()>persist.maxRecent)
             recentSSH.remove(recentSSH.size()-1);
