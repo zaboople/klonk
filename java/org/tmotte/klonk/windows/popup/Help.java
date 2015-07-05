@@ -99,6 +99,7 @@ public class Help {
     jtp.setText(helpText);
     jsp=new JScrollPane(jtp);
     jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    jsp.getVerticalScrollBar().setUnitIncrement(16);
     //Force the stupid thing to scroll to top:
     jtp.setCaretPosition(0);
 
@@ -154,8 +155,7 @@ public class Help {
         );
         h.show(new Rectangle(800,400));
       }
-    });  
-      
+    });       
   }
   
 }
