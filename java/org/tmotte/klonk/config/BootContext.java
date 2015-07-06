@@ -46,6 +46,7 @@ import org.tmotte.klonk.windows.popup.ssh.SSHFileDialogNoFileException;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
 import org.tmotte.klonk.windows.popup.ssh.SSHLogin;
+import org.tmotte.klonk.windows.popup.ssh.SSHOpenFrom;
 import org.tmotte.klonk.windows.popup.ssh.SSHOptionPicker;
 
 /** 
@@ -270,6 +271,7 @@ public class BootContext {
       layout.getMainDisplay(), 
       statusBar,
       fileDialogWrapper, 
+      new SSHOpenFrom(mainFrame),
       yesNoCancel, 
       yesNo
     );

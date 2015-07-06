@@ -28,9 +28,10 @@ import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.YesNoCancel;
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
+import org.tmotte.klonk.windows.popup.ssh.SSHOpenFrom;
 
 /** 
- * THE critical path in the application. Everything DI-injected is an interface, if that helps. Mostly concerned with
+ * THE critical path in the application. Most things DI-injected are an interface, if that helps. Mostly concerned with
  * opening files and editors that contain them.
  */
 public class CtrlMain  {
@@ -52,6 +53,7 @@ public class CtrlMain  {
   private FileDialogWrapper fileDialog;
   private YesNoCancel yesNo, yesNoCancel;
   private MainDisplay layout;
+  private SSHOpenFrom sshOpenFrom;
 
   //Editors list:
   private LinkedList<Editor> editors=new LinkedList<>();
@@ -83,12 +85,14 @@ public class CtrlMain  {
       MainDisplay layout, 
       StatusUpdate statusBar,
       FileDialogWrapper fileDialog,
+      SSHOpenFrom sshOpenFrom,
       YesNoCancel yesNoCancel,
       YesNoCancel yesNo
     ) {
     this.layout=layout;
     this.statusBar=statusBar;
     this.fileDialog=fileDialog;
+    this.sshOpenFrom=sshOpenFrom;
     this.yesNoCancel=yesNoCancel;
     this.yesNo=yesNo;
   }
