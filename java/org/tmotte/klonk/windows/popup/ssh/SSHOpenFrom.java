@@ -180,11 +180,18 @@ public class SSHOpenFrom {
       public void run() {
         try {
           JFrame parentFrame=PopupTestContext.makeMainFrame();
+          SSHOpenFrom w=new SSHOpenFrom(parentFrame);
           List<UserServer> uss=new ArrayList<>();
+
+          w.show(uss);
+
           uss.add(new UserServer("mrderp", "suvuh.suv.com"));
           uss.add(new UserServer("trang", "woi.hoi.org"));
-          SSHOpenFrom w=new SSHOpenFrom(parentFrame);
           w.show(uss);
+
+          uss.add(new UserServer("sploong", "twabbada.lob.net"));
+          w.show(uss);
+          
           
         } catch (Exception e) {
           e.printStackTrace();
