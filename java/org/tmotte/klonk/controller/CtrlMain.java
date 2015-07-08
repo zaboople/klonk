@@ -221,7 +221,9 @@ public class CtrlMain  {
     fileClose(false);
   }
   public void doLoadFile(String file) {
-    loadFile(fileResolver.get(file));
+    File f=fileResolver.get(file);
+    if (f!=null)
+      loadFile(f);
   }
  
   // FILE OPEN FROM: //
