@@ -1,5 +1,6 @@
 package org.tmotte.klonk.windows.popup.ssh;
 import java.awt.Insets;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -33,10 +34,13 @@ public class SSHOpenFrom {
   private DefaultComboBoxModel<String> jcbPreviousData;
   private JTextField jtfFile;
   private JButton btnOK, btnCancel;
+  private JLabel lblError;
+  private JPanel pnlError;
   
   private boolean shownBefore=false;
   private boolean initialized=false;
   private String result=null;
+  private boolean failed=false;
 
   public SSHOpenFrom(JFrame parentFrame) {
     this.parentFrame=parentFrame;
@@ -55,8 +59,12 @@ public class SSHOpenFrom {
     if (!shownBefore && !jcbPrevious.hasFocus())
       jcbPrevious.requestFocusInWindow();
     Positioner.set(parentFrame, win, shownBefore || (win.getBounds().x>-1 && win.getBounds().y>-1));
+    failed=true;
     shownBefore=true;
-    doShow();
+    lblError.setVisible(false);
+    lblError.setText(null);
+    while (failed)
+      doShow();
     return result;
   }
 
@@ -65,14 +73,26 @@ public class SSHOpenFrom {
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
     result=null;
-    win.setVisible(false);  
+    failed=false;
     if (action){
       String userHost=jcbPrevious.getEditor().getItem().toString().trim();
       String file=jtfFile.getText().trim();
       result=userHost;
-      if (!userHost.equals("") && !file.equals(""))
-        result+="@"+file;        
+      if (!userHost.equals("") && !file.equals("")) {
+        if (!file.startsWith("/"))
+          file=":~/"+file;
+        else
+          file=":"+file;
+        result+=file;
+      }
+      else {
+        failed=true;
+        lblError.setText("ERROR: User@Host & File are needed");
+        lblError.setVisible(true);
+      }
     }
+    if (!failed)
+      win.setVisible(false);      
   }
 
   ///////////////////////////
@@ -92,7 +112,7 @@ public class SSHOpenFrom {
     win=new JDialog(parentFrame, true);
     win.setResizable(true);
     win.setTitle("Open from SSH");
-
+    
     jcbPreviousData=new DefaultComboBoxModel<>();
     jcbPreviousData.removeAllElements();
 
@@ -102,6 +122,11 @@ public class SSHOpenFrom {
 
     jtfFile=new JTextField();
     jtfFile.setColumns(80);
+
+    pnlError=new JPanel();
+    lblError=new JLabel();
+    lblError.setText("<none>");
+    lblError.setForeground(Color.RED);
 
     btnOK    =new JButton("OK");
     btnOK.setMnemonic(KeyEvent.VK_K);
@@ -116,9 +141,13 @@ public class SSHOpenFrom {
     gb.anchor=gb.NORTHWEST;
     gb.fill=gb.HORIZONTAL;
     gb.weightXY(1,0);
+    gb.insets.right=5;
     gb.add(getInputPanel());
+    gb.insets.right=0;
     gb.weightXY(1);
     gb.addY(getButtons());
+    gb.weightXY(0);
+    gb.addY(getErrorPanel());
     win.pack();  
   }
   private JPanel getInputPanel() {
@@ -127,19 +156,35 @@ public class SSHOpenFrom {
     gb.weightXY(0).gridXY(0);
     gb.anchor=gb.WEST;
 
-    gb.insets.top=2;
+    gb.insets.top=5;
     gb.insets.bottom=2;
-    gb.insets.left=5;
-
-    gb.add(new JLabel("User@Host"));
+    gb.insets.left=10;    
+    gb.add(new JLabel(""));
+    gb.addX(new JLabel("User@Host"));
     gb.addX(new JLabel("File"));
+    
+    gb.insets.top=2;
+    gb.insets.left=5;
     gb.setX(0);
-    gb.addY(jcbPrevious);
+    gb.addY(new JLabel("ssh:"));
+    gb.insets.left=1;
+    gb.addX(jcbPrevious);
+    gb.insets.left=5;
     gb.weightXY(1, 0);
     gb.fill=gb.HORIZONTAL;    
     gb.addX(jtfFile);
     
     return jp;
+  }
+  private JPanel getErrorPanel() {
+    JPanel panel=pnlError;
+    GridBug gb=new GridBug(panel);
+    gb.setInsets(5);
+    gb.insets.top=0;
+    gb.weightXY(1, 0);
+    gb.anchor=gb.WEST;
+    gb.add(lblError);  
+    return panel;
   }
   private JPanel getButtons() {
     JPanel panel=new JPanel();
@@ -150,7 +195,6 @@ public class SSHOpenFrom {
     insets.left=5;
     insets.right=5;
 
-    gb.gridx=0;
     gb.add(btnOK);
     gb.addX(btnCancel);
     return panel;
@@ -183,15 +227,14 @@ public class SSHOpenFrom {
           SSHOpenFrom w=new SSHOpenFrom(parentFrame);
           List<UserServer> uss=new ArrayList<>();
 
-          w.show(uss);
+          System.out.println(w.show(uss));
 
           uss.add(new UserServer("mrderp", "suvuh.suv.com"));
           uss.add(new UserServer("trang", "woi.hoi.org"));
-          w.show(uss);
+          System.out.println(w.show(uss));
 
           uss.add(new UserServer("sploong", "twabbada.lob.net"));
-          w.show(uss);
-          
+          System.out.println(w.show(uss));         
           
         } catch (Exception e) {
           e.printStackTrace();

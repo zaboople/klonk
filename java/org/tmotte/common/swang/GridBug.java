@@ -34,6 +34,18 @@ public class GridBug extends GridBagConstraints {
     container.add(c);
     return this;
   }
+  
+  public GridBug setInsets(int i) {
+    return setInsets(i, i, i, i);
+  }
+  public GridBug setInsets(int top, int right, int bottom, int left) {
+    insets.top=top;
+    insets.right=right;
+    insets.bottom=bottom;
+    insets.left=left;
+    return this;
+  }
+  
 
   public GridBug setY(int gridy){
     this.gridy=gridy;
