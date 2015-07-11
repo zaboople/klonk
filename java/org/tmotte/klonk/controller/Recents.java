@@ -18,30 +18,36 @@ class Recents {
 
   //Private data:
   private ArrayList<String> recentDirs, recentFiles;
-  private ArrayList<UserServer> recentSSH;
+  private ArrayList<UserServer> recentSSHConns;
   
+  //Initialize:
   Recents(KPersist persist) {
     this.persist=persist;
     recentDirs    =new ArrayList<>(persist.maxRecent);
     recentFiles   =new ArrayList<>(persist.maxRecent);
-    recentSSH     =new ArrayList<>(persist.maxRecent);
+    recentSSHConns=new ArrayList<>(persist.maxRecent);
     persist.getRecent(recentFiles, recentDirs);
-    persist.getRecentSSH(recentSSH);
-    for (UserServer us: recentSSH)
+    persist.getRecentSSH(recentSSHConns);
+    for (UserServer us: recentSSHConns)
       System.out.println(us.user+" : "+us.server);
   }
-  public void setFileListener(Setter<List<String>> recentFileListener) {
+  void setFileListener(Setter<List<String>> recentFileListener) {
     this.recentFileListener=recentFileListener;
     recentFileListener.set(recentFiles);
   }
-  public void setDirListener(Setter<List<String>> recentDirListener) {
+  void setDirListener(Setter<List<String>> recentDirListener) {
     this.recentDirListener=recentDirListener;
     recentDirListener.set(recentDirs);
   }
 
-
+  //Data retrieval:
   String getFirstDir()  {return recentDirs.get(0);}
   boolean hasDirs()     {return recentDirs.size()>0;}
+  List<UserServer> getRecentSSHConns(){
+    return recentSSHConns;
+  }
+  
+  //Events:
   void recentFileSavedNew(File file, File oldFile) {
     if (oldFile!=null && !oldFile.equals(file) && oldFile.exists())
       //This is when we save-as and thus discard an existing file.
@@ -102,22 +108,22 @@ class Recents {
       if (ssf!=null){
         String user=ssf.getSSH().getUser(), 
                host=ssf.getSSH().getHost();
-        if (recentSSH==null)
-          recentSSH=new ArrayList<UserServer>(persist.maxRecent);
+        if (recentSSHConns==null)
+          recentSSHConns=new ArrayList<UserServer>(persist.maxRecent);
         boolean isFirst=false;
-        for (int i=0; i<recentSSH.size(); i++) {
-          UserServer us=recentSSH.get(i);
+        for (int i=0; i<recentSSHConns.size(); i++) {
+          UserServer us=recentSSHConns.get(i);
           if (us.server.equals(host) && us.user.equals(user)){
             if (!(isFirst = i==0))
-              recentSSH.remove(i);
+              recentSSHConns.remove(i);
             break;
           }
         }
         if (!isFirst) {
-          recentSSH.add(0, new UserServer(user, host));
-          if (recentSSH.size()>persist.maxRecent)
-            recentSSH.remove(recentSSH.size()-1);
-          persist.setRecentSSH(recentSSH);
+          recentSSHConns.add(0, new UserServer(user, host));
+          if (recentSSHConns.size()>persist.maxRecent)
+            recentSSHConns.remove(recentSSHConns.size()-1);
+          persist.setRecentSSH(recentSSHConns);
         }
       }
     }

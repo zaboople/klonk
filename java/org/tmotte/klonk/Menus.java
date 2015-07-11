@@ -59,7 +59,7 @@ public class Menus {
                     fileCloseOthers, fileCloseAll,
                     filePrint,
                     fileDocDirWindows, fileClipboardDoc, fileClipboardDocDir, 
-                    fileOpenFromDocDir, fileSaveToDocDir,
+                    fileOpenFromDocDir, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
                     fileFaveAddFile, fileFaveAddDir,
                     fileExit,
                     searchFind, searchReplace, searchRepeat, searchRepeatBackwards, searchGoToLine,
@@ -376,6 +376,9 @@ public class Menus {
         ,fileOpenFromFave=mu.doMenu(
           "Favorite directory", KeyEvent.VK_F
         )
+        ,fileOpenFromSSH=mu.doMenuItem(
+          "SSH...", fileListener, KeyEvent.VK_S
+        )
       )
       ,mu.add(
         mu.doMenu("Save to", KeyEvent.VK_V)
@@ -387,6 +390,9 @@ public class Menus {
         )
         ,fileSaveToFave=mu.doMenu(
           "Favorite directory", KeyEvent.VK_F 
+        )
+        ,fileSaveToSSH=mu.doMenuItem(
+          "SSH...", fileListener, KeyEvent.VK_S
         )
       )
       ,
@@ -664,7 +670,11 @@ public class Menus {
         else
         if (s==fileOpenFromDocDir)   ctrlMain.doOpenFromDocDir();
         else
+        if (s==fileOpenFromSSH)      ctrlMain.doOpenFromSSH();
+        else
         if (s==fileSaveToDocDir)     ctrlMain.doSaveToDocDir();
+        else
+        if (s==fileSaveToSSH)        ctrlMain.doSaveToSSH();
         else
         if (s==fileFaveAddDir)       ctrlFileOther.doAddCurrentToFaveDirs();
         else

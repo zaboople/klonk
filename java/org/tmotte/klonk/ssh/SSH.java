@@ -176,7 +176,7 @@ public class SSH {
   }
 
   boolean isConnected(){
-    myLog("SSH.isConnected() "+session);
+    //myLog("SSH.isConnected() "+session);
     if (session!=null && session.isConnected())
       return true;
     session=null;

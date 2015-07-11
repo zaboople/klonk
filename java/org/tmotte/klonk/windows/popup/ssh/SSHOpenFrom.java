@@ -77,13 +77,12 @@ public class SSHOpenFrom {
     if (action){
       String userHost=jcbPrevious.getEditor().getItem().toString().trim();
       String file=jtfFile.getText().trim();
-      result=userHost;
       if (!userHost.equals("") && !file.equals("")) {
         if (!file.startsWith("/"))
           file=":~/"+file;
         else
           file=":"+file;
-        result+=file;
+        result="ssh:"+userHost+file;
       }
       else {
         failed=true;

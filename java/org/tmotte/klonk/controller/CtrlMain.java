@@ -239,7 +239,15 @@ public class CtrlMain  {
       )!=null)
       loadFile(file);
   }
-  
+  public void doOpenFromSSH() {
+    File file;
+    String f=sshOpenFrom.show(recents.getRecentSSHConns());
+    if (f!=null && (
+          file=fileDialog.show(false, fileResolver.get(f)) 
+        )!=null)
+      loadFile(file);
+  }
+    
   // FILE SAVE TO: //
   public void doSaveToDocDir() {
     File file;
@@ -254,6 +262,15 @@ public class CtrlMain  {
       )!=null)
       fileSave(editorMgr.getFirst(), file, true);
   }
+  public void doSaveToSSH() {
+    File file;
+    String f=sshOpenFrom.show(recents.getRecentSSHConns());
+    if (f!=null && (
+          file=showFileDialogForSave(fileResolver.get(f), null) 
+        )!=null)
+      fileSave(editorMgr.getFirst(), file, true);
+  }
+  
   public void doFileExit() {
     tryExit();
   }
