@@ -25,7 +25,6 @@ import org.tmotte.klonk.config.msg.UserServer;
 import org.tmotte.klonk.windows.Positioner;
 import org.tmotte.klonk.windows.popup.PopupTestContext;
 
-//FIXME document this sucker in the online help
 public class SSHOpenFrom {
 
   private JFrame parentFrame;
@@ -58,7 +57,7 @@ public class SSHOpenFrom {
       jcbPreviousData.addElement(us.user+"@"+us.server);
     if (!shownBefore && !jcbPrevious.hasFocus())
       jcbPrevious.requestFocusInWindow();
-    Positioner.set(parentFrame, win, shownBefore || (win.getBounds().x>-1 && win.getBounds().y>-1));
+    Positioner.set(parentFrame, win, false);
     failed=true;
     shownBefore=true;
     lblError.setVisible(false);
