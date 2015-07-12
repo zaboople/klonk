@@ -233,21 +233,27 @@ public class SSH {
   private boolean connect() {
     try {
       return tryConnect1();
-    } catch (java.io.IOException e) {
-      //Includes java.net.NoRouteToHostException and some others:
-      userNotify.alert(e);
-      return false;
-    } catch (com.jcraft.jsch.JSchException e) {
-      userNotify.alert(e);
-      return false;
     } catch (Exception e) {
-      Throwable internal=e.getCause();
-      if (internal!=null && (internal instanceof java.net.UnknownHostException)) 
-        userNotify.alert(internal);
-      else
+      if (!diagnose(e))
         userNotify.alert(e);
       return false;
     }
+  }
+  private boolean diagnose(Throwable e) {
+    if (e==null) 
+      return false;
+    else
+    if (e instanceof java.net.UnknownHostException) {
+      userNotify.alert("Cannot resolve hostname: "+host);
+      return true;
+    }
+    else
+    if (e instanceof java.net.NoRouteToHostException) {
+      userNotify.alert("No route to host: "+host);
+      return true;
+    }
+    else 
+      return diagnose(e.getCause());
   }
   private boolean tryConnect1() throws Exception {
   
