@@ -293,6 +293,9 @@ To connect to an SSH server's file system, simply enter the name like so in the 
 <p>
 If you leave the path out, klonk will attempt to start with your home directory. If you leave the user out, klonk will prompt you for a user. It will also prompt you for a password as necessary. 
 </p>
+<p>
+You can also save/open to/from SSH by going to File → Save to → SSH, or File → Open from → SSH.
+</p>
 
 <p>
 SSH behavior can be configured by going to Options → SSH in the menu. This includes three features:
