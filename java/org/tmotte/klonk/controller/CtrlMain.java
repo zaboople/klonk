@@ -233,18 +233,19 @@ public class CtrlMain  {
       loadFile(file);
   }
   public void doOpenFrom(String dir) {
-    File file;
-    if ((
-      file=fileDialog.showForDir(false, fileResolver.get(dir))
-      )!=null)
+    File file=fileResolver.get(dir);
+    if (file==null)
+      return;
+    file=fileDialog.showForDir(false, file);
+    if (file!=null)
       loadFile(file);
   }
   public void doOpenFromSSH() {
-    File file;
-    String f=sshOpenFrom.show(recents.getRecentSSHConns());
-    if (f!=null && (
-          file=fileDialog.show(false, fileResolver.get(f)) 
-        )!=null)
+    File file=getSSHRecent();
+    if (file==null) 
+      return;
+    file=fileDialog.show(false, file);
+    if (file!=null)
       loadFile(file);
   }
     
@@ -256,19 +257,27 @@ public class CtrlMain  {
       fileSave(ed, file, true);
   }
   public void doSaveTo(String dir) {
-    File file;
-    if ((
-      file=showFileDialogForSave(null, fileResolver.get(dir)) 
-      )!=null)
+    File file=fileResolver.get(dir);
+    if (file==null)
+      return;
+    file=showFileDialogForSave(null, file);
+    if (file!=null)
       fileSave(editorMgr.getFirst(), file, true);
   }
   public void doSaveToSSH() {
-    File file;
-    String f=sshOpenFrom.show(recents.getRecentSSHConns());
-    if (f!=null && (
-          file=showFileDialogForSave(fileResolver.get(f), null) 
-        )!=null)
+    File file=getSSHRecent();
+    if (file==null) 
+      return;
+    file=showFileDialogForSave(file, null);
+    if (file!=null)
       fileSave(editorMgr.getFirst(), file, true);
+  }
+
+  private File getSSHRecent() {
+    String f=sshOpenFrom.show(recents.getRecentSSHConns());
+    if (f==null)
+      return null;
+    return fileResolver.get(f);
   }
   
   public void doFileExit() {
