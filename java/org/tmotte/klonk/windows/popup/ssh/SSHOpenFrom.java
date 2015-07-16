@@ -1,4 +1,5 @@
 package org.tmotte.klonk.windows.popup.ssh;
+import java.awt.Rectangle;
 import java.awt.Insets;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -53,10 +54,20 @@ public class SSHOpenFrom {
   public String show(List<UserServer> recent) {
     init();
     jcbPreviousData.removeAllElements();
-    for (UserServer us: recent)
-      jcbPreviousData.addElement(us.user+"@"+us.server);
+    if (recent.size()==0)
+      jcbPreviousData.addElement("");
+    else
+      for (UserServer us: recent)
+        jcbPreviousData.addElement(us.user+"@"+us.server);
     if (!shownBefore && !jcbPrevious.hasFocus())
       jcbPrevious.requestFocusInWindow();
+    if (!shownBefore)
+      win.pack();
+    Rectangle parentRect=parentFrame.getBounds(), thisRect=win.getBounds();
+    if (parentRect.width / 2 > thisRect.width){
+      thisRect.width=parentRect.width / 2;
+      win.setBounds(thisRect);
+    }
     Positioner.set(parentFrame, win, false);
     failed=true;
     shownBefore=true;
@@ -112,14 +123,12 @@ public class SSHOpenFrom {
     win.setTitle("Open from SSH");
     
     jcbPreviousData=new DefaultComboBoxModel<>();
-    jcbPreviousData.removeAllElements();
 
     jcbPrevious=new JComboBox<>(jcbPreviousData);
     jcbPrevious.setEditable(true);
     jcbPrevious.setMaximumRowCount(KPersist.maxRecent);
 
     jtfFile=new JTextField();
-    jtfFile.setColumns(80);
 
     pnlError=new JPanel();
     lblError=new JLabel();
@@ -165,11 +174,15 @@ public class SSHOpenFrom {
     gb.insets.left=5;
     gb.setX(0);
     gb.addY(new JLabel("ssh:"));
+    
     gb.insets.left=1;
-    gb.addX(jcbPrevious);
-    gb.insets.left=5;
-    gb.weightXY(1, 0);
     gb.fill=gb.HORIZONTAL;    
+    gb.weightXY(0.3, 0);
+    gb.addX(jcbPrevious);
+    
+    gb.insets.left=5;
+    gb.weightXY(0.7, 0);
+    jtfFile.setColumns(50);
     gb.addX(jtfFile);
     
     return jp;
