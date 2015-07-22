@@ -89,7 +89,7 @@ public class SSHOpenFrom {
       String userHost=jcbPrevious.getEditor().getItem().toString().trim();
       String file=jtfFile.getText().trim();
       if (!userHost.equals("") && !file.equals("")) {
-        if (!file.startsWith("/"))
+        if (!file.startsWith("~") && !file.startsWith("/"))
           file=":~/"+file;
         else
           file=":"+file;
