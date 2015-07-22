@@ -51,8 +51,9 @@ public class SSHOpenFrom {
     win.toFront();
   }
 
-  public String show(List<UserServer> recent) {
+  public String show(boolean forSave, List<UserServer> recent) {
     init();
+    win.setTitle(forSave ?"Save to SHH" :"Open from SSH");    
     jcbPreviousData.removeAllElements();
     if (recent.size()==0)
       jcbPreviousData.addElement("");
@@ -120,7 +121,7 @@ public class SSHOpenFrom {
   private void create(){
     win=new JDialog(parentFrame, true);
     win.setResizable(true);
-    win.setTitle("Open from SSH");
+    win.setTitle("blargh");
     
     jcbPreviousData=new DefaultComboBoxModel<>();
 
@@ -238,14 +239,14 @@ public class SSHOpenFrom {
           SSHOpenFrom w=new SSHOpenFrom(parentFrame);
           List<UserServer> uss=new ArrayList<>();
 
-          System.out.println(w.show(uss));
+          System.out.println(w.show(false, uss));
 
           uss.add(new UserServer("mrderp", "suvuh.suv.com"));
           uss.add(new UserServer("trang", "woi.hoi.org"));
-          System.out.println(w.show(uss));
+          System.out.println(w.show(true, uss));
 
           uss.add(new UserServer("sploong", "twabbada.lob.net"));
-          System.out.println(w.show(uss));         
+          System.out.println(w.show(false, uss));         
           
         } catch (Exception e) {
           e.printStackTrace();

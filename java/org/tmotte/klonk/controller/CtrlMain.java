@@ -241,10 +241,11 @@ public class CtrlMain  {
       loadFile(file);
   }
   public void doOpenFromSSH() {
-    File file=getSSHRecent();
+    File file=getSSHRecent(false);
     if (file==null) 
       return;
-    file=fileDialog.show(false, file);
+    if (!file.isFile())
+      file=fileDialog.show(false, file);
     if (file!=null)
       loadFile(file);
   }
@@ -265,7 +266,7 @@ public class CtrlMain  {
       fileSave(editorMgr.getFirst(), file, true);
   }
   public void doSaveToSSH() {
-    File file=getSSHRecent();
+    File file=getSSHRecent(true);
     if (file==null) 
       return;
     file=showFileDialogForSave(file, null);
@@ -273,8 +274,8 @@ public class CtrlMain  {
       fileSave(editorMgr.getFirst(), file, true);
   }
 
-  private File getSSHRecent() {
-    String f=sshOpenFrom.show(recents.getRecentSSHConns());
+  private File getSSHRecent(boolean forSave) {
+    String f=sshOpenFrom.show(forSave, recents.getRecentSSHConns());
     if (f==null)
       return null;
     return fileResolver.get(f);
