@@ -258,7 +258,7 @@ public class SSH {
   private boolean tryConnect1() throws Exception {
   
     //Set known hosts:
-    if (knownHosts!=null) {
+    if (knownHosts!=null && !knownHosts.equals("")) {
       jsch.setKnownHosts(knownHosts);
       if (false)
         printHostKeys(jsch);
