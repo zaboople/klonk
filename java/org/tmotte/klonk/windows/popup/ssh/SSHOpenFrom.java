@@ -88,7 +88,10 @@ public class SSHOpenFrom {
     if (action){
       String userHost=jcbPrevious.getEditor().getItem().toString().trim();
       String file=jtfFile.getText().trim();
-      if (!userHost.equals("") && !file.equals("")) {
+      if (!userHost.equals("")) {
+        if (file.equals(""))
+          file=":~";
+        else
         if (!file.startsWith("~") && !file.startsWith("/"))
           file=":~/"+file;
         else
@@ -97,7 +100,7 @@ public class SSHOpenFrom {
       }
       else {
         failed=true;
-        lblError.setText("ERROR: User@Host & File are needed");
+        lblError.setText("ERROR: User@Host is needed");
         lblError.setVisible(true);
       }
     }
