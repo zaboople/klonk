@@ -32,6 +32,7 @@ public class SSHOpenFrom {
   private JFrame parentFrame;
   private JDialog win;  
   private JComboBox<String> jcbPrevious;
+  private JCheckBox jcbSudo;
   private DefaultComboBoxModel<String> jcbPreviousData;
   private JTextField jtfFile;
   private JButton btnOK, btnCancel;
@@ -129,6 +130,8 @@ public class SSHOpenFrom {
     jcbPrevious=new JComboBox<>(jcbPreviousData);
     jcbPrevious.setEditable(true);
     jcbPrevious.setMaximumRowCount(KPersist.maxRecent);
+    
+    jcbSudo=new JCheckBox("sudo");
 
     jtfFile=new JTextField();
 
