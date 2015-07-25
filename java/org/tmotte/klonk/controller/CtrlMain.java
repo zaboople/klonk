@@ -413,8 +413,9 @@ public class CtrlMain  {
       file=fileDialog.show(true);
     if (file==null)
       return null;
+    Editor eFirst=editorMgr.getFirst();
     for (Editor e: editorMgr.forEach()) 
-      if (e.sameFile(file)){
+      if (e!=eFirst && e.sameFile(file)){
         userNotify.alert("File is already open in another window; close it first: "+e.getTitle());
         return null;
       }
