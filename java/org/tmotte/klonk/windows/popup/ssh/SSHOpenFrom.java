@@ -60,6 +60,7 @@ public class SSHOpenFrom {
     win.setTitle(forSave ?"Save to SHH" :"Open from SSH");
     
     //Sudo always off:
+    jcbSudo.setVisible(false);
     jcbSudo.setSelected(false);
     
     //Dynamic previous:
@@ -184,7 +185,8 @@ public class SSHOpenFrom {
     gb.add(new JLabel(""));
     gb.addX(new JLabel("User@Host"));
     gb.addX(new JLabel("File"));
-    gb.addX(new JLabel("Sudo"));
+    //gb.addX(new JLabel("Sudo"));
+    gb.addX(new JLabel(""));
     
     gb.insets.top=2;
     gb.insets.left=5;
