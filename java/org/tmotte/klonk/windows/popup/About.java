@@ -35,7 +35,7 @@ public class About {
 
   private JFrame parentFrame;
   private JDialog win;
-  private JTextPane jtpLicense, jtpVersion;
+  private JTextPane jtpLicense, jtpVersion, jtpJavaVersion;
   private JScrollPane jspLicense;
   private JButton btnOK; 
 
@@ -79,16 +79,19 @@ public class About {
 
     jtpLicense=new JTextPane();
     jtpVersion=new JTextPane();
+    jtpJavaVersion=new JTextPane();
     btnOK=new JButton(); 
 
-    jtpVersion.setEditable(false); 
-    jtpVersion.setBorder(null);       
-    jtpVersion.setOpaque(false);
-    jtpVersion.setFont(jtpVersion.getFont().deriveFont(Font.BOLD, 14));
+    JTextPane[] jtps={jtpLicense, jtpVersion, jtpJavaVersion};
+    for (JTextPane jtp: jtps) {
+      jtp.setEditable(false); 
+      jtp.setBorder(null);       
+      jtp.setOpaque(false);
+    }
+    Font font=jtpVersion.getFont().deriveFont(Font.BOLD, 14);
+    jtpVersion.setFont(font);
+    jtpJavaVersion.setFont(font);
 
-    jtpLicense.setEditable(false); 
-    jtpLicense.setBorder(null);       
-    jtpLicense.setOpaque(false);
     jtpLicense.setContentType("text/html");
     Properties props=new Properties();
     try (java.io.InputStream is=getClass().getResourceAsStream("About-Version-Number.txt");) {
@@ -97,12 +100,15 @@ public class About {
       throw new RuntimeException(e);
     }
     String number=props.getProperty("VERSION.KLONK");
-    String license=Loader.loadUTF8String(getClass(), "About-License.html"),
-           version=Loader.loadUTF8String(getClass(), "About-Version.txt");
+    String 
+      license=Loader.loadUTF8String(getClass(), "About-License.html"),
+      version=Loader.loadUTF8String(getClass(), "About-Version.txt"),
+      javaVersion="Running under Java version: "+System.getProperty("java.version");
     license=license.replaceAll("<meta.*?>", "");
     version=version.replaceAll("\\$version", number);
     jtpLicense.setText(license);
     jtpVersion.setText(version);
+    jtpJavaVersion.setText(javaVersion);
     jspLicense=new JScrollPane(jtpLicense);
     jspLicense.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     //Force the stupid thing to scroll to top:
@@ -122,6 +128,9 @@ public class About {
     gb.weightx=1;
     gb.fill=gb.HORIZONTAL;
     gb.add(jtpVersion);
+
+    gb.insets.top=0;
+    gb.addY(jtpJavaVersion);
     
     gb.insets.top=0;
     gb.weightXY(1);

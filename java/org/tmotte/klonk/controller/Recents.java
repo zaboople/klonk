@@ -28,8 +28,6 @@ class Recents {
     recentSSHConns=new ArrayList<>(persist.maxRecent);
     persist.getRecent(recentFiles, recentDirs);
     persist.getRecentSSH(recentSSHConns);
-    for (UserServer us: recentSSHConns)
-      System.out.println(us.user+" : "+us.server);
   }
   void setFileListener(Setter<List<String>> recentFileListener) {
     this.recentFileListener=recentFileListener;

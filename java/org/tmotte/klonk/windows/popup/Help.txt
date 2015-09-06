@@ -312,6 +312,9 @@ SSH behavior can be configured by going to Options → SSH in the menu. This inc
 <p>
 3. You can disconnect open connections, which are otherwise left open until you exit Klonk.
 </p>
+<p>
+<b>Important note</b>: Modern ssh servers tend to use very large ssh keys. Your local java installation most likely won't support this by default, and you'll get funky errors about ssh keys and/or algorithms when trying to connect.  The fix is relatively easy: Google for the official JCE (Java Cryptography Extension), and follow the instructions; this involves downloading a couple files and copying them into your java installation folder.
+</p>
 
 
 <h2>Shutting Down the Application</h2>
