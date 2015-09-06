@@ -50,13 +50,14 @@ public class FindAndReplace {
   JDialog win;
   MyTextArea mtaFind, mtaReplace;
   JComponent contFind, contReplace;
-  JCheckBox chkReplace, chkCase, chkReplaceAll, chkConfirmReplace, chkRegex;
+  JCheckBox chkReplace, chkCase, chkReplaceAll, chkConfirmReplace, chkRegex, chkRegexMultiline;
   JButton btnFind,
           btnReverse,
           btnCancel;
   JLabel lblFind;
   
   //Fonts:
+  Font fontBold, fontNormal;
   FontOptions fontOptions;
   private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
     public void set(FontOptions fo){setFont(fo);}
@@ -228,6 +229,7 @@ public class FindAndReplace {
     //Pattern & matcher preserved for multiple invocations:
     private Pattern pattern;
     private Matcher matcher;
+    private boolean multiline;
 
     public int getEnd(){return locationEnd;}
     public int getStart() {return location;}
@@ -296,7 +298,9 @@ public class FindAndReplace {
     }
     private void findRegex(String searchFor, String searchIn, boolean forwards, boolean caseSensitive) {
       if (pattern==null){
-        int flags=Pattern.MULTILINE|Pattern.DOTALL;
+        int flags=multiline 
+          ?Pattern.MULTILINE|Pattern.DOTALL
+          :0;
         if (!caseSensitive)
           flags|=Pattern.CASE_INSENSITIVE;
         try {
@@ -392,7 +396,8 @@ public class FindAndReplace {
   }
 
   private void create() {
-    Font fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
+    fontNormal=new JLabel().getFont();
+    fontBold=fontNormal.deriveFont(Font.BOLD);
     win=new JDialog(parentFrame, true);
     win.setTitle("Find & Replace");
 
@@ -592,6 +597,9 @@ public class FindAndReplace {
   private void listen() {
     chkReplace.addActionListener(chkReplaceListener);
     chkReplaceAll.addActionListener(chkReplaceAllListener);
+    chkCase.addActionListener(chkBoldListener);
+    chkReplaceAll.addActionListener(chkBoldListener);
+    chkRegex.addActionListener(chkBoldListener);
     doButtonEvents(btnFind,    buttonListener, KeyMapper.key(KeyEvent.VK_F3));
     doButtonEvents(btnFind,    buttonListener, KeyMapper.key(KeyEvent.VK_ENTER));
     doButtonEvents(btnReverse, buttonListener, KeyMapper.key(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK));
@@ -615,6 +623,21 @@ public class FindAndReplace {
     butt.addActionListener(action);
     KeyMapper.accel(butt, action, key);
   }
+
+  /** FIXME */
+  private ActionListener chkBoldListener=new ActionListener() {
+    public void actionPerformed(ActionEvent event) {
+      JCheckBox jcb=(JCheckBox)event.getSource();
+      boolean boldChecked=
+        jcb==chkCase || jcb==chkReplaceAll || jcb==chkRegex;
+      if (boldChecked) {
+        if (jcb.isSelected())
+          jcb.setFont(fontBold);
+        else
+          jcb.setFont(fontNormal);
+      }
+    }
+  };
   
   /** When replace is checked, enable disable stuff: */
   private ActionListener chkReplaceListener=new ActionListener() {
