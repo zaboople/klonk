@@ -1,6 +1,7 @@
 package org.tmotte.klonk.ssh;
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;
+import com.jcraft.jsch.OpenSSHConfig;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import java.io.ByteArrayOutputStream;
@@ -15,7 +16,7 @@ public class SSH {
 
   private JSch jsch=new JSch();
   private Session session;
-  private String user, pass, host, knownHosts, privateKeys, defaultFilePerms, defaultDirPerms;
+  private String user, pass, host, knownHosts, privateKeys, defaultFilePerms, defaultDirPerms, configFile;
   private boolean connected=false;
   private boolean lastConnectAuthFail=false;
   private SFTP sftp;
@@ -260,9 +261,15 @@ public class SSH {
     //Set known hosts:
     if (knownHosts!=null && !knownHosts.equals("")) {
       jsch.setKnownHosts(knownHosts);
-      if (false)
+      if (true)
         printHostKeys(jsch);
+    } 
+    if (configFile!=null && !configFile.equals("")) {
+      jsch.setConfigRepository(
+        OpenSSHConfig.parseFile(configFile)
+      );
     }
+
 
     //OK close:
     close();
