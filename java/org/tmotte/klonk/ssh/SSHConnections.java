@@ -18,7 +18,7 @@ public class SSHConnections {
   private final ConnectionParse parser=new ConnectionParse();
   private Set<String> users=new HashSet<>();
   
-  private String knownHosts, privateKeys;
+  private String knownHosts, privateKeys, openSSHConfig;
   private String defaultFilePerms, defaultDirPerms;
   private IUserPass iUserPass;
   private UserNotify userNotify;
@@ -42,6 +42,7 @@ public class SSHConnections {
     this.privateKeys=opts.getPrivateKeysFilename();
     this.defaultFilePerms=opts.getDefaultFilePermissions();
     this.defaultDirPerms=opts.getDefaultDirPermissions();
+    this.openSSHConfig=opts.getOpenSSHConfigFilename();
     for (Map<String,SSH> map: conns.values())
       for (SSH ssh: map.values()) 
         configure(ssh);
@@ -156,6 +157,7 @@ public class SSHConnections {
     ssh
       .withKnown(knownHosts)
       .withPrivateKeys(privateKeys)
+      .withOpenSSHConfig(openSSHConfig)      
       .withDefaultPerms(defaultFilePerms, defaultDirPerms);
     return ssh;
   }

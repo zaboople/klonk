@@ -40,13 +40,16 @@ public class SSHOptionPicker {
   private JCheckBox 
     jcbKnownHosts, 
     jcbPrivateKeys,
+    jcbOpenSSHConfig,
     jcbSelectAllConns;
   private JTextField 
     jtfKnownHosts, 
-    jtfPrivateKeys;  
+    jtfPrivateKeys,
+    jtfOpenSSHConfig;  
   private JButton 
     btnKnownHosts, 
-    btnPrivateKeys;
+    btnPrivateKeys,
+    btnOpenSSHConfig;
   private JPanel jpConns;
   private GridBug gbConns;
   private JLabel lblOpenConns;
@@ -82,6 +85,12 @@ public class SSHOptionPicker {
       if (privateKeys!=null)
         jtfPrivateKeys.setText(privateKeys);
       jcbPrivateKeys.setSelected( privateKeys !=null);
+
+      //Open SSH Config:
+      String openSSHConfig=ifEmpty(options.getOpenSSHConfigFilename());
+      if (openSSHConfig!=null)
+        jtfOpenSSHConfig.setText(openSSHConfig);
+      jcbOpenSSHConfig.setSelected( openSSHConfig !=null);
       
       //Default permissions:
       setChecked(tcUser, options.dur, options.duw, options.dux);
@@ -120,7 +129,12 @@ public class SSHOptionPicker {
         jcbPrivateKeys.isSelected()
           ?ifEmpty(jtfPrivateKeys)
           :""
-      );    
+      );
+      options.setOpenSSHConfigFilename(
+        jcbOpenSSHConfig.isSelected()
+          ?ifEmpty(jtfOpenSSHConfig)
+          :""
+      );      
       options.dur=tcUser.read.isSelected();
       options.duw=tcUser.write.isSelected();
       options.dux=tcUser.execute.isSelected();
@@ -180,6 +194,11 @@ public class SSHOptionPicker {
     jtfPrivateKeys=new JTextField();  
     jtfPrivateKeys.setColumns(45);
     btnPrivateKeys=new JButton("...");
+
+    jcbOpenSSHConfig=new JCheckBox("OpenSSH Config");
+    jtfOpenSSHConfig=new JTextField();  
+    jtfOpenSSHConfig.setColumns(45);
+    btnOpenSSHConfig=new JButton("...");
 
     btnOK    =new JButton("OK");
     btnOK.setMnemonic(KeyEvent.VK_K);
@@ -265,9 +284,9 @@ public class SSHOptionPicker {
     
     gb.insets.right=4;
     gb.addX(btnKnownHosts);
-    gb.insets.right=0;
 
     //Private keys checkbox+textfield+button:
+    gb.insets.right=0;
     gb.setX(0);
     gb.insets.top=4;   
     gb.addY(jcbPrivateKeys);
@@ -280,6 +299,20 @@ public class SSHOptionPicker {
 
     gb.insets.right=4;
     gb.addX(btnPrivateKeys);
+
+    //OpenSSH checkbox+textfield+button:
+    gb.insets.right=0;
+    gb.setX(0);
+    gb.addY(jcbOpenSSHConfig);
+    
+    gb.weightx=1;
+    gb.fill=gb.BOTH;    
+    gb.addX(jtfOpenSSHConfig);
+    gb.fill=gb.NONE;
+    gb.weightx=0;
+
+    gb.insets.right=4;
+    gb.addX(btnOpenSSHConfig);
     
     return jp;
   }
@@ -380,10 +413,12 @@ public class SSHOptionPicker {
     };
     jcbKnownHosts.addActionListener(jcbAction);
     jcbPrivateKeys.addActionListener(jcbAction);
+    jcbOpenSSHConfig.addActionListener(jcbAction);
     
     //GetFiles
     listenFileSelector(jtfKnownHosts, btnKnownHosts);
-    listenFileSelector(jtfPrivateKeys, btnPrivateKeys);    
+    listenFileSelector(jtfPrivateKeys, btnPrivateKeys);
+    listenFileSelector(jtfOpenSSHConfig, btnOpenSSHConfig);
 
     //Check all:
     listenForCheckAll();
@@ -430,11 +465,14 @@ public class SSHOptionPicker {
   }
   private void setVisible() {
     boolean kh=jcbKnownHosts.isSelected(),
-            pk=jcbPrivateKeys.isSelected();
+            pk=jcbPrivateKeys.isSelected(),
+            os=jcbOpenSSHConfig.isSelected();
     jtfKnownHosts.setEnabled(kh);
     btnKnownHosts.setEnabled(kh);
     jtfPrivateKeys.setEnabled(pk);
     btnPrivateKeys.setEnabled(pk);
+    jtfOpenSSHConfig.setEnabled(os);
+    btnOpenSSHConfig.setEnabled(os);
   }
   
   ////////////////

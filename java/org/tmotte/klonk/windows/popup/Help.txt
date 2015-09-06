@@ -287,37 +287,62 @@ Klonk includes the ability to connect to servers over SSH and use SFTP/SSH to re
 </p>
 
 <p>
-To connect to an SSH server's file system, simply enter the name like so in the File → Open dialog:
-</p>
+To connect to an SSH server's file system, you can do one of two things:
+<ol>
+  <li>Enter the name like so in the File → Open dialog:
   <pre>  ssh:user@server.domain.domain/path1/path2/etc</pre>
-<p>
-If you leave the path out, klonk will attempt to start with your home directory. If you leave the user out, klonk will prompt you for a user. It will also prompt you for a password as necessary. 
-</p>
-<p>
-You can also save/open to/from SSH by going to File → Save to → SSH, or File → Open from → SSH.
-</p>
-
-<p>
-SSH behavior can be configured by going to Options → SSH in the menu. This includes three features:
+  If you leave the path out, klonk will attempt to start with your home directory. If you leave the user out, klonk will prompt you for a user. It will also prompt you for a password as necessary. 
+  </li>
+  <li>Go to File → Save to → SSH, or File → Open from → SSH.</li>
+</ol>
 </p>
 
 <p>
-1. Since typing passwords is a hassle, it's a good idea to set up private/public key arrangement for SSH. Klonk does not have this ability built-in, so you will need to create the files using your favorite SSH client. Klonk will need the location of your "private keys" file, which you can enter here. You can also enter the location of your "known hosts" file, which is not absolutely necessary but is considered important for security reasons.
+SSH behavior can be configured by going to Options → SSH in the menu:
+<ol>
+
+<li>
+You can set a "Known hosts" file. Klonk can't generate this file, but but most other SSH clients will as you connect to different servers, collecting "fingerprints" of your favorite SSH servers and warning/failing if they suddenly change (which may mean a man-in-the-middle attack). You don't <i>have</i> to do this, but it is widely considered to be a Very Good Thing. 
+</li>
+
+<li>
+Since typing passwords is a hassle, it's a good idea to set up private/public key arrangement for SSH. Klonk does not have this ability built-in, so you will need to create the files using your favorite SSH client. Klonk will need the location of your "private keys" file, which you can enter here. You can also enter the location of your "known hosts" file, which is not absolutely necessary but is considered important for security reasons.
+</li>
+
+<li>
+You can select an OpenSSH Config file, which provides a few conveniences. The most important thing is that you can configure shortcut hostnames like so:
+<pre>
+Host derp
+     HostName derpity.derpity.derp.derp.derp.org
+</pre>
+and then just use "derp" as a hostname whenever you want to connect to derpity.derpity.derp.derp.derp.org.
+</li>
+
+<li>
+You can set the default permissions to be assigned when you create a new file or directory (your remote umask setting is unfortunately ignored). 
+</li>
+
+<li>
+You can disconnect open connections, which are otherwise left open until you exit Klonk.
+</li>
+</ol>
 </p>
 
-<p>
-2. You can set the default permissions to be assigned when you create a new file or directory (your remote umask setting is unfortunately ignored). 
-</p>
 
-<p>
-3. You can disconnect open connections, which are otherwise left open until you exit Klonk.
-</p>
 <p>
 <b>Important note</b>: Modern ssh servers tend to use very large ssh keys. Your local java installation most likely won't support this by default, and you'll get funky errors about ssh keys and/or algorithms when trying to connect.  The fix is relatively easy: Google for the official JCE (Java Cryptography Extension), and follow the instructions; this involves downloading a couple files and copying them into your java installation folder.
 </p>
+<p><b>But wait there's more:</b> Once you've fixed the problem with very large ssh keys, you may have more problems with your known_hosts file (as per #1), especially with Debian Linux servers. Klonk will complain about an "RSA fingerprint" not matching what you have, and when you look in your known_hosts, you see "ecdsa-sha2-nistp256" instead of "ssh-rsa". The way to fix this is by creating an OpenSSH config file that sets the "priority" for known_hosts signatures as follows:
+</p>
+<pre>
+# Refer to linux man page on ssh_config 
+Host *
+  HostKeyAlgorithms ecdsa-sha2-nistp256,ssh-rsa,ssh-dss
+</pre>
+<p>This can be done using the OpenSSH Config File option as described in #3 above.
+</p>
 
-
-<h2>Shutting Down the Application</h2>
+<h2>Shutting Down Klonk</h2>
 
 <p>
 When you you exit Klonk it will stop and ask you to save any files that have unsaved changes. You will also notice that Klonk shows a small red bar at the upper left if the current file has unsaved changes, and/or an adjoining blue bar if this or another file has unsaved changes.

@@ -4,6 +4,7 @@ public class SSHOptions {
 
   private String knownHostsFilename;
   private String privateKeysFilename;
+  private String openSSHConfigFilename;
 
   /** These are the default file permissions */
   public boolean 
@@ -17,10 +18,13 @@ public class SSHOptions {
 
   public String getKnownHostsFilename() {
     return knownHostsFilename;
-  }  
+  }
   public String getPrivateKeysFilename() {
     return privateKeysFilename;
-  }  
+  }
+  public String getOpenSSHConfigFilename() {
+    return openSSHConfigFilename;
+  }
   public String getDefaultFilePermissions() {
     return Integer.toString(
       getDigit(dox, 0)+
@@ -82,7 +86,10 @@ public class SSHOptions {
     this.privateKeysFilename=name;
     return this;
   }
-  
+  public SSHOptions setOpenSSHConfigFilename(String name) {
+    this.openSSHConfigFilename=name;
+    return this;
+  }  
   ////////////////
   // DEBUGGING: //
   ////////////////
@@ -90,6 +97,7 @@ public class SSHOptions {
   public String toString(){
     return "Known Hosts:"+knownHostsFilename
         +"\nPrivate keys:"+privateKeysFilename
+        +"\nOpenSSH Config file: "+openSSHConfigFilename+" "
         +"\nDefault Permissions: "+getRWXUser()+getRWXGroup()+getRWXOther()+" "
         +getDefaultFilePermissions()+" "
         +getDefaultDirPermissions()

@@ -126,6 +126,7 @@ public class KPersist {
       SSHOptions opts=new SSHOptions();
       opts.setKnownHostsFilename(get("SSH.KnownHosts", null));
       opts.setPrivateKeysFilename(get("SSH.PrivateKeys", null));
+      opts.setOpenSSHConfigFilename(get("SSH.OpenSSHConfig", null));
       String user=get("SSH.Default.User",  "rw-"),
             group=get("SSH.Default.Group", "r--"),
             other=get("SSH.Default.Other", "---");
@@ -146,6 +147,7 @@ public class KPersist {
     SSHOptions opts=getSSHOptions();
     set("SSH.KnownHosts",    opts.getKnownHostsFilename());
     set("SSH.PrivateKeys",   opts.getPrivateKeysFilename());
+    set("SSH.OpenSSHConfig", opts.getOpenSSHConfigFilename());
     set("SSH.Default.User",  opts.getRWXUser());
     set("SSH.Default.Group", opts.getRWXGroup());
     set("SSH.Default.Other", opts.getRWXOther());

@@ -16,7 +16,7 @@ public class SSH {
 
   private JSch jsch=new JSch();
   private Session session;
-  private String user, pass, host, knownHosts, privateKeys, defaultFilePerms, defaultDirPerms, configFile;
+  private String user, pass, host, knownHosts, privateKeys, defaultFilePerms, defaultDirPerms, openSSHConfig;
   private boolean connected=false;
   private boolean lastConnectAuthFail=false;
   private SFTP sftp;
@@ -60,6 +60,10 @@ public class SSH {
   }
   SSH withPrivateKeys(String privateKeys) {
     this.privateKeys=privateKeys;
+    return this;
+  }
+  SSH withOpenSSHConfig(String file) {
+    this.openSSHConfig=file;
     return this;
   }
   SSH withIUserPass(IUserPass iUserPass) {
@@ -264,9 +268,9 @@ public class SSH {
       if (true)
         printHostKeys(jsch);
     } 
-    if (configFile!=null && !configFile.equals("")) {
+    if (openSSHConfig!=null && !openSSHConfig.equals("")) {
       jsch.setConfigRepository(
-        OpenSSHConfig.parseFile(configFile)
+        OpenSSHConfig.parseFile(openSSHConfig)
       );
     }
 
