@@ -29,6 +29,7 @@ import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.YesNoCancel;
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
 import org.tmotte.klonk.windows.popup.ssh.SSHOpenFrom;
+import org.tmotte.klonk.windows.popup.ssh.SSHOpenFromResult;
 
 /** 
  * THE critical path in the application. Most things DI-injected are an interface, if that helps. Mostly concerned with
@@ -275,10 +276,18 @@ public class CtrlMain  {
   }
 
   private File getSSHRecent(boolean forSave) {
-    String f=sshOpenFrom.show(forSave, recents.getRecentSSHConns());
+    SSHOpenFromResult f=sshOpenFrom.show(forSave, recents.getRecentSSHConns());
     if (f==null)
       return null;
-    return fileResolver.get(f);
+    if (f.sudo) {
+      if (
+          !yesNo.show("Open with sudo? "+f.sshFilename).isYes()
+        ){
+        statusBar.showBad("File "+(forSave ?"save" :"open")+" cancelled");
+        return null;
+      }
+    }
+    return fileResolver.get(f.sshFilename);
   }
   
   public void doFileExit() {

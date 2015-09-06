@@ -41,7 +41,7 @@ public class SSHOpenFrom {
   
   private boolean shownBefore=false;
   private boolean initialized=false;
-  private String result=null;
+  private SSHOpenFromResult result=null;
   private boolean failed=false;
 
   public SSHOpenFrom(JFrame parentFrame) {
@@ -53,9 +53,16 @@ public class SSHOpenFrom {
     win.toFront();
   }
 
-  public String show(boolean forSave, List<UserServer> recent) {
+  public SSHOpenFromResult show(boolean forSave, List<UserServer> recent) {
     init();
-    win.setTitle(forSave ?"Save to SHH" :"Open from SSH");    
+    
+    //Dynamic title:
+    win.setTitle(forSave ?"Save to SHH" :"Open from SSH");
+    
+    //Sudo always off:
+    jcbSudo.setSelected(false);
+    
+    //Dynamic previous:
     jcbPreviousData.removeAllElements();
     if (recent.size()==0)
       jcbPreviousData.addElement("");
@@ -98,7 +105,7 @@ public class SSHOpenFrom {
           file=":~/"+file;
         else
           file=":"+file;
-        result="ssh:"+userHost+file;
+        result=new SSHOpenFromResult("ssh:"+userHost+file, jcbSudo.isSelected());
       }
       else {
         failed=true;
@@ -134,7 +141,7 @@ public class SSHOpenFrom {
     jcbPrevious.setEditable(true);
     jcbPrevious.setMaximumRowCount(KPersist.maxRecent);
     
-    jcbSudo=new JCheckBox("sudo");
+    jcbSudo=new JCheckBox("");
 
     jtfFile=new JTextField();
 
@@ -177,6 +184,7 @@ public class SSHOpenFrom {
     gb.add(new JLabel(""));
     gb.addX(new JLabel("User@Host"));
     gb.addX(new JLabel("File"));
+    gb.addX(new JLabel("Sudo"));
     
     gb.insets.top=2;
     gb.insets.left=5;
@@ -192,6 +200,9 @@ public class SSHOpenFrom {
     gb.weightXY(0.7, 0);
     jtfFile.setColumns(50);
     gb.addX(jtfFile);
+
+    gb.weightXY(0, 0);
+    gb.addX(jcbSudo);
     
     return jp;
   }
