@@ -5,7 +5,7 @@
     <style type="text/css">
       body {
         font-size:12px;
-        font-family:Helvetica,Arial,Geneva;
+        font-family:"Arial Unicode MS",Helvetica,Geneva;
         font-color:black;
       }
       h2  { margin:6px 10px 2px 10px; }
@@ -16,42 +16,30 @@
   </head>
   <body>
 
-<h2>Introduction</h2>
+<h2>Contents</h2>
+<ul>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#switch">The Switch Menu, AKA Where Are My Tabs?</a></li>
+  <li><a href="#find">Find & Replace</a></li>
+  <li><a href="#undo">Undo</a></li>
+  <li><a href="#align">The "Align" Menu</a></li>
+  <li><a href="#filetypes">Supported File Types</a></li>
+  <li><a href="#batch">External → Run Batch Program</a></li>
+  <li><a href="#config">Command-Line Parameters, Configuration, Logging & Your Home Directory</a></li>
+  <li><a href="#status">The Status Bar</a></li>
+  <li><a href="#ssh">SSH</a></li>
+  <li><a href="#shutdown">Shutting Down Klonk</a></li>
+  <li><a href="#keys">Other Shortcut Keys</a></li>
+</ul>
+
+<h2><a name="intro">Introduction</a></h2>
 
 <p>
 This describes hidden shortcuts and confusing features that you might not expect or understand.
 </p>
 
 
-<h2> Editor Shortcut Keys </h2>
-
-<h3> Tab & Shift-Tab</h3>
-<p>
-As is common in text editors, these keystrokes indent and un-indent by default. Go to "Options" → "Tabs & indents" in the top menu to customize/disable their behavior.
-</p>
-
-<h3> Shift-Right-arrow, Shift-Left-arrow: </h3>
-
-<p>
-As is also common in text editors, these keys expand or contract the current selection by one character to the left or right depending on where the cursor is. 
-</p>
-
-<p>
-Adding in the Ctrl button accelerates the action, jumping over multiple characters at a time. Ctrl-Left/Right-arrow alone jumps over characters without selecting them.
-</p>
-
-<p>
-As a bonus, if you start with any one of the following characters: 
-</p>
-
-  <pre>   ([{"</pre>
-
-<p>
-then Shift-Ctrl-Right/Left-arrow will try to find a matching character to close it, so that the number of opening/closing characters in between matches. This only works if all characters are on the same line, however. 
-</p>
-
-
-<h2> The Switch Menu, AKA Where Are My Tabs? </h2>
+<h2><a name="switch"> The Switch Menu, AKA Where Are My Tabs? </a></h2>
 
 <p>
 Klonk does not use tabs, in part because they tend to become unreadable when editing a lot of files. It can still open many files at once, however. The Switch menu allows one to switch between different files. 
@@ -66,7 +54,7 @@ Also, as per the menu, F11 will send the current file to the "back", and Shift-F
 </p>
 
 
-<h2> Find & Replace </h2>
+<h2><a name="find"> Find & Replace </a></h2>
 
 <h3> F3</h3>
 <p>
@@ -87,7 +75,7 @@ The "Regular expression" checkbox tells Klonk to use the standard Java regex syn
 </p>
 
 <p>
-Note that the java flags Pattern.MULTILINE & Pattern.DOTALL are always turned on, because this gives the most intuitive results. 
+The java flags Pattern.MULTILINE & Pattern.DOTALL are turned on by default, because this gives the most intuitive results. Among other things, this means the "^" and "$" special characters don't work, but you can still use "\n" to match the end of a line. Use the "Multi-line + Dot-All" checkbox to turn these off (you can selectively re-enable them using "(?m)" and/or "(?s)" in your regex as per the official documentation).
 </p>
 
 <p>
@@ -125,7 +113,7 @@ Also, the auto-indent and tab-indents-line features found in the main editor do 
 </p>
 
 
-<h2> Undo </h2>
+<h2><a name="undo"> Undo </a></h2>
 
 <p>
 The "Undo" menu describes a variety of undo options, but the most important operations, undo and redo, are in the text editor's right-click/context menu; their shortcuts are Ctrl-Z and Shift-Ctrl-Z (as is common elsewhere). 
@@ -161,7 +149,7 @@ As noted earlier, the designated Redo shortcut is Shift-Ctrl-Z, but Ctrl-Y will 
 </p>
 
 
-<h2> The "Align" Menu </h2>
+<h2><a name="align"> The "Align" Menu </a></h2>
 
 <p>
 The "Align" menu is not very intuitive-looking, but its purpose is to allow one to quickly insert or delete spaces in the middle of a line to align to a nearby line. For example, you can change
@@ -190,7 +178,7 @@ When doing this, Klonk's algorithm looks for a position to align to based on whe
 </p>
 
 
-<h2> Supported File Types </h2>
+<h2><a name="filetypes"> Supported File Types </a></h2>
 
 <p>
 Officially, Klonk supports the following types of text file encoding:
@@ -201,11 +189,11 @@ Officially, Klonk supports the following types of text file encoding:
   UTF-16 Little-Endian</pre>
 
 <p>
-This means Klonk should be able to read any Microsoft-generated text file without trouble. It even accepts Microsoft's somewhat-non-standard version of UTF-8 (it will also preserve Microsoft's non-standard Byte Order Mark when saving if it found such when opening a UTF-8 file).
+This means Klonk should be able to read any Microsoft-generated text file without trouble. It even accepts Microsoft's somewhat-non-standard version of UTF-8 (and preserve Microsoft's non-standard Byte Order Mark when saving if it found such when opening a UTF-8 file).
 </p>
 
 <p>
-This also means that Klonk does a reasonably good job with files containing Unicode characters, for example the famous Unicode Snowman:
+This also means that Klonk does a reasonably good job with files containing Unicode characters, for example the famous Unicode Snowman, which may or may not work here:
 </p>
 <pre>  ☃</pre>
 
@@ -214,7 +202,7 @@ Such characters only display properly if you have selected a font that can handl
 </p>
 
 
-<h2> External → Run Batch Program </h2>
+<h2><a name="batch">External → Run Batch Program</a></h2>
 
 <p>
 This allows you to run a program and pipe the standard output/error back into Klonk. It is pretty good as a poor person's substitute for an IDE compiler (whatever that means). Warning: For some programs the "Stop" button is not very good at killing the program. The "Stop" button may not work, in which case you may have to end the program using the operating system's features (like Unix/Linux/OSx's "kill -9", etc.).
@@ -241,7 +229,7 @@ or
 </p>
   <pre>  bash -c [$1]</pre>
 <p>
-to execute it.
+to execute it. 
 </p>
 
 <h3>ALT-D</h3>
@@ -250,26 +238,29 @@ Similar to a web browser's address bar, this keystroke transfers focus to the dr
 </p>
 
 
-<h2>Command-Line Parameters</h2>
+<h2><a name="config">Command-Line Parameters, Configuration, Logging & Your Home Directory</a></h2>
 
 <p>
 Klonk will open any file whose name is passed to it on the command line.
 </p>
 
 <p>
-Configuration data and so on is stored in the user's home directory, which is automatically detected. You can specify an alternate home directory using 
+Configuration data and so on is stored in a directory named "klonk" in your home directory, which is automatically detected. You can specify an alternate home directory using 
 </p>
   <pre>  -home [directory name]</pre>
 <p>
-as a command-line option. Currently your home directory is set to:
+as a command-line option. Right now Klonk's home directory is set to:
 </p>
   <pre>  $[Home]</pre>
 <p>
 Note that a file named Klonk.properties is stored in this directory. You can modify your settings directly (albeit carefully) or remove them entirely to reset to the application defaults.
 </p>
+<p>
+Also, Klonk will write a log to this directory, as "log.txt". This can be helpful when diagnosing problems.
+</p>
 
 
-<h2>The Status Bar</h2>
+<h2><a name="status">The Status Bar</a></h2>
 
 <p>
 Popup windows are annoying. The status bar at the bottom of Klonk's main window is often used to pass along information that does not require a decision from the user. So if you're expecting some kind of notification and don't get one, look at the status bar.
@@ -280,10 +271,10 @@ Note that the status bar also has a red "CAPS LOCK" indicator. Thanks to a bug i
 </p>
 
 
-<h2> SSH </h2>
+<h2><a name="ssh"> SSH </a></h2>
 
 <p>
-Klonk includes the ability to connect to servers over SSH and use SFTP/SSH to read and write files. This is convenient when working with Unix/Linux servers that don't support better file sharing options.
+Klonk includes the ability to connect to servers over SSH and use SFTP/SSH to read and write files. This is convenient when working with Unix/Linux servers that don't support better file sharing options. 
 </p>
 
 <p>
@@ -312,6 +303,8 @@ Since typing passwords is a hassle, it's a good idea to set up private/public ke
 <li>
 You can select an OpenSSH Config file, which provides a few conveniences. The most important thing is that you can configure shortcut hostnames like so:
 <pre>
+# Refer to linux man page on ssh_config; note that a limited subset of features are supported, unfortunately
+# not including ProxyCommand :(
 Host derp
      HostName derpity.derpity.derp.derp.derp.org
 </pre>
@@ -335,14 +328,15 @@ You can disconnect open connections, which are otherwise left open until you exi
 <p><b>But wait there's more:</b> Once you've fixed the problem with very large ssh keys, you may have more problems with your known_hosts file (as per #1), especially with Debian Linux servers. Klonk will complain about an "RSA fingerprint" not matching what you have, and when you look in your known_hosts, you see "ecdsa-sha2-nistp256" instead of "ssh-rsa". The way to fix this is by creating an OpenSSH config file that sets the "priority" for known_hosts signatures as follows:
 </p>
 <pre>
-# Refer to linux man page on ssh_config 
 Host *
   HostKeyAlgorithms ecdsa-sha2-nistp256,ssh-rsa,ssh-dss
 </pre>
 <p>This can be done using the OpenSSH Config File option as described in #3 above.
 </p>
 
-<h2>Shutting Down Klonk</h2>
+<p>Finally, note that Klonk uses the JCraft JSCH SSH library to gain SSH connectivity, so when diagnosing problems with SSH you may find it helpful to look for similar issues others have had with that library. </p>
+
+<h2><a name="shutdown">Shutting Down Klonk</a></h2>
 
 <p>
 When you you exit Klonk it will stop and ask you to save any files that have unsaved changes. You will also notice that Klonk shows a small red bar at the upper left if the current file has unsaved changes, and/or an adjoining blue bar if this or another file has unsaved changes.
@@ -356,8 +350,33 @@ However, many folks are used to hitting the power-off/restart button on their wo
 Also, when the OS kills it, Klonk won't get a chance to save its configuration first. Most configuration options are saved as soon as you change them, but a few things that change rapidly are not (mainly window position & size). This won't cause data corruption/loss/etc., but doing a clean exit guarantees the app returns to the exact same configuration after restart.
 </p>
 
+<h2><a name="keys"> Other Shortcut Keys </a></h2>
 
-<h2> Things That Might Be Obvious, But For the Sake of Completeness... </h2>
+<h3> Tab & Shift-Tab</h3>
+<p>
+As is common in text editors, these keystrokes indent and un-indent by default. Go to "Options" → "Tabs & indents" in the top menu to customize/disable their behavior.
+</p>
+
+<h3> Shift-Right-arrow, Shift-Left-arrow: </h3>
+
+<p>
+As is also common in text editors, these keys expand or contract the current selection by one character to the left or right depending on where the cursor is. 
+</p>
+
+<p>
+Adding in the Ctrl button accelerates the action, jumping over multiple characters at a time. Ctrl-Left/Right-arrow alone jumps over characters without selecting them.
+</p>
+
+<p>
+As a bonus, if you start with any one of the following characters: 
+</p>
+
+  <pre>   ([{"</pre>
+
+<p>
+then Shift-Ctrl-Right/Left-arrow will try to find a matching character to close it, so that the number of opening/closing characters in between matches. This only works if all characters are on the same line, however. 
+</p>
+
 
 <h3> ESC</h3>
 <p>
