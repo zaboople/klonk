@@ -27,6 +27,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.JWindow;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.ScrollPaneConstants;
 import org.tmotte.common.io.Loader;
 import org.tmotte.common.swang.GridBug;
@@ -93,6 +95,17 @@ public class Help {
     jtp.setBorder(null);       
     jtp.setOpaque(false);
     jtp.setContentType("text/html");
+
+    jtp.addHyperlinkListener(new HyperlinkListener() {
+      @Override public void hyperlinkUpdate(final HyperlinkEvent evt) {
+        if (HyperlinkEvent.EventType.ACTIVATED == evt.getEventType()){
+          String desc = evt.getDescription();
+          if (desc == null || !desc.startsWith("#")) return;
+          desc = desc.substring(1);
+          jtp.scrollToReference(desc);
+        }
+      }
+    });    
     
     String helpText=Loader.loadUTF8String(getClass(), "Help.txt");
     helpText=helpText.replace("$[Home]", homeDir);
