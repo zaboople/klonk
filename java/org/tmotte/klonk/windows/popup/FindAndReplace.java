@@ -48,40 +48,38 @@ public class FindAndReplace {
 
   //Display components:
   JDialog win;
-  MyTextArea mtaFind, mtaReplace;
-  JComponent contFind, contReplace;
-  JCheckBox chkReplace, chkCase, chkReplaceAll, chkConfirmReplace, chkRegex, chkRegexMultiline;
-  JButton btnFind,
-          btnReverse,
-          btnCancel;
-  JLabel lblFind;
+  private MyTextArea mtaFind, mtaReplace;
+  private JComponent contFind, contReplace;
+  private JCheckBox chkReplace, chkCase, chkReplaceAll, chkConfirmReplace, chkRegex, chkRegexMultiline;
+  private JButton btnFind, btnReverse, btnCancel;
+  private JLabel lblFind;
   
   //Fonts:
-  Font fontBold, fontNormal;
-  FontOptions fontOptions;
+  private Font fontBold, fontNormal;
+  private FontOptions fontOptions;
   private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
     public void set(FontOptions fo){setFont(fo);}
   };  
   
   //Other windows. Yes we technically violate our singleton sort-of-a-rule here, creating
   //extra instances of YesNoCancel
-  JFrame parentFrame;
-  YesNoCancel popupAskReplace, popupAskReplaceAll;
+  private JFrame parentFrame;
+  private YesNoCancel popupAskReplace, popupAskReplaceAll;
   
   //Internal state:
-  boolean everShown=false;
-  boolean skipReplace=false;
-  boolean initialized=false;
+  private boolean everShown=false;
+  private boolean skipReplace=false;
+  private boolean initialized=false;
   
   //This is so we can send updates back to the main window ourselves, as well
   //as to an alert popup:
-  Setter<String> alerter;
-  StatusUpdate statusBar;
+  private Setter<String> alerter;
+  private StatusUpdate statusBar;
   
   //Note that these are transient (so to speak) and require single-threaded
   //behavior from the class. 
-  MyTextArea target;
-  Finder finder=new Finder();
+  private MyTextArea target;
+  private Finder finder=new Finder();
 
   
 
@@ -181,7 +179,10 @@ public class FindAndReplace {
         boolean found=finder
           .setDocument(target.getDocument(), offset)
           .setReplace(replaceOn, mtaReplace.getText())
-          .find(searchFor, forwards, chkCase.isSelected(), chkRegex.isSelected());
+          .find(
+            searchFor, forwards, chkCase.isSelected(), 
+            chkRegex.isSelected(), chkRegexMultiline.isSelected()
+          );
         if (!found) {
           if (!foundOnce) statusBar.showBad("Not found");
           return;
@@ -216,140 +217,7 @@ public class FindAndReplace {
     }
   }
   
-  private static class Finder {
-    //Results:
-    private int location=-1, locationEnd=-1;
-    private String replaceResult;
-    private String lastError;
-    //Inputs held as instance variables for convenience:
-    private Document doc;
-    private int offset;
-    private boolean replaceOn;
-    private String replaceWith;
-    //Pattern & matcher preserved for multiple invocations:
-    private Pattern pattern;
-    private Matcher matcher;
-    private boolean multiline;
-
-    public int getEnd(){return locationEnd;}
-    public int getStart() {return location;}
-    
-    public void reset() {
-      pattern=null;
-      matcher=null;
-    }
-    public Finder setDocument(Document doc, int offset) {
-      this.doc=doc;
-      this.offset=offset;
-      return this;
-    }
-    public Finder setReplace(boolean replaceOn, String replaceWith) {
-      this.replaceOn=replaceOn;
-      this.replaceWith=replaceWith;
-      return this;
-    }
-    
-    public boolean find(
-        String searchFor, 
-        boolean forwards, 
-        boolean caseSensitive, 
-        boolean regex
-      ) {
-      replaceResult=null;
-      location=-1;
-      locationEnd=-1;
-
-      String searchIn;
-      try {
-        searchIn=forwards
-          ?doc.getText(offset, doc.getLength()-offset)
-          :doc.getText(0, offset);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-      if (regex)
-        findRegex(  searchFor, searchIn, forwards, caseSensitive);
-      else
-        findRegular(searchFor, searchIn, forwards, caseSensitive);
-      return location!=-1;
-    }
-    private void findRegular(String searchFor, String searchIn, boolean forwards, boolean caseSensitive) {
-      if (caseSensitive) 
-        location=forwards 
-          ?searchIn.indexOf(searchFor)
-          :searchIn.lastIndexOf(searchFor);
-      else {
-        //We search both low & up case because apparently
-        //there are character sets where this is the only thing
-        //that works. Turkish or something. Whatever.
-        searchFor=searchFor.toLowerCase();
-        String searchInLow=searchIn.toLowerCase();
-        location=forwards ?searchInLow.indexOf(searchFor)
-                          :searchInLow.lastIndexOf(searchFor);
-        searchFor=searchFor.toUpperCase();
-        String searchInHi=searchIn.toUpperCase();
-        int loc =forwards ?searchInHi.indexOf(searchFor)
-                          :searchInHi.lastIndexOf(searchFor);
-        if (location==-1 || (loc!=-1 && loc<location))
-          location=loc;
-      }
-      locationEnd=location==-1 ?-1 :location+searchFor.length();
-      replaceResult=replaceWith;
-    }
-    private void findRegex(String searchFor, String searchIn, boolean forwards, boolean caseSensitive) {
-      if (pattern==null){
-        int flags=multiline 
-          ?Pattern.MULTILINE|Pattern.DOTALL
-          :0;
-        if (!caseSensitive)
-          flags|=Pattern.CASE_INSENSITIVE;
-        try {
-          pattern=Pattern.compile(searchFor, flags);
-        } catch (PatternSyntaxException e) {
-          lastError="Regex syntax is wrong: "+e.getMessage();
-          return;            
-        }
-        matcher=pattern.matcher(searchIn);
-      }
-      else
-        matcher.reset(searchIn);
-      if (matcher.find()){
-      
-        //This is kooky but we have to go all the way
-        //from start to end to get last match with regex.
-        do {
-          location=matcher.start();
-          locationEnd=matcher.end();
-        } while (!forwards && matcher.find());
-        
-        if (replaceOn) {
-          
-          //Follow thru on the kooky part above:
-          if (!forwards)
-            matcher.find(location);
-            
-          //Getting the replacement is dumb. We have no choice but to let it give
-          //us all the crap we don't need so we can grab the good part at the end.
-          StringBuffer sb=new StringBuffer();
-          try {
-            matcher.appendReplacement(sb, replaceWith);
-          } catch (IllegalArgumentException e) {
-            lastError="Replacement syntax is wrong (typically caused by $ characters):\n"
-                      +e.getMessage();
-            return;
-          } catch (IndexOutOfBoundsException e) {
-            lastError="Replacement syntax is wrong (typically caused by $ characters):\n"
-                      +e.getMessage();
-            return;
-          }
-          replaceResult=sb.substring(location);
-        }
-      }
-    }
-    
-  }//end inner class
-  
-  
+ 
   private boolean confirmReplace(int startPos, int endPos) throws Exception {
     YesNoCancel asker=getAskReplaceWindow();
     Point caretPoint=target.getVisualCaretPosition();
@@ -421,6 +289,8 @@ public class FindAndReplace {
     chkConfirmReplace.setSelected(true);
     chkRegex=new JCheckBox("Regular expression");
     chkRegex.setSelected(false);
+    chkRegexMultiline=new JCheckBox("Multi-line + Dot-all");
+    chkRegexMultiline.setSelected(true);
     
 
     //Bottom buttons:
@@ -547,6 +417,10 @@ public class FindAndReplace {
     gb.add(chkCase);
     gb.insets.top=-3;
     gb.addY(chkRegex);
+    gb.insets.left+=12;
+    gb.addY(chkRegexMultiline);
+    chkRegexMultiline.setVisible(false);
+    gb.insets.left-=12;
     gb.addY(chkConfirmReplace);
     gb.addY(chkReplaceAll);
     return gb.container;
@@ -595,15 +469,11 @@ public class FindAndReplace {
   /////////////
   
   private void listen() {
-    chkReplace.addActionListener(chkReplaceListener);
-    chkReplaceAll.addActionListener(chkReplaceAllListener);
-    chkCase.addActionListener(chkBoldListener);
-    chkReplaceAll.addActionListener(chkBoldListener);
-    chkRegex.addActionListener(chkBoldListener);
-    doButtonEvents(btnFind,    buttonListener, KeyMapper.key(KeyEvent.VK_F3));
-    doButtonEvents(btnFind,    buttonListener, KeyMapper.key(KeyEvent.VK_ENTER));
-    doButtonEvents(btnReverse, buttonListener, KeyMapper.key(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK));
-    doButtonEvents(btnCancel,  buttonListener, KeyMapper.key(KeyEvent.VK_ESCAPE));
+    addCheckBoxListeners(chkReplace, chkReplaceAll, chkCase, chkRegex, chkRegexMultiline);
+    doButtonEvents(btnFind,     buttonListener, KeyMapper.key(KeyEvent.VK_F3));
+    doButtonEvents(btnFind,     buttonListener, KeyMapper.key(KeyEvent.VK_ENTER));
+    doButtonEvents(btnReverse,  buttonListener, KeyMapper.key(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK));
+    doButtonEvents(btnCancel,   buttonListener, KeyMapper.key(KeyEvent.VK_ESCAPE));
     KeyMapper.accel(btnCancel,  buttonListener, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
     
     mtaFind.addFocusListener(new FocusAdapter(){
@@ -624,35 +494,33 @@ public class FindAndReplace {
     KeyMapper.accel(butt, action, key);
   }
 
-  /** FIXME */
-  private ActionListener chkBoldListener=new ActionListener() {
-    public void actionPerformed(ActionEvent event) {
-      JCheckBox jcb=(JCheckBox)event.getSource();
-      boolean boldChecked=
-        jcb==chkCase || jcb==chkReplaceAll || jcb==chkRegex;
-      if (boldChecked) {
-        if (jcb.isSelected())
-          jcb.setFont(fontBold);
-        else
-          jcb.setFont(fontNormal);
+  private void addCheckBoxListeners(JCheckBox... chks) {
+    ActionListener chkListener=new ActionListener() {
+      public void actionPerformed(ActionEvent event) {
+        JCheckBox jcb=(JCheckBox)event.getSource();
+        if (jcb==chkCase || jcb==chkReplaceAll || jcb==chkRegex) {
+          if (jcb.isSelected())
+            jcb.setFont(fontBold);
+          else
+            jcb.setFont(fontNormal);
+        }
+        if (jcb==chkRegex) {
+          chkRegexMultiline.setVisible(chkRegex.isSelected());
+        }
+        if (jcb==chkReplace) {
+          enableReplace();
+          if (chkReplace.isSelected())
+            mtaReplace.requestFocusInWindow();
+        }
+        if (jcb==chkReplaceAll) {
+          enableReplace();
+        }
       }
-    }
-  };
+    };
+    for (JCheckBox jcb: chks) 
+      jcb.addActionListener(chkListener);
+  }
   
-  /** When replace is checked, enable disable stuff: */
-  private ActionListener chkReplaceListener=new ActionListener() {
-    public void actionPerformed(ActionEvent event) {
-      enableReplace();
-      if (chkReplace.isSelected())
-        mtaReplace.requestFocusInWindow();
-    }
-  };
-  /** When Replace All is checked: */
-  private ActionListener chkReplaceAllListener=new ActionListener() {
-    public void actionPerformed(ActionEvent event) {
-      enableReplace();
-    }
-  };
   /** Button clicks: */
   private Action buttonListener=new AbstractAction() {
     public void actionPerformed(ActionEvent event) {
