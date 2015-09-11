@@ -265,7 +265,7 @@ public class SSH {
     //Set known hosts:
     if (knownHosts!=null && !knownHosts.equals("")) {
       jsch.setKnownHosts(knownHosts);
-      if (true)
+      if (false)
         printHostKeys(jsch);
     } 
     if (openSSHConfig!=null && !openSSHConfig.equals("")) {
