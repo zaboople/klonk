@@ -175,7 +175,6 @@
   
   <target name="_dist.bin" depends="config.prod,jar,exe">
     <mkdir dir ="${dist.dir}/bin"/>
-    <mkdir dir ="${dist.dir}/bin"/>
     <copy file="${lib.dir}/Klonk.bat"    todir="${dist.dir}/bin"/>
     <copy file="dist/klonk.jar"   tofile="${dist.dir}/bin/${appname.version}.jar"/>
     <zip destfile="${dist.dir}/${appname.version}.zip">
