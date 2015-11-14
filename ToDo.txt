@@ -1,39 +1,43 @@
+-OSX
+  -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
+  -Auto-trim on save for the sake of code nazis
+
 -Current
   -SSH Sudo
 
   -Help should should show the name of your current log file.
 
   -Alt-f-d doesn't work with ssh and needs to be disabled.
-  
+
   -Ctrl - and Ctrl + should resize font
- 
+
   -Hey and a menu item for File-Delete? With confirm of course. Hmph.
 
   -Load file & Find/replace are abusive. Fix them.
     -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
-  
+
 
   -Tabs & Indents allows invalid input - letters instead of numbers
- 
+
   -When I switch windows the cursor position frequently goes somewhere else
 
   -Ctrl-W ought to just close the editor if no files are open. It makes no difference.
-   
 
--Maybe  
+
+-Maybe
   -SSH Todo:
     Single quotes in the filename are a bit of a problem, and double quotes, and whatever else.
-    When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore    
+    When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore
     What about when a host key changes or is missing? Will we blow up?
 
-  -File open ought to start off the session with the last directory opened. 
+  -File open ought to start off the session with the last directory opened.
    It's annoying when it defaults to my stupid home directory. Well ...ssh. Ugh.
-   
-  -Favorite commands. 
-  
+
+  -Favorite commands.
+
 
   -Maybe a more sophisticated version of find/replace, where I break up the String? It is pretty slow on an 8MB file.
-    -Loop thru 20000 characters at a time, appending last searchFor.length() from previous to first. 
+    -Loop thru 20000 characters at a time, appending last searchFor.length() from previous to first.
     -Note that java.util.regex.Matcher does have the ability to tell you that the end of a string is a partial match.
   -How about dual-window mode. Only two windows, that's it.
   -About should show an icon
@@ -46,11 +50,11 @@
 
 -Long term problems
   -Weird background bugs
-    -Do you see that doo doo where java says it's starting up with mixed mode "sharing"? 
+    -Do you see that doo doo where java says it's starting up with mixed mode "sharing"?
     -Mostly when it runs two at once.
     -Exe alternatives?
       -Consider jexepack, which costs $100 or you get an alert everytime you open it.
-  
+
   -Slow scrolling:
     -Too many key listeners?
     -Noticed that it seems to slow down with a lot of windows open. Hmph. Don't tell me I have to resort to... oh gawd no. Not recreating jtextareas when I switch windows. Horrors.
@@ -88,4 +92,4 @@
           at java.awt.event.InvocationEvent.dispatch(Unknown Source)
           at java.awt.EventQueue.dispatchEventImpl(Unknown Source)
           at java.awt.EventQueue.access$200(Unknown Source)
-          at java.awt.EventQueue$3.run(Unknown Source)        
+          at java.awt.EventQueue$3.run(Unknown Source)

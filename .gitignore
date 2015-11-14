@@ -5,4 +5,4 @@ test/home/seize
 test/autoopen
 build
 dist
-
+.DS_Store

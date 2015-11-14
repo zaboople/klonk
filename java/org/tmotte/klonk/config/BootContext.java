@@ -49,8 +49,8 @@ import org.tmotte.klonk.windows.popup.ssh.SSHLogin;
 import org.tmotte.klonk.windows.popup.ssh.SSHOpenFrom;
 import org.tmotte.klonk.windows.popup.ssh.SSHOptionPicker;
 
-/** 
- * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) architecture. 
+/**
+ * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) architecture.
  * There are two layers, an initial layer and a user interface layer. There is also some public-static stuff
  * here for convenience.
  */
@@ -66,20 +66,22 @@ public class BootContext {
     //we're DOA, no point in logging:
     final BootContext context=new BootContext(args);
     if (!context.getHome().ready)
-      return;  
-      
+      return;
+
     //Turn off direct 3d on windows, seems to cause exceptions rendering our yes/no/cancel window
     System.setProperty("sun.java2d.d3d", "false");
-      
+    //Turn on macintosh menubar
+    System.setProperty("apple.laf.useScreenMenuBar", "true");
+
     //Find out if the application is already running:
     if (!context.getFileListener().lockOrSignal(args)) {
       context.getLog().log("Klonk is handing off to another process.");
       System.exit(0);
       return;
     }
-    
+
     //After the GUI starts up, all errors go here:
-    Thread.setDefaultUncaughtExceptionHandler( 
+    Thread.setDefaultUncaughtExceptionHandler(
       new Thread.UncaughtExceptionHandler() {
         public void uncaughtException(Thread t, Throwable e){
           //SSHFileDialogNoFileException is thrown by our nasty
@@ -89,7 +91,7 @@ public class BootContext {
         }
       }
     );
-    
+
     //Starting the GUI up:
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
@@ -110,9 +112,9 @@ public class BootContext {
   private FileListen fileListen;
   private KLog klog;
   private UserNotify userNotify;
- 
+
   /**
-   * This gives us the 1st layer of the application, enough to 
+   * This gives us the 1st layer of the application, enough to
    * get thru a minimal boot and die informatively when things go wrong:
    */
   private BootContext(String [] args){
@@ -140,13 +142,13 @@ public class BootContext {
       ?new KLog(System.out)
       :new KLog(home, processID);
     userNotify=new UserNotify(klog);
-    fileListen=new FileListen(klog, processID, home);    
-  } 
+    fileListen=new FileListen(klog, processID, home);
+  }
   private KHome getHome() { return home; }
   private UserNotify getLog()   { return userNotify;  }
   private FileListen getFileListener() { return fileListen; }
 
-  
+
   //////////////////////////
   // USER INTERFACE BOOT: //
   //////////////////////////
@@ -157,7 +159,7 @@ public class BootContext {
   private CtrlMain createMainController() {
 
     initLookFeel();
-  
+
     // Basic logging & persistence:
     Setter<Throwable> failHandler=userNotify.getExceptionHandler();
     KPersist persist=new KPersist(home, failHandler);
@@ -178,7 +180,7 @@ public class BootContext {
         new java.awt.Rectangle(10, 10, 300, 300)
       ),
       persist.getWindowMaximized()
-    );    
+    );
     StatusUpdate statusBar=layout.getStatusBar();
 
 
@@ -187,7 +189,7 @@ public class BootContext {
     // Our general purpose hello-ok, yes-no-cancel and yes-no popups;
     // Also backfills alerter into our general-purpose notifier:
     final KAlert alerter=new KAlert(mainFrame);
-    YesNoCancel 
+    YesNoCancel
       yesNoCancel=new YesNoCancel(mainFrame, true),
       yesNo      =new YesNoCancel(mainFrame, false);
     userNotify.setUI(alerter, false);
@@ -196,7 +198,7 @@ public class BootContext {
     IUserPass iUserPass=new SSHLogin(mainFrame, alerter);
 
     // File dialog + SSH:
-    // This gets a special user notifier that schedules thread-safe alerts 
+    // This gets a special user notifier that schedules thread-safe alerts
     // because most of the work is done without the Swing event dispatch thread:
     UserNotify sshUN=new UserNotify(klog).setUI(alerter, true);
     SSHOptions sshOpts=persist.getSSHOptions();
@@ -204,11 +206,11 @@ public class BootContext {
       .withLogin(iUserPass)
       .withOptions(sshOpts);
     FileDialogWrapper fileDialogWrapper=new FileDialogWrapper(
-      mainFrame, 
-      new SSHFileSystemView(sshConns, sshUN), 
+      mainFrame,
+      new SSHFileSystemView(sshConns, sshUN),
       new SSHFileView()
     );
-  
+
     //Search popups:
     FindAndReplace findAndReplace=
       new FindAndReplace(mainFrame, alerter, statusBar, editorFont);
@@ -216,7 +218,7 @@ public class BootContext {
 
     //Shell:
     Shell shell=new Shell(
-      mainFrame, failHandler, persist, fileDialogWrapper, 
+      mainFrame, failHandler, persist, fileDialogWrapper,
       getPopupIcon(this), ctrlMain.getCurrFileNameGetter()
     );
 
@@ -226,15 +228,15 @@ public class BootContext {
     FontPicker fontPicker=new FontPicker(mainFrame, alerter);
     SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, fileDialogWrapper);
     LineDelimiters kDelims=new LineDelimiters(mainFrame);
-    
+
     //Help:
     Help help=new Help(mainFrame, home.getUserHome(), editorFont);
     About about=new About(mainFrame);
-    
+
 
     // MENUS: //
-    
-    Menus menus=new Menus(editors);  
+
+    Menus menus=new Menus(editors);
     menus.setFastUndos(persist.getFastUndos())
           .setWordWrap(persist.getWordWrap());
     {
@@ -243,7 +245,7 @@ public class BootContext {
       fontListeners.add(shell.getFontListener());
       fontListeners.add(favorites.getFontListener());
       fontListeners.add(findAndReplace.getFontListener());
-  
+
       CtrlFavorites ctrlFavorites=new CtrlFavorites(
         persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
       );
@@ -256,27 +258,27 @@ public class BootContext {
         ,new CtrlFileOther(editors, statusBar, ctrlFavorites)
         ,new CtrlOther    (shell, help, about)
         ,new CtrlOptions  (
-          editors, statusBar, persist, ctrlFavorites, 
+          editors, statusBar, persist, ctrlFavorites,
           ctrlMain.getLineDelimiterListener(), fontListeners, sshConns,
           sshOptionPicker, tabsAndIndents, favorites, fontPicker, kDelims
         )
       );
     }
-    mainFrame.setJMenuBar(menus.getMenuBar());    
-        
+    mainFrame.setJMenuBar(menus.getMenuBar());
+
     // PUSH THINGS BACK TO MAIN CONTROLLER: //
     // AND RETURN:                          //
 
     ctrlMain.setLayoutAndPopups(
-      layout.getMainDisplay(), 
+      layout.getMainDisplay(),
       statusBar,
-      fileDialogWrapper, 
+      fileDialogWrapper,
       new SSHOpenFrom(mainFrame),
-      yesNoCancel, 
+      yesNoCancel,
       yesNo
     );
     ctrlMain.setListeners(
-      fileListen.getLockRemover(), 
+      fileListen.getLockRemover(),
       sshConns.getFileResolver(),
       menus.getEditorSwitchListener(),
       menus.getRecentFileListener(),
@@ -285,7 +287,7 @@ public class BootContext {
     return ctrlMain;
   }
 
-  
+
   ///////////////////////////////////////
   // STATIC UTILITIES:                 //
   // These are public because they are //
@@ -298,7 +300,7 @@ public class BootContext {
     return ii.getImage();
   }
   public static Image getPopupIcon(Object o) {
-    return getIcon(o, "org/tmotte/klonk/windows/app-find-replace.png");  
+    return getIcon(o, "org/tmotte/klonk/windows/app-find-replace.png");
   }
   public static Image getAppIcon(Object o) {
     return getIcon(o, "org/tmotte/klonk/windows/app.png");
@@ -306,7 +308,7 @@ public class BootContext {
 
   public static void initLookFeel() {
     try {
-      javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());    
+      javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

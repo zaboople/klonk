@@ -39,26 +39,28 @@ public class Menus {
   private Editors editors;
   private Map<JMenuItem,Editor> switchMenuToEditor=new Hashtable<>();
   private MenuUtils mu=new MenuUtils();
-  
+  private boolean isMSWindows=false;
+  private boolean isOSX=false;
+
   //Controllers:
   private CtrlMain ctrlMain;
   private CtrlMarks ctrlMarks;
   private CtrlSelection ctrlSelection;
   private CtrlUndo ctrlUndo;
-  private CtrlSearch ctrlSearch;  
-  private CtrlOptions ctrlOptions;  
-  private CtrlFileOther ctrlFileOther;    
-  private CtrlOther ctrlOther;      
+  private CtrlSearch ctrlSearch;
+  private CtrlOptions ctrlOptions;
+  private CtrlFileOther ctrlFileOther;
+  private CtrlOther ctrlOther;
 
   //Visual component instances:
   private JMenuBar bar=new JMenuBar();
-  private JMenu file, fileReopen, fileOpenFromRecentDir, fileSaveToRecentDir, 
+  private JMenu file, fileReopen, fileOpenFromRecentDir, fileSaveToRecentDir,
                 fileFave, fileOpenFromFave, fileSaveToFave,
                 search, mark, switcher, undo, select, align, external, options, help;
-  private JMenuItem fileOpen, fileSave, fileNew, fileSaveAs, fileClose, 
+  private JMenuItem fileOpen, fileSave, fileNew, fileSaveAs, fileClose,
                     fileCloseOthers, fileCloseAll,
                     filePrint,
-                    fileDocDirWindows, fileClipboardDoc, fileClipboardDocDir, 
+                    fileDocDirWindows, fileClipboardDoc, fileClipboardDocDir,
                     fileOpenFromDocDir, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
                     fileFaveAddFile, fileFaveAddDir,
                     fileExit,
@@ -67,7 +69,7 @@ public class Menus {
                     markSet, markGoToPrevious, markGoToNext, markClearCurrent, markClearAll,
                     undoUndo, undoRedo,
                     undoToBeginning, undoRedoToEnd, undoClearUndos, undoClearRedos, undoClearBoth,
-                    selectUpperCase, selectLowerCase, selectSortLines, selectGetSelectionSize,  selectGetAsciiValues, 
+                    selectUpperCase, selectLowerCase, selectSortLines, selectGetSelectionSize,  selectGetAsciiValues,
                     weirdInsertToAlign, weirdInsertToAlignBelow, weirdBackspaceToAlign, weirdBackspaceToAlignBelow,
                     externalRunBatch,
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
@@ -85,16 +87,19 @@ public class Menus {
   /////////////////////
   // INITIALIZATION: //
   /////////////////////
-  
+
   public Menus(Editors editors) {
     this.editors=editors;
+    String os=System.getProperty("os.name").toLowerCase();
+    isMSWindows=os!=null && os.indexOf("windows")>-1;
+    isOSX=os.indexOf("mac os")>-1;
     create();
   }
   public void setControllers(
        CtrlMain ctrlMain
       ,CtrlMarks ctrlMarks
       ,CtrlSelection ctrlSelection
-      ,CtrlUndo ctrlUndo  
+      ,CtrlUndo ctrlUndo
       ,CtrlSearch ctrlSearch
       ,CtrlFileOther ctrlFileOther
       ,CtrlOther ctrlOther
@@ -106,8 +111,8 @@ public class Menus {
     this.ctrlUndo=ctrlUndo;
     this.ctrlSearch=ctrlSearch;
     this.ctrlOptions=ctrlOptions;
-    this.ctrlFileOther=ctrlFileOther;    
-    this.ctrlOther=ctrlOther;    
+    this.ctrlFileOther=ctrlFileOther;
+    this.ctrlOther=ctrlOther;
   }
   public JMenuBar getMenuBar() {
     return bar;
@@ -115,29 +120,29 @@ public class Menus {
   public Doer getEditorSwitchListener() {
     return new Doer() {
       public void doIt() {editorChange();}
-    };  
+    };
   }
   public Setter<List<String>> getRecentFileListener() {
-    return new Setter<List<String>>(){ 
+    return new Setter<List<String>>(){
       public void set(List<String> files) {setRecentFiles(files);}
     };
   }
   public Setter<List<String>> getRecentDirListener() {
-    return new Setter<List<String>>(){ 
+    return new Setter<List<String>>(){
       public void set(List<String> dirs){setRecentDirs(dirs);}
     };
   }
   public Setter<List<String>> getFavoriteFileListener() {
-    return new Setter<List<String>>(){ 
+    return new Setter<List<String>>(){
       public void set(List<String> files) {setFavoriteFiles(files);}
     };
   }
   public Setter<List<String>> getFavoriteDirListener() {
-    return new Setter<List<String>>(){ 
+    return new Setter<List<String>>(){
       public void set(List<String> dirs){setFavoriteDirs(dirs);}
     };
   }
-  
+
 
 
   /////////////////////////////////////////////
@@ -178,7 +183,7 @@ public class Menus {
     showHasFile(e.getFile()!=null);
     setSwitchMenu();
   }
-  
+
 
   //////////////////////
   //                  //
@@ -207,11 +212,11 @@ public class Menus {
     menuX.removeAll();
     menuX.setEnabled(startList.size()>0);
     int easyLen=3;
-    
+
     //Build first menu, a quick-list of recent files:
-    for (int i=0; i<Math.min(easyLen, startList.size()); i++) 
+    for (int i=0; i<Math.min(easyLen, startList.size()); i++)
       menuX.add(mu.doMenuItem(startList.get(i), listener));
-    
+
     //Build second menu, a longer sorter list of all files you have open:
     if (startList.size()>easyLen){
       menuX.addSeparator();
@@ -219,7 +224,7 @@ public class Menus {
       for (String s: startList)
         list.add(s);
       Collections.sort(list);
-      for (String s: list) 
+      for (String s: list)
         menuX.add(mu.doMenuItem(s, listener));
     }
   }
@@ -232,7 +237,7 @@ public class Menus {
         skipped[i-start]=menuX.getItem(i);
     }
     menuX.removeAll();
-    for (String s: startList) 
+    for (String s: startList)
       menuX.add(mu.doMenuItem(s, listener));
     if (skipLast>0){
       menuX.addSeparator();
@@ -246,27 +251,27 @@ public class Menus {
   //////////////////
   // SWITCH MENU: //
   //////////////////
-  
+
   private void setSwitchMenu() {
     switcher.removeAll();
     switchMenuToEditor.clear();
     int easyLen=3;
-    
+
     //Build first menu, a quick-list of recent files:
     int i=-1, emin=Math.min(easyLen, editors.size());
     for (Editor e: editors.forEach()){
       ++i;
       if (i>=emin) break;
       JMenuItem j=i==0
-        ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)   
+        ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)
         :mu.doMenuItem(
-          e.getTitle(), switchListener, -1, 
+          e.getTitle(), switchListener, -1,
           i==1 ?KeyMapper.key(KeyEvent.VK_F12,0) :null
         );
       switchMenuToEditor.put(j, e);
       switcher.add(j);
     }
-    
+
     //Build second menu, a longer sorted list of all files:
     if (editors.size()>emin){
       switcher.addSeparator();
@@ -277,13 +282,13 @@ public class Menus {
       Collections.sort(list, switchSorter);
       for (Editor e: list) {
         JMenuItem j=e==first
-          ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)   
+          ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)
           :mu.doMenuItem(e.getTitle(), switchListener);
         switchMenuToEditor.put(j, e);
         switcher.add(j);
       }
     }
-    
+
     //Build third menu, which swaps current for the other:
     if (editors.size()>1){
       switcher.addSeparator();
@@ -291,7 +296,7 @@ public class Menus {
       switcher.add(switchBackToFront);
       switcher.add(switchNextUnsaved);
     }
-    
+
     fileCloseOthers.setEnabled(editors.size()>1);
   }
   private static Comparator<Editor> switchSorter=new Comparator<Editor> () {
@@ -303,22 +308,22 @@ public class Menus {
   ///////////////////////////
   // CREATE/LAYOUT/LISTEN: //
   ///////////////////////////
-  
+
   //Unlike a lot of other create/layout/listens, this is almost all-in-one,
   //since everything is generic and we can chain function calls like an
   //absolute lunatic, which is fun.
   private void create() {
     bar.setBorderPainted(false);
-    
+
     file=mu.doMenu(bar, "File", KeyEvent.VK_F);
-    
+
     //File menu section 1:
     mu.add(
        file
       ,fileOpen =mu.doMenuItem("Open...", fileListener, KeyEvent.VK_O)
       ,fileNew  =mu.doMenuItem("New",     fileListener, KeyEvent.VK_N)
       ,fileSave =mu.doMenuItem(
-        "Save",    fileListener, KeyEvent.VK_S, 
+        "Save",    fileListener, KeyEvent.VK_S,
         KeyMapper.key(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)
       )
       ,fileSaveAs=mu.doMenuItem("Save as...",   fileListener, KeyEvent.VK_A)
@@ -333,7 +338,7 @@ public class Menus {
         "Close all",   fileListener, KeyEvent.VK_E
       )
     );
-    
+
     //File menu section 2 (print):
     file.addSeparator();
     mu.add(
@@ -343,16 +348,15 @@ public class Menus {
         KeyMapper.key(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)
       )
     );
-    
+
     //File menu section 3:
     file.addSeparator();
-    String os=System.getProperty("os.name");
-    if (os!=null && os.toLowerCase().indexOf("windows")>-1)
+    if (isMSWindows)
       file.add(fileDocDirWindows =mu.doMenuItem(
         "Open document's directory", fileListener, KeyEvent.VK_D
       ));
     mu.add(
-      file, 
+      file,
       fileClipboardDoc=mu.doMenuItem(
         "Copy document name to clipboard", fileListener, KeyEvent.VK_Y
       ),
@@ -389,7 +393,7 @@ public class Menus {
           "Recent directory", KeyEvent.VK_R
         )
         ,fileSaveToFave=mu.doMenu(
-          "Favorite directory", KeyEvent.VK_F 
+          "Favorite directory", KeyEvent.VK_F
         )
         ,fileSaveToSSH=mu.doMenuItem(
           "SSH...", fileListener, KeyEvent.VK_S
@@ -419,7 +423,7 @@ public class Menus {
     ));
 
 
-    //SWITCH:    
+    //SWITCH:
     switcher=mu.doMenu(bar, "Switch",     KeyEvent.VK_W);
     switchFrontToBack=mu.doMenuItem(
       "Send front to back", switchListener, KeyEvent.VK_S, KeyMapper.key(KeyEvent.VK_F11)
@@ -431,7 +435,7 @@ public class Menus {
       "Next unsaved file", switchListener, KeyEvent.VK_X
     );
 
-    
+
     //SEARCH:
     search=mu.doMenu(bar, "Search", KeyEvent.VK_S);
     mu.add(
@@ -470,34 +474,34 @@ public class Menus {
         KeyMapper.key(KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK)
       )
     );
-        
-    
+
+
     //MARK:
     mark=mu.doMenu(bar, "Mark", markListener, KeyEvent.VK_M);
     mu.add(
       mark,
       markSet=mu.doMenuItem(
-        "Set mark", 
+        "Set mark",
         markItemListener, KeyEvent.VK_S, KeyMapper.key(KeyEvent.VK_F4)
       )
       ,
       markGoToPrevious=mu.doMenuItem(
-        "Go to previous mark", 
+        "Go to previous mark",
         markItemListener, KeyEvent.VK_G, KeyMapper.key(KeyEvent.VK_F8)
       )
       ,
       markGoToNext=mu.doMenuItem(
-        "Go to next mark", 
+        "Go to next mark",
         markItemListener, KeyEvent.VK_O, KeyMapper.key(KeyEvent.VK_F9)
       )
       ,
       markClearCurrent=mu.doMenuItem(
-        "Clear current mark", 
+        "Clear current mark",
         markItemListener, KeyEvent.VK_C
       )
       ,
       markClearAll=mu.doMenuItem(
-        "Clear all marks", 
+        "Clear all marks",
         markItemListener, KeyEvent.VK_L
       )
     );
@@ -510,12 +514,12 @@ public class Menus {
       undo
       ,
       undoUndo=mu.doMenuItem(
-        "Undo", undoItemListener, KeyEvent.VK_U, 
+        "Undo", undoItemListener, KeyEvent.VK_U,
         KeyMapper.key(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK)
       )
       ,
       undoRedo=mu.doMenuItem(
-        "Redo", undoItemListener, KeyEvent.VK_R, 
+        "Redo", undoItemListener, KeyEvent.VK_R,
         KeyMapper.key(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
     );
@@ -524,12 +528,12 @@ public class Menus {
       undo
       ,
       undoToBeginning=mu.doMenuItem(
-        "Undo to beginning", undoItemListener, KeyEvent.VK_D, 
+        "Undo to beginning", undoItemListener, KeyEvent.VK_D,
         KeyMapper.key(KeyEvent.VK_F9, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
       ,
       undoRedoToEnd=mu.doMenuItem(
-        "Redo to end", undoItemListener, KeyEvent.VK_T, 
+        "Redo to end", undoItemListener, KeyEvent.VK_T,
         KeyMapper.key(KeyEvent.VK_F12, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
     );
@@ -551,27 +555,27 @@ public class Menus {
     );
 
 
-    //WEIRD:
+    //Selection:
     mu.add(
       select=mu.doMenu(bar, "Selection",   selectListener, KeyEvent.VK_E)
       ,selectUpperCase=mu.doMenuItem(
-        "Uppercase selection", 
+        "Uppercase selection",
         selectionItemListener, KeyEvent.VK_U
       )
       ,selectLowerCase=mu.doMenuItem(
-        "Lowercase selection", 
+        "Lowercase selection",
         selectionItemListener, KeyEvent.VK_L
       )
       ,selectSortLines=mu.doMenuItem(
-        "Sort selected lines", 
+        "Sort selected lines",
         selectionItemListener, KeyEvent.VK_S
       )
       ,selectGetSelectionSize=mu.doMenuItem(
-        "Get selection size", 
+        "Get selection size",
         selectionItemListener, KeyEvent.VK_G
       )
       ,selectGetAsciiValues=mu.doMenuItem(
-        "Get ASCII/Unicode value(s) of selection", 
+        "Get ASCII/Unicode value(s) of selection",
         selectionItemListener, KeyEvent.VK_A
       )
     );
@@ -581,40 +585,40 @@ public class Menus {
       align=mu.doMenu(bar, "Align", KeyEvent.VK_A)
       ,
       weirdInsertToAlign=mu.doMenuItem(
-        "Insert spaces to align cursor to above", 
+        "Insert spaces to align cursor to above",
         alignItemListener, KeyEvent.VK_I,
         KeyMapper.key(KeyEvent.VK_SPACE, KeyEvent.CTRL_DOWN_MASK)
       )
-      , 
+      ,
       weirdInsertToAlignBelow=mu.doMenuItem(
-        "Insert spaces to align cursor to below", 
+        "Insert spaces to align cursor to below",
         alignItemListener, KeyEvent.VK_N,
         KeyMapper.key(KeyEvent.VK_SPACE, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
-      , 
+      ,
       weirdBackspaceToAlign=mu.doMenuItem(
-        "Backspace to align cursor to above", 
+        "Backspace to align cursor to above",
         alignItemListener, KeyEvent.VK_B,
         KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.CTRL_DOWN_MASK)
       )
-      , 
+      ,
       weirdBackspaceToAlignBelow=mu.doMenuItem(
-        "Backspace to align cursor to below", 
+        "Backspace to align cursor to below",
         alignItemListener, KeyEvent.VK_C,
         KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
     );
-    
+
     //EXTERNAL:
     mu.add(
       external=mu.doMenu(bar, "External", KeyEvent.VK_X)
       ,externalRunBatch=mu.doMenuItem(
-        "Run batch program", 
+        "Run batch program",
         externalItemListener, KeyEvent.VK_R,
         KeyMapper.key(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK)
       )
     );
-               
+
     //OPTIONS:
     mu.add(
       options=mu.doMenu(bar, "Options",   KeyEvent.VK_O)
@@ -629,7 +633,7 @@ public class Menus {
       ,optionFavorites     =mu.doMenuItem("Favorite files & directories", optionListener, KeyEvent.VK_A)
       ,optionSSH           =mu.doMenuItem("SSH Options",                  optionListener, KeyEvent.VK_S)
     );
-    
+
     //HELP:
     mu.add(
       help=mu.doMenu(bar, "Help",   KeyEvent.VK_H)
@@ -637,11 +641,11 @@ public class Menus {
       ,helpShortcut=mu.doMenuItem("Shortcuts and hidden features", helpListener, KeyEvent.VK_S)
     );
   }
-  
+
   //////////////////////
   // EVENT LISTENERS: //
   //////////////////////
-  
+
   private Action
     fileListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
@@ -731,22 +735,22 @@ public class Menus {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
         if (s==markSet) {
-          if (ctrlMarks.doMarkSet()) 
+          if (ctrlMarks.doMarkSet())
             showHasMarks(true);
         }
         else
-        if (s==markGoToPrevious) 
+        if (s==markGoToPrevious)
           ctrlMarks.doMarkGoToPrevious();
         else
-        if (s==markGoToNext)     
+        if (s==markGoToNext)
           ctrlMarks.doMarkGoToNext();
         else
         if (s==markClearCurrent) {
-          if (ctrlMarks.doMarkClearCurrent()) 
+          if (ctrlMarks.doMarkClearCurrent())
             showHasMarks(false);
         }
         else
-        if (s==markClearAll) {    
+        if (s==markClearAll) {
           ctrlMarks.doMarkClearAll();
           showHasMarks(false);
         }
@@ -768,7 +772,7 @@ public class Menus {
         if (s==switchNextUnsaved)
           ctrlMain.doSwitchToNextUnsaved();
         else {
-          Editor e=switchMenuToEditor.get(s);          
+          Editor e=switchMenuToEditor.get(s);
           if (e==null)
             throw new RuntimeException("Menus.switchListener(): Null editor in hash");
           ctrlMain.doSwitch(e);
@@ -811,7 +815,7 @@ public class Menus {
         if (s==selectGetAsciiValues)        ctrlSelection.doWeirdAsciiValues();
       }
     }
-    , 
+    ,
     alignItemListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
@@ -824,7 +828,7 @@ public class Menus {
         if (s==weirdBackspaceToAlignBelow) editors.getFirst().doBackspaceToAlign(false);
       }
     }
-    , 
+    ,
     externalItemListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
@@ -833,7 +837,7 @@ public class Menus {
           throw new RuntimeException("Unexpected "+s);
       }
     }
-    , 
+    ,
     optionListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
@@ -850,7 +854,7 @@ public class Menus {
         if (s==optionSSH)             ctrlOptions.doSSH();
       }
     }
-    , 
+    ,
     helpListener=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
@@ -862,7 +866,7 @@ public class Menus {
       }
     }
     ;
-  private MenuListener 
+  private MenuListener
     selectListener=new MenuListener(){
       public void menuCanceled(MenuEvent e){}
       public void menuDeselected(MenuEvent e){}
@@ -896,5 +900,5 @@ public class Menus {
         }
       }
     }
-  ;   
+  ;
 }
