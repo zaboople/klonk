@@ -70,8 +70,10 @@ public class BootContext {
 
     //Turn off direct 3d on windows, seems to cause exceptions rendering our yes/no/cancel window
     System.setProperty("sun.java2d.d3d", "false");
-    //Turn on macintosh menubar
+
+    //Turn on macintosh menubar, and force apple to ask our windows if they want to quit:
     System.setProperty("apple.laf.useScreenMenuBar", "true");
+    System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
 
     //Find out if the application is already running:
     if (!context.getFileListener().lockOrSignal(args)) {
