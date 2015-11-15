@@ -1,0 +1,5 @@
+# Note: javapackager comes with java 8 distributions, but it may not be accessible from the
+# command-line until you put the correct directory in your path, i.e. something like:
+#    export PATH=$PATH:/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/bin/
+#
+javapackager -deploy -native dmg -srcfiles dist/klonk.jar -outdir dist/dmg -outfile klonk -appclass org.tmotte.klonk.config.BootContext -title "Klonk" -name Klonk -Bicon=lib/app.icns
