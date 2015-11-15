@@ -1,6 +1,7 @@
 -OSX
   -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
   -Auto-trim on save for the sake of code nazis
+  -Get a switch window dialog because we have no choice, same for selection menu
 
 -Current
   -SSH Sudo
