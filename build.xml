@@ -4,10 +4,10 @@
   <!--**********-->
   <!--PROPERTIES-->
   <!--**********-->
-  
+
   <!--Properties: arbitrary environment prefix:-->
   <property environment="env"/>
-  
+
   <!--Properties: directories:-->
   <property file="build.properties"/>
   <property name="java.dir" value="java"/>
@@ -24,22 +24,22 @@
 
   <property name="version" value="${VERSION.KLONK}"/>
   <property name="appname.version" value="${appname}.${version}"/>
-  
+
   <path id="classpath">
     <fileset dir="${jar.dir}" includes="*.jar"/>
   </path>
-  
-  
+
+
   <!--**************-->
   <!--TARGETS: HELP -->
   <!--**************-->
 
   <target name="help">
     <echo>
-  clean:         
+  clean:
     Deletes all generated classes etc.
   config.prod,config.test:
-    One of these two targets must be run first when building from scratch. 
+    One of these two targets must be run first when building from scratch.
     These copy either of two .png files into the build directory; the application will use the file
     as its window icon. This way it's easier to tell whether it's a test or production build, especially
     when I am using the application in one window and testing changes in another.
@@ -48,18 +48,22 @@
     help screens.
   jar:
     Compiles and creates dist/${appname}.jar file from contents of ./build. This is an executable
-    jar, so double-clicking it should start the application if your java environment is properly 
+    jar, so double-clicking it should start the application if your java environment is properly
     configured.
   exe:
     Generates a windows executable using jsmoothgen. To use this target, you will need to download
     jsmoothgen, then set a JSMOOTH_HOME environment variable to point to the correct
     directory of your jsmooth install. The actual build is controlled by build.exe.xml.
-    
-    Note that the windows executable will *still* require a Java installation; it only makes 
-    application startup a little more straightforward (especially mapping file types to the 
+
+    Note that the windows executable will *still* require a Java installation; it only makes
+    application startup a little more straightforward (especially mapping file types to the
     executable). Also consider using the jar target, however.
+
   dist:
-    Creates source zip &amp; binaries zip in dist directory.
+    Creates source zip &amp; binaries zip in dist directory. This only works on ms windows.
+
+  NOTE: To make a macintosh distribution file, run the "jar" task and then lib/makedmg
+
     </echo>
   </target>
 
@@ -71,7 +75,7 @@
     <delete dir="javadoc"/>
     <delete dir ="${build.dir}"/>
     <delete dir ="${dist.dir}"/>
-    <delete file="${appname}.jar"/>          
+    <delete file="${appname}.jar"/>
     <delete>
       <fileset dir="." includes="*.pdf"/>
     </delete>
@@ -80,7 +84,7 @@
   <!--****************-->
   <!--TARGETS: CONFIG -->
   <!--****************-->
-  
+
   <target name="config.test">
     <copy file="${lib.dir}/apptest.png"              tofile="${icon.png}" overwrite="true"/>
     <copy file="${lib.dir}/apptest-find-replace.png" tofile="${iconFR.png}" overwrite="true"/>
@@ -89,7 +93,7 @@
     <copy file="${lib.dir}/app.png"              tofile="${icon.png}"  overwrite="true"/>
     <copy file="${lib.dir}/app-find-replace.png" tofile="${iconFR.png}"  overwrite="true"/>
   </target>
-  
+
   <!--****************-->
   <!--TARGETS: BUILD  -->
   <!--****************-->
@@ -101,24 +105,24 @@
     <fail unless="haspng"
           message="Need to run config.prod or config.test target first before compile"/>
 
-    <!--Compile:-->    
-    <javac destdir="${build.dir}" 
-          debug="true" 
+    <!--Compile:-->
+    <javac destdir="${build.dir}"
+          debug="true"
           failonerror="true"
           deprecation="on"
           srcdir="${java.dir}"
           includeantruntime="false">
       <classpath refid="classpath"/>
     </javac>
-    
+
     <!--Copies the help.txt & about.txt file:-->
     <copy todir="${build.dir}">
       <fileset dir="${java.dir}" includes="**/*.txt"/>
     </copy>
     <!--Version number & license for about screen-->
-    <copy tofile="${build.dir}/org/tmotte/klonk/windows/popup/About-Version-Number.txt" 
+    <copy tofile="${build.dir}/org/tmotte/klonk/windows/popup/About-Version-Number.txt"
           file="build.properties"/>
-    <copy tofile="${build.dir}/org/tmotte/klonk/windows/popup/About-License.html" 
+    <copy tofile="${build.dir}/org/tmotte/klonk/windows/popup/About-License.html"
           file="license.html"/>
   </target>
 
@@ -132,13 +136,13 @@
     </javadoc>
   </target>
 
- 
+
   <target name="jar" depends="compile">
     <mkdir dir ="${dist.dir}"/>
     <jar basedir="./build" destfile="dist/${appname}.jar">
 
       <!--Unzip all the jars and zip them into our own jar:-->
-      <zipgroupfileset dir="${jar.dir}" includes="*.jar" /> 
+      <zipgroupfileset dir="${jar.dir}" includes="*.jar" />
 
       <manifest>
         <attribute name="Built-By" value="Mr Motte" />
@@ -153,14 +157,15 @@
       <fileset dir="." includes="build.exe.xml"/>
     </subant>
   </target>
-  
+
+
   <!-- ********************* -->
   <!-- TARGETS: DISTRIBUTION -->
   <!-- ********************* -->
-  
-  <target name="dist" depends="_dist.src,_dist.bin,_dist.site">
-    
-  </target>
+
+  <target name="dist" depends="_dist.src,_dist.bin,_dist.site"/>
+
+
 
   <target name="_dist.site" depends="_dist.src,_dist.bin">
     <mkdir dir ="${dist.dir}/site"/>
@@ -168,11 +173,11 @@
       <fileset dir="${dist.dir}">
         <include name="*.zip"/>
       </fileset>
-    </copy>    
+    </copy>
     <copy file="license.html"     todir="${dist.dir}/site"/>
     <copy file="build.properties" todir="${dist.dir}/site"/>
   </target>
-  
+
   <target name="_dist.bin" depends="config.prod,jar,exe">
     <mkdir dir ="${dist.dir}/bin"/>
     <copy file="${lib.dir}/Klonk.bat"    todir="${dist.dir}/bin"/>
@@ -183,7 +188,7 @@
     <!--Cleanup:-->
     <delete file="dist/klonk.jar"/>
   </target>
-  
+
   <target name="_dist.src" depends="clean">
     <mkdir dir ="${dist.dir}"/>
     <zip destfile="dist/${appname.version}.src.zip">
@@ -191,5 +196,5 @@
                   excludes=".git/**/*,.git"/>
     </zip>
   </target>
-  
+
 </project>
