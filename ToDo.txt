@@ -1,7 +1,10 @@
 -OSX
+  -Do a .klonk directory in home instead of klonk
+  -Capslock doesn't work when you turn it off
   -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
   -Auto-trim on save for the sake of code nazis
   -Get a switch window dialog because we have no choice, same for selection menu
+  -Ctrl-W breaks everything but Ctrl-F4 doesn't... something's happening in the editor when you press that button combo
 
 -Current
   -SSH Sudo

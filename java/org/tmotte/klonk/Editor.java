@@ -61,14 +61,14 @@ public class Editor {
   private String title="Untitled";
   private File file;
 
- 
+
   /////////////////////////
   // Construct & Config: //
   /////////////////////////
 
   public Editor(
-      Setter<Throwable> failHandler, 
-      EditorListener editListener, UndoListener undoL, 
+      Setter<Throwable> failHandler,
+      EditorListener editListener, UndoListener undoL,
       String lineBreaker, boolean wordWrap
     ) {
     this.editListener=editListener;
@@ -119,11 +119,11 @@ public class Editor {
   public void setTitle(String s) {
     title=s;
   }
-  
+
   ////////////
   // Marks: //
   ////////////
-  
+
   public int doSetMark() {
     return setMark();
   }
@@ -149,7 +149,7 @@ public class Editor {
     return marks==null ?0 :marks.size();
   }
 
-  
+
   /////////////////////////////
   // Text area pass-through: //
   /////////////////////////////
@@ -189,7 +189,7 @@ public class Editor {
   public int getCaretPos() {
     return jta.getCaret().getDot();
   }
-  
+
   public void undo() {
     jta.undo();
   }
@@ -217,7 +217,7 @@ public class Editor {
   public void clearRedos() {
     jta.clearRedos();
   }
-  
+
 
   ///////////////////////////
   // Other public methods: //
@@ -235,7 +235,7 @@ public class Editor {
   public boolean hasUnsavedChanges() {
     return unsavedChanges;
   }
-  
+
   public void doUpperCase(){
     replaceSelection(jta.getSelectedText().toUpperCase());
   }
@@ -339,8 +339,8 @@ public class Editor {
     }
     return -1;
   }
-  
-  /** 
+
+  /**
    * Invoked on document change. This might be pushing the limit on performance,
    * since it's going to be invoked every time you type a character in. Oh well, so
    * far it's not a problem.
@@ -353,7 +353,7 @@ public class Editor {
     for (ListIterator<Integer> li=marks.listIterator(); li.hasNext();) {
       int a=li.next();
       if ((nowBefore|=start<a)) {
-        if (insert) 
+        if (insert)
           li.set(a+len);
         else
         if (end>a)
@@ -366,7 +366,7 @@ public class Editor {
   }
 
   // SORT: //
-  
+
   private boolean sortLines() {
     try {
       Caret c=jta.getCaret();
@@ -379,7 +379,7 @@ public class Editor {
         return false;
       List<String> lines=new ArrayList<>(1+rowLast-rowFirst);
       int veryFirst=-1, veryLast=-1;
-      
+
       for (int r=rowFirst; r<=rowLast; r++){
         int begin=jta.getLineStartOffset(r),
             end  =jta.getLineEndOffset(r);
@@ -392,7 +392,7 @@ public class Editor {
       }
       int lineCount=lines.size();
       boolean newLineAtEnd=lines.get(lineCount-1).endsWith("\n");
-      
+
       //Now sort:
       java.util.Collections.sort(lines, lineSorter);
       StringBuilder sb=new StringBuilder(Math.max(2+veryLast-veryFirst, 2));
@@ -415,17 +415,17 @@ public class Editor {
       failHandler.set(e);
     }
     return true;
-  } 
+  }
   private static Comparator<String> lineSorter=new Comparator<String>(){
     public int compare(String a, String b){
       return a.compareTo(b);
     }
   };
-  
+
 
   // ALIGN: //
-  
-  
+
+
   private boolean deleteToAlign(boolean above) {
     try {
       int cpos;
@@ -455,18 +455,18 @@ public class Editor {
       }
       if (currLineLimit==-1)
         return false;
-      
+
       String line=null;
       if (above) {
         int min=Math.max(-1, rowNum-4),
             rr=rowNum-1;
-        while (rr>min && line==null) 
+        while (rr>min && line==null)
           line=checkLineForBackAlign(rr--, currLineLimit, colIndex);
       }
       else {
         int max=Math.min(jta.getLineCount(), rowNum+4),
             rr=rowNum+1;
-        while (rr<max && line==null) 
+        while (rr<max && line==null)
           line=checkLineForBackAlign(rr++, currLineLimit, colIndex);
       }
       int len=line==null ?0 :line.length();
@@ -490,7 +490,7 @@ public class Editor {
     }
     return null;
   }
- 
+
   private boolean insertToAlign(boolean above) {
     try {
       int cpos=jta.getCaretPosition();
@@ -507,15 +507,15 @@ public class Editor {
       else {
         int max=Math.min(jta.getLineCount(), rowNum+3),
             rr=rowNum+1;
-        while (rr<max && line==null) 
+        while (rr<max && line==null)
           line=checkLineForInsertAlign(rr++, colIndex);
       }
-      
+
       //Get the bump for the best matching line found and insert:
       int bump=line==null
         ?1
         :Spaceable.getRight(line);
-      if (bump==0) 
+      if (bump==0)
         bump=1;
       StringBuilder sb=new StringBuilder(bump);
       for (int i=0; i<bump; i++) sb.append(" ");
@@ -526,7 +526,7 @@ public class Editor {
     }
   }
   private String checkLineForInsertAlign(int row, int currLinePos) throws Exception {
-    int pStart=jta.getLineStartOffset(row)+currLinePos, 
+    int pStart=jta.getLineStartOffset(row)+currLinePos,
         pEnd  =jta.betterLineEndOffset(row);
     if (pStart<pEnd) {
       String temp=trimRight(jta.getText(pStart, pEnd-pStart));
@@ -547,11 +547,11 @@ public class Editor {
     if (last==0) return "";
     return last<s.length() ?s.substring(0, last) :s;
   }
-  
- 
-  
+
+
+
   //ETC: //
-  
+
   private void replaceSelection(String text) {
     try {
       Caret c=jta.getCaret();
@@ -564,16 +564,16 @@ public class Editor {
     }
   }
 
-  
+
   /////////////
   // EVENTS: //
   /////////////
 
   private void setEvents() {
-  
+
     //File drag & drop:
     jta.setDropTarget(myDropTarget);
-    
+
     //Gotta listen to the caret so we show the correct
     //row & column, for one thing:
     jta.addCaretListener(new CaretListener(){
@@ -581,7 +581,7 @@ public class Editor {
         editListener.doCaretMoved(Editor.this, e.getDot());
       }
     });
-    
+
     //Document change listening, for red thing and so on:
     jta.getDocument().addDocumentListener(docListener);
 
@@ -591,17 +591,17 @@ public class Editor {
     };
     KeyMapper.accel(jta, "EditorCapsLock1", caps, KeyEvent.VK_CAPS_LOCK);
     //Oh heck, let's handle these too:
-    KeyMapper.accel(jta, "EditorCapsLock2", caps, KeyEvent.VK_CAPS_LOCK, 
+    KeyMapper.accel(jta, "EditorCapsLock2", caps, KeyEvent.VK_CAPS_LOCK,
                     KeyEvent.SHIFT_DOWN_MASK);
-    KeyMapper.accel(jta, "EditorCapsLock3", caps, KeyEvent.VK_CAPS_LOCK, 
+    KeyMapper.accel(jta, "EditorCapsLock3", caps, KeyEvent.VK_CAPS_LOCK,
                     KeyEvent.CTRL_DOWN_MASK);
-    KeyMapper.accel(jta, "EditorCapsLock3", caps, KeyEvent.VK_CAPS_LOCK, 
+    KeyMapper.accel(jta, "EditorCapsLock3", caps, KeyEvent.VK_CAPS_LOCK,
                     KeyEvent.ALT_DOWN_MASK);
-    KeyMapper.accel(jta, "EditorCapsLock4", caps, KeyEvent.VK_CAPS_LOCK, 
+    KeyMapper.accel(jta, "EditorCapsLock4", caps, KeyEvent.VK_CAPS_LOCK,
                     KeyEvent.SHIFT_DOWN_MASK, KeyEvent.CTRL_DOWN_MASK);
     //That's enough. Stop pressing weird buttons.
-                
-    
+
+
 
     //This is because there's a bug in capslock detection, such that
     //we have to check a second time after receiving focus because it
@@ -618,7 +618,7 @@ public class Editor {
 
     //Ctrl-W is an extra file close shortcut:
     KeyMapper.accel(
-      jta, "EditorCtrlW", 
+      jta, "EditorCtrlW",
       new AbstractAction() {
         public void actionPerformed(ActionEvent ae) {
           editListener.closeEditor();
@@ -635,7 +635,7 @@ public class Editor {
   };
 
   private void checkCapsLock() {
-    boolean state=Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK); 
+    boolean state=Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
     editListener.doCapsLock(state);
   }
   private DropTarget myDropTarget=new DropTarget() {
@@ -643,7 +643,7 @@ public class Editor {
       try {
         evt.acceptDrop(DnDConstants.ACTION_COPY);
         List droppedFiles=(List)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-        for (Object file : droppedFiles) 
+        for (Object file : droppedFiles)
           editListener.fileDropped((File)file);
       } catch (Exception ex) {
         failHandler.set(ex);
@@ -653,7 +653,7 @@ public class Editor {
 
 
   /////////////////////////////////////////////////////////////////////////
-  // NOTE: MyDocumentListener always gets invoked before myUndoListener. // 
+  // NOTE: MyDocumentListener always gets invoked before myUndoListener. //
   //       This affects the used & unsavedChanges variables.             //
   /////////////////////////////////////////////////////////////////////////
 
@@ -674,7 +674,7 @@ public class Editor {
       unsavedChanges=true;
       editListener.doEditorChanged(Editor.this);
     }
-  }   
+  }
   private UndoListener myUndoListener=new UndoListener() {
     public void happened(UndoEvent ue) {
       if (unsavedChanges && ue.isUndoSaveStable) {
@@ -704,7 +704,7 @@ public class Editor {
       lineBreaker=res.delimiter;
       if (lineBreaker==null)
         lineBreaker=defaultLineBreaker;
-      setTabsOrSpaces(res.hasTabs ?TabAndIndentOptions.INDENT_TABS 
+      setTabsOrSpaces(res.hasTabs ?TabAndIndentOptions.INDENT_TABS
                                   :TabAndIndentOptions.INDENT_SPACES);
     } finally {
       jta.setSuppressUndo(false);
@@ -718,7 +718,7 @@ public class Editor {
   private void doSaveFile(File saveToFile) throws Exception {
     used|=true;
     KFileIO.save(jta, saveToFile, lineBreaker, encoding, encodingNeedsBOM);
-    if (saveToFile!=file) 
+    if (saveToFile!=file)
       setFile(saveToFile);
     unsavedChanges=false;
     jta.setSaved();
@@ -731,5 +731,5 @@ public class Editor {
       throw new RuntimeException(e);
     }
   }
-  
+
 }
