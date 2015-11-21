@@ -60,6 +60,7 @@ public class Editor {
   private boolean unsavedChanges=false;
   private String title="Untitled";
   private File file;
+  private Toolkit toolkit=Toolkit.getDefaultToolkit();
 
 
   /////////////////////////
@@ -585,36 +586,7 @@ public class Editor {
     //Document change listening, for red thing and so on:
     jta.getDocument().addDocumentListener(docListener);
 
-    //Caps lock detection
-    Action caps=new AbstractAction() {
-      public void actionPerformed(ActionEvent ae) {checkCapsLock();}
-    };
-    KeyMapper.accel(jta, "EditorCapsLock1", caps, KeyEvent.VK_CAPS_LOCK);
-    //Oh heck, let's handle these too:
-    KeyMapper.accel(jta, "EditorCapsLock2", caps, KeyEvent.VK_CAPS_LOCK,
-                    KeyEvent.SHIFT_DOWN_MASK);
-    KeyMapper.accel(jta, "EditorCapsLock3", caps, KeyEvent.VK_CAPS_LOCK,
-                    KeyEvent.CTRL_DOWN_MASK);
-    KeyMapper.accel(jta, "EditorCapsLock3", caps, KeyEvent.VK_CAPS_LOCK,
-                    KeyEvent.ALT_DOWN_MASK);
-    KeyMapper.accel(jta, "EditorCapsLock4", caps, KeyEvent.VK_CAPS_LOCK,
-                    KeyEvent.SHIFT_DOWN_MASK, KeyEvent.CTRL_DOWN_MASK);
-    //That's enough. Stop pressing weird buttons.
-
-
-
-    //This is because there's a bug in capslock detection, such that
-    //we have to check a second time after receiving focus because it
-    //doesn't pick up. I even tried sending artificial key events
-    //to "stimulate" the system, SwingUtilities.invokeLater(), etc.
-    //Note that myKeyListener will remove itself after
-    //its first invocation:
-    jta.addFocusListener(new FocusAdapter(){
-      public void focusGained(FocusEvent e){
-        checkCapsLock();
-        jta.addKeyListener(myKeyListener);
-      }
-    });
+    doCapsCrap();
 
     //Ctrl-W is an extra file close shortcut:
     KeyMapper.accel(
@@ -627,17 +599,49 @@ public class Editor {
       KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK
     );
   }
-  private KeyListener myKeyListener=new KeyAdapter() {
-    public void keyReleased(KeyEvent e){
-      checkCapsLock();
-      jta.removeKeyListener(myKeyListener);
-    }
-  };
 
+
+  private void doCapsCrap(){
+    //Caps lock detection: So this is hard. We need to check when the caps button is
+    //pressed, and sometimes we get that. But we also need to check when we get focus,
+    //in case it changed when we weren't around. But we also need to check every time
+    //you press a key, because... Sigh. And it still works halfway. And that depends on
+    //operating system. So... sigh.
+    KeyMapper.accel(jta, "EditorCapsLock1", getCapsAction(), KeyEvent.VK_CAPS_LOCK);
+    KeyMapper.accel(jta, "EditorCapsLock2", getCapsAction(), KeyEvent.VK_CAPS_LOCK,
+                    KeyEvent.SHIFT_DOWN_MASK);
+    KeyMapper.accel(jta, "EditorCapsLock3", getCapsAction(), KeyEvent.VK_CAPS_LOCK,
+                    KeyEvent.CTRL_DOWN_MASK);
+    KeyMapper.accel(jta, "EditorCapsLock3", getCapsAction(), KeyEvent.VK_CAPS_LOCK,
+                    KeyEvent.ALT_DOWN_MASK);
+    KeyMapper.accel(jta, "EditorCapsLock4", getCapsAction(), KeyEvent.VK_CAPS_LOCK,
+                    KeyEvent.SHIFT_DOWN_MASK, KeyEvent.CTRL_DOWN_MASK);
+    jta.addFocusListener(
+      new FocusAdapter(){
+        public void focusGained(FocusEvent e){
+          checkCapsLock();
+        }
+      }
+    );
+    jta.addKeyListener(new KeyAdapter() {
+      public void keyReleased(KeyEvent e){
+        checkCapsLock();
+      }
+    });
+  }
+  private Action getCapsAction() {
+    return new AbstractAction() {
+      public void actionPerformed(ActionEvent ae) {
+        checkCapsLock();
+      }
+    };
+  }
   private void checkCapsLock() {
-    boolean state=Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
+    boolean state=toolkit.getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
     editListener.doCapsLock(state);
   }
+
+
   private DropTarget myDropTarget=new DropTarget() {
     public synchronized void drop(DropTargetDropEvent evt) {
       try {
