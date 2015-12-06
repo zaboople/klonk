@@ -61,15 +61,15 @@ public class MyTextArea extends JTextArea {
   private boolean tabIndentsLine=false;
   private String indentSpaces="  ";
   private int indentSpacesLen=indentSpaces.length();
-  
+
   ///////////////////
   // CONSTRUCTORS: //
   ///////////////////
-  
+
   public MyTextArea() {
     addMenus();
     addListeners();
-    //Removing these keystrokes because they mess up undo, and I wanted one of my menus 
+    //Removing these keystrokes because they mess up undo, and I wanted one of my menus
     //to use the first one:
     getInputMap().put(KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.CTRL_DOWN_MASK), "none");
     getInputMap().put(KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.SHIFT_DOWN_MASK), "none");
@@ -81,7 +81,7 @@ public class MyTextArea extends JTextArea {
     undoListeners.add(ul);
     return this;
   }
-  
+
   ////////////////////////////////////
   // PUBLIC PROPERTIES AND METHODS: //
   ////////////////////////////////////
@@ -96,8 +96,8 @@ public class MyTextArea extends JTextArea {
     startRedo();
     suppressUndoRecord=false;
   }
-  
-  public Point getVisualCaretPosition() throws Exception { 
+
+  public Point getVisualCaretPosition() throws Exception {
     //Both of these offsets include the invisible part of the text area. The first
     //is an offset from the top of the text area, the other of course from top of the screen.
     //The latter, however, gets smaller (even negative) as you scroll down, whereas
@@ -123,7 +123,7 @@ public class MyTextArea extends JTextArea {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-  } 
+  }
   public void highlightCaret(int caretPos) {
     try {
       int row=getLineOfOffset(caretPos);
@@ -134,7 +134,7 @@ public class MyTextArea extends JTextArea {
       throw new RuntimeException(e);
     }
   }
-  
+
   public JScrollPane makeVerticalScrollable(){
     jsp=new JScrollPane(this);
     jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -208,7 +208,7 @@ public class MyTextArea extends JTextArea {
   }
   public int betterLineEndOffset(int line) {
     try {
-      return line<getLineCount()-1 
+      return line<getLineCount()-1
         ?getLineEndOffset(line)-1
         :getLineEndOffset(line);
     } catch (Exception e) {
@@ -236,13 +236,13 @@ public class MyTextArea extends JTextArea {
   /////////////
 
   private void addMenus() {
-  
+
     //NOTE: The key mnemonics for undo/redo don't necessarily work
-    //because they are only enabled when you show the menu. We handle 
+    //because they are only enabled when you show the menu. We handle
     //that in our key events. Ctrl-x-a-c-v already work without the menu.
 
     MenuUtils.add(
-      menu, 
+      menu,
       mnuUndo=MenuUtils.doMenuItem(
         "Undo", myRightClickListener, KeyEvent.VK_U,
         KeyMapper.key(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK)
@@ -254,7 +254,7 @@ public class MyTextArea extends JTextArea {
     );
     menu.addSeparator();
     MenuUtils.add(
-      menu, 
+      menu,
       mnuCut=MenuUtils.doMenuItem(
         "Cut", myRightClickListener, KeyEvent.VK_C,
         KeyMapper.key(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK)
@@ -270,21 +270,21 @@ public class MyTextArea extends JTextArea {
     );
     menu.addSeparator();
     MenuUtils.add(
-      menu, 
+      menu,
       mnuSelectAll=MenuUtils.doMenuItem(
         "Select All", myRightClickListener, KeyEvent.VK_T,
         KeyMapper.key(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK)
       )
     );
   }
-  
+
   //////////////////
   //              //
   //  LISTENERS:  //
   //              //
   //////////////////
-  
-  
+
+
   private void addListeners() {
     addKeyListener(new MyKeyListener());
     getDocument().addDocumentListener(new MyDocumentListener());
@@ -293,7 +293,7 @@ public class MyTextArea extends JTextArea {
         public void mousePressed(MouseEvent e) {maybeShowPopup(e);}
         public void mouseReleased(MouseEvent e) {maybeShowPopup(e);}
         private void maybeShowPopup(MouseEvent e) {
-          if (e.isPopupTrigger()) 
+          if (e.isPopupTrigger())
             showMenu(e.getX(), e.getY());
           else
             setSelected(false, false);
@@ -311,8 +311,8 @@ public class MyTextArea extends JTextArea {
     setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
   }
 
-    
-    
+
+
   ////////////////////////
   // DOCUMENT LISTENER: //
   ////////////////////////
@@ -335,6 +335,7 @@ public class MyTextArea extends JTextArea {
         return;
       try {
         int start=de.getOffset(), len=de.getLength();
+        //System.out.println("Start "+start+" len "+len+ " pre " +preUndoSelected);
         if (preUndoSelected==null || len!=preUndoSelected.length())
           throw new RuntimeException(
             "Recorded selection length does not match DocumentEvent; DE start:"+start
@@ -349,7 +350,7 @@ public class MyTextArea extends JTextArea {
     public void changedUpdate(DocumentEvent e) {
       throw new RuntimeException(new RuntimeException("Didn't expect a changedUpdate "+e));
     }
-  }  
+  }
 
   ///////////////////
   // KEY LISTENER: //
@@ -363,12 +364,12 @@ public class MyTextArea extends JTextArea {
       //This will cause an undo error!
       try {
         final int code=e.getKeyCode();
-        setSelected(code==e.VK_DELETE, 
-                    code==e.VK_BACK_SPACE || 
+        setSelected(code==e.VK_DELETE,
+                    code==e.VK_BACK_SPACE ||
                         (code==e.VK_H && KeyMapper.ctrlPressed(e.getModifiersEx()))
-                      );        
+                      );
 
-         if (code==e.VK_RIGHT) {
+        if (code==e.VK_RIGHT) {
 
           //ARROW RIGHT:
           int mods=e.getModifiersEx();
@@ -376,7 +377,7 @@ public class MyTextArea extends JTextArea {
             e.consume();
             doControlArrow(false, KeyMapper.shiftPressed(mods));
           }
-         
+
         }
         else
         if (code==e.VK_UP) {
@@ -411,23 +412,23 @@ public class MyTextArea extends JTextArea {
               setCaretPosition(end==0 ?0 :end-1);
             }
           }
-         
+
         }
         else
         if (code==e.VK_CONTEXT_MENU || (
               code==e.VK_F10 && KeyMapper.shiftPressed(e)
-            )) { 
-            
+            )) {
+
           //CONTEXT MENU:
           Point p=getCaret().getMagicCaretPosition();
           if (p==null) p=new Point(10,10);
           showMenu(p.x, p.y);
           e.consume();
-          
+
         }
         else
         if (code==e.VK_Z) {
-        
+
           //UNDO/REDO:
           int mods=e.getModifiersEx();
           if (KeyMapper.ctrlPressed(mods)){
@@ -437,11 +438,11 @@ public class MyTextArea extends JTextArea {
               undo();
             e.consume();
           }
-          
+
         }
         else
         if (code==e.VK_Y && KeyMapper.ctrlPressed(e)) {
-        
+
           //Another way to REDO:
           redo();
           e.consume();
@@ -449,14 +450,14 @@ public class MyTextArea extends JTextArea {
         }
         else
         if (code==e.VK_ENTER && indentOnHardReturn) {
-          
+
            doIndentOnHardReturn();
            e.consume();
-          
+
         }
         else
         if (code==e.VK_TAB && tabIndentsLine) {
-        
+
           //Tab indent & tab insert:
           int mods=e.getModifiersEx();
           if (KeyMapper.ctrlPressed(mods)){
@@ -467,7 +468,7 @@ public class MyTextArea extends JTextArea {
           else
             doTabIndent(KeyMapper.shiftPressed(mods));
           e.consume();
-          
+
         }
 
       } catch (Exception ex) {
@@ -475,7 +476,7 @@ public class MyTextArea extends JTextArea {
       }
     }
   }
-  
+
 
   ////////////////////////
   // RIGHT-CLICK MENUS: //
@@ -483,7 +484,7 @@ public class MyTextArea extends JTextArea {
 
   private void showMenu(int x, int y) {
     final Caret caret=getCaret();
-    int cpos=caret.getDot(), 
+    int cpos=caret.getDot(),
         mark=caret.getMark();
     mnuCut.setEnabled(cpos!=mark);
     mnuCopy.setEnabled(cpos!=mark);
@@ -527,7 +528,7 @@ public class MyTextArea extends JTextArea {
     if (end!=-1 && end!=start)
       moveCaretPosition(end);
   }
-  
+
   private void doHighlightEffect(final int pos, final int startLine, final int endLine) {
     setCaretPosition(startLine);
     moveCaretPosition(endLine);
@@ -554,7 +555,7 @@ public class MyTextArea extends JTextArea {
           newCaretEndY  =modelToView(newCaretEnd).y;
       int offFromBottom=currBottom-newCaretEndY,
           offFromTop   =newCaretStartY-currTop;
-          
+
       //Temporarily turning off the adjustment of visible caret because it
       //really doesn't seem helpful. Tends to cause a sudden bump where the
       //thing you're watching for a change suddenly moves elsewhere:
@@ -573,11 +574,11 @@ public class MyTextArea extends JTextArea {
 
   private void doControlArrow(boolean left, boolean shift) throws Exception {
     final Caret caret=getCaret();
-    int 
+    int
       //Where the blinky thing is:
-      cpos=caret.getDot(), 
-      //If there is a selection, where it starts, 
-      //else the same as cpos; keep in mind that 
+      cpos=caret.getDot(),
+      //If there is a selection, where it starts,
+      //else the same as cpos; keep in mind that
       //it is not necessarily to the right or left
       //of cpos just because this is right-> or left->
       mark=caret.getMark();
@@ -593,8 +594,8 @@ public class MyTextArea extends JTextArea {
     else {
       int endRow=getLineEndOffset(row),
           lineCount=getLineCount();
-      if (row!=lineCount && endRow==cpos+1) 
-        //When there is another row, end of row is 
+      if (row!=lineCount && endRow==cpos+1)
+        //When there is another row, end of row is
         //is a linefeed, so you're one behind:
         endRow=getLineEndOffset(row+1);
       String selectable=getText(cpos, endRow-cpos);
@@ -605,8 +606,8 @@ public class MyTextArea extends JTextArea {
         setCaretPosition(mark);
         moveCaretPosition(cpos+upTo);
       }
-      else 
-        setCaretPosition(cpos+upTo);      
+      else
+        setCaretPosition(cpos+upTo);
     }
   }
 
@@ -618,19 +619,19 @@ public class MyTextArea extends JTextArea {
   private void doTabIndent(boolean remove) {
     try {
       Caret caret=getCaret();
-      
+
       //Determine current selection, forwards or backwards:
       boolean forwards;
       int startSel, endSel;
       {
-        final int cpos=caret.getDot(), 
+        final int cpos=caret.getDot(),
                   mark=caret.getMark();
         forwards=cpos>=mark;
         startSel=forwards ?mark :cpos;
         endSel  =forwards ?cpos :mark;
       }
       boolean anySel=startSel!=endSel;
-      
+
       //Get first and last row. Ignore last row
       //if it's an empty line:
       int firstRow=getLineOfOffset(startSel),
@@ -642,7 +643,7 @@ public class MyTextArea extends JTextArea {
       }
       int startPos=getLineStartOffset(firstRow),
           endPos  =getLineEndOffset(lastRow);
-          
+
 
       //Now build up buffer of changes:
       String indentStr=tabsOrSpaces ?"\t" :indentSpaces;
@@ -660,15 +661,15 @@ public class MyTextArea extends JTextArea {
             ep=getLineEndOffset(r);//;
         String lineStr=getText(sp, ep-sp);
         int eolFactor=(r==veryLastRow ?0 :1);
-        
+
         //For partially indented lines, we need to know that:
         int spaceCount=getSpaceCount(lineStr);
         int actualLen=getTabOffBy(spaceCount);
         boolean lenMismatch=actualLen!=indentStrLen;
-        
+
         if (remove) {
           if (lineStr.startsWith(indentStr) || lenMismatch){
-            if (lenMismatch) 
+            if (lenMismatch)
               actualLen=indentStrLen-actualLen;
             anyChange=true;
             lineStr=lineStr.substring(actualLen);
@@ -679,14 +680,14 @@ public class MyTextArea extends JTextArea {
                 startSel-=actualLen;
             }
             endSel-=actualLen;
-          }  
+          }
         }
         else
-        if (!lenMismatch && firstRow==lastRow && 
-            spaceCount==lineStr.length()-eolFactor && 
-            startSel!=ep-eolFactor) 
+        if (!lenMismatch && firstRow==lastRow &&
+            spaceCount==lineStr.length()-eolFactor &&
+            startSel!=ep-eolFactor)
           //This catches the situation where it looks like you need to indent
-          //but you actually have enough spaces already, just after the cursor. 
+          //but you actually have enough spaces already, just after the cursor.
           //So just move the cursor:
           setCaretPosition(ep-eolFactor);
         else {
@@ -734,7 +735,7 @@ public class MyTextArea extends JTextArea {
         spaceCount++;
     return spaceCount;
   }
-    
+
   private void doIndentOnHardReturn() {
     try {
       Caret caret=getCaret();
@@ -788,7 +789,7 @@ public class MyTextArea extends JTextArea {
   private void undoAll(){
     suppressUndoRecord=true;
     UndoStep us;
-    while ((us=undos.doUndo())!=null) 
+    while ((us=undos.doUndo())!=null)
       while (!doUndoReplace(us, null, true)){}
     suppressUndoRecord=false;
     checkUnstable();
@@ -796,13 +797,13 @@ public class MyTextArea extends JTextArea {
   private void redoAll(){
     suppressUndoRecord=true;
     UndoStep us;
-    while ((us=undos.doRedo())!=null) 
+    while ((us=undos.doRedo())!=null)
       while (!doUndoReplace(us, null, false)){}
     suppressUndoRecord=false;
     checkUnstable();
   }
-  
-  
+
+
   private void startUndo(){
     doubleUpCount=0;
     UndoStep st=null;
@@ -843,10 +844,10 @@ public class MyTextArea extends JTextArea {
     return did ?st :null;
   }
 
-  
-  private boolean checkUnstableAndFast(UndoStep newStep) { 
+
+  private boolean checkUnstableAndFast(UndoStep newStep) {
     //Agree to fast undo if we aren't in stable state, and
-    //either fast undos are on, or we have a doubleUp 
+    //either fast undos are on, or we have a doubleUp
     return checkUnstable() && (fastUndos || newStep.doubleUp);
   }
   private boolean checkUnstable() {
@@ -857,7 +858,7 @@ public class MyTextArea extends JTextArea {
     return true;
   }
 
-  
+
   private boolean doUndoReplace(UndoStep st, UndoStep old, boolean undoOrRedo) {
     doubleUndo=st.doubleUp && old!=null && old.doubleUp && (!st.doubleUpDone || doubleUpCount<1);
     if (doubleUndo)
@@ -874,9 +875,9 @@ public class MyTextArea extends JTextArea {
     //because the position change is too far, fast or not:
     return (undoOrRedo ^ st.uType==st.ADD)             //XOR trickiness
       ?doUndoReplace(old!=null, st.text, st.start, st.start)      //Add text back if undo/remove redo/add
-      :doUndoReplace(old!=null, null, st.start, st.start+st.len); //Rip text out  if redo/remove undo/add    
+      :doUndoReplace(old!=null, null, st.start, st.start+st.len); //Rip text out  if redo/remove undo/add
   }
-  
+
   private boolean doUndoReplace(boolean hasPriorUndo, String text, int start, int finish) {
     final Caret caret=getCaret();
     int cpos=caret.getDot(), mark=caret.getMark();
@@ -898,12 +899,12 @@ public class MyTextArea extends JTextArea {
           sel2=mark<cpos ?cpos :mark;
       boolean notYet=
          !doubleUndo && (
-           Math.abs(start-sel1)>1 
+           Math.abs(start-sel1)>1
            ||
           (Math.abs(start-finish)>1 && Math.abs(start-sel1) +Math.abs(finish-sel2)>1)
          );
       if (notYet){
-        if (!hasPriorUndo) 
+        if (!hasPriorUndo)
           betterSetCaretPosition(start, finish);
         return false;
       }
@@ -912,7 +913,7 @@ public class MyTextArea extends JTextArea {
     //Do the deed;
     doScrollIntoView(start, start);
     replaceRange(text, start, finish);
-    
+
     //Highlight what we just did, if we're adding
     //text and it's more than one character:
     if (text!=null) {

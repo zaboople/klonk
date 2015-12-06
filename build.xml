@@ -146,7 +146,7 @@
 
       <manifest>
         <attribute name="Built-By" value="Mr Motte" />
-        <attribute name="Main-Class" value="org.tmotte.klonk.config.BootContext" />
+        <attribute name="Main-Class" value="org.tmotte.klonk.config.Klonk" />
       </manifest>
     </jar>
   </target>
