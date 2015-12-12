@@ -31,7 +31,7 @@ import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
 import org.tmotte.klonk.windows.popup.ssh.SSHOpenFrom;
 import org.tmotte.klonk.windows.popup.ssh.SSHOpenFromResult;
 
-/** 
+/**
  * THE critical path in the application. Most things DI-injected are an interface, if that helps. Mostly concerned with
  * opening files and editors that contain them.
  */
@@ -44,7 +44,7 @@ public class CtrlMain  {
   //                 //
   /////////////////////
 
-  
+
   //DI-injected stuff:
   private KPersist persist;
   private StatusUpdate statusBar;
@@ -73,17 +73,17 @@ public class CtrlMain  {
   public CtrlMain(UserNotify userNotify, final KPersist persist) {
     this.userNotify=userNotify;
     this.persist=persist;
-    recents=new Recents(persist); 
+    recents=new Recents(persist);
   }
-  
+
   /////////////////////////////////
   //DI initialization functions: //
   /////////////////////////////////
-  
+
   // DI SET: //
-  
+
   public void setLayoutAndPopups(
-      MainDisplay layout, 
+      MainDisplay layout,
       StatusUpdate statusBar,
       FileDialogWrapper fileDialog,
       SSHOpenFrom sshOpenFrom,
@@ -103,14 +103,14 @@ public class CtrlMain  {
       Doer editorSwitchListener,
       Setter<List<String>> recentFileListener,
       Setter<List<String>> recentDirListener
-    ) {  
+    ) {
     this.lockRemover=lockRemover;
     this.fileResolver=fileResolver;
     this.editorSwitchedListener=editorSwitchListener;
     this.recents.setFileListener(recentFileListener);
     this.recents.setDirListener(recentDirListener);
   }
-  
+
 
   // DI GET: //
 
@@ -119,20 +119,20 @@ public class CtrlMain  {
   }
   public Setter<List<String>> getFileReceiver() {
     return new Setter<List<String>>(){
-      public @Override void set(List<String> files) 
+      public @Override void set(List<String> files)
         {doLoadAsync(files);}
     };
   }
   public Getter<String> getCurrFileNameGetter() {
     return new Getter<String>() {
-      public @Override String get() 
+      public @Override String get()
         {return getCurrentFileName();}
     };
   }
   public Doer getAppCloseListener() {
     return new Doer() {
       //This is the application close listener:
-      public @Override void doIt() 
+      public @Override void doIt()
         {tryExit();}
     };
   }
@@ -148,11 +148,11 @@ public class CtrlMain  {
         if (e.getFile()!=null && !e.hasUnsavedChanges())
           fileSave(false);
       }
-    };  
+    };
   }
-  
+
   //DI OTHER: //
- 
+
   public void doLoadFiles(String[] args) {
     loadFiles(args);
   }
@@ -174,7 +174,7 @@ public class CtrlMain  {
     }
   };
 
- 
+
   //////////////////////
   //                  //
   //   MENU EVENTS:   //
@@ -215,7 +215,7 @@ public class CtrlMain  {
         return;
     //If very last one is just an untitled, ignore and return.
     //Note that since we automatically create an untitled when
-    //we close the last one, we have to be careful about an 
+    //we close the last one, we have to be careful about an
     //endless loop:
     if (!editorMgr.getFirst().isUsed())
       return;
@@ -226,7 +226,7 @@ public class CtrlMain  {
     if (f!=null)
       loadFile(f);
   }
- 
+
   // FILE OPEN FROM: //
   public void doOpenFromDocDir() {
     File file;
@@ -243,14 +243,14 @@ public class CtrlMain  {
   }
   public void doOpenFromSSH() {
     File file=getSSHRecent(false);
-    if (file==null) 
+    if (file==null)
       return;
     if (!file.isFile())
       file=fileDialog.show(false, file);
     if (file!=null)
       loadFile(file);
   }
-    
+
   // FILE SAVE TO: //
   public void doSaveToDocDir() {
     File file;
@@ -268,7 +268,7 @@ public class CtrlMain  {
   }
   public void doSaveToSSH() {
     File file=getSSHRecent(true);
-    if (file==null) 
+    if (file==null)
       return;
     file=showFileDialogForSave(file, null);
     if (file!=null)
@@ -289,11 +289,11 @@ public class CtrlMain  {
     }
     return fileResolver.get(f.sshFilename);
   }
-  
+
   public void doFileExit() {
     tryExit();
   }
-  
+
   //////////////////
   // SWITCH MENU: //
   //////////////////
@@ -325,7 +325,7 @@ public class CtrlMain  {
   public void doSwitch(Editor editor) {
     editorSwitch(editor);
   }
- 
+
 
   ///////////////////////
   //                   //
@@ -347,7 +347,7 @@ public class CtrlMain  {
     lockRemover.doIt();
     System.exit(0);
   }
- 
+
   private String getCurrentFileName() {
     File file=editorMgr.getFirst().getFile();
     return file==null ?null :getFullPath(file);
@@ -369,14 +369,14 @@ public class CtrlMain  {
     int rowPos=e.getRow(caretPos);
     statusBar.showRowColumn(rowPos+1, caretPos-e.getRowOffset(rowPos));
   }
-  
+
   ////////////////
   // FILE SAVE: //
   ////////////////
 
   private boolean fileSave(boolean forceNewFile) {
     Editor e=editorMgr.getFirst();
-    
+
     //1. Get file:
     boolean newFile=true;
     File file=null, oldFile=e.getFile();
@@ -423,13 +423,13 @@ public class CtrlMain  {
     if (file==null)
       return null;
     Editor eFirst=editorMgr.getFirst();
-    for (Editor e: editorMgr.forEach()) 
+    for (Editor e: editorMgr.forEach())
       if (e!=eFirst && e.sameFile(file)){
         userNotify.alert("File is already open in another window; close it first: "+e.getTitle());
         return null;
       }
     //This is only needed if we are using JFileChooser. The AWT chooser will result in a question
-    //courtesy of the OS: 
+    //courtesy of the OS:
     if (file.exists()) {
       if (!yesNo.show("Replace file "+file.getAbsolutePath()+"?").isYes())
         return null;
@@ -467,7 +467,7 @@ public class CtrlMain  {
         return false;
       //"No" means we do nothing
     }
-    if (e.getFile()!=null) 
+    if (e.getFile()!=null)
       recents.recentFileClosed(e.getFile());
     editors.remove(0);
     statusBar.show("Closed: "+e.getTitle());
@@ -483,11 +483,11 @@ public class CtrlMain  {
   // FILE LOAD: //
   ////////////////
 
-  /** 
+  /**
    * Called when the directory listener discovers other app isntances want files needs to be loaded by this one,
    * schedules this onto the event dispatch thread with invokeLater.
    */
-  private void doLoadAsync(final List<String> fileNames) { 
+  private void doLoadAsync(final List<String> fileNames) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
@@ -499,7 +499,7 @@ public class CtrlMain  {
       }
     });
   }
-  
+
   private void loadFiles(String[] args) {
     if (args!=null)
       for (String s: args) {
@@ -521,7 +521,7 @@ public class CtrlMain  {
       userNotify.alert("No such file: "+file);
       return;
     }
-    for (Editor ed: editorMgr.forEach()) 
+    for (Editor ed: editorMgr.forEach())
       if (ed.sameFile(file)){
         editorSwitch(ed);
         userNotify.alert("File is already open: "+ed.getTitle());
@@ -529,7 +529,7 @@ public class CtrlMain  {
       }
     try {
       Editor toUse=null;
-      for (Editor e:editorMgr.forEach()) 
+      for (Editor e:editorMgr.forEach())
         if (!e.isUsed()) {
           toUse=e;
           editorSwitch(e);
@@ -545,6 +545,7 @@ public class CtrlMain  {
   private boolean loadFile(Editor e, File file) {
     try {
       statusBar.show("Loading: "+file+"...");
+      file=file.getCanonicalFile();
       e.loadFile(file, persist.getDefaultLineDelimiter());
     } catch (Exception ex) {
       checkIOError(ex);
@@ -554,19 +555,19 @@ public class CtrlMain  {
     fileIsLoaded(e, file);
     return true;
   }
-  
+
   private void checkIOError(Exception ex) {
     String msg=getCause(ex).getMessage();
     if (msg!=null && msg.contains("Permission denied"))
       userNotify.alert(msg);
-    else 
+    else
       userNotify.alert(ex);
   }
   private Throwable getCause(Throwable e) {
     Throwable e1=e.getCause();
     return e1==null ?e :getCause(e1);
   }
-  
+
 
 
   ////////////////////////
@@ -580,12 +581,12 @@ public class CtrlMain  {
   }
   private Editor newEditor(){
     Editor e=new Editor(
-      userNotify.getExceptionHandler(), 
-      editorListener, 
-      myUndoListener, 
-      persist.getDefaultLineDelimiter(), 
+      userNotify.getExceptionHandler(),
+      editorListener,
+      myUndoListener,
+      persist.getDefaultLineDelimiter(),
       persist.getWordWrap()
-    ); 
+    );
     e.setFastUndos(persist.getFastUndos());
     e.setTitle(getUnusedTitle());
     TabAndIndentOptions taio=persist.getTabAndIndentOptions();
@@ -594,7 +595,7 @@ public class CtrlMain  {
     e.setFont(persist.getFontAndColors());
 
     editors.add(0, e);
-    setEditor(e); 
+    setEditor(e);
     return e;
   }
   private void setEditor(Editor e) {
@@ -611,7 +612,7 @@ public class CtrlMain  {
     return name;
   }
   private boolean isUsedTitle(String name) {
-    for (Editor ed:editorMgr.forEach()) 
+    for (Editor ed:editorMgr.forEach())
       if (ed.getTitle().equals(name))
         return true;
     return false;
@@ -647,7 +648,7 @@ public class CtrlMain  {
     editorSwitched(e);
     statusBar.show("File loaded: "+file);
   }
-  
+
   private void stabilityChange(Editor editor) {
     boolean b=editor.hasUnsavedChanges();
     if (thisUnsaved!=b){
@@ -663,14 +664,14 @@ public class CtrlMain  {
         statusBar.showChangeAny(anyUnsaved=true);
       return;
     }
-    else 
-    if (anyUnsaved) 
+    else
+    if (anyUnsaved)
       for (Editor ed: editors)
         if (ed.hasUnsavedChanges())
           return;
     statusBar.showChangeAny(anyUnsaved=false);
   }
-  /** Invoked whenever we switch to a different editor, 
+  /** Invoked whenever we switch to a different editor,
       or current editor is used to open a file
       or current editor is saved to a new file. */
   private void editorSwitched(Editor e) {

@@ -166,6 +166,7 @@ public class BootContext {
     Setter<Throwable> failHandler=userNotify.getExceptionHandler();
     KPersist persist=new KPersist(home, failHandler);
     FontOptions editorFont=persist.getFontAndColors();
+    CurrentOS currentOS=new CurrentOS();
 
     //Main controller:
     CtrlMain ctrlMain=new CtrlMain(userNotify, persist);
@@ -238,7 +239,7 @@ public class BootContext {
 
     // MENUS: //
 
-    Menus menus=new Menus(editors);
+    Menus menus=new Menus(editors, currentOS);
     menus.setFastUndos(persist.getFastUndos())
           .setWordWrap(persist.getWordWrap());
     {
@@ -257,7 +258,7 @@ public class BootContext {
         ,new CtrlSelection(editors, statusBar, alerter)
         ,new CtrlUndo     (editors, statusBar, yesNo, persist)
         ,new CtrlSearch   (editors, statusBar, findAndReplace, goToLine)
-        ,new CtrlFileOther(editors, statusBar, ctrlFavorites)
+        ,new CtrlFileOther(editors, statusBar, ctrlFavorites, currentOS)
         ,new CtrlOther    (shell, help, about)
         ,new CtrlOptions  (
           editors, statusBar, persist, ctrlFavorites,
@@ -315,5 +316,7 @@ public class BootContext {
       throw new RuntimeException(e);
     }
   }
-
+  public static CurrentOS getCurrentOS() {
+    return new CurrentOS();
+  }
 }

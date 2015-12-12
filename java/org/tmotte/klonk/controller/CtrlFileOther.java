@@ -4,6 +4,7 @@ import org.tmotte.common.swang.SimpleClipboard;
 import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.msg.Editors;
+import org.tmotte.klonk.config.CurrentOS;
 import java.util.LinkedList;
 
 
@@ -11,20 +12,29 @@ public class CtrlFileOther {
   private Editors editors;
   private StatusUpdate statusBar;
   private CtrlFavorites ctrlFavorites;
-  
+  private CurrentOS currentOS;
+
   public CtrlFileOther(
-      Editors editors, StatusUpdate statusBar, CtrlFavorites ctrlFavorites
+      Editors editors, StatusUpdate statusBar, CtrlFavorites ctrlFavorites, CurrentOS currentOS
     ) {
     this.editors=editors;
     this.statusBar=statusBar;
     this.ctrlFavorites=ctrlFavorites;
+    this.currentOS=currentOS;
   }
 
-  public void doDocumentDirectoryMSWindows() {
+  public void doDocumentDirectoryExplore() {
     try{
-      Runtime.getRuntime().exec(
-        "explorer "+editors.getFirst().getFile().getParent()
-      );
+      String cmd=null;
+      if (currentOS.isOSX)
+        cmd="open ";
+      else
+      if (currentOS.isMSWindows)
+        cmd="explorer ";
+      else
+        throw new RuntimeException("Unknown operating system");
+      String filename=editors.getFirst().getFile().getParentFile().getCanonicalPath();
+      Runtime.getRuntime().exec(cmd+filename);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -69,6 +79,10 @@ public class CtrlFileOther {
     statusBar.show("Copied to clipboard: "+name);
   }
 
-  
- 
+  public static void main(String[] args) throws Exception {
+    java.io.File file=new java.io.File(args[0]);
+    System.out.println(file.getCanonicalPath());
+    System.out.println(file.getCanonicalFile().getParentFile());
+  }
+
 }

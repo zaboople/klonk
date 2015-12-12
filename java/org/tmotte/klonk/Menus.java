@@ -21,6 +21,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
+import org.tmotte.klonk.config.CurrentOS;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Setter;
@@ -39,8 +40,7 @@ public class Menus {
   private Editors editors;
   private Map<JMenuItem,Editor> switchMenuToEditor=new Hashtable<>();
   private MenuUtils mu=new MenuUtils();
-  private boolean isMSWindows=false;
-  private boolean isOSX=false;
+  private CurrentOS currentOS;
 
   //Controllers:
   private CtrlMain ctrlMain;
@@ -60,7 +60,7 @@ public class Menus {
   private JMenuItem fileOpen, fileSave, fileNew, fileSaveAs, fileClose,
                     fileCloseOthers, fileCloseAll,
                     filePrint,
-                    fileDocDirWindows, fileClipboardDoc, fileClipboardDocDir,
+                    fileDocDirExplore, fileClipboardDoc, fileClipboardDocDir,
                     fileOpenFromDocDir, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
                     fileFaveAddFile, fileFaveAddDir,
                     fileExit,
@@ -88,11 +88,9 @@ public class Menus {
   // INITIALIZATION: //
   /////////////////////
 
-  public Menus(Editors editors) {
+  public Menus(Editors editors, CurrentOS currentOS) {
     this.editors=editors;
-    String os=System.getProperty("os.name").toLowerCase();
-    isMSWindows=os!=null && os.indexOf("windows")>-1;
-    isOSX=os.indexOf("mac os")>-1;
+    this.currentOS=currentOS;
     create();
   }
   public void setControllers(
@@ -192,8 +190,8 @@ public class Menus {
   //////////////////////
 
   private void showHasFile(boolean has) {
-    if (fileDocDirWindows!=null)
-      fileDocDirWindows.setEnabled(has);
+    if (fileDocDirExplore!=null)
+      fileDocDirExplore.setEnabled(has);
     fileFaveAddFile.setEnabled(has);
     fileFaveAddDir.setEnabled(has);
     fileClipboardDoc.setEnabled(has);
@@ -351,8 +349,8 @@ public class Menus {
 
     //File menu section 3:
     file.addSeparator();
-    if (isMSWindows)
-      file.add(fileDocDirWindows =mu.doMenuItem(
+    if (currentOS.isMSWindows || currentOS.isOSX)
+      file.add(fileDocDirExplore =mu.doMenuItem(
         "Open document's directory", fileListener, KeyEvent.VK_D
       ));
     mu.add(
@@ -666,7 +664,7 @@ public class Menus {
         else
         if (s==filePrint)            ctrlFileOther.doPrint();
         else
-        if (s==fileDocDirWindows)    ctrlFileOther.doDocumentDirectoryMSWindows();
+        if (s==fileDocDirExplore)    ctrlFileOther.doDocumentDirectoryExplore();
         else
         if (s==fileClipboardDoc)     ctrlFileOther.doClipboardDoc();
         else
