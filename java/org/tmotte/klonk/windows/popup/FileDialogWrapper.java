@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.CurrentOS;
+import org.tmotte.klonk.ssh.SSHFile;
 
 /**
  * The FileDialog/JFileChooser classes already do most of the work, so this just does a minimal
@@ -60,7 +61,7 @@ public class FileDialogWrapper {
 
   public File show(boolean forSave, File startFile, File startDir) {
     init();
-    if (currentOS.isOSX)
+    if (currentOS.isOSX && SSHFile.cast(startFile)==null || SSHFile.cast(startDir)==null)
       try {
         //Broken on MS Windows XP. If you do "save as" and the old file
         //name is longer than the new one, the last characters from the old
@@ -89,7 +90,11 @@ public class FileDialogWrapper {
         }
         else {
           fileChooser.setSelectedFile(startFile);
-          startDir=startFile.getParentFile();
+          try {
+            startDir=startFile.getCanonicalFile().getParentFile();
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
         }
       }
       if (startDir!=null)
