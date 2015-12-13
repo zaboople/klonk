@@ -34,20 +34,20 @@ import org.tmotte.klonk.config.option.SSHOptions;
 public class SSHOptionPicker {
 
   private JFrame parentFrame;
-  private FileDialogWrapper fdw; 
+  private FileDialogWrapper fdw;
 
-  private JDialog win;  
-  private JCheckBox 
-    jcbKnownHosts, 
+  private JDialog win;
+  private JCheckBox
+    jcbKnownHosts,
     jcbPrivateKeys,
     jcbOpenSSHConfig,
     jcbSelectAllConns;
-  private JTextField 
-    jtfKnownHosts, 
+  private JTextField
+    jtfKnownHosts,
     jtfPrivateKeys,
-    jtfOpenSSHConfig;  
-  private JButton 
-    btnKnownHosts, 
+    jtfOpenSSHConfig;
+  private JButton
+    btnKnownHosts,
     btnPrivateKeys,
     btnOpenSSHConfig;
   private JPanel jpConns;
@@ -67,19 +67,19 @@ public class SSHOptionPicker {
   public SSHOptionPicker(JFrame parentFrame, FileDialogWrapper fdw) {
     this.parentFrame=parentFrame;
     this.fdw=fdw;
-  }  
+  }
   public boolean show(SSHOptions options, final List<String> servers) {
     init();
     result=false;
     {
       //Pre-set inputs:
-      
+
       //Known hosts:
       String knownHosts=ifEmpty(options.getKnownHostsFilename());
       if (knownHosts!=null)
         jtfKnownHosts.setText(knownHosts);
       jcbKnownHosts.setSelected( knownHosts !=null);
-      
+
       //Private keys:
       String privateKeys=ifEmpty(options.getPrivateKeysFilename());
       if (privateKeys!=null)
@@ -91,16 +91,16 @@ public class SSHOptionPicker {
       if (openSSHConfig!=null)
         jtfOpenSSHConfig.setText(openSSHConfig);
       jcbOpenSSHConfig.setSelected( openSSHConfig !=null);
-      
+
       //Default permissions:
       setChecked(tcUser, options.dur, options.duw, options.dux);
       setChecked(tcGroup, options.dgr, options.dgw, options.dgx);
       setChecked(tcOther, options.dor, options.dow, options.dox);
-      
+
       //Kill connections:
       boolean kk=servers.size()>0;
       jcbSelectAllConns.setEnabled(kk);
-      if (kk) 
+      if (kk)
         jcbSelectAllConns.setVisible(servers.size()>1);
       lblOpenConns.setForeground(kk ?Color.BLACK :Color.GRAY);
       jpConns.removeAll();
@@ -117,7 +117,7 @@ public class SSHOptionPicker {
     doShow();
     if (result) {
       servers.clear();
-      for (JCheckBox jcb: listCBConns) 
+      for (JCheckBox jcb: listCBConns)
         if (jcb.isSelected())
           servers.add(jcb.getText());
       options.setKnownHostsFilename(
@@ -134,7 +134,7 @@ public class SSHOptionPicker {
         jcbOpenSSHConfig.isSelected()
           ?ifEmpty(jtfOpenSSHConfig)
           :""
-      );      
+      );
       options.dur=tcUser.read.isSelected();
       options.duw=tcUser.write.isSelected();
       options.dux=tcUser.execute.isSelected();
@@ -168,16 +168,16 @@ public class SSHOptionPicker {
         throw new RuntimeException("Could not obtain file: "+file);
       }
   }
-  
+
   /////////////
   // CREATE: //
   /////////////
-  
+
   private void init() {
     if (!initialized) {
       create();
-      layout(); 
-      listen();    
+      layout();
+      listen();
       initialized=true;
     }
   }
@@ -191,12 +191,12 @@ public class SSHOptionPicker {
     btnKnownHosts=new JButton("...");
 
     jcbPrivateKeys=new JCheckBox("Private keys");
-    jtfPrivateKeys=new JTextField();  
+    jtfPrivateKeys=new JTextField();
     jtfPrivateKeys.setColumns(45);
     btnPrivateKeys=new JButton("...");
 
     jcbOpenSSHConfig=new JCheckBox("OpenSSH Config");
-    jtfOpenSSHConfig=new JTextField();  
+    jtfOpenSSHConfig=new JTextField();
     jtfOpenSSHConfig.setColumns(45);
     btnOpenSSHConfig=new JButton("...");
 
@@ -204,13 +204,13 @@ public class SSHOptionPicker {
     btnOK.setMnemonic(KeyEvent.VK_K);
     btnCancel=new JButton("Cancel");
     btnCancel.setMnemonic(KeyEvent.VK_C);
-    
+
     jcbSelectAllConns=new JCheckBox("Select all");
     lblOpenConns=new JLabel("<html><b>Kill open connections:</b></html>");
     jpConns=new JPanel();
     gbConns=new GridBug(jpConns);
     listCBConns=new LinkedList<JCheckBox>();
-    
+
     tcUser=new TripleCheck();
     tcGroup=new TripleCheck();
     tcOther=new TripleCheck();
@@ -222,7 +222,7 @@ public class SSHOptionPicker {
     gb.fill=gb.HORIZONTAL;
     gb.anchor=gb.NORTHWEST;
     gb.add(getKnownPrivatePanel());
-    
+
     gb.insets.top=20;
     gb.insets.left=8;
     gb.insets.right=8;
@@ -232,7 +232,7 @@ public class SSHOptionPicker {
       j.setForeground(new Color(200,200,200));
       gb.addY(j);
     }
-    
+
     gb.insets.left=6;
     gb.insets.top=10;
     gb.insets.bottom=10;
@@ -244,7 +244,7 @@ public class SSHOptionPicker {
       JSeparator j=new JSeparator(JSeparator.HORIZONTAL);
       j.setForeground(new Color(200,200,200));
       gb.addY(j);
-    }    
+    }
 
     gb.insets.top=2;
     gb.insets.left=4;
@@ -275,24 +275,24 @@ public class SSHOptionPicker {
     gb.insets.left+=2;
     gb.insets.top=4;
     gb.addY(jcbKnownHosts);
-    
+
     gb.weightx=1;
-    gb.fill=gb.BOTH;    
-    gb.addX(jtfKnownHosts);    
+    gb.fill=gb.BOTH;
+    gb.addX(jtfKnownHosts);
     gb.fill=gb.NONE;
     gb.weightx=0;
-    
+
     gb.insets.right=4;
     gb.addX(btnKnownHosts);
 
     //Private keys checkbox+textfield+button:
     gb.insets.right=0;
     gb.setX(0);
-    gb.insets.top=4;   
+    gb.insets.top=4;
     gb.addY(jcbPrivateKeys);
-    
+
     gb.weightx=1;
-    gb.fill=gb.BOTH;    
+    gb.fill=gb.BOTH;
     gb.addX(jtfPrivateKeys);
     gb.fill=gb.NONE;
     gb.weightx=0;
@@ -304,22 +304,22 @@ public class SSHOptionPicker {
     gb.insets.right=0;
     gb.setX(0);
     gb.addY(jcbOpenSSHConfig);
-    
+
     gb.weightx=1;
-    gb.fill=gb.BOTH;    
+    gb.fill=gb.BOTH;
     gb.addX(jtfOpenSSHConfig);
     gb.fill=gb.NONE;
     gb.weightx=0;
 
     gb.insets.right=4;
     gb.addX(btnOpenSSHConfig);
-    
+
     return jp;
   }
 
   private JPanel getAccessPanel() {
     JPanel jp=new JPanel();
-    
+
     GridBug gb=new GridBug(jp);
     gb.weightXY(0).gridXY(0);
     gb.anchor=gb.WEST;
@@ -328,19 +328,19 @@ public class SSHOptionPicker {
     gb.insets.left=0;
     gb.weightx=1;
     gb.gridwidth=4;
-    gb.add(new JLabel("<html><body><b>Default access for new files/directories:</b></body></html>"));    
-    gb.addY(new JLabel("(Note: Read permission on directory will be treated as execute also)"));    
+    gb.add(new JLabel("<html><body><b>Default access for new files/directories:</b></body></html>"));
+    gb.addY(new JLabel("(Note: Read permission on directory will be treated as execute also)"));
     gb.gridwidth=1;
 
-    gb.setX(0);  
+    gb.setX(0);
     gb.weightx=0;
-    gb.addY(new JLabel(""));    
+    gb.addY(new JLabel(""));
     gb.insets.left=6;
     gb.addX(new JLabel("Read"));
     gb.addX(new JLabel("Write"));
     gb.weightx=1;
     gb.addX(new JLabel("Execute"));
-    
+
     addAccessTriple(gb, tcUser, "User");
     addAccessTriple(gb, tcGroup, "Group");
     addAccessTriple(gb, tcOther, "Other");
@@ -362,7 +362,7 @@ public class SSHOptionPicker {
   private JPanel getKillConnsPanel() {
     JPanel jp=new JPanel();
     //jp.setBackground(Color.GREEN);
-    
+
     GridBug gb=new GridBug(jp);
     gb.weightXY(0).gridXY(0);
     gb.anchor=gb.WEST;
@@ -380,7 +380,7 @@ public class SSHOptionPicker {
 
     gbConns.weightXY(1,0);
     gbConns.anchor=gbConns.WEST;
-    
+
     return jp;
   }
 
@@ -399,7 +399,7 @@ public class SSHOptionPicker {
     gb.addX(btnCancel);
     return panel;
   }
-  
+
   /////////////
   // LISTEN: //
   /////////////
@@ -414,7 +414,7 @@ public class SSHOptionPicker {
     jcbKnownHosts.addActionListener(jcbAction);
     jcbPrivateKeys.addActionListener(jcbAction);
     jcbOpenSSHConfig.addActionListener(jcbAction);
-    
+
     //GetFiles
     listenFileSelector(jtfKnownHosts, btnKnownHosts);
     listenFileSelector(jtfPrivateKeys, btnPrivateKeys);
@@ -442,7 +442,7 @@ public class SSHOptionPicker {
             b.setSelected(sel);
         }
       }
-    );    
+    );
   }
   private void listenOKCancel() {
     Action okAction=new AbstractAction() {
@@ -450,18 +450,18 @@ public class SSHOptionPicker {
     };
     btnOK.addActionListener(okAction);
     KeyMapper.accel(btnOK, okAction, KeyMapper.key(KeyEvent.VK_ENTER));
-    
+
     Action cancelAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(false);}
     };
     btnCancel.addActionListener(cancelAction);
     KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
-    KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));  
+    KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
   }
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
     result=action;
-    win.setVisible(false);  
+    win.setVisible(false);
   }
   private void setVisible() {
     boolean kh=jcbKnownHosts.isSelected(),
@@ -474,11 +474,11 @@ public class SSHOptionPicker {
     jtfOpenSSHConfig.setEnabled(os);
     btnOpenSSHConfig.setEnabled(os);
   }
-  
+
   ////////////////
   // UTILITIES: //
   ////////////////
-  
+
   private String ifEmpty(JTextField jtf) {
     return ifEmpty(jtf.getText());
   }
@@ -492,7 +492,7 @@ public class SSHOptionPicker {
     tc.write.setSelected(write);
     tc.execute.setSelected(execute);
   }
-  
+
   ///////////
   // TEST: //
   ///////////
@@ -507,29 +507,29 @@ public class SSHOptionPicker {
           List<String> servers=new ArrayList<>();
 
           System.out.println("OPTIONS BEFORE:\n"+sopt);
-          
+
           servers.add("hoopty.doopty.com");
           servers.add("braindamage.waffles.org");
           servers.add("splat.cannon.imbecile.nk");
           debugTestResult(pop.show(sopt, servers), sopt, servers);
-          
+
           servers.clear();
           servers.add("bottom.bong.com");
           debugTestResult(pop.show(sopt, servers), sopt, servers);
-          
+
           servers.clear();
           debugTestResult(pop.show(sopt, servers), sopt, servers);
         } catch (Exception e) {
           e.printStackTrace();
         }
       }
-    });  
-  }  
+    });
+  }
   private static void debugTestResult(boolean result, SSHOptions sopt, List<String> servers){
     System.out.println("\nResult: ");
     if (result){
       System.out.println(sopt);
-      for (String s: servers) 
+      for (String s: servers)
         System.out.println("Disconnect: "+s);
     }
     else
