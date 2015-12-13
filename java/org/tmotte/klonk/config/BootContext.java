@@ -210,6 +210,7 @@ public class BootContext {
       .withOptions(sshOpts);
     FileDialogWrapper fileDialogWrapper=new FileDialogWrapper(
       mainFrame,
+      currentOS,
       new SSHFileSystemView(sshConns, sshUN),
       new SSHFileView()
     );

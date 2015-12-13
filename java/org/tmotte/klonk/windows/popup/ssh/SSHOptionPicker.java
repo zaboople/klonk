@@ -498,11 +498,15 @@ public class SSHOptionPicker {
   ///////////
 
   public static void main(final String[] args) throws Exception {
+
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          JFrame parentFrame=PopupTestContext.makeMainFrame();
-          SSHOptionPicker pop=new SSHOptionPicker(parentFrame, new FileDialogWrapper(parentFrame));
+          PopupTestContext ptc=new PopupTestContext();
+          JFrame parentFrame=ptc.makeMainFrame();
+          SSHOptionPicker pop=new SSHOptionPicker(
+            parentFrame, new FileDialogWrapper(parentFrame, ptc.getCurrentOS())
+          );
           SSHOptions sopt=new SSHOptions();
           List<String> servers=new ArrayList<>();
 

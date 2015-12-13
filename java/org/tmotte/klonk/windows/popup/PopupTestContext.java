@@ -16,11 +16,12 @@ import org.tmotte.klonk.controller.CtrlMain;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.windows.MainLayout;
+import org.tmotte.klonk.config.CurrentOS;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.BootContext;
 
-/** 
+/**
  * For testing popups without the overhead of the main application running.
  * It should be noted that 90% of the tests herein only use the makeMainFrame() function.
  * Shell is the exception, but then again, it is a complicated animal.
@@ -33,21 +34,22 @@ public class PopupTestContext  {
   KPersist persist;
   JFrame mainFrame;
   Setter<Throwable> fail;
-  
-  
+  CurrentOS currentOS=new CurrentOS();
+
+
   public KPersist getPersist() {
     if (persist==null)
       persist=new KPersist(getHome(), getFail());
     return persist;
   }
   protected KHome getHome() {
-    if (home==null) 
+    if (home==null)
       //This could be improved by using a command line argument
       home=new KHome("./test/home");
     return home;
   }
   public JFrame getMainFrame() {
-    if (mainFrame==null) 
+    if (mainFrame==null)
       mainFrame=makeMainFrame();
     return mainFrame;
   }
@@ -63,11 +65,14 @@ public class PopupTestContext  {
   public Image getPopupIcon() {
     return BootContext.getPopupIcon(this);
   }
-  
+  public CurrentOS getCurrentOS() {
+    return currentOS;
+  }
+
   ////////////////
   // UTILITIES: //
   ////////////////
- 
+
   public static JFrame makeMainFrame() {
     BootContext.initLookFeel();
     JFrame mainFrame=new JFrame("Klonk - Test Main Frame");
@@ -89,6 +94,6 @@ public class PopupTestContext  {
     return mainFrame;
   }
 
-    
+
 
 }

@@ -55,11 +55,11 @@ public class Shell {
   private boolean initialized=false;
 
   public Shell(
-     JFrame parentFrame, 
-     Setter<Throwable> fail, 
-     KPersist persist, 
-     FileDialogWrapper fdw, 
-     Image icon, 
+     JFrame parentFrame,
+     Setter<Throwable> fail,
+     KPersist persist,
+     FileDialogWrapper fdw,
+     Image icon,
      Getter<String> currFileGetter
     ) {
     this.parentFrame=parentFrame;
@@ -68,10 +68,10 @@ public class Shell {
     this.persist=persist;
     this.icon=icon;
     this.currFileGetter=currFileGetter;
-  }  
+  }
   public Setter<FontOptions> getFontListener() {
     return fontListener;
-  } 
+  }
   public void show() {
     init();
     if (!jcbPrevious.hasFocus() && !mtaOutput.hasFocus())
@@ -81,7 +81,7 @@ public class Shell {
     win.setVisible(true);
     win.toFront();
   }
-  
+
   ////////////////////////
   //                    //
   //  PRIVATE METHODS:  //
@@ -106,7 +106,7 @@ public class Shell {
   }
   private void close() {
     closing();
-    win.setVisible(false);  
+    win.setVisible(false);
   }
   private void switchBack() {
     preserveBounds();
@@ -119,7 +119,7 @@ public class Shell {
     this.fontOptions=f;
     if (initialized)
       setFont(mtaOutput);
-  }  
+  }
   private void setFont(JTextComponent mta) {
     FontOptions f=fontOptions;
     mta.setFont(f.getFont());
@@ -179,7 +179,7 @@ public class Shell {
     die();
     btnRun.setEnabled(false);
     btnStop.setEnabled(true);
-    String command=getCommand(); 
+    String command=getCommand();
     mtaOutput.reset();
     runner=new Runner2(command);
     runner.execute();
@@ -220,7 +220,7 @@ public class Shell {
             publish("  Parameter: "+commands.get(i)+"\n");
         ProcessBuilder pb=new ProcessBuilder(commands);
         pb.redirectErrorStream(true);
-        process=pb.start();       
+        process=pb.start();
         try (
             InputStream istr=process.getInputStream();
             InputStreamReader isr=new InputStreamReader(istr);
@@ -239,7 +239,7 @@ public class Shell {
     }
     @Override protected void process(List<String> lines){
       if (!kill)
-        for (String s: lines) 
+        for (String s: lines)
           mtaOutput.append(s);
     }
     @Override protected void done() {
@@ -250,30 +250,30 @@ public class Shell {
       if (!kill)
         mtaOutput.requestFocusInWindow();
     }
-    
+
   };
 
-  
+
   ///////////////////////////
-  // CREATE/LAYOUT/LISTEN: //  
+  // CREATE/LAYOUT/LISTEN: //
   ///////////////////////////
 
   private void init() {
     if (!initialized) {
       create();
-      layout(); 
-      listen();    
+      layout();
+      listen();
       initialized=true;
     }
   }
   private void create(){
     fontOptions=persist.getFontAndColors();
-  
+
     jcbPreviousData=new DefaultComboBoxModel<>();
     fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
     persistedFiles=new LinkedList<>();
     persist.getCommands(persistedFiles);
-  
+
     String hStart="<html><body>",
            hEnd="</body></html>",
            bStart="<b>",
@@ -290,16 +290,16 @@ public class Shell {
     btnForgetFile.setMnemonic(KeyEvent.VK_O);
 
     jcbPreviousData.removeAllElements();
-    for (String f: persistedFiles) 
+    for (String f: persistedFiles)
       jcbPreviousData.addElement(f);
     jcbPrevious=new JComboBox<>(jcbPreviousData);
     jcbPrevious.setEditable(true);
     jcbPrevious.setMaximumRowCount(KPersist.maxFavorite);
 
-    btnRun   =new JButton(hStart+bStart+"Run "+bEnd+" (Ctrl-E)"+hEnd); 
+    btnRun   =new JButton(hStart+bStart+"Run "+bEnd+" (Ctrl-E)"+hEnd);
     btnRun.setMnemonic(KeyEvent.VK_R);
 
-    btnStop   =new JButton("Stop"); 
+    btnStop   =new JButton("Stop");
     btnStop.setMnemonic(KeyEvent.VK_S);
     btnStop.setFont(fontBold);
     btnStop.setEnabled(false);
@@ -319,7 +319,7 @@ public class Shell {
     setFont(mta);
     return mta;
   }
-  
+
   private void layout() {
     GridBug gb=new GridBug(win);
     gb.gridXY(0);
@@ -327,9 +327,9 @@ public class Shell {
     gb.anchor=gb.WEST;
     gb.fill=gb.HORIZONTAL;
     gb.addY(getFileSelectPanel());
-    
+
     gb.addY(getButtonRunPanel());
-    
+
     gb.weightXY(1, 1);
     gb.fill=gb.BOTH;
     gb.addY(getOutputPanel());
@@ -386,7 +386,7 @@ public class Shell {
     GridBug gb=new GridBug(new JPanel());
     gb.gridXY(0);
     gb.weightXY(0);
-    gb.insets.top=5; 
+    gb.insets.top=5;
     gb.insets.right=12;
     gb.insets.bottom=5;
     gb.addX(btnClose);
@@ -394,7 +394,7 @@ public class Shell {
     gb.addX(btnSwitch);
     return gb.container;
   }
-  
+
   private void listen(){
 
     //Alt-D focuses combobox:
@@ -417,7 +417,7 @@ public class Shell {
       public void actionPerformed(ActionEvent event) {forget();}
     };
     btnForgetFile.addActionListener(forgetAction);
-    
+
     //Run:
     Action runAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {exec();}
@@ -433,7 +433,7 @@ public class Shell {
         }
       }
     });
-    
+
     //Stop:
     Action stopAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
@@ -481,12 +481,12 @@ public class Shell {
       }
     }
   };
-  
+
 
   /////////////
   /// TEST: ///
   /////////////
-  
+
   public static void main(final String[] args) throws Exception {
 
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -494,7 +494,7 @@ public class Shell {
         PopupTestContext ptc=new PopupTestContext();
         Shell shell=new Shell(
           ptc.getMainFrame(), ptc.getFail(), ptc.getPersist(),
-          new FileDialogWrapper(ptc.getMainFrame()),
+          new FileDialogWrapper(ptc.getMainFrame(), ptc.getCurrentOS()),
           ptc.getPopupIcon(),
           new Getter<String>() {
             public String get() {return null;}
@@ -504,7 +504,7 @@ public class Shell {
         //Won't work because previous command is not synchronous
         //ptc.getPersist().save();
       }
-    });  
+    });
   }
- 
+
 }

@@ -10,9 +10,10 @@ import java.io.File;
 import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import org.tmotte.klonk.config.option.FontOptions;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
+import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.CurrentOS;
 
 /**
  * The FileDialog/JFileChooser classes already do most of the work, so this just does a minimal
@@ -22,21 +23,28 @@ import javax.swing.filechooser.FileView;
 public class FileDialogWrapper {
 
   private JFrame mainFrame;
+  private CurrentOS currentOS;
+  private boolean initialized=false;
+
+  //FileDialog is best for OSX at least when not doing SSH:
   private FileDialog fileDialog;
 
-  //JFileChooser sucks but not as bad when used in native mode:
+  //JFileChooser sucks but not as bad when used in native mode on windows,
+  //and it works great with my SSH tricks:
   private JFileChooser fileChooser;
   private FileView fileView;
   private FileSystemView fileSystemView;
-  private boolean initialized=false;
 
-  public FileDialogWrapper(JFrame mainFrame, FileSystemView fsv, FileView fv){
+
+
+  public FileDialogWrapper(JFrame mainFrame, CurrentOS currentOS, FileSystemView fsv, FileView fv){
     this.mainFrame=mainFrame;
+    this.currentOS=currentOS;
     this.fileSystemView=fsv;
     this.fileView=fv;
   }
-  public FileDialogWrapper(JFrame mainFrame){
-    this(mainFrame, null, null);
+  public FileDialogWrapper(JFrame mainFrame, CurrentOS currentOS){
+    this(mainFrame, currentOS, null, null);
   }
 
 
@@ -52,7 +60,29 @@ public class FileDialogWrapper {
 
   public File show(boolean forSave, File startFile, File startDir) {
     init();
-    if (fileChooser!=null) {
+    if (currentOS.isOSX)
+      try {
+        //Broken on MS Windows XP. If you do "save as" and the old file
+        //name is longer than the new one, the last characters from the old
+        //file get appended to the new one - very likely a null terminated string
+        //problem. I tried everything and it was unfixable.
+        FileDialog fd=fileDialog;
+        if (startFile!=null)
+          fd.setFile(startFile.getCanonicalPath().trim());
+        if (startDir!=null)
+          fd.setDirectory(startDir.getCanonicalPath());
+        fd.setTitle(forSave ?"Save" :"Open");
+        fd.setMode(forSave ?fd.SAVE :fd.LOAD);
+        fd.setVisible(true);
+
+        File[] f=fd.getFiles();
+        if (f==null || f.length==0)
+          return null;
+        return f[0];
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    else {
       if (startFile!=null){
         if (startFile.isDirectory()){
           startDir=startFile;
@@ -72,27 +102,6 @@ public class FileDialogWrapper {
       else
         return null;
     }
-    else try {
-      //Unused; Broken on MS Windows XP. If you do "save as" and the old file
-      //name is longer than the new one, the last characters from the old
-      //file get appended to the new one - very likely a null terminated string
-      //problem. I tried everything and it was unfixable.
-      FileDialog fd=fileDialog;
-      if (startFile!=null)
-        fd.setFile(startFile.getCanonicalPath().trim());
-      if (startDir!=null)
-        fd.setDirectory(startDir.getCanonicalPath());
-      fd.setTitle(forSave ?"Save" :"Open");
-      fd.setMode(forSave ?fd.SAVE :fd.LOAD);
-      fd.setVisible(true);
-
-      File[] f=fd.getFiles();
-      if (f==null || f.length==0)
-        return null;
-      return f[0];
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
 
 
@@ -108,7 +117,7 @@ public class FileDialogWrapper {
       fileChooser.setFileSystemView(fileSystemView);
     if (fileView!=null)
       fileChooser.setFileView(fileView);
-    //fileDialog=new FileDialog(mainFrame);
+    fileDialog=new FileDialog(mainFrame);
   }
 
   public static void main(final String[] args) {
@@ -117,7 +126,9 @@ public class FileDialogWrapper {
     else
       javax.swing.SwingUtilities.invokeLater(new Runnable() {
         public void run() {
-          FileDialogWrapper fdw=new FileDialogWrapper(PopupTestContext.makeMainFrame());
+          FileDialogWrapper fdw=new FileDialogWrapper(
+            PopupTestContext.makeMainFrame(), new org.tmotte.klonk.config.CurrentOS()
+          );
           File d=new File(args[0]),
               f=new File(args[1]);
           System.out.println("For save: >"+fdw.show(true, null, null)+"<");

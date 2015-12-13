@@ -16,7 +16,7 @@ class Test {
     String path=null;
     boolean forSave=false;
     for (int i=0; i<args.length; i++) {
-      String s=args[i];      
+      String s=args[i];
       if (s.startsWith("-h")){
         usage();
         return;
@@ -32,7 +32,7 @@ class Test {
         usage();
         System.exit(1);
         return;
-      }        
+      }
     }
     test(path, forSave);
   }
@@ -40,9 +40,9 @@ class Test {
     System.err.println("Usage: -p <path> -s");
   }
   private static void test(final String path, final boolean forSave) throws Exception {
-    
+
     //This is obnoxious but we have to do it when we get a null file:
-    Thread.setDefaultUncaughtExceptionHandler( 
+    Thread.setDefaultUncaughtExceptionHandler(
         new Thread.UncaughtExceptionHandler() {
           public void uncaughtException(Thread t, Throwable e){
             if (e instanceof SSHFileDialogNoFileException)
@@ -69,6 +69,7 @@ class Test {
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
             new org.tmotte.klonk.windows.popup.FileDialogWrapper(
               m,
+              ptc.getCurrentOS(),
               new SSHFileSystemView(conns, notifier),
               new SSHFileView()
             );
