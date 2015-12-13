@@ -14,8 +14,8 @@ import org.tmotte.klonk.config.option.FontOptions;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 
-/** 
- * The FileDialog/JFileChooser classes already do most of the work, so this just does a minimal 
+/**
+ * The FileDialog/JFileChooser classes already do most of the work, so this just does a minimal
  * bit of upkeep and whatnot. It used to be in the Popups class, but at the risk of earning the title
  * of Wrapper/Facade/Factory Abuser, I moved it down here so Popups could be more focused on its primary task.
  */
@@ -23,13 +23,13 @@ public class FileDialogWrapper {
 
   private JFrame mainFrame;
   private FileDialog fileDialog;
-  
+
   //JFileChooser sucks but not as bad when used in native mode:
   private JFileChooser fileChooser;
   private FileView fileView;
   private FileSystemView fileSystemView;
   private boolean initialized=false;
-  
+
   public FileDialogWrapper(JFrame mainFrame, FileSystemView fsv, FileView fv){
     this.mainFrame=mainFrame;
     this.fileSystemView=fsv;
@@ -38,7 +38,7 @@ public class FileDialogWrapper {
   public FileDialogWrapper(JFrame mainFrame){
     this(mainFrame, null, null);
   }
-  
+
 
   public File show(boolean forSave) {
     return show(forSave, null);
@@ -80,12 +80,12 @@ public class FileDialogWrapper {
       FileDialog fd=fileDialog;
       if (startFile!=null)
         fd.setFile(startFile.getCanonicalPath().trim());
-      if (startDir!=null) 
+      if (startDir!=null)
         fd.setDirectory(startDir.getCanonicalPath());
       fd.setTitle(forSave ?"Save" :"Open");
       fd.setMode(forSave ?fd.SAVE :fd.LOAD);
       fd.setVisible(true);
-      
+
       File[] f=fd.getFiles();
       if (f==null || f.length==0)
         return null;
@@ -107,7 +107,7 @@ public class FileDialogWrapper {
     if (fileSystemView!=null)
       fileChooser.setFileSystemView(fileSystemView);
     if (fileView!=null)
-      fileChooser.setFileView(fileView);   
+      fileChooser.setFileView(fileView);
     //fileDialog=new FileDialog(mainFrame);
   }
 
@@ -123,7 +123,7 @@ public class FileDialogWrapper {
           System.out.println("For save: >"+fdw.show(true, null, null)+"<");
           System.out.println("For save to file: "+f+" -> "+fdw.show(true, f, null)+"<");
           System.out.println("For save to dir: "+d+" -> "+fdw.show(true, null, d)+"<");
-        
+
           System.out.println("For open: >"+fdw.show(false, null, null)+"<");
           System.out.println("For open to file: "+f+" -> "+fdw.show(false, f, null)+"<");
           System.out.println("For open to dir: "+d+" ->"+fdw.show(false, null, d)+"<");
