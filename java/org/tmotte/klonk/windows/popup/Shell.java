@@ -21,6 +21,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
 import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.CurrentOS;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
@@ -48,6 +49,7 @@ public class Shell {
   private JComboBox<String> jcbPrevious;
   private DefaultComboBoxModel<String> jcbPreviousData;
   private Font fontBold;
+  private CurrentOS currentOS;
 
   //State:
   private boolean shownBefore=false;
@@ -60,7 +62,8 @@ public class Shell {
      KPersist persist,
      FileDialogWrapper fdw,
      Image icon,
-     Getter<String> currFileGetter
+     Getter<String> currFileGetter,
+     CurrentOS currentOS
     ) {
     this.parentFrame=parentFrame;
     this.fail=fail;
@@ -68,6 +71,7 @@ public class Shell {
     this.persist=persist;
     this.icon=icon;
     this.currFileGetter=currFileGetter;
+    this.currentOS=currentOS;
   }
   public Setter<FontOptions> getFontListener() {
     return fontListener;
@@ -312,7 +316,7 @@ public class Shell {
     btnSwitch.setMnemonic(KeyEvent.VK_B);
   }
   private MyTextArea getMTA(){
-    MyTextArea mta=new MyTextArea();
+    MyTextArea mta=new MyTextArea(currentOS);
     mta.setLineWrap(true);
     mta.setWrapStyleWord(false);
     mta.setEditable(true);
@@ -498,7 +502,8 @@ public class Shell {
           ptc.getPopupIcon(),
           new Getter<String>() {
             public String get() {return null;}
-          }
+          },
+          ptc.getCurrentOS()
         );
         shell.show();
         //Won't work because previous command is not synchronous

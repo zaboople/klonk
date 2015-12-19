@@ -32,6 +32,7 @@ import javax.swing.JWindow;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.edit.MyTextArea;
+import org.tmotte.klonk.config.CurrentOS;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.windows.Positioner;
@@ -50,21 +51,23 @@ public class Favorites {
   private JButton btnOK, btnCancel;
   private Font fontBold;
   private boolean initialized=false;
+  private CurrentOS currentOS;
   private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
     public void set(FontOptions fo){setFont(fo);}
   };
 
   private boolean result;
-  
-  
+
+
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
 
-  public Favorites(JFrame parentFrame, FontOptions fontOptions) {
+  public Favorites(JFrame parentFrame, FontOptions fontOptions, CurrentOS currentOS) {
     this.parentFrame=parentFrame;
     this.fontOptions=fontOptions;
-  }  
+    this.currentOS=currentOS;
+  }
   public Setter<FontOptions> getFontListener() {
     return fontListener;
   }
@@ -84,7 +87,7 @@ public class Favorites {
     }
     return result;
   }
-  
+
   ////////////////////////
   //                    //
   //  PRIVATE METHODS:  //
@@ -102,7 +105,7 @@ public class Favorites {
   }
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
-    win.setVisible(false);  
+    win.setVisible(false);
     result=action;
   }
   private void load(MyTextArea mta, Collection<String> names) {
@@ -142,13 +145,13 @@ public class Favorites {
   }
 
   ///////////////////////////
-  // CREATE/LAYOUT/LISTEN: //  
+  // CREATE/LAYOUT/LISTEN: //
   ///////////////////////////
-  
+
   private void init() {
     if (!initialized){
       create();
-      layout(); 
+      layout();
       listen();
       initialized=true;
     }
@@ -167,7 +170,7 @@ public class Favorites {
     setFont(mtaDirs);
   }
   private MyTextArea getMTA(){
-    MyTextArea mta=new MyTextArea();
+    MyTextArea mta=new MyTextArea(currentOS);
     mta.setRows(7);
     mta.setColumns(60);
     mta.setLineWrap(false);
@@ -175,7 +178,7 @@ public class Favorites {
     mta.setFont(fontOptions.getFont());
     return mta;
   }
-  
+
   private void layout() {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
@@ -192,9 +195,9 @@ public class Favorites {
     GridBug gb=new GridBug(new JPanel());
     gb.gridXY(0);
     gb.weightXY(0);
-    
+
     gb.anchor=gb.CENTER;
-    gb.insets.top=5; 
+    gb.insets.top=5;
     gb.insets.bottom=5;
     gb.insets.left=5;
     {
@@ -204,7 +207,7 @@ public class Favorites {
       j.setFont(f);
       gb.addY(j);
     }
-    
+
     gb.anchor=gb.WEST;
     gb.insets.top=2;
     gb.insets.bottom=0;
@@ -215,7 +218,7 @@ public class Favorites {
       j.setFont(fontBold);
       gb.addY(j);
     }
-    
+
     gb.insets.top=0;
     gb.insets.left=0;
     gb.insets.right=0;
@@ -236,7 +239,7 @@ public class Favorites {
       j.setFont(fontBold);
       gb.addY(j);
     }
-    
+
     gb.insets.top=0;
     gb.insets.left=0;
     gb.insets.right=0;
@@ -244,7 +247,7 @@ public class Favorites {
     gb.fill=gb.BOTH;
     gb.anchor=gb.NORTH;
     gb.addY(mtaDirs.makeVerticalScrollable());
-    
+
     return gb.container;
   }
   private Container getButtons() {
@@ -261,15 +264,15 @@ public class Favorites {
     return gb.container;
   }
   private void listen() {
-  
+
     mtaFiles.addKeyListener(new MTAKeyListen(mtaFiles, btnCancel, mtaDirs));
     mtaDirs.addKeyListener( new MTAKeyListen(mtaDirs,  mtaFiles,  btnOK));
-    
+
     Action okAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(true);}
     };
     btnOK.addActionListener(okAction);
-    
+
     Action cancelAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(false);}
     };
@@ -277,7 +280,7 @@ public class Favorites {
     KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
     KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
   }
- 
+
   private class MTAKeyListen extends  KeyAdapter {
     JComponent prev, next;
     MyTextArea mta;
@@ -301,13 +304,14 @@ public class Favorites {
       }
     }
   };
- 
+
   /////////////
   /// TEST: ///
   /////////////
-  
+
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      PopupTestContext ptc=new PopupTestContext();
       public void run() {
         List<String> files=new java.util.ArrayList<>(),
                      dirs =new java.util.ArrayList<>();
@@ -316,7 +320,7 @@ public class Favorites {
         files.add("CCCC/cc/c/c///ccc");
         dirs.add("dddddddddd");
         new Favorites(
-          PopupTestContext.makeMainFrame(), new FontOptions()
+          ptc.makeMainFrame(), new FontOptions(), ptc.getCurrentOS()
         ).show(files, dirs);
         System.out.println("\nFILES: ");
         for (String s: files)
@@ -325,7 +329,7 @@ public class Favorites {
         for (String s: dirs)
           System.out.println(s);
       }
-    });  
+    });
   }
-  
+
 }

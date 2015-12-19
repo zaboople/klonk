@@ -169,7 +169,7 @@ public class BootContext {
     CurrentOS currentOS=new CurrentOS();
 
     //Main controller:
-    CtrlMain ctrlMain=new CtrlMain(userNotify, persist);
+    CtrlMain ctrlMain=new CtrlMain(userNotify, persist, currentOS);
     Editors editors=ctrlMain.getEditors();
 
 
@@ -217,19 +217,20 @@ public class BootContext {
 
     //Search popups:
     FindAndReplace findAndReplace=
-      new FindAndReplace(mainFrame, alerter, statusBar, editorFont);
+      new FindAndReplace(mainFrame, alerter, statusBar, currentOS, editorFont);
     GoToLine goToLine=new GoToLine(mainFrame, alerter);
 
     //Shell:
     Shell shell=new Shell(
       mainFrame, failHandler, persist, fileDialogWrapper,
-      getPopupIcon(this), ctrlMain.getCurrFileNameGetter()
+      getPopupIcon(this), ctrlMain.getCurrFileNameGetter(),
+      currentOS
     );
 
     //Various option popups:
-    Favorites favorites=new Favorites(mainFrame, editorFont);
+    Favorites favorites=new Favorites(mainFrame, editorFont, currentOS);
     TabsAndIndents tabsAndIndents=new TabsAndIndents(mainFrame);
-    FontPicker fontPicker=new FontPicker(mainFrame, alerter);
+    FontPicker fontPicker=new FontPicker(mainFrame, alerter, currentOS);
     SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, fileDialogWrapper);
     LineDelimiters kDelims=new LineDelimiters(mainFrame);
 

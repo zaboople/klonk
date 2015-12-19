@@ -40,7 +40,7 @@ import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.io.FileMetaData;
 import org.tmotte.klonk.io.KFileIO;
-
+import org.tmotte.klonk.config.CurrentOS;
 
 /** Enhances MyTextArea with secondary editing features. Also adds file-specific information. */
 public class Editor {
@@ -69,13 +69,13 @@ public class Editor {
 
   public Editor(
       Setter<Throwable> failHandler,
-      EditorListener editListener, UndoListener undoL,
+      EditorListener editListener, UndoListener undoL, CurrentOS currentOS,
       String lineBreaker, boolean wordWrap
     ) {
     this.editListener=editListener;
     this.failHandler=failHandler;
     this.lineBreaker=lineBreaker;
-    jta=new MyTextArea();
+    jta=new MyTextArea(currentOS);
     jta.setDragEnabled(false);
     jta.makeVerticalScrollable();
     jta.addUndoListener(undoL);

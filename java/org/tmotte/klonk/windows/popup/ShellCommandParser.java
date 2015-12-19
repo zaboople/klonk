@@ -2,8 +2,9 @@ package org.tmotte.klonk.windows.popup;
 import java.util.List;
 import java.io.File;
 import java.util.LinkedList;
-import org.tmotte.common.text.StringChunker;
 import java.util.regex.Pattern;
+import org.tmotte.common.text.StringChunker;
+import org.tmotte.klonk.config.CurrentOS;
 
 class ShellCommandParser {
   static Pattern delimiterPattern=Pattern.compile("(\"|'|\\p{Blank})");
@@ -43,18 +44,18 @@ class ShellCommandParser {
       results.add(cmd);
       return results;
     }
-    
-    //OK then let's just assume the first blank ends the program, even the program doesn't seem to exist, 
+
+    //OK then let's just assume the first blank ends the program, even the program doesn't seem to exist,
     //like "ps -aux". Then everything else is an argument, isn't it:
     sc.reset(cmd);
     results.add(sc.getUpTo(" "));
     return getProgramArguments(results, sc);
   }
-    
+
   private static boolean referencesCurrFile(String cmd) {
     return cmd.indexOf(currFileMarker)!=-1;
   }
-    
+
   private static List<String> getProgramArguments(List<String> results, StringChunker sc){
 
     while (sc.find(delimiterPattern)){
@@ -80,13 +81,13 @@ class ShellCommandParser {
       results.add(sc.getRest());
     return results;
   }
-  
+
   ///////////
   // TEST: //
   ///////////
-  
+
   public static void main(String[] args) {
-    String 
+    String
       command=args[0],
       currFileName=args.length>1
         ?args[1] :null;

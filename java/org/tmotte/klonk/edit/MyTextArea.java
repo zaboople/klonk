@@ -24,6 +24,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.text.Element;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.Caret;
@@ -32,6 +33,7 @@ import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.common.swang.KeyMapper;
+import org.tmotte.klonk.config.CurrentOS;
 
 public class MyTextArea extends JTextArea {
 
@@ -61,14 +63,16 @@ public class MyTextArea extends JTextArea {
   private boolean tabIndentsLine=false;
   private String indentSpaces="  ";
   private int indentSpacesLen=indentSpaces.length();
+  private CurrentOS currentOS;
 
   ///////////////////
   // CONSTRUCTORS: //
   ///////////////////
 
-  public MyTextArea() {
+  public MyTextArea(CurrentOS currentOS) {
     addMenus();
     addListeners();
+    this.currentOS=currentOS;
     //Removing these keystrokes because they mess up undo, and I wanted one of my menus
     //to use the first one:
     getInputMap().put(KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.CTRL_DOWN_MASK), "none");
@@ -335,7 +339,7 @@ public class MyTextArea extends JTextArea {
         return;
       try {
         int start=de.getOffset(), len=de.getLength();
-        //System.out.println("Start "+start+" len "+len+ " pre " +preUndoSelected);
+        //System.out.println("Start: "+start+" len: "+len+ " pre: " +preUndoSelected);
         if (preUndoSelected==null || len!=preUndoSelected.length())
           throw new RuntimeException(
             "Recorded selection length does not match DocumentEvent; DE start:"+start
@@ -470,6 +474,9 @@ public class MyTextArea extends JTextArea {
           e.consume();
 
         }
+        else
+        if (currentOS.isOSX && code==e.VK_W && KeyMapper.ctrlPressed(e))
+          e.consume();
 
       } catch (Exception ex) {
         throw new RuntimeException(ex);

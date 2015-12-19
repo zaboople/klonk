@@ -41,6 +41,7 @@ import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
+import org.tmotte.klonk.config.CurrentOS;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 
@@ -53,56 +54,61 @@ public class FindAndReplace {
   private JCheckBox chkReplace, chkCase, chkReplaceAll, chkConfirmReplace, chkRegex, chkRegexMultiline;
   private JButton btnFind, btnReverse, btnCancel;
   private JLabel lblFind;
-  
+
   //Fonts:
   private Font fontBold, fontNormal;
   private FontOptions fontOptions;
   private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
     public void set(FontOptions fo){setFont(fo);}
-  };  
-  
+  };
+
   //Other windows. Yes we technically violate our singleton sort-of-a-rule here, creating
   //extra instances of YesNoCancel
   private JFrame parentFrame;
   private YesNoCancel popupAskReplace, popupAskReplaceAll;
-  
+
   //Internal state:
   private boolean everShown=false;
   private boolean skipReplace=false;
   private boolean initialized=false;
-  
+
   //This is so we can send updates back to the main window ourselves, as well
   //as to an alert popup:
   private Setter<String> alerter;
   private StatusUpdate statusBar;
-  
+
   //Note that these are transient (so to speak) and require single-threaded
-  //behavior from the class. 
+  //behavior from the class.
   private MyTextArea target;
   private Finder finder=new Finder();
 
-  
+  //Injected for MyTextArea:
+  private CurrentOS currentOS;
+
+
 
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
 
   public FindAndReplace(
-      JFrame parentFrame, 
-      Setter<String> alerter, 
-      StatusUpdate statusBar, 
+      JFrame parentFrame,
+      Setter<String> alerter,
+      StatusUpdate statusBar,
+      CurrentOS currentOS,
       FontOptions fontOptions
     ) {
     this.parentFrame=parentFrame;
     this.statusBar=statusBar;
     this.alerter=alerter;
+    this.currentOS=currentOS;
     this.fontOptions=fontOptions;
   }
   public Setter<FontOptions> getFontListener() {
     return fontListener;
   }
   public void doFind(MyTextArea target)    {doFind(target, false);}
-  public void doReplace(MyTextArea target) {doFind(target, true);}  
+  public void doReplace(MyTextArea target) {doFind(target, true);}
   public synchronized void repeatFindReplace(MyTextArea mta, boolean forwards) {
     init();
     this.target=mta;
@@ -172,7 +178,7 @@ public class FindAndReplace {
       Caret caret=target.getCaret();
       int mark=caret.getMark(), dot=caret.getDot();
       int offset=((forwards ^ skipReplace) ^ !replaceOn)
-         ?Math.min(mark, dot) 
+         ?Math.min(mark, dot)
          :Math.max(mark, dot);
       while (findAgain) {
         findAgain=false;
@@ -180,7 +186,7 @@ public class FindAndReplace {
           .setDocument(target.getDocument(), offset)
           .setReplace(replaceOn, mtaReplace.getText())
           .find(
-            searchFor, forwards, chkCase.isSelected(), 
+            searchFor, forwards, chkCase.isSelected(),
             chkRegex.isSelected(), chkRegexMultiline.isSelected()
           );
         if (!found) {
@@ -216,8 +222,8 @@ public class FindAndReplace {
       throw new RuntimeException(e);
     }
   }
-  
- 
+
+
   private boolean confirmReplace(int startPos, int endPos) throws Exception {
     YesNoCancel asker=getAskReplaceWindow();
     Point caretPoint=target.getVisualCaretPosition();
@@ -291,7 +297,7 @@ public class FindAndReplace {
     chkRegex.setSelected(false);
     chkRegexMultiline=new JCheckBox("Multi-line + Dot-all");
     chkRegexMultiline.setSelected(true);
-    
+
 
     //Bottom buttons:
     btnFind=new JButton();
@@ -315,7 +321,7 @@ public class FindAndReplace {
 
   }
   private MyTextArea makeTextArea() {
-    MyTextArea mta=new MyTextArea(); 
+    MyTextArea mta=new MyTextArea(currentOS);
     mta.setRows(3);//This doesn't work right because we set the font different.
     mta.setLineWrap(false);
     mta.setWrapStyleWord(false);
@@ -336,11 +342,11 @@ public class FindAndReplace {
     }
     return popupAskReplaceAll;
   }
-  
+
   /////////////
   // LAYOUT: //
   /////////////
-  
+
   private void layout() {
     GridBug gb=new GridBug(win);
     gb.anchor=gb.WEST;
@@ -377,20 +383,20 @@ public class FindAndReplace {
     gb.fill=gb.BOTH;
     gb.weightXY(1, 0.5);
     gb.addY(contReplace);
-   
+
     //Buttons and otherwise:
     gb.insets.top=5;
     gb.weighty=0;
     gb.insets.bottom=5;
     gb.addY(getBottomPanel());
     win.pack();
-    
+
     enableReplace();
     setFont();
   }
   private Container getBottomPanel() {
     GridBug gb=new GridBug(new JPanel());
-    
+
     //Checkboxes:
     gb.gridXY(0).weightXY(0);
     gb.add(getOptionsPanel());
@@ -450,24 +456,24 @@ public class FindAndReplace {
       mtaFind.setForeground(f.getColor());
       mtaFind.setBackground(f.getBackgroundColor());
       mtaFind.setCaretColor(f.getCaretColor());
-  
+
       mtaReplace.setFont(f.getFont());
       mtaReplace.setForeground(f.getColor());
       mtaReplace.setBackground(f.getBackgroundColor());
       mtaReplace.setCaretColor(f.getCaretColor());
-  
-      //Am doing this because otherwise it doesn't adjust to 
+
+      //Am doing this because otherwise it doesn't adjust to
       //our desired setting of rows elsewhere because we set
       //font AFTER instantiation.
       win.pack();
     }
-  } 
-  
+  }
+
 
   /////////////
   // EVENTS: //
   /////////////
-  
+
   private void listen() {
     addCheckBoxListeners(chkReplace, chkReplaceAll, chkCase, chkRegex, chkRegexMultiline);
     doButtonEvents(btnFind,     buttonListener, KeyMapper.key(KeyEvent.VK_F3));
@@ -475,7 +481,7 @@ public class FindAndReplace {
     doButtonEvents(btnReverse,  buttonListener, KeyMapper.key(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK));
     doButtonEvents(btnCancel,   buttonListener, KeyMapper.key(KeyEvent.VK_ESCAPE));
     KeyMapper.accel(btnCancel,  buttonListener, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
-    
+
     mtaFind.addFocusListener(new FocusAdapter(){
       public void focusGained(FocusEvent fe) {
         mtaFind.selectAll();
@@ -517,10 +523,10 @@ public class FindAndReplace {
         }
       }
     };
-    for (JCheckBox jcb: chks) 
+    for (JCheckBox jcb: chks)
       jcb.addActionListener(chkListener);
   }
-  
+
   /** Button clicks: */
   private Action buttonListener=new AbstractAction() {
     public void actionPerformed(ActionEvent event) {
@@ -528,10 +534,10 @@ public class FindAndReplace {
       if (o==btnFind)
         find(true);
       else
-      if (o==btnReverse) 
+      if (o==btnReverse)
         find(false);
       else
-      if (o==btnCancel) 
+      if (o==btnCancel)
         win.setVisible(false);
     }
   };
@@ -576,5 +582,5 @@ public class FindAndReplace {
     chkConfirmReplace.setEnabled(replaceOn && !chkReplaceAll.isSelected());
   }
 
-  
+
 }

@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.EditorListener;
+import org.tmotte.klonk.config.CurrentOS;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Editors;
@@ -55,6 +56,7 @@ public class CtrlMain  {
   private YesNoCancel yesNo, yesNoCancel;
   private MainDisplay layout;
   private SSHOpenFrom sshOpenFrom;
+  private CurrentOS currentOS;
 
   //Editors list:
   private LinkedList<Editor> editors=new LinkedList<>();
@@ -70,9 +72,10 @@ public class CtrlMain  {
   private Recents recents;
 
   //Constructor:
-  public CtrlMain(UserNotify userNotify, final KPersist persist) {
+  public CtrlMain(UserNotify userNotify, final KPersist persist, CurrentOS currentOS) {
     this.userNotify=userNotify;
     this.persist=persist;
+    this.currentOS=currentOS;
     recents=new Recents(persist);
   }
 
@@ -584,6 +587,7 @@ public class CtrlMain  {
       userNotify.getExceptionHandler(),
       editorListener,
       myUndoListener,
+      currentOS,
       persist.getDefaultLineDelimiter(),
       persist.getWordWrap()
     );
