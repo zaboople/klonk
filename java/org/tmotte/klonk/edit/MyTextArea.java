@@ -55,6 +55,7 @@ public class MyTextArea extends JTextArea {
   private boolean doubleUndo=false;
   private int doubleUpCount=0;
   private LinkedList<UndoListener> undoListeners;
+  private String specialOSXTemp=null;
 
   //Configuration:
   private boolean fastUndos=false;
@@ -328,24 +329,50 @@ public class MyTextArea extends JTextArea {
         return;
       try {
         int start=de.getOffset(), len=de.getLength();
-        undos.doAdd(start, len, getText(start, len), forceDoubleUp);
+        //System.out.println("INSERT: "+de+" "+start+" "+len);
+        String change=getText(start, len);
+        if (currentOS.isOSX) {
+          //This should probably be done in all cases:
+          setSelected(null);
+          //Refer to the extensive writeup in removeUpdate about this:
+          if (len == 1)
+            specialOSXTemp=change;
+          else
+          if (specialOSXTemp!=null)
+            specialOSXTemp=null;
+        }
+        //if (isOSX && len==1 &&
+        undos.doAdd(start, len, change, forceDoubleUp);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     }
     int incr=0;
     public void removeUpdate(DocumentEvent de) {
+      //We've been there and done that: After it's happened, you CANNOT get hold
+      //of the text that was removed. It's too late.
       if (suppressUndoRecord)
         return;
       try {
         int start=de.getOffset(), len=de.getLength();
         //System.out.println("Start: "+start+" len: "+len+ " pre: " +preUndoSelected);
-        if (preUndoSelected==null || len!=preUndoSelected.length())
-          throw new RuntimeException(
-            "Recorded selection length does not match DocumentEvent; DE start:"+start
-           +" DE length:"+len+" selection length:"+(preUndoSelected==null ?0 :preUndoSelected.length())
-           +" selection: "+preUndoSelected
-          );
+        if (preUndoSelected==null || len!=preUndoSelected.length()) {
+          if (preUndoSelected==null && currentOS.isOSX && specialOSXTemp!=null){
+            // So on the macintosh, when you press a vowel and hold it,
+            // you're given the option to automatically delete the letter that shows
+            // and replace with another.
+            // The length of the remove will be incorrectly reported in cases
+            // where you had text selected; that's already done, the character was inserted,
+            // now you're after that, but it will still report that selection size.
+            setSelected(specialOSXTemp);
+          }
+          else
+            throw new RuntimeException(
+              "Recorded selection length does not match DocumentEvent; DE start:"+start
+             +" DE length:"+len+" selection length:"+(preUndoSelected==null ?0 :preUndoSelected.length())
+             +" selection: "+preUndoSelected
+            );
+        }
         undos.doRemove(start, len, preUndoSelected, forceDoubleUp);
       } catch (Exception e) {
         throw new RuntimeException(e);
@@ -372,7 +399,7 @@ public class MyTextArea extends JTextArea {
                     code==e.VK_BACK_SPACE ||
                         (code==e.VK_H && KeyMapper.ctrlPressed(e.getModifiersEx()))
                       );
-
+        //System.out.println("CODE "+code+" MODS "+e.getModifiersEx());
         if (code==e.VK_RIGHT) {
 
           //ARROW RIGHT:
@@ -790,6 +817,7 @@ public class MyTextArea extends JTextArea {
     }
   }
   private void setSelected(String text) {
+    //System.out.println("SELECTED: "+text+"<");
     preUndoSelected=text;
   }
 
