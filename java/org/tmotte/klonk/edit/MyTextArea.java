@@ -502,10 +502,34 @@ public class MyTextArea extends JTextArea {
 
         }
         else
-        if (code==e.VK_W && KeyMapper.ctrlPressed(e))
+        if (code==e.VK_W && KeyMapper.ctrlPressed(e) && currentOS.isOSX)
           // Normally this gives a delete-to-beginning-of-line that
           // nobody knows about
           e.consume();
+        else
+        if (code==e.VK_V && KeyMapper.ctrlPressed(e) && currentOS.isOSX){
+          // Pressing ctrl-v on macintosh should paste:
+          paste();
+          e.consume();
+        }
+        else
+        if (code==e.VK_C && KeyMapper.ctrlPressed(e) && currentOS.isOSX){
+          // Pressing ctrl-c on macintosh should copy:
+          copy();
+          e.consume();
+        }
+        else
+        if (code==e.VK_X && KeyMapper.ctrlPressed(e) && currentOS.isOSX){
+          // Pressing ctrl-x on macintosh should cut:
+          cut();
+          e.consume();
+        }
+        else
+        if (code==e.VK_A && KeyMapper.ctrlPressed(e) && currentOS.isOSX){
+          // Pressing ctrl-x on macintosh should select all:
+          selectAll();
+          e.consume();
+        }
 
       } catch (Exception ex) {
         throw new RuntimeException(ex);
