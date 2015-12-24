@@ -1,6 +1,5 @@
 -OSX
-  -Holding down a vowel key to get the alternate vowel prompt fails because it's deleting the original vowel without telling us
-  -Getting a nasty error about "Unable to simultaneously satisfy constraints" when using java.awt.FileDialog
+  -Make Command-O an open shortcut
   -Do a .klonk directory in home instead of klonk
   -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
   -Auto-trim on save for the sake of code nazis

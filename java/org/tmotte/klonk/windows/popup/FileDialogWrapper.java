@@ -27,9 +27,6 @@ public class FileDialogWrapper {
   private CurrentOS currentOS;
   private boolean initialized=false;
 
-  //FileDialog is best for OSX at least when not doing SSH:
-  private FileDialog fileDialog;
-
   //JFileChooser sucks but not as bad when used in native mode on windows,
   //and it works great with my SSH tricks:
   private JFileChooser fileChooser;
@@ -63,11 +60,15 @@ public class FileDialogWrapper {
     init();
     if (currentOS.isOSX && SSHFile.cast(startFile)==null || SSHFile.cast(startDir)==null)
       try {
-        //Broken on MS Windows XP. If you do "save as" and the old file
-        //name is longer than the new one, the last characters from the old
-        //file get appended to the new one - very likely a null terminated string
-        //problem. I tried everything and it was unfixable.
-        FileDialog fd=fileDialog;
+        // Broken on MS Windows XP. If you do "save as" and the old file
+        // name is longer than the new one, the last characters from the old
+        // file get appended to the new one - very likely a null terminated string
+        // problem. I tried everything and it was unfixable.
+        //
+        // On OSX? Well, then we can't reuse file dialogs or errors start dumping out.
+        // So we make a new one every time, which doesn't seem to use that much
+        // memory.
+        FileDialog fd=new java.awt.FileDialog(mainFrame);
         if (startFile!=null)
           fd.setFile(startFile.getCanonicalPath().trim());
         if (startDir!=null)
@@ -122,7 +123,6 @@ public class FileDialogWrapper {
       fileChooser.setFileSystemView(fileSystemView);
     if (fileView!=null)
       fileChooser.setFileView(fileView);
-    fileDialog=new FileDialog(mainFrame);
   }
 
   public static void main(final String[] args) {
