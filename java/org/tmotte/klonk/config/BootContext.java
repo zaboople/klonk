@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.klonk.Menus;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Setter;

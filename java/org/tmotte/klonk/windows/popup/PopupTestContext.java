@@ -8,18 +8,18 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.List;
 import javax.swing.JFrame;
-import org.tmotte.klonk.Menus;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
+import org.tmotte.klonk.config.KPersist;
+import org.tmotte.klonk.config.KHome;
+import org.tmotte.klonk.config.BootContext;
 import org.tmotte.klonk.controller.CtrlMain;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.windows.MainLayout;
-import org.tmotte.klonk.config.CurrentOS;
-import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.config.KHome;
-import org.tmotte.klonk.config.BootContext;
+import org.tmotte.klonk.Menus;
 
 /**
  * For testing popups without the overhead of the main application running.

@@ -1,4 +1,4 @@
-package org.tmotte.klonk.config;
+package org.tmotte.common.swang;
 public class CurrentOS {
   public final boolean isOSX;
   public final boolean isMSWindows;

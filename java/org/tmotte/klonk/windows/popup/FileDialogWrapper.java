@@ -12,8 +12,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.config.CurrentOS;
 import org.tmotte.klonk.ssh.SSHFile;
 
 /**
@@ -132,7 +132,7 @@ public class FileDialogWrapper {
       javax.swing.SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           FileDialogWrapper fdw=new FileDialogWrapper(
-            PopupTestContext.makeMainFrame(), new org.tmotte.klonk.config.CurrentOS()
+            PopupTestContext.makeMainFrame(), new CurrentOS()
           );
           File d=new File(args[0]),
               f=new File(args[1]);

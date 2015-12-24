@@ -67,8 +67,20 @@ public class KeyMapper {
   public static boolean altPressed(int mods) {
     return (mods & KeyEvent.ALT_DOWN_MASK)==KeyEvent.ALT_DOWN_MASK;
   }
-
-
+  /** This is the macintosh "command" key */
+  public static boolean metaPressed(int mods, CurrentOS currentOS) {
+    return currentOS.isOSX && (mods & KeyEvent.META_DOWN_MASK)==KeyEvent.META_DOWN_MASK;
+  }
+  public static boolean metaPressed(KeyEvent k, CurrentOS currentOS) {
+    return currentOS.isOSX && metaPressed(k.getModifiersEx(), currentOS);
+  }
+  /** This is the macintosh "option" key */
+  public static boolean optionPressed(int mods, CurrentOS currentOS) {
+    return currentOS.isOSX && (mods & KeyEvent.ALT_DOWN_MASK)==KeyEvent.ALT_DOWN_MASK;
+  }
+  public static boolean optionPressed(KeyEvent k, CurrentOS currentOS) {
+    return currentOS.isOSX && optionPressed(k.getModifiersEx(), currentOS);
+  }
   public static KeyStroke keyByOS(int hotKey) {
     return KeyStroke.getKeyStroke(
       hotKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()

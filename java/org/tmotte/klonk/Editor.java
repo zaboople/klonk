@@ -29,6 +29,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Caret;
 import javax.swing.text.Document;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.msg.Setter;
@@ -40,7 +41,6 @@ import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.io.FileMetaData;
 import org.tmotte.klonk.io.KFileIO;
-import org.tmotte.klonk.config.CurrentOS;
 
 /** Enhances MyTextArea with secondary editing features. Also adds file-specific information. */
 public class Editor {

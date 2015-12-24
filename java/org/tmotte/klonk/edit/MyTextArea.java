@@ -31,9 +31,9 @@ import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.config.CurrentOS;
 
 public class MyTextArea extends JTextArea {
 
@@ -389,22 +389,22 @@ public class MyTextArea extends JTextArea {
 
   private class MyKeyListener extends KeyAdapter {
     public void keyPressed(KeyEvent e){
-      //WARNING WARNING WARNING
-      //If an if statement intercepts a key code but does not take action,
-      //you run the risk of skipping the call to setSelected() at the bottom.
-      //This will cause an undo error!
+
       try {
         final int code=e.getKeyCode();
+
+        // Intercept variations on backspace/delete one character:
         setSelected(code==e.VK_DELETE,
                     code==e.VK_BACK_SPACE ||
                         (code==e.VK_H && KeyMapper.ctrlPressed(e.getModifiersEx()))
                       );
+
         //System.out.println("CODE "+code+" MODS "+e.getModifiersEx());
         if (code==e.VK_RIGHT) {
 
           //ARROW RIGHT:
           int mods=e.getModifiersEx();
-          if (KeyMapper.ctrlPressed(mods)){
+          if (KeyMapper.ctrlPressed(mods) || KeyMapper.optionPressed(mods, currentOS)){
             e.consume();
             doControlArrow(false, KeyMapper.shiftPressed(mods));
           }
@@ -428,7 +428,7 @@ public class MyTextArea extends JTextArea {
           //ARROW LEFT:
           int mods=e.getModifiersEx();
           boolean shift=KeyMapper.shiftPressed(mods);
-          if (KeyMapper.ctrlPressed(mods)){
+          if (KeyMapper.ctrlPressed(mods) || KeyMapper.optionPressed(mods, currentOS)){
             e.consume();
             doControlArrow(true, shift);
           }
@@ -462,7 +462,7 @@ public class MyTextArea extends JTextArea {
 
           //UNDO/REDO:
           int mods=e.getModifiersEx();
-          if (KeyMapper.ctrlPressed(mods)){
+          if (KeyMapper.ctrlPressed(mods) || KeyMapper.metaPressed(e, currentOS)){
             if (KeyMapper.shiftPressed(mods))
               redo();
             else
@@ -502,7 +502,9 @@ public class MyTextArea extends JTextArea {
 
         }
         else
-        if (currentOS.isOSX && code==e.VK_W && KeyMapper.ctrlPressed(e))
+        if (code==e.VK_W && KeyMapper.ctrlPressed(e))
+          // Normally this gives a delete-to-beginning-of-line that
+          // nobody knows about
           e.consume();
 
       } catch (Exception ex) {

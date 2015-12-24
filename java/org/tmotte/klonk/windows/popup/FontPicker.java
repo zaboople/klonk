@@ -37,9 +37,9 @@ import javax.swing.event.ListSelectionListener;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.msg.Setter;
-import org.tmotte.klonk.config.CurrentOS;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 

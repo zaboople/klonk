@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
 import org.tmotte.common.text.StringChunker;
-import org.tmotte.klonk.config.CurrentOS;
+import org.tmotte.common.swang.CurrentOS;
 
 class ShellCommandParser {
   static Pattern delimiterPattern=Pattern.compile("(\"|'|\\p{Blank})");
