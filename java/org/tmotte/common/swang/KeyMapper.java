@@ -4,6 +4,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 import javax.swing.JComponent;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 
 
@@ -35,7 +36,7 @@ public class KeyMapper {
     jc.getActionMap()
       .put(stupidName, action);
     jc.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-      .put(hotKey, stupidName);    
+      .put(hotKey, stupidName);
     return jc;
   }
   public static JComponent accel(JComponent jc, String stupidName, Action action, int hotKey) {
@@ -66,13 +67,17 @@ public class KeyMapper {
   public static boolean altPressed(int mods) {
     return (mods & KeyEvent.ALT_DOWN_MASK)==KeyEvent.ALT_DOWN_MASK;
   }
- 
- 
 
+
+  public static KeyStroke keyByOS(int hotKey) {
+    return KeyStroke.getKeyStroke(
+      hotKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
+    );
+  }
   public static KeyStroke key(int hotKey) {
     return KeyStroke.getKeyStroke(hotKey, 0);
   }
-  /** 
+  /**
    * @param modifiers Note that this is not KeyEvent.VK_etc, but InputEvent.etc_MASK
    */
   public static KeyStroke key(int hotKey, int modifiers) {
@@ -84,5 +89,5 @@ public class KeyMapper {
       mod|=m;
     return key(hotKey, mod);
   }
-  
+
 }

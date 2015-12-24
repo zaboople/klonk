@@ -318,11 +318,17 @@ public class Menus {
     //File menu section 1:
     mu.add(
        file
-      ,fileOpen =mu.doMenuItem("Open...", fileListener, KeyEvent.VK_O)
-      ,fileNew  =mu.doMenuItem("New",     fileListener, KeyEvent.VK_N)
+      ,fileOpen =mu.doMenuItem(
+        "Open...", fileListener, KeyEvent.VK_O,
+        KeyMapper.keyByOS(KeyEvent.VK_O)
+      )
+      ,fileNew  =mu.doMenuItem(
+        "New",     fileListener, KeyEvent.VK_N,
+        KeyMapper.keyByOS(KeyEvent.VK_N)
+      )
       ,fileSave =mu.doMenuItem(
         "Save",    fileListener, KeyEvent.VK_S,
-        KeyMapper.key(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)
+        KeyMapper.keyByOS(KeyEvent.VK_S)
       )
       ,fileSaveAs=mu.doMenuItem("Save as...",   fileListener, KeyEvent.VK_A)
       ,fileClose =mu.doMenuItem(
