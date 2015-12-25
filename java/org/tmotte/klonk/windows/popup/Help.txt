@@ -8,8 +8,8 @@
         font-family:"Arial Unicode MS",Helvetica,Geneva;
         font-color:black;
       }
-      h2  { margin:6px 10px 2px 10px; }
-      h3  { margin:2px 10px 2px 10px; }
+      h2  { margin:10px 10px 2px 10px; font-style:bold; font-size:16px}
+      h3  { margin:2px 10px 2px 10px; font-style:bold; font-size:14px}
       p   { margin:0px 10px 6px 10px; }
       pre { margin:0px 10px 6px 10px; }
     </style>
@@ -42,7 +42,7 @@ This describes hidden shortcuts and confusing features that you might not expect
 <h2><a name="switch"> The Switch Menu, AKA Where Are My Tabs? </a></h2>
 
 <p>
-Klonk does not use tabs, in part because they tend to become unreadable when editing a lot of files. It can still open many files at once, however. The Switch menu allows one to switch between different files. 
+Klonk does not use tabs, in part because they tend to become unreadable when editing a lot of files. It can still open many files at once, however. The Switch menu allows one to switch between different files.
 </p>
 
 <p>
@@ -62,7 +62,7 @@ As per the top menu & standard practice, when the Find & Replace window is close
 </p>
 
 <p>
-When the Find & Replace window is open, F3 also acts as a shortcut for the "Find" button; Shift-F3 acts as a shortcut for the "Find backwards" button. Furthermore, when "Confirm replace" is turned on, F3 and Shift-F3 are shortcuts for the "Yes" button. 
+When the Find & Replace window is open, F3 also acts as a shortcut for the "Find" button; Shift-F3 acts as a shortcut for the "Find backwards" button. Furthermore, when "Confirm replace" is turned on, F3 and Shift-F3 are shortcuts for the "Yes" button.
 </p>
 
 <p>
@@ -116,7 +116,7 @@ Also, the auto-indent and tab-indents-line features found in the main editor do 
 <h2><a name="undo"> Undo </a></h2>
 
 <p>
-The "Undo" menu describes a variety of undo options, but the most important operations, undo and redo, are in the text editor's right-click/context menu; their shortcuts are Ctrl-Z and Shift-Ctrl-Z (as is common elsewhere). 
+The "Undo" menu describes a variety of undo options, but the most important operations, undo and redo, are in the text editor's right-click/context menu; their shortcuts are Ctrl-Z and Shift-Ctrl-Z (as is common elsewhere), and on Macintosh/OSX you can substitute ⌘ (Command) for Ctrl (both work).
 </p>
 
 <p>
@@ -125,7 +125,7 @@ Unlike most editors & IDE's, Klonk allows "unlimited" undo capability, where all
 <pre>  ABCD</pre>
 
 <p>
-then undo to 
+then undo to
 </p>
 <pre>  AB</pre>
 
@@ -198,7 +198,7 @@ This also means that Klonk does a reasonably good job with files containing Unic
 <pre>  ☃</pre>
 
 <p>
-Such characters only display properly if you have selected a font that can handle them, however. Go to "Options" → "Font & colors" to change your font (on Microsoft Windows, "Arial Unicode MS" is a reliable choice). 
+Such characters only display properly if you have selected a font that can handle them, however. Go to "Options" → "Font & colors" to change your font (on Microsoft Windows, "Arial Unicode MS" is a reliable choice).
 </p>
 
 
@@ -209,11 +209,11 @@ This allows you to run a program and pipe the standard output/error back into Kl
 </p>
 
 <p>
-Note that when using this to run an external java program, it may help to use the 
+Note that when using this to run an external java program, it may help to use the
 </p>
 <pre>  -Xshare:off </pre>
 <p>
-java parameter to avoid conflicting with Klonk's memory. 
+java parameter to avoid conflicting with Klonk's memory.
 </p>
 
 <p>
@@ -229,7 +229,7 @@ or
 </p>
   <pre>  bash -c [$1]</pre>
 <p>
-to execute it. 
+to execute it.
 </p>
 
 <h3>ALT-D</h3>
@@ -245,7 +245,7 @@ Klonk will open any file whose name is passed to it on the command line.
 </p>
 
 <p>
-Configuration data and so on is stored in a directory named "klonk" in your home directory, which is automatically detected. You can specify an alternate home directory using 
+Configuration data and so on is stored in a directory named "klonk" in your home directory, which is automatically detected. You can specify an alternate home directory using
 </p>
   <pre>  -home [directory name]</pre>
 <p>
@@ -274,7 +274,7 @@ Note that the status bar also has a red "CAPS LOCK" indicator. Thanks to a bug i
 <h2><a name="ssh"> SSH </a></h2>
 
 <p>
-Klonk includes the ability to connect to servers over SSH and use SFTP/SSH to read and write files. This is convenient when working with Unix/Linux servers that don't support better file sharing options. 
+Klonk includes the ability to connect to servers over SSH and use SFTP/SSH to read and write files. This is convenient when working with Unix/Linux servers that don't support better file sharing options.
 </p>
 
 <p>
@@ -282,7 +282,7 @@ To connect to an SSH server's file system, you can do one of two things:
 <ol>
   <li>Enter the name like so in the File → Open dialog:
   <pre>  ssh:user@server.domain.domain/path1/path2/etc</pre>
-  If you leave the path out, klonk will attempt to start with your home directory. If you leave the user out, klonk will prompt you for a user. It will also prompt you for a password as necessary. 
+  If you leave the path out, klonk will attempt to start with your home directory. If you leave the user out, klonk will prompt you for a user. It will also prompt you for a password as necessary.
   </li>
   <li>Go to File → Save to → SSH, or File → Open from → SSH.</li>
 </ol>
@@ -293,7 +293,7 @@ SSH behavior can be configured by going to Options → SSH in the menu:
 <ol>
 
 <li>
-You can set a "Known hosts" file. Klonk can't generate this file, but but most other SSH clients will as you connect to different servers, collecting "fingerprints" of your favorite SSH servers and warning/failing if they suddenly change (which may mean a man-in-the-middle attack). You don't <i>have</i> to do this, but it is widely considered to be a Very Good Thing. 
+You can set a "Known hosts" file. Klonk can't generate this file, but but most other SSH clients will as you connect to different servers, collecting "fingerprints" of your favorite SSH servers and warning/failing if they suddenly change (which may mean a man-in-the-middle attack). You don't <i>have</i> to do this, but it is widely considered to be a Very Good Thing.
 </li>
 
 <li>
@@ -312,7 +312,7 @@ and then just use "derp" as a hostname whenever you want to connect to derpity.d
 </li>
 
 <li>
-You can set the default permissions to be assigned when you create a new file or directory (your remote umask setting is unfortunately ignored). 
+You can set the default permissions to be assigned when you create a new file or directory (your remote umask setting is unfortunately ignored).
 </li>
 
 <li>
@@ -343,7 +343,7 @@ When you you exit Klonk it will stop and ask you to save any files that have uns
 </p>
 
 <p>
-However, many folks are used to hitting the power-off/restart button on their workstation and waiting to see which applications throw up alert windows to warn about unsaved changes. Unfortunately the Java runtime doesn't have any facility for "hooking" a shutdown message and telling the operating system to wait. Thus Klonk will briefly flash a popup warning about unsaved changes and then get killed by the OS before you have a chance to do anything. 
+However, many folks are used to hitting the power-off/restart button on their workstation and waiting to see which applications throw up alert windows to warn about unsaved changes. Unfortunately the Java runtime doesn't have any facility for "hooking" a shutdown message and telling the operating system to wait. Thus Klonk will briefly flash a popup warning about unsaved changes and then get killed by the OS before you have a chance to do anything.
 </p>
 
 <p>
@@ -354,27 +354,27 @@ Also, when the OS kills it, Klonk won't get a chance to save its configuration f
 
 <h3> Tab & Shift-Tab</h3>
 <p>
-As is common in text editors, these keystrokes indent and un-indent by default. Go to "Options" → "Tabs & indents" in the top menu to customize/disable their behavior.
+As is common in text editors, these keystrokes indent and un-indent by default; press Ctrl-Tab to actually insert a tab character. Go to "Options" → "Tabs & indents" in the top menu to customize/disable this behavior.
 </p>
 
 <h3> Shift-Right-arrow, Shift-Left-arrow: </h3>
 
 <p>
-As is also common in text editors, these keys expand or contract the current selection by one character to the left or right depending on where the cursor is. 
+As is also common in text editors, these keys expand or contract the current selection by one character to the left or right depending on where the cursor is.
 </p>
 
 <p>
-Adding in the Ctrl button accelerates the action, jumping over multiple characters at a time. Ctrl-Left/Right-arrow alone jumps over characters without selecting them.
+Adding in the Ctrl button accelerates the action, jumping over multiple characters at a time. Ctrl-Left/Right-arrow alone jumps over characters without selecting them. On Macintosh/OSX you can also press Option instead of Ctrl (both work).
 </p>
 
 <p>
-As a bonus, if you start with any one of the following characters: 
+As a bonus, if you start with any one of the following characters:
 </p>
 
   <pre>   ([{"</pre>
 
 <p>
-then Shift-Ctrl-Right/Left-arrow will try to find a matching character to close it, so that the number of opening/closing characters in between matches. This only works if all characters are on the same line, however. 
+then Shift-Ctrl-Right/Left-arrow will try to find a matching character to close it, so that the number of opening/closing characters in between matches. This only works if all characters are on the same line, however.
 </p>
 
 

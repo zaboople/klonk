@@ -81,7 +81,7 @@ public class Editor {
     jta.addUndoListener(undoL);
     jta.addUndoListener(myUndoListener);
     setWordWrap(wordWrap);
-    setEvents();
+    setEvents(currentOS);
   }
 
   public void setTabsOrSpaces(int tabsOrSpaces) {
@@ -570,7 +570,7 @@ public class Editor {
   // EVENTS: //
   /////////////
 
-  private void setEvents() {
+  private void setEvents(CurrentOS currentOS) {
 
     //File drag & drop:
     jta.setDropTarget(myDropTarget);
@@ -589,15 +589,16 @@ public class Editor {
     doCapsCrap();
 
     //Ctrl-W is an extra file close shortcut:
-    KeyMapper.accel(
-      jta, "EditorCtrlW",
-      new AbstractAction() {
-        public void actionPerformed(ActionEvent ae) {
-          editListener.closeEditor();
-        }
-      },
-      KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK
-    );
+    if (!currentOS.isOSX)
+      KeyMapper.accel(
+        jta, "EditorCtrlW",
+        new AbstractAction() {
+          public void actionPerformed(ActionEvent ae) {
+            editListener.closeEditor();
+          }
+        },
+        KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK
+      );
   }
 
 

@@ -330,10 +330,17 @@ public class Menus {
         "Save",    fileListener, KeyEvent.VK_S,
         KeyMapper.keyByOS(KeyEvent.VK_S)
       )
-      ,fileSaveAs=mu.doMenuItem("Save as...",   fileListener, KeyEvent.VK_A)
+      ,fileSaveAs=mu.doMenuItem(
+        "Save as...",   fileListener, KeyEvent.VK_A,
+        currentOS.isOSX
+          ?KeyMapper.key(KeyEvent.VK_S, InputEvent.META_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)
+          :null
+      )
       ,fileClose =mu.doMenuItem(
         "Close",   fileListener, KeyEvent.VK_C,
-        KeyMapper.key(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK)
+        currentOS.isOSX
+          ?KeyMapper.key(KeyEvent.VK_W, InputEvent.META_DOWN_MASK)
+          :KeyMapper.key(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK)
       )
       ,fileCloseOthers=mu.doMenuItem(
         "Close others",   fileListener, KeyEvent.VK_L
@@ -423,7 +430,9 @@ public class Menus {
     file.addSeparator();
     file.add(fileExit  =mu.doMenuItem(
       "Exit",    fileListener, KeyEvent.VK_X,
-      KeyMapper.key(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK)
+      currentOS.isOSX
+        ?null
+        :KeyMapper.key(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK)
     ));
 
 
