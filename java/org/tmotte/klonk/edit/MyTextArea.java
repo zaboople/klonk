@@ -530,7 +530,18 @@ public class MyTextArea extends JTextArea {
           selectAll();
           e.consume();
         }
-
+        else
+        if (code==e.VK_HOME && currentOS.isOSX && !KeyMapper.ctrlPressed(e)){
+          // Pressing ctrl-x on macintosh should select all:
+          doHomeEnd(true);
+          e.consume();
+        }
+        else
+        if (code==e.VK_END && currentOS.isOSX && !KeyMapper.ctrlPressed(e)){
+          // Pressing ctrl-x on macintosh should select all:
+          doHomeEnd(false);
+          e.consume();
+        }
       } catch (Exception ex) {
         throw new RuntimeException(ex);
       }
@@ -632,6 +643,18 @@ public class MyTextArea extends JTextArea {
     }
   }
 
+  private void doHomeEnd(boolean home) throws Exception {
+    int row=getLineOfOffset(getCaret().getDot());
+    if (home)
+      setCaretPosition(getLineStartOffset(row));
+    else {
+      int eol=getLineEndOffset(row);
+      if (getLineCount()-1!=row)
+        eol-=1;
+      setCaretPosition(eol);
+    }
+  }
+
   private void doControlArrow(boolean left, boolean shift) throws Exception {
     final Caret caret=getCaret();
     int
@@ -655,7 +678,7 @@ public class MyTextArea extends JTextArea {
       int endRow=getLineEndOffset(row),
           lineCount=getLineCount();
       if (row!=lineCount && endRow==cpos+1)
-        //When there is another row, end of row is
+        //When there is another row, end of row
         //is a linefeed, so you're one behind:
         endRow=getLineEndOffset(row+1);
       String selectable=getText(cpos, endRow-cpos);
