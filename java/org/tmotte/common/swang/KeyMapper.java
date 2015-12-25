@@ -10,6 +10,11 @@ import java.awt.event.KeyEvent;
 
 public class KeyMapper {
 
+  //////////////////////////////////////////////////////////
+  // ADDING HOTKEYS TO COMPONENTS; NOTE HOW THE COMPONENT //
+  // ITSELF IS RETURNED FOR CONVENIENCE:                  //
+  //////////////////////////////////////////////////////////
+
   public static AbstractButton accel(AbstractButton jc, Action action, KeyStroke hotKey) {
     String text=jc.getText();
     if (text.length()>20)
@@ -49,6 +54,10 @@ public class KeyMapper {
     return accel(jc, stupidName, action, key(hotKey, modifiers));
   }
 
+  /////////////////////////////////////
+  // DETECTING MODIFIER KEY PRESSES: //
+  /////////////////////////////////////
+
   public static boolean ctrlPressed(KeyEvent k) {
     return ctrlPressed(k.getModifiersEx());
   }
@@ -81,6 +90,11 @@ public class KeyMapper {
   public static boolean optionPressed(KeyEvent k, CurrentOS currentOS) {
     return currentOS.isOSX && optionPressed(k.getModifiersEx(), currentOS);
   }
+
+  ///////////////////////////////
+  // CREATE KeyStroke OBJECTS: //
+  ///////////////////////////////
+
   public static KeyStroke keyByOS(int hotKey) {
     return KeyStroke.getKeyStroke(
       hotKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
