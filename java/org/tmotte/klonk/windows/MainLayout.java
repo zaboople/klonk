@@ -17,7 +17,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.net.URL;
-import javax.swing.ImageIcon;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -29,14 +28,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
-import org.tmotte.klonk.config.KHome;
+import org.tmotte.common.swang.GridBug;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.MainDisplay;
 import org.tmotte.klonk.config.msg.StatusUpdate;
-import org.tmotte.common.swang.GridBug;
 
-public class MainLayout { 
+public class MainLayout {
 
   /////////////////////
   // INITIALIZATION: //
@@ -45,13 +43,13 @@ public class MainLayout {
   //Core stuff:
   private JFrame frame;
   private Doer appCloseListener;
-  
+
   //Main editor window components:
-  private JLabel lblRow=new JLabel(), 
-                 lblCol=new JLabel(), 
+  private JLabel lblRow=new JLabel(),
+                 lblCol=new JLabel(),
                  lblMsg=new JLabel(),
                  lblMsgBad=new JLabel();
-  private JPanel pnlEditor=new JPanel(), 
+  private JPanel pnlEditor=new JPanel(),
                  pnlSaveThisAlert=new JPanel(),
                  pnlSaveAlert=new JPanel(),
                  pnlCapsLock=new JPanel(),
@@ -62,26 +60,28 @@ public class MainLayout {
   private Color noChangeColor;
   private boolean hasStatus=false;
   private StatusUpdate statusUpdate;
-  
 
-  public MainLayout(JFrame frame, Doer appCloseListener) {
+  public MainLayout(
+      JFrame frame, Doer appCloseListener
+    ) {
     this.frame=frame;
     this.appCloseListener=appCloseListener;
     doEvents();
     layout();
   }
-  
-  
-  
+
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
 
   // DI STUFF //
-  
+
+  public JPanel getMainPanel() {
+    return pnlEditor;
+  }
   public StatusUpdate getStatusBar() {
     if (statusUpdate==null)
-      statusUpdate=new StatusUpdate(){ 
+      statusUpdate=new StatusUpdate(){
         public void show(String s)                    {MainLayout.this.showStatus(s, false); }
         public void showBad(String s)                 {MainLayout.this.showStatus(s, true);}
         public void showCapsLock(boolean b)           {MainLayout.this.showCapsLock(b);}
@@ -89,8 +89,8 @@ public class MainLayout {
         public void showRowColumn(int row, int column){MainLayout.this.showRowColumn(row,column);}
         public void showChangeThis(boolean b)         {MainLayout.this.showChangeThis(b);}
         public void showChangeAny(boolean b)          {MainLayout.this.showChangeAny(b);}
-        public void showTitle(String title)           {MainLayout.this.showTitle(title);}    
-      };  
+        public void showTitle(String title)           {MainLayout.this.showTitle(title);}
+      };
     return statusUpdate;
   }
   public MainDisplay getMainDisplay() {
@@ -106,7 +106,7 @@ public class MainLayout {
       }
     };
   }
-  
+
 
   public void show(Rectangle rect, boolean maximized) {
     Positioner.fix(rect);
@@ -132,7 +132,7 @@ public class MainLayout {
   private void showChangeAny(boolean chg) {
     pnlSaveAlert.setBackground(chg ?Color.BLUE :noChangeColor);
   }
-  
+
   private void showStatus(String msg) {
     showStatus(msg, false);
   }
@@ -161,7 +161,7 @@ public class MainLayout {
   private void showCapsLock(boolean visible) {
     pnlCapsLock.setVisible(visible);
   }
-    
+
   private void setCurrentEditor(Component c) {
     pnlEditor.removeAll();
     editorGB.add(c);
@@ -169,24 +169,23 @@ public class MainLayout {
   }
 
   private void doEvents() {
-    frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);  
+    frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     frame.addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e){
         appCloseListener.doIt();
       }
     });
   }
-
   /**
    * @param rect The boundaries of the main window.
    */
   private void layout() {
-  
-    
+
+
     //Set up editor panel:
     editorGB.gridXY(0).weightXY(1);
     editorGB.fill=editorGB.BOTH;
-    
+
     //Set up rest of layout:
     GridBug gb=new GridBug(frame.getContentPane());
 
@@ -220,7 +219,7 @@ public class MainLayout {
     pnlSaveThisAlert.setMinimumSize(prefer);
     pnlSaveAlert.setPreferredSize(prefer);
     pnlSaveAlert.setMaximumSize(prefer);
-    pnlSaveAlert.setMinimumSize(prefer);    
+    pnlSaveAlert.setMinimumSize(prefer);
 
     GridBug gb=new GridBug(blah);
     gb.fill=gb.VERTICAL;
@@ -230,7 +229,7 @@ public class MainLayout {
     gb.weightx=1; //Last in line gets the 1 always
     gb.gridx++;
     gb.addX(pnlSaveAlert);
-    
+
     return blah;
   }
   private void layoutStatusPanel() {
@@ -255,29 +254,29 @@ public class MainLayout {
     gb.insets.top=1;
     gb.insets.bottom=1;
     gb.anchor=gb.WEST;
-    
+
     gb.insets.left=3;
     gb.addX(lblRowHi);
-    
+
     gb.insets.left=2;
     gb.addX(lblRow);
-    
+
     gb.insets.left=3;
     gb.addX(lblColHi);
-    
+
     gb.insets.left=2;
     gb.addX(lblCol);
-    
+
     gb.insets.left=10;
     gb.addX(makeSeparator());
-  
+
     gb.insets.left=8;
     gb.addX(layoutCapsLock(font));
 
     gb.weightx=1;
     gb.insets.left=10;
     gb.addX(makeMsgPanel());
-    
+
   }
   private Container layoutCapsLock(Font font) {
     JLabel lblCapsLock=new JLabel();
@@ -293,11 +292,11 @@ public class MainLayout {
     gb.weightx=1;
     gb.insets.left=9;
     gb.addX(makeSeparator());
-    
+
     return pnlCapsLock;
   }
-  
-  
+
+
   private JSeparator makeSeparator() {
     JSeparator sep=new JSeparator(SwingConstants.VERTICAL);
     Dimension prefer=new Dimension(2,10);
@@ -313,5 +312,5 @@ public class MainLayout {
     return gb.container;
   }
 
-  
+
 }
