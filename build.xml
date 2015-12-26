@@ -62,7 +62,8 @@
   dist:
     Creates source zip &amp; binaries zip in dist directory. This only works on ms windows.
 
-  NOTE: To make a macintosh distribution file, run the "jar" task and then lib/makedmg
+  NOTE: To make a macintosh distribution file, run the "jar" task and then lib/makedmg. This
+    only works on Java 8 and above.
 
     </echo>
   </target>
