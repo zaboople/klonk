@@ -17,6 +17,8 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import org.tmotte.common.swang.CurrentOS;
@@ -55,6 +57,7 @@ public class Menus {
   //Visual component instances:
   private JMenuBar bar=new JMenuBar();
   private JMenu file, fileReopen, fileOpenFromRecentDir, fileSaveToRecentDir,
+                fileOpenFrom,
                 fileFave, fileOpenFromFave, fileSaveToFave,
                 search, mark, switcher, undo, select, align, external, options, help;
   private JMenuItem fileOpen, fileSave, fileNew, fileSaveAs, fileClose,
@@ -114,6 +117,22 @@ public class Menus {
   }
   public JMenuBar getMenuBar() {
     return bar;
+  }
+  /** This is a workaround for osx making it to hard to keyboard your way to a top menu. */
+  public void attachTo(JPanel pnlEditor) {
+    JPopupMenu pfile=file.getPopupMenu();
+    JPopupMenu pswitcher=switcher.getPopupMenu();
+    if (currentOS.isOSX) {
+      KeyMapper.accel(
+        pnlEditor, "MainFramehey",
+        new AbstractAction() {
+          public void actionPerformed(ActionEvent ae) {
+            pswitcher.show(pnlEditor, 0, 0);
+          }
+        },
+        KeyEvent.VK_I, KeyEvent.META_DOWN_MASK
+      );
+    }
   }
   public Doer getEditorSwitchListener() {
     return new Doer() {
@@ -378,10 +397,11 @@ public class Menus {
 
     //File menu section 4:
     file.addSeparator();
+    fileOpenFrom=mu.doMenu("Open from", KeyEvent.VK_F);
     mu.add(
       file
       ,mu.add(
-        mu.doMenu("Open from", KeyEvent.VK_F)
+        fileOpenFrom
         ,fileOpenFromDocDir=mu.doMenuItem(
           "Current document directory", fileListener, KeyEvent.VK_C
         )
