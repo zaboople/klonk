@@ -124,7 +124,7 @@ public class Menus {
     JPopupMenu pswitcher=switcher.getPopupMenu();
     if (currentOS.isOSX) {
       KeyMapper.accel(
-        pnlEditor, "MainFramehey",
+        pnlEditor, pswitcher.getClass()+pswitcher.getName(),
         new AbstractAction() {
           public void actionPerformed(ActionEvent ae) {
             pswitcher.show(pnlEditor, 0, 0);
@@ -476,12 +476,16 @@ public class Menus {
       ,
       searchFind=mu.doMenuItem(
         "Find", searchListener, KeyEvent.VK_F,
-        KeyMapper.key(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK)
+        currentOS.isOSX
+          ?KeyMapper.key(KeyEvent.VK_F, KeyEvent.META_DOWN_MASK)
+          :KeyMapper.key(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK)
       )
       ,
       searchReplace=mu.doMenuItem(
         "Replace", searchListener, KeyEvent.VK_R,
-        KeyMapper.key(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK)
+        currentOS.isOSX
+          ?KeyMapper.key(KeyEvent.VK_R, KeyEvent.META_DOWN_MASK)
+          :KeyMapper.key(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK)
       )
     );
     search.addSeparator();

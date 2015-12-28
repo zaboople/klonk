@@ -45,7 +45,7 @@ public class KeyParser {
 
   private static Pattern dividerRegex=Pattern.compile("(-| )");
 
-  public static KeyStroke key(String parse) throws Exception {
+  public static KeyStroke parse(String parse) throws Exception {
     try {
       int mods=0;
       int hotkey=0;
@@ -113,9 +113,9 @@ public class KeyParser {
   public static void main(String[] args) throws Exception {
     KeyParser parser=new KeyParser();
     for (String arg: args) {
-      KeyStroke parsed=key(arg);
+      KeyStroke parsed=parse(arg);
       String reversed=parser.toString(parsed);
-      KeyStroke parsedAgain=key(reversed);
+      KeyStroke parsedAgain=parse(reversed);
       System.out.println("From: \""+arg+"\"\n    to: "+parsed+"\n  to: \""+reversed+"\"\n    to: "+parsedAgain);
     }
   }

@@ -32,7 +32,8 @@ public class KPersist {
   private SSHOptions sshOptionsCache;
   private List<String> recentFilesCache, recentDirsCache;
   private List<UserServer> recentSSHCache;
-  
+  private KeyConfig keyConfig;
+
   public KPersist(KHome home, Setter<Throwable> logFail) {
     this.logFail=logFail;
     try {
@@ -42,10 +43,10 @@ public class KPersist {
       else
         load();
     } catch (Exception e) {
-      logFail.set(e); 
+      logFail.set(e);
     }
   }
-  
+
 
 
   /////////////////
@@ -61,7 +62,7 @@ public class KPersist {
   }
 
   // WORD WRAP: //
-  
+
   public KPersist setWordWrap(boolean b) {
     return setBoolean("WordWrap", b);
   }
@@ -84,7 +85,7 @@ public class KPersist {
   public boolean getWindowMaximized() {
     return getBoolean("Window.Maximized", false);
   }
-  
+
   public void setShellWindowBounds(Rectangle r) {
     setBounds("Shell.Window", r);
   }
@@ -120,7 +121,7 @@ public class KPersist {
   }
 
   // SSH OPTIONS: //
-  
+
   public SSHOptions getSSHOptions(){
     if (sshOptionsCache==null) {
       SSHOptions opts=new SSHOptions();
@@ -151,13 +152,13 @@ public class KPersist {
     set("SSH.Default.User",  opts.getRWXUser());
     set("SSH.Default.Group", opts.getRWXGroup());
     set("SSH.Default.Other", opts.getRWXOther());
-  }  
+  }
 
   // LINE DELIMITERS: //
 
   public String getDefaultLineDelimiter() {
     String s=properties.getProperty("DefaultLineDelimiter");
-    if (s==null)          
+    if (s==null)
       return LineDelimiterOptions.CRLFs;
     else
       return LineDelimiterOptions.translateFromReadable(s);
@@ -211,7 +212,7 @@ public class KPersist {
   public KPersist getCommands(List<String> recentCommands){
     return getFiles(recentCommands, "File.Batch.", maxRecent);
   }
-  
+
   public void getFavorites(List<String> faveFiles,  List<String> faveDirs) {
     getFiles(faveFiles,    "File.Favorite.Files.", maxFavorite);
     getFiles(faveDirs,     "File.Favorite.Dirs." , maxFavorite);
@@ -231,7 +232,7 @@ public class KPersist {
       recent.add(new UserServer(s[0], s[1]));
     }
   }
-  
+
   public void setRecentFiles(List<String> files) {
     recentFilesCache=files;
   }
@@ -250,19 +251,29 @@ public class KPersist {
 
 
   // FAST UNDOS: //
-  
+
   public KPersist setFastUndos(boolean fast) {
     return setBoolean("FastUndos", fast);
   }
   public boolean getFastUndos() {
     return getBoolean("FastUndos", true);
   }
-  
+
+  public KeyConfig getKeyConfig() {
+    if (keyConfig==null)
+      try {
+        keyConfig=new KeyConfig(properties);
+      } catch (Exception e) {
+        throw new RuntimeException("Key config failed to load: "+e.getMessage(), e);
+      }
+    return keyConfig;
+  }
+
   ///////////
   // SAVE: //
   ///////////
 
-  /** This is for when we do lazy save, because some things change too quickly to 
+  /** This is for when we do lazy save, because some things change too quickly to
       be constantly saving.*/
   public KPersist checkSave() {
     if (hasChanges)
@@ -270,7 +281,7 @@ public class KPersist {
     return this;
   }
   public void save() {
-    
+
     // 1. Check the file caches and make properties:
     if (recentFilesCache!=null) {
       setFiles(recentFilesCache,   "File.RecentFiles.",    maxRecent);
@@ -287,17 +298,17 @@ public class KPersist {
       setFiles(r,    "File.Recent.SSH.",     maxRecent);
       recentSSHCache=null;
     }
-    
+
     // 2. Save everything
     try (FileOutputStream fos=new FileOutputStream(file);) {
       properties.store(fos, "You are permitted to sort this file");
       hasChanges=false;
     } catch (Exception e) {
-      logFail.set(e); 
+      logFail.set(e);
     }
-    
+
   }
-  
+
   //////////////////////
   // PRIVATE METHODS: //
   //////////////////////
@@ -319,12 +330,12 @@ public class KPersist {
 
   private void setFiles(List<String> files, String name, int max) {
     int len=files.size();
-    int maxlen=max==-1 
-      ?len 
+    int maxlen=max==-1
+      ?len
       :Math.min(len, max);
     for (int i=0; i<maxlen; i++)
       set(name+i, files.get(i));
-    for (int i=maxlen; i<max; i++) 
+    for (int i=maxlen; i<max; i++)
       properties.remove(name+i);
     return;
   }
@@ -336,7 +347,7 @@ public class KPersist {
     }
     return this;
   }
-  
+
   private KPersist setColor(String name, java.awt.Color c) {
     setInt(name+".R", c.getRed());
     setInt(name+".G", c.getGreen());
@@ -352,8 +363,8 @@ public class KPersist {
     if (b<0 || b>255) b=100;
     return new Color(r, g, b);
   }
-  
-  
+
+
   private KPersist setBoolean(String name, boolean val) {
     set(name, String.valueOf(val));
     return this;
@@ -384,7 +395,7 @@ public class KPersist {
       return -1;
     }
   }
-  
+
   private void set(String name, String val) {
     properties.setProperty(name, val);
     hasChanges=true;
@@ -398,13 +409,13 @@ public class KPersist {
       val=defaultVal;
     return val;
   }
-  
+
   private void load() {
     try (FileInputStream fos=new FileInputStream(file);) {
       properties.load(fos);
     } catch (Exception e) {
-      logFail.set(e); 
+      logFail.set(e);
     }
   }
-  
+
 }

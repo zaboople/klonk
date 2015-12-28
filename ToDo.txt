@@ -1,7 +1,7 @@
 -OSX
   -We need some whitespace around the edit window, it's too tight
-  -F12 and F11 are busted
-  -Ctrl-F Find is broken by the fact that it's an editor thing
+  -F12 and F11 are busted because they're OS things
+  -Ctrl-F (Find) is busted because it's an editor thing
   -Do a .klonk directory in home instead of klonk
   -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
   -Auto-trim on save for the sake of code nazis
