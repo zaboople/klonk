@@ -2,4 +2,5 @@
 # command-line until you put the correct directory in your path, i.e. something like:
 #    export PATH=$PATH:/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/bin/
 #
+ant jar
 javapackager -deploy -native dmg -srcfiles dist/klonk.jar -outdir dist/dmg -outfile klonk -appclass org.tmotte.klonk.config.Klonk -title "Klonk" -name Klonk -Bicon=lib/app.icns
