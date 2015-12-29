@@ -48,6 +48,7 @@ public class Editor {
   //Dependencies:
   private EditorListener editListener;
   private Setter<Throwable> failHandler;
+  private CurrentOS currentOS;
 
   //Purely private:
   private MyTextArea jta;
@@ -75,7 +76,9 @@ public class Editor {
     this.editListener=editListener;
     this.failHandler=failHandler;
     this.lineBreaker=lineBreaker;
+    this.currentOS=currentOS;
     jta=new MyTextArea(currentOS);
+    jta.setMargin(new java.awt.Insets(2,5,2,5));
     jta.setDragEnabled(false);
     jta.makeVerticalScrollable();
     jta.addUndoListener(undoL);
@@ -164,6 +167,10 @@ public class Editor {
   }
   public void requestFocus(){
     jta.requestFocus();
+    // This is to fix an OSX bug where the font renders wrong when we switch
+    // editors
+    if (currentOS.isOSX)
+      jta.repaint();
   }
   public boolean isAnythingSelected() {
     return jta.isAnythingSelected();
