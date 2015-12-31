@@ -57,6 +57,7 @@ public class Editor {
   private String encoding=FileMetaData.UTF8;
   private boolean encodingNeedsBOM=false;
   private String lineBreaker;
+  private boolean autoTrimOnSave=false;
   private boolean used=false;
   private boolean unsavedChanges=false;
   private String title="Untitled";
@@ -71,7 +72,7 @@ public class Editor {
   public Editor(
       Setter<Throwable> failHandler,
       EditorListener editListener, UndoListener undoL, CurrentOS currentOS,
-      String lineBreaker, boolean wordWrap
+      String lineBreaker, boolean wordWrap, boolean autoTrim
     ) {
     this.editListener=editListener;
     this.failHandler=failHandler;
@@ -84,6 +85,7 @@ public class Editor {
     jta.addUndoListener(undoL);
     jta.addUndoListener(myUndoListener);
     setWordWrap(wordWrap);
+    setAutoTrim(autoTrim);
     setEvents(currentOS);
   }
 
@@ -105,6 +107,9 @@ public class Editor {
     jta.setLineWrap(wordWrap);
     jta.setWrapStyleWord(wordWrap);
   }
+  public void setAutoTrim(boolean b){
+    autoTrimOnSave=b;
+  }
   public void setFont(FontOptions options) {
     jta.setFont(options.getFont());
     jta.setForeground(options.getColor());
@@ -123,6 +128,7 @@ public class Editor {
   public void setTitle(String s) {
     title=s;
   }
+
 
   ////////////
   // Marks: //
@@ -728,6 +734,22 @@ public class Editor {
     jta.setCaretPosition(0);
   }
   private void doSaveFile(File saveToFile) throws Exception {
+    if (autoTrimOnSave) {
+      int lc=jta.getLineCount();
+      for (int line=0; line<lc; line++) {
+        int
+          end=jta.getLineEndOffset(line),
+          start=jta.getLineStartOffset(line);
+        if (line < lc-1)
+          end-=1;
+        String lineStr=jta.getText(start, end-start);
+        if (lineStr.endsWith(" ")) {
+          while (lineStr.endsWith(" "))
+            lineStr=lineStr.substring(0, lineStr.length()-1);
+          jta.betterReplaceRange(lineStr, start, end);
+        }
+      }
+    }
     used|=true;
     KFileIO.save(jta, saveToFile, lineBreaker, encoding, encodingNeedsBOM);
     if (saveToFile!=file)

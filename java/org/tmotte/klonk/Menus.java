@@ -77,7 +77,7 @@ public class Menus {
                     externalRunBatch,
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
                     helpAbout, helpShortcut;
-  private JCheckBoxMenuItem undoFast, optionWordWrap;
+  private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
 
 
   /////////////////////
@@ -192,6 +192,10 @@ public class Menus {
   }
   public Menus setWordWrap(boolean w) {
     optionWordWrap.setState(w);
+    return this;
+  }
+  public Menus setAutoTrim(boolean w) {
+    optionAutoTrim.setState(w);
     return this;
   }
   public void editorChange() {
@@ -659,7 +663,12 @@ public class Menus {
     //OPTIONS:
     mu.add(
       options=mu.doMenu(bar, "Options",   KeyEvent.VK_O)
-      ,optionWordWrap      =mu.doMenuItemCheckbox("Word wrap",            optionListener, KeyEvent.VK_W, false)
+      ,optionWordWrap=mu.doMenuItemCheckbox(
+        "Word wrap", optionListener, KeyEvent.VK_W, false
+      )
+      ,optionAutoTrim=mu.doMenuItemCheckbox(
+        "Auto-trim trailing spaces on Save", optionListener, KeyEvent.VK_A, false
+      )
     );
     options.addSeparator();
     mu.add(
@@ -667,7 +676,7 @@ public class Menus {
       ,optionTabsAndIndents=mu.doMenuItem("Tabs & Indents",               optionListener, KeyEvent.VK_T)
       ,optionLineDelimiters=mu.doMenuItem("Line delimiters",              optionListener, KeyEvent.VK_L)
       ,optionFont          =mu.doMenuItem("Font & colors",                optionListener, KeyEvent.VK_F)
-      ,optionFavorites     =mu.doMenuItem("Favorite files & directories", optionListener, KeyEvent.VK_A)
+      ,optionFavorites     =mu.doMenuItem("Favorite files & directories", optionListener, KeyEvent.VK_V)
       ,optionSSH           =mu.doMenuItem("SSH Options",                  optionListener, KeyEvent.VK_S)
     );
 
@@ -879,6 +888,8 @@ public class Menus {
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
         if (s==optionWordWrap)        ctrlOptions.doWordWrap();
+        else
+        if (s==optionAutoTrim)        ctrlOptions.doAutoTrim();
         else
         if (s==optionTabsAndIndents)  ctrlOptions.doTabsAndIndents();
         else

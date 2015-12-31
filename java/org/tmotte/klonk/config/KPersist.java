@@ -61,13 +61,27 @@ public class KPersist {
     return sb.toString();
   }
 
-  // WORD WRAP: //
+  // SIMPLE BOOLEANS: WORD WRAP, FAST UNDOS, AUTO-TRIM: //
 
   public KPersist setWordWrap(boolean b) {
     return setBoolean("WordWrap", b);
   }
   public boolean getWordWrap() {
     return getBoolean("WordWrap", true);
+  }
+
+  public KPersist setFastUndos(boolean fast) {
+    return setBoolean("FastUndos", fast);
+  }
+  public boolean getFastUndos() {
+    return getBoolean("FastUndos", true);
+  }
+
+  public KPersist setAutoTrim(boolean trim) {
+    return setBoolean("AutoTrim", trim);
+  }
+  public boolean getAutoTrim() {
+    return getBoolean("AutoTrim", false);
   }
 
   // WINDOW BOUNDS: //
@@ -249,15 +263,7 @@ public class KPersist {
     setFiles(dirs,  "File.Favorite.Dirs.",  maxFavorite);
   }
 
-
-  // FAST UNDOS: //
-
-  public KPersist setFastUndos(boolean fast) {
-    return setBoolean("FastUndos", fast);
-  }
-  public boolean getFastUndos() {
-    return getBoolean("FastUndos", true);
-  }
+  // SHORTCUTS: //
 
   public KeyConfig getKeyConfig() {
     if (keyConfig==null)

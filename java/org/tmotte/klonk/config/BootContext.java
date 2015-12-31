@@ -244,7 +244,8 @@ public class BootContext {
 
     Menus menus=new Menus(editors, currentOS);
     menus.setFastUndos(persist.getFastUndos())
-          .setWordWrap(persist.getWordWrap());
+          .setWordWrap(persist.getWordWrap())
+          .setAutoTrim(persist.getAutoTrim());
     {
       //This cannot be an array because of "generic array creation" compiler fail:
       List<Setter<FontOptions>> fontListeners=new java.util.ArrayList<>(10);

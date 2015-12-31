@@ -36,11 +36,11 @@ public class CtrlOptions {
   private SSHOptionPicker sshOptionPicker;
   private TabsAndIndents tabsAndIndents;
   private FontPicker fontPicker;
-  
+
   public CtrlOptions(
-      Editors editors, StatusUpdate statusBar, KPersist persist, CtrlFavorites ctrlFavorites, 
+      Editors editors, StatusUpdate statusBar, KPersist persist, CtrlFavorites ctrlFavorites,
       LineDelimiterListener delimListener, List<Setter<FontOptions>> fontListeners, SSHConnections sshConns,
-      SSHOptionPicker sshOptionPicker, TabsAndIndents tabsAndIndents, 
+      SSHOptionPicker sshOptionPicker, TabsAndIndents tabsAndIndents,
       Favorites favorites, FontPicker fontPicker, LineDelimiters lineDelimiters
     ) {
     this.editors=editors;
@@ -50,7 +50,7 @@ public class CtrlOptions {
     this.delimListener=delimListener;
     this.fontListeners=fontListeners;
     this.sshConns=sshConns;
-    
+
     this.sshOptionPicker=sshOptionPicker;
     this.tabsAndIndents=tabsAndIndents;
     this.favorites=favorites;
@@ -60,8 +60,8 @@ public class CtrlOptions {
     this.taio=persist.getTabAndIndentOptions();
     this.fontOptions=persist.getFontAndColors();
     this.sshOptions=persist.getSSHOptions();
-  } 
-  
+  }
+
   public void doWordWrap() {
     boolean b=persist.getWordWrap();
     persist.setWordWrap(!b);
@@ -69,6 +69,13 @@ public class CtrlOptions {
     for (Editor e: editors.forEach())
       e.setWordWrap(!b);;
   }
+
+  public void doAutoTrim() {
+    boolean b=persist.getAutoTrim();
+    persist.setAutoTrim(!b);
+    persist.save();
+  }
+
 
   public void doTabsAndIndents(){
     taio.indentionMode=editors.getFirst().getTabsOrSpaces();
@@ -80,7 +87,7 @@ public class CtrlOptions {
       persist.save();
     }
   }
-  
+
   public void doFontAndColors() {
     if (!fontPicker.show(fontOptions))
       return;
@@ -91,16 +98,16 @@ public class CtrlOptions {
     persist.setFontAndColors(fontOptions);
     persist.save();
   }
-  
+
   public void doFavorites() {
-    if (!favorites.show(ctrlFavorites.getFiles(), ctrlFavorites.getDirs())) 
+    if (!favorites.show(ctrlFavorites.getFiles(), ctrlFavorites.getDirs()))
       statusBar.showBad("Changes to favorite files/directories cancelled");
     else {
       ctrlFavorites.set();
       statusBar.show("Changes to favorite files/directories saved");
     }
   }
- 
+
   public void doLineDelimiters(){
     LineDelimiterOptions k=new LineDelimiterOptions();
     k.defaultOption=persist.getDefaultLineDelimiter();
@@ -108,7 +115,7 @@ public class CtrlOptions {
     lineDelimiters.show(k, delimListener);
   }
 
-  public void doSSH(){ 
+  public void doSSH(){
     List<String> hosts=sshConns.getConnectedHosts();
     if (sshOptionPicker.show(sshOptions, hosts)){
       persist.writeSSHOptions();

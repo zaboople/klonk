@@ -589,7 +589,8 @@ public class CtrlMain  {
       myUndoListener,
       currentOS,
       persist.getDefaultLineDelimiter(),
-      persist.getWordWrap()
+      persist.getWordWrap(),
+      persist.getAutoTrim()
     );
     e.setFastUndos(persist.getFastUndos());
     e.setTitle(getUnusedTitle());
