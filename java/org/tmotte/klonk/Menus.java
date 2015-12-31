@@ -667,7 +667,7 @@ public class Menus {
         "Word wrap", optionListener, KeyEvent.VK_W, false
       )
       ,optionAutoTrim=mu.doMenuItemCheckbox(
-        "Auto-trim trailing spaces on Save", optionListener, KeyEvent.VK_A, false
+        "Auto-trim trailing spaces on save", optionListener, KeyEvent.VK_A, false
       )
     );
     options.addSeparator();
