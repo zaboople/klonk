@@ -447,9 +447,12 @@ public class CtrlMain  {
   /////////////////
 
   private boolean fileCloseLastFirst(boolean forExit) {
+    // 1 This forces the app to close the most recently accessed
+    // files last, so that they are the most likely to appear in the reopen menu.
+    // 2 This probably forces unnecessary screen updates since the setEditor()
+    // call is followed by a fileClose() that will most likely update screen state
+    // a second time.
     if (editorMgr.size()>1){
-      //This forces the app to close the most recently accessed
-      //files last, so that they are the most likely to appear in the reopen menu:
       Editor e=editors.removeLast();
       editors.addFirst(e);
       setEditor(e);
@@ -468,17 +471,20 @@ public class CtrlMain  {
       else
       if (result.isCancel())
         return false;
-      //"No" means we do nothing
+      //"No" means "keep going"
     }
     if (e.getFile()!=null)
       recents.recentFileClosed(e.getFile());
     editors.remove(0);
     statusBar.show("Closed: "+e.getTitle());
+    
+    // Proper screen updates happen unless we're exiting completely:
     if (editorMgr.size()>0)
       setEditor(editorMgr.getFirst());
     else
     if (!forExit)
       newEditor();
+    
     return true;
   }
 
@@ -531,15 +537,18 @@ public class CtrlMain  {
         return;
       }
     try {
+      // Find a free editor first; we're going to try to avoid screen updates
+      // (thus the false on editorSwitch() and newEditor()) because the 
+      // loadFile() function will force that no matter what. 
       Editor toUse=null;
       for (Editor e:editorMgr.forEach())
         if (!e.isUsed()) {
           toUse=e;
-          editorSwitch(e);
+          editorSwitch(e, false);
           break;
         }
       if (toUse==null)
-        toUse=newEditor();
+        toUse=newEditor(false);
       loadFile(toUse, file);
     } catch (Exception e) {
       userNotify.alert(e);
@@ -550,12 +559,13 @@ public class CtrlMain  {
       statusBar.show("Loading: "+file+"...");
       file=file.getCanonicalFile();
       e.loadFile(file, persist.getDefaultLineDelimiter());
+      fileIsLoaded(e, file);
     } catch (Exception ex) {
       checkIOError(ex);
+      editorSwitched(e); //See loadFile(File), we need to force screen update
       statusBar.showBad("Load failed");
       return false;
     }
-    fileIsLoaded(e, file);
     return true;
   }
 
@@ -576,13 +586,18 @@ public class CtrlMain  {
   ////////////////////////
   // EDITOR MANAGEMENT: //
   ////////////////////////
-
   private void editorSwitch(Editor editor) {
+    editorSwitch(editor, true);
+  }
+  private void editorSwitch(Editor editor, boolean updateUI) {
     editors.remove(editors.indexOf(editor));
     editors.add(0, editor);
-    setEditor(editor);
+    setEditor(editor, updateUI);
   }
   private Editor newEditor(){
+    return newEditor(true);
+  }
+  private Editor newEditor(boolean updateUI){
     Editor e=new Editor(
       userNotify.getExceptionHandler(),
       editorListener,
@@ -600,13 +615,18 @@ public class CtrlMain  {
     e.setFont(persist.getFontAndColors());
 
     editors.add(0, e);
-    setEditor(e);
+    setEditor(e, updateUI);
     return e;
   }
   private void setEditor(Editor e) {
+    setEditor(e, true);
+  }
+  private void setEditor(Editor e, boolean updateUI) {
     layout.setEditor(e.getContainer());
-    editorSwitched(e);
-    e.requestFocus();
+    if (updateUI) {
+      editorSwitched(e);
+      e.requestFocus();
+    }
   }
 
   private String getUnusedTitle() {
