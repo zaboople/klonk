@@ -133,7 +133,7 @@ public class Menus {
             pswitcher.show(pnlEditor, 0, 0);
           }
         },
-        KeyEvent.VK_I, KeyEvent.META_DOWN_MASK
+        KeyMapper.keyOption(KeyEvent.VK_I, currentOS)
       );
     }
   }
