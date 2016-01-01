@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -43,6 +44,8 @@ public class Menus {
   private Map<JMenuItem,Editor> switchMenuToEditor=new Hashtable<>();
   private MenuUtils mu=new MenuUtils();
   private CurrentOS currentOS;
+  // Used when sorting the Switch menu:
+  private List<Editor> switchSortSource=new ArrayList<>(20); 
 
   //Controllers:
   private CtrlMain ctrlMain;
@@ -78,7 +81,7 @@ public class Menus {
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
-
+  private JPopupMenu pswitcher;
 
   /////////////////////
   //                 //
@@ -121,7 +124,6 @@ public class Menus {
   /** This is a workaround for osx making it to hard to keyboard your way to a top menu. */
   public void attachTo(JPanel pnlEditor) {
     JPopupMenu pfile=file.getPopupMenu();
-    JPopupMenu pswitcher=switcher.getPopupMenu();
     if (currentOS.isOSX) {
       KeyMapper.accel(
         pnlEditor, pswitcher.getClass()+pswitcher.getName(),
@@ -278,35 +280,43 @@ public class Menus {
     switchMenuToEditor.clear();
     int easyLen=3;
 
-    //Build first menu, a quick-list of recent files:
+    // Build first menu, a quick/short list of recent files:
     int i=-1, emin=Math.min(easyLen, editors.size());
     for (Editor e: editors.forEach()){
       ++i;
-      if (i>=emin) break;
-      JMenuItem j=i==0
-        ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)
-        :mu.doMenuItem(
-          e.getTitle(), switchListener, -1,
-          i==1 ?KeyMapper.key(KeyEvent.VK_F12,0) :null
-        );
-      switchMenuToEditor.put(j, e);
-      switcher.add(j);
+      if (i>=emin) 
+        break;
+      makeSwitchMenuItem(switcher,  e, i==0, i==1);
     }
 
-    //Build second menu, a longer sorted list of all files:
-    if (editors.size()>emin){
+    // Build second menu (containing all items) and/or popup switcher menu: 
+    boolean secondSet=editors.size()>emin;
+    if (secondSet)
       switcher.addSeparator();
-      Editor first=editors.getFirst();
-      List<Editor> list=new ArrayList<>(editors.size());
+    if (secondSet || pswitcher!=null){
+
+      // Rebuild sorted list of editors:
+      switchSortSource.clear();
       for (Editor e: editors.forEach())
-        list.add(e);
-      Collections.sort(list, switchSorter);
-      for (Editor e: list) {
-        JMenuItem j=e==first
-          ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)
-          :mu.doMenuItem(e.getTitle(), switchListener);
-        switchMenuToEditor.put(j, e);
-        switcher.add(j);
+        switchSortSource.add(e);
+      Collections.sort(switchSortSource, switchSorter);
+      
+      // Clear popup of all but title & first separator:
+      if (pswitcher!=null) {
+        int size=pswitcher.getComponentCount();
+        for (int ps=2; ps<size; ps++)
+          pswitcher.remove(2);
+      }      
+
+      // Add to whichever menu needs it. Be careful: You must
+      // make a new menu item each time, EVEN when adding it to
+      // different menus:
+      Editor firstEditor=editors.getFirst();
+      for (Editor e: switchSortSource) {
+        if (secondSet)
+          makeSwitchMenuItem(switcher,  e, e==firstEditor, false);
+        if (pswitcher!=null)
+          makeSwitchMenuItem(pswitcher, e, e==firstEditor, false);
       }
     }
 
@@ -320,6 +330,23 @@ public class Menus {
 
     fileCloseOthers.setEnabled(editors.size()>1);
   }
+  /** Only called by setSwitchMenu() */
+  private void makeSwitchMenuItem(
+      javax.swing.JComponent c, Editor e, boolean checked, boolean f12
+    ) {
+    JMenuItem jmi=
+      checked
+        ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)
+        :mu.doMenuItem(
+          e.getTitle(), switchListener, -1,
+          f12 
+            ?KeyMapper.key(KeyEvent.VK_F12,0) 
+            :null
+        );
+    switchMenuToEditor.put(jmi, e);
+    c.add(jmi);
+  }
+  /** Also only used by setSwitchMenu() */
   private static Comparator<Editor> switchSorter=new Comparator<Editor> () {
     public int compare(Editor e1, Editor e2) {
       return e1.getTitle().compareTo(e2.getTitle());
@@ -471,6 +498,18 @@ public class Menus {
     switchNextUnsaved=mu.doMenuItem(
       "Next unsaved file", switchListener, KeyEvent.VK_X
     );
+    if (currentOS.isOSX){
+      pswitcher=new JPopupMenu();
+      JLabel lbl=new javax.swing.JLabel("Switch:");
+      lbl.setFont(switcher.getFont());
+      lbl.setBorder(
+        new javax.swing.border.EmptyBorder(
+          new java.awt.Insets(2,10,2,2)
+        )
+      );
+      pswitcher.add(lbl);
+      pswitcher.addSeparator();
+    }
 
 
     //SEARCH:
