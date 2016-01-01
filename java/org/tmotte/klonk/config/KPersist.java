@@ -23,7 +23,7 @@ public class KPersist {
   public final static int maxRecent=15;
   public final static int maxFavorite=50;
 
-  private File file;
+  private File mainFile;
   private Properties properties=new Properties();
   private Setter<Throwable> logFail;
   private boolean hasChanges=false;
@@ -37,9 +37,9 @@ public class KPersist {
   public KPersist(KHome home, Setter<Throwable> logFail) {
     this.logFail=logFail;
     try {
-      file=home.nameFile("klonk.properties");
-      if (!file.exists())
-        file.createNewFile();
+      mainFile=home.nameFile("klonk.properties");
+      if (!mainFile.exists())
+        mainFile.createNewFile();
       else
         load();
     } catch (Exception e) {
@@ -306,7 +306,7 @@ public class KPersist {
     }
 
     // 2. Save everything
-    try (FileOutputStream fos=new FileOutputStream(file);) {
+    try (FileOutputStream fos=new FileOutputStream(mainFile);) {
       properties.store(fos, "You are permitted to sort this file");
       hasChanges=false;
     } catch (Exception e) {
@@ -417,7 +417,7 @@ public class KPersist {
   }
 
   private void load() {
-    try (FileInputStream fos=new FileInputStream(file);) {
+    try (FileInputStream fos=new FileInputStream(mainFile);) {
       properties.load(fos);
     } catch (Exception e) {
       logFail.set(e);
