@@ -79,7 +79,7 @@ public class Editor {
     this.lineBreaker=lineBreaker;
     this.currentOS=currentOS;
     jta=new MyTextArea(currentOS);
-    jta.setMargin(new java.awt.Insets(2,5,2,5));
+    jta.setMargin(new java.awt.Insets(2,4,2,4));
     jta.setDragEnabled(false);
     jta.makeVerticalScrollable();
     jta.addUndoListener(undoL);
