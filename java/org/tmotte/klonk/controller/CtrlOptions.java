@@ -75,7 +75,7 @@ public class CtrlOptions {
     persist.setAutoTrim(!b);
     persist.save();
     for (Editor e: editors.forEach())
-      e.setWordWrap(!b);
+      e.setAutoTrim(!b);
   }
 
 
