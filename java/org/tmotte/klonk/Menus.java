@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -44,8 +45,9 @@ public class Menus {
   private Map<JMenuItem,Editor> switchMenuToEditor=new Hashtable<>();
   private MenuUtils mu=new MenuUtils();
   private CurrentOS currentOS;
-  // Used when sorting the Switch menu:
+  // Used when sorting the Switch menu & recent menus, respectively:
   private List<Editor> switchSortSource=new ArrayList<>(20); 
+  private Map<JMenu, List<String>> recentSortSources=new HashMap<>();
 
   //Controllers:
   private CtrlMain ctrlMain;
@@ -123,7 +125,6 @@ public class Menus {
   }
   /** This is a workaround for osx making it to hard to keyboard your way to a top menu. */
   public void attachTo(JPanel pnlEditor) {
-    JPopupMenu pfile=file.getPopupMenu();
     if (currentOS.isOSX) {
       KeyMapper.accel(
         pnlEditor, pswitcher.getClass()+pswitcher.getName(),
@@ -232,21 +233,30 @@ public class Menus {
     markClearAll.setEnabled(has);
   }
   private void setRecent(List<String> startList, JMenu menuX, Action listener) {
+    int size=startList.size();
     menuX.removeAll();
-    menuX.setEnabled(startList.size()>0);
+    menuX.setEnabled(size>0);
     int easyLen=3;
 
     //Build first menu, a quick-list of recent files:
-    for (int i=0; i<Math.min(easyLen, startList.size()); i++)
+    for (int i=0; i<Math.min(easyLen, size); i++)
       menuX.add(mu.doMenuItem(startList.get(i), listener));
 
     //Build second menu, a longer sorter list of all files you have open:
-    if (startList.size()>easyLen){
-      menuX.addSeparator();
-      List<String> list=new ArrayList<>(startList.size());
+    if (size>easyLen){
+    
+      // Build & sort list of names:
+      List<String> list=recentSortSources.get(menuX);
+      if (list==null) {
+        list=new ArrayList<>(16);
+        recentSortSources.put(menuX, list);
+      }
       for (String s: startList)
         list.add(s);
       Collections.sort(list);
+
+      // Now add them:
+      menuX.addSeparator();
       for (String s: list)
         menuX.add(mu.doMenuItem(s, listener));
     }
