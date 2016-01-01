@@ -115,5 +115,10 @@ public class KeyMapper {
       mod|=m;
     return key(hotKey, mod);
   }
-
+  public static KeyStroke keyOption(int hotKey, CurrentOS currentOS) {
+    if (!currentOS.isOSX)
+      throw new IllegalStateException("Cannot call this outside of OSX");
+    return key(hotKey, KeyEvent.ALT_DOWN_MASK);
+  }
+  
 }
