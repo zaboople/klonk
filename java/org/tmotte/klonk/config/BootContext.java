@@ -137,7 +137,7 @@ public class BootContext {
     home=new KHome(
       argHomeDir!=null
         ?argHomeDir
-        :KHome.nameIt(System.getProperty("user.home"), "klonk")
+        :KHome.nameIt(System.getProperty("user.home"), ".klonk")
     );
     String pid=ManagementFactory.getRuntimeMXBean().getName();
     String processID=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
