@@ -477,14 +477,14 @@ public class CtrlMain  {
       recents.recentFileClosed(e.getFile());
     editors.remove(0);
     statusBar.show("Closed: "+e.getTitle());
-    
+
     // Proper screen updates happen unless we're exiting completely:
     if (editorMgr.size()>0)
       setEditor(editorMgr.getFirst());
     else
     if (!forExit)
       newEditor();
-    
+
     return true;
   }
 
@@ -538,17 +538,17 @@ public class CtrlMain  {
       }
     try {
       // Find a free editor first; we're going to try to avoid screen updates
-      // (thus the false on editorSwitch() and newEditor()) because the 
-      // loadFile() function will force that no matter what. 
+      // (thus the false on editorSwitch() and newEditor()) because the
+      // loadFile() function will force that no matter what.
       Editor toUse=null;
       for (Editor e:editorMgr.forEach())
         if (!e.isUsed()) {
           toUse=e;
-          editorSwitch(e, false);
+          editorSwitch(e);
           break;
         }
       if (toUse==null)
-        toUse=newEditor(false);
+        toUse=newEditor();
       loadFile(toUse, file);
     } catch (Exception e) {
       userNotify.alert(e);
