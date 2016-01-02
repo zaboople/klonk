@@ -153,7 +153,8 @@ public class Menus {
         pSelect, "selection2", popupShower,
         KeyEvent.VK_L, KeyEvent.META_DOWN_MASK
       );
-      //For some reason this one can't do the same as the others:
+      //For some reason this one can't do the same as the others probably
+      //because the JTextArea is intercepting the keystroke:
       KeyMapper.accel(
         pnlEditor, "switch2",
         new AbstractAction() {
