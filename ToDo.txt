@@ -1,7 +1,9 @@
 -OSX
   -File Save As is broken - we feed apple the file path and they stuff it in the filename box. Don't worry, open from recent & save to recent are ok.
   -Shift-home & Shift-end don't work. They just move the cursor, they don't select.
+    -Also ctrl-home and ctrl-end don't work.
   -KeyMapping
+    -We really need a sorted properties file
   -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
   -Right click menu is still on ctrl-everything, shouldn't it go option-everything... and preserve ctrl-everything...
 
