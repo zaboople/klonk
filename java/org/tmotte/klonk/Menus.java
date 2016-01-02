@@ -83,7 +83,7 @@ public class Menus {
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
-  private JPopupMenu pswitcher, pOpenFrom, pSaveTo, pSelect, pFavorite;
+  private JPopupMenu pswitcher, pOpenFrom, pSaveTo, pSelect, pFavorite, pReopen;
 
   /////////////////////
   //                 //
@@ -137,6 +137,10 @@ public class Menus {
           }
         };
 
+      KeyMapper.accel(
+        pReopen, "reopen2", popupShower,
+        KeyEvent.VK_R, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
+      );
       KeyMapper.accel(
         pOpenFrom, "openfrom2", popupShower,
         KeyEvent.VK_O, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
@@ -531,6 +535,7 @@ public class Menus {
       pOpenFrom=makePopup(fileOpenFrom, "Open from:");
       pSaveTo=makePopup(fileSaveTo, "Save to:");
       pFavorite=makePopup(fileFave, "Favorite files:");
+      pReopen=makePopup(fileReopen, "Reopen file:");
     }
 
     //File menu section 5 (Exit)
