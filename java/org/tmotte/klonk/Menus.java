@@ -21,6 +21,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import org.tmotte.common.swang.CurrentOS;
@@ -127,7 +128,7 @@ public class Menus {
   public void attachTo(JPanel pnlEditor) {
     if (currentOS.isOSX) {
       KeyMapper.accel(
-        pnlEditor, pswitcher.getClass()+pswitcher.getName(),
+        pnlEditor, "switch1",
         new AbstractAction() {
           public void actionPerformed(ActionEvent ae) {
             pswitcher.show(pnlEditor, 0, 0);
@@ -136,7 +137,7 @@ public class Menus {
         KeyEvent.VK_I, KeyEvent.META_DOWN_MASK
       );
       KeyMapper.accel(
-        pnlEditor, pOpenFrom.getClass()+pOpenFrom.getName(),
+        pnlEditor, "openfrom2",
         new AbstractAction() {
           public void actionPerformed(ActionEvent ae) {
             pOpenFrom.show(pnlEditor, 0, 0);
@@ -494,6 +495,8 @@ public class Menus {
       fileReopen=mu.doMenu("Re-open", KeyEvent.VK_R)
     );
     pOpenFrom=fileOpenFrom.getPopupMenu();
+    labelPopup(pOpenFrom, "Open from:");
+
     //File menu section 5 (Exit)
     file.addSeparator();
     file.add(fileExit  =mu.doMenuItem(
@@ -736,6 +739,10 @@ public class Menus {
 
   private JPopupMenu makeLabelledPopup(String label) {
     JPopupMenu menu=new JPopupMenu();
+    labelPopup(menu, label);
+    return menu;
+  }
+  private void labelPopup(JPopupMenu menu, String label) {
     JLabel lbl=new javax.swing.JLabel(label);
     lbl.setFont(file.getFont());
     lbl.setBorder(
@@ -743,9 +750,8 @@ public class Menus {
         new java.awt.Insets(2,10,2,2)
       )
     );
-    menu.add(lbl);
-    menu.addSeparator();
-    return menu;
+    menu.insert(lbl, 0);
+    menu.insert(new JSeparator(javax.swing.SwingConstants.HORIZONTAL), 1);
   }
 
   //////////////////////
