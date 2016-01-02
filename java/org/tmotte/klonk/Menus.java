@@ -124,7 +124,7 @@ public class Menus {
     return bar;
   }
   /** This is a workaround for osx making it to hard to keyboard your way to a top menu. */
-  public void attachTo(JPanel pnlEditor) {
+  public void attachPopups(JPanel pnlEditor) {
     if (currentOS.isOSX) {
       AbstractAction popupShower=
         new AbstractAction() {

@@ -271,7 +271,7 @@ public class BootContext {
         )
       );
     }
-    menus.attachTo(layout.getMainPanel());
+    menus.attachPopups(layout.getMainPanel());
     mainFrame.setJMenuBar(menus.getMenuBar());
 
     // PUSH THINGS BACK TO MAIN CONTROLLER: //
