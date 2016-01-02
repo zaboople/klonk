@@ -83,7 +83,7 @@ public class Menus {
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
-  private JPopupMenu pswitcher, pOpenFrom, pSaveTo;
+  private JPopupMenu pswitcher, pOpenFrom, pSaveTo, pSelect;
 
   /////////////////////
   //                 //
@@ -152,6 +152,15 @@ public class Menus {
           }
         },
         KeyEvent.VK_T, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
+      );
+      KeyMapper.accel(
+        pnlEditor, "selection2",
+        new AbstractAction() {
+          public void actionPerformed(ActionEvent ae) {
+            pSelect.show(pnlEditor, 0, 0);
+          }
+        },
+        KeyEvent.VK_L, KeyEvent.META_DOWN_MASK
       );
     }
   }
@@ -506,7 +515,7 @@ public class Menus {
       ,
       fileReopen=mu.doMenu("Re-open", KeyEvent.VK_R)
     );
-    if (currentOSX.isOSX) {
+    if (currentOS.isOSX) {
       pOpenFrom=makePopup(fileOpenFrom, "Open from:");
       pSaveTo=makePopup(fileSaveTo, "Save to:");
     }
@@ -683,6 +692,8 @@ public class Menus {
         selectionItemListener, KeyEvent.VK_A
       )
     );
+    if (currentOS.isOSX)
+      pSelect=makePopup(select, "Select:");
 
     //ALIGN:
     mu.add(
