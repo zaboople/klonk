@@ -83,7 +83,7 @@ public class Menus {
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
-  private JPopupMenu pswitcher, pOpenFrom, pSaveTo, pSelect;
+  private JPopupMenu pswitcher, pOpenFrom, pSaveTo, pSelect, pFavorite;
 
   /////////////////////
   //                 //
@@ -152,6 +152,15 @@ public class Menus {
           }
         },
         KeyEvent.VK_T, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
+      );
+      KeyMapper.accel(
+        pnlEditor, "favorite2",
+        new AbstractAction() {
+          public void actionPerformed(ActionEvent ae) {
+            pFavorite.show(pnlEditor, 0, 0);
+          }
+        },
+        KeyEvent.VK_I, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
       );
       KeyMapper.accel(
         pnlEditor, "selection2",
@@ -290,19 +299,29 @@ public class Menus {
     }
   }
   private void setFavorites(Collection<String> startList, JMenu menuX, Action listener, int skipLast) {
-    JMenuItem[] skipped=new JMenuItem[skipLast];
-    {
+
+    // Collect a list of items to put back:
+    JMenuItem[] skip=null;
+    if (skipLast>0) {
+      skip=new JMenuItem[skipLast];
       int count=menuX.getItemCount();
       int start=count-skipLast;
       for (int i=start; i<count; i++)
-        skipped[i-start]=menuX.getItem(i);
+        skip[i-start]=menuX.getItem(i);
     }
-    menuX.removeAll();
+
+    // Clearing menu, but not doing a removeAll() call because that messes up our popup menu:
+    while (menuX.getComponentCount()>0)
+      menuX.remove(0);
+
+    // Add everything:
     for (String s: startList)
       menuX.add(mu.doMenuItem(s, listener));
+
+    // Put things back or enable/disable if empty:
     if (skipLast>0){
       menuX.addSeparator();
-      for (JMenuItem i: skipped)
+      for (JMenuItem i: skip)
         menuX.add(i);
     }
     else
@@ -518,6 +537,7 @@ public class Menus {
     if (currentOS.isOSX) {
       pOpenFrom=makePopup(fileOpenFrom, "Open from:");
       pSaveTo=makePopup(fileSaveTo, "Save to:");
+      pFavorite=makePopup(fileFave, "Favorite files:");
     }
 
     //File menu section 5 (Exit)

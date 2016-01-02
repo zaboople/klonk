@@ -7,15 +7,15 @@
   -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
 
 -Current
-  -Switch windows build to use the new thing I found
+  -Switch ms windows exe build to use the new thing I found
+
+  -Ctrl - and Ctrl + should resize font
 
   -SSH Sudo
 
   -Help should should show the name of your current log file.
 
   -Alt-f-d doesn't work with ssh and needs to be disabled.
-
-  -Ctrl - and Ctrl + should resize font
 
   -Hey and a menu item for File-Delete? With confirm of course. Hmph.
 
