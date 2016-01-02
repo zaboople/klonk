@@ -265,9 +265,17 @@ public class Menus {
     markClearCurrent.setEnabled(has);
     markClearAll.setEnabled(has);
   }
+
+  //Doing a removeAll() call messes up our popup menus that derive from the JMenu,
+  //so this is a good alternative:
+  private void cleanMenu(JMenu menuX) {
+    int ct=menuX.getComponentCount();
+    for (int i=0; i<ct; i++)
+      menuX.remove(0);
+  }
   private void setRecent(List<String> startList, JMenu menuX, Action listener) {
     int size=startList.size();
-    menuX.removeAll();
+    cleanMenu(menuX);
     menuX.setEnabled(size>0);
     int easyLen=3;
 
@@ -307,9 +315,7 @@ public class Menus {
         skip[i-start]=menuX.getItem(i);
     }
 
-    // Clearing menu, but not doing a removeAll() call because that messes up our popup menu:
-    while (menuX.getComponentCount()>0)
-      menuX.remove(0);
+    cleanMenu(menuX);
 
     // Add everything:
     for (String s: startList)
