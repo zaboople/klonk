@@ -24,6 +24,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
@@ -81,6 +83,7 @@ public class Menus {
                     weirdInsertToAlign, weirdInsertToAlignBelow, weirdBackspaceToAlign, weirdBackspaceToAlignBelow,
                     externalRunBatch,
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
+                    osxShortcuts,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
   private JPopupMenu pswitcher, pOpenFrom, pSaveTo, pSelect, pFavorite, pReopen;
@@ -716,8 +719,10 @@ public class Menus {
         selectionItemListener, KeyEvent.VK_A
       )
     );
-    if (currentOS.isOSX)
+    if (currentOS.isOSX) {
       pSelect=makePopup(select, "Selection:");
+      pSelect.addPopupMenuListener(popupSelectListener);
+    }
 
     //ALIGN:
     mu.add(
@@ -785,6 +790,10 @@ public class Menus {
       ,helpShortcut=mu.doMenuItem("Shortcuts and hidden features", helpListener, KeyEvent.VK_S)
     );
   }
+
+  ///////////////////////////////////////
+  // POPUP MENU CREATION FOR OSX ONLY: //
+  ///////////////////////////////////////
 
   private JPopupMenu makePopup(JMenu from, String label) {
     JPopupMenu menu=from.getPopupMenu();
@@ -1034,17 +1043,32 @@ public class Menus {
       }
     }
     ;
+
+  //////////////////////////////////
+  // REAL-TIME ON-SHOW LISTENERS: //
+  //////////////////////////////////
+  private void enableSelectItems() {
+    boolean selected=editors.getFirst().isAnythingSelected();
+    selectUpperCase.setEnabled(selected);
+    selectLowerCase.setEnabled(selected);
+    selectSortLines.setEnabled(selected);
+    selectGetSelectionSize.setEnabled(selected);
+    selectGetAsciiValues.setEnabled(selected);
+  }
+  private PopupMenuListener
+    popupSelectListener=new PopupMenuListener() {
+      public void popupMenuCanceled(PopupMenuEvent e){}
+      public void popupMenuWillBecomeInvisible(PopupMenuEvent e){}
+      public void popupMenuWillBecomeVisible(PopupMenuEvent e){
+        enableSelectItems();
+      }
+    };
   private MenuListener
     selectListener=new MenuListener(){
       public void menuCanceled(MenuEvent e){}
       public void menuDeselected(MenuEvent e){}
       public void menuSelected(MenuEvent e){
-        boolean selected=editors.getFirst().isAnythingSelected();
-        selectUpperCase.setEnabled(selected);
-        selectLowerCase.setEnabled(selected);
-        selectSortLines.setEnabled(selected);
-        selectGetSelectionSize.setEnabled(selected);
-        selectGetAsciiValues.setEnabled(selected);
+        enableSelectItems();
       }
     }
     ,
