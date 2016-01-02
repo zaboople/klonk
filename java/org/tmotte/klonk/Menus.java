@@ -126,6 +126,34 @@ public class Menus {
   /** This is a workaround for osx making it to hard to keyboard your way to a top menu. */
   public void attachTo(JPanel pnlEditor) {
     if (currentOS.isOSX) {
+      AbstractAction popupShower=
+        new AbstractAction() {
+          public void actionPerformed(ActionEvent ae) {
+            Object src=ae.getSource();
+            if (src instanceof JPopupMenu)
+              ((JPopupMenu)src).show(pnlEditor, 0, 0);
+            else
+              throw new RuntimeException("Unexpected thing received popup event "+src.getClass()+" "+src);
+          }
+        };
+
+      KeyMapper.accel(
+        pOpenFrom, "openfrom2", popupShower,
+        KeyEvent.VK_O, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
+      );
+      KeyMapper.accel(
+        pSaveTo, "saveto2", popupShower,
+        KeyEvent.VK_T, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
+      );
+      KeyMapper.accel(
+        pFavorite, "favorite2", popupShower,
+        KeyEvent.VK_I, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
+      );
+      KeyMapper.accel(
+        pSelect, "selection2", popupShower,
+        KeyEvent.VK_L, KeyEvent.META_DOWN_MASK
+      );
+      //For some reason this one can't do the same as the others:
       KeyMapper.accel(
         pnlEditor, "switch2",
         new AbstractAction() {
@@ -134,42 +162,6 @@ public class Menus {
           }
         },
         KeyEvent.VK_I, KeyEvent.META_DOWN_MASK
-      );
-      KeyMapper.accel(
-        pnlEditor, "openfrom2",
-        new AbstractAction() {
-          public void actionPerformed(ActionEvent ae) {
-            pOpenFrom.show(pnlEditor, 0, 0);
-          }
-        },
-        KeyEvent.VK_O, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
-      );
-      KeyMapper.accel(
-        pnlEditor, "saveto2",
-        new AbstractAction() {
-          public void actionPerformed(ActionEvent ae) {
-            pSaveTo.show(pnlEditor, 0, 0);
-          }
-        },
-        KeyEvent.VK_T, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
-      );
-      KeyMapper.accel(
-        pnlEditor, "favorite2",
-        new AbstractAction() {
-          public void actionPerformed(ActionEvent ae) {
-            pFavorite.show(pnlEditor, 0, 0);
-          }
-        },
-        KeyEvent.VK_I, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
-      );
-      KeyMapper.accel(
-        pnlEditor, "selection2",
-        new AbstractAction() {
-          public void actionPerformed(ActionEvent ae) {
-            pSelect.show(pnlEditor, 0, 0);
-          }
-        },
-        KeyEvent.VK_L, KeyEvent.META_DOWN_MASK
       );
     }
   }
@@ -713,7 +705,7 @@ public class Menus {
       )
     );
     if (currentOS.isOSX)
-      pSelect=makePopup(select, "Select:");
+      pSelect=makePopup(select, "Selection:");
 
     //ALIGN:
     mu.add(
