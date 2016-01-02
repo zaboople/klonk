@@ -1,4 +1,5 @@
 package org.tmotte.klonk;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -211,14 +212,14 @@ public class Menus {
     return this;
   }
   public void setFavoriteFiles(Collection<String> startList) {
-    setFavorites(startList, fileFave, reopenListener, 2);
+    setFavorites(startList, fileFave, pFavorite, reopenListener, 2);
   }
   public void setFavoriteDirs(Collection<String> startList) {
     setFavorites(startList, fileOpenFromFave, openFromListener, 0);
     setFavorites(startList, fileSaveToFave,   saveToListener, 0);
   }
   public void setRecentFiles(List<String> startList) {
-    setRecent(startList, fileReopen, reopenListener);
+    setRecent(startList, fileReopen, pReopen, reopenListener);
   }
   public void setRecentDirs(List<String> startList) {
     setRecent(startList, fileOpenFromRecentDir, openFromListener);
@@ -269,16 +270,26 @@ public class Menus {
     markClearAll.setEnabled(has);
   }
 
-  //Doing a removeAll() call messes up our popup menus that derive from the JMenu,
-  //so this is a good alternative:
-  private void cleanMenu(JMenu menuX) {
-    int ct=menuX.getComponentCount();
-    for (int i=0; i<ct; i++)
-      menuX.remove(0);
+  /**
+   * Doing a removeAll() call messes up our popup menus that derive from the JMenu
+   * so we preserve the title JLabel & separator here.
+   */
+  private void cleanMenu(JMenu menuX, JPopupMenu menuP) {
+    Component[] cs=
+      menuP==null
+        ?null
+        :menuP.getComponents();
+    menuX.removeAll();
+    if (menuP!=null)
+      for (int i=0; i<cs.length && i<2; i++)
+        menuP.add(cs[i]);
   }
   private void setRecent(List<String> startList, JMenu menuX, Action listener) {
+    setRecent(startList, menuX, null, listener);
+  }
+  private void setRecent(List<String> startList, JMenu menuX, JPopupMenu menuP, Action listener) {
     int size=startList.size();
-    cleanMenu(menuX);
+    cleanMenu(menuX, menuP);
     menuX.setEnabled(size>0);
     int easyLen=3;
 
@@ -306,7 +317,14 @@ public class Menus {
         menuX.add(mu.doMenuItem(s, listener));
     }
   }
-  private void setFavorites(Collection<String> startList, JMenu menuX, Action listener, int skipLast) {
+  private void setFavorites(
+      Collection<String> startList, JMenu menuX, Action listener, int skipLast
+    ) {
+    setFavorites(startList, menuX, null, listener, skipLast);
+  }
+  private void setFavorites(
+      Collection<String> startList, JMenu menuX, JPopupMenu menuP, Action listener, int skipLast
+    ) {
 
     // Collect a list of items to put back:
     JMenuItem[] skip=null;
@@ -318,7 +336,7 @@ public class Menus {
         skip[i-start]=menuX.getItem(i);
     }
 
-    cleanMenu(menuX);
+    cleanMenu(menuX, menuP);
 
     // Add everything:
     for (String s: startList)
