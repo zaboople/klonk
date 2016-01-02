@@ -151,7 +151,7 @@ public class Menus {
             pSaveTo.show(pnlEditor, 0, 0);
           }
         },
-        KeyEvent.VK_T, KeyEvent.META_DOWN_MASK
+        KeyEvent.VK_T, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
       );
     }
   }
