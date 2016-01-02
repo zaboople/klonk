@@ -46,7 +46,7 @@ public class Menus {
   private MenuUtils mu=new MenuUtils();
   private CurrentOS currentOS;
   // Used when sorting the Switch menu & recent menus, respectively:
-  private List<Editor> switchSortSource=new ArrayList<>(20); 
+  private List<Editor> switchSortSource=new ArrayList<>(20);
   private Map<JMenu, List<String>> recentSortSources=new HashMap<>();
 
   //Controllers:
@@ -83,7 +83,7 @@ public class Menus {
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
-  private JPopupMenu pswitcher;
+  private JPopupMenu pswitcher, pOpenFrom;
 
   /////////////////////
   //                 //
@@ -133,7 +133,16 @@ public class Menus {
             pswitcher.show(pnlEditor, 0, 0);
           }
         },
-        KeyMapper.keyOption(KeyEvent.VK_I, currentOS)
+        KeyEvent.VK_I, KeyEvent.META_DOWN_MASK
+      );
+      KeyMapper.accel(
+        pnlEditor, pOpenFrom.getClass()+pOpenFrom.getName(),
+        new AbstractAction() {
+          public void actionPerformed(ActionEvent ae) {
+            pOpenFrom.show(pnlEditor, 0, 0);
+          }
+        },
+        KeyEvent.VK_O, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
       );
     }
   }
@@ -244,13 +253,14 @@ public class Menus {
 
     //Build second menu, a longer sorter list of all files you have open:
     if (size>easyLen){
-    
+
       // Build & sort list of names:
       List<String> list=recentSortSources.get(menuX);
       if (list==null) {
         list=new ArrayList<>(16);
         recentSortSources.put(menuX, list);
       }
+      list.clear();
       for (String s: startList)
         list.add(s);
       Collections.sort(list);
@@ -294,12 +304,12 @@ public class Menus {
     int i=-1, emin=Math.min(easyLen, editors.size());
     for (Editor e: editors.forEach()){
       ++i;
-      if (i>=emin) 
+      if (i>=emin)
         break;
       makeSwitchMenuItem(switcher,  e, i==0, i==1);
     }
 
-    // Build second menu (containing all items) and/or popup switcher menu: 
+    // Build second menu (containing all items) and/or popup switcher menu:
     boolean secondSet=editors.size()>emin;
     if (secondSet)
       switcher.addSeparator();
@@ -310,13 +320,13 @@ public class Menus {
       for (Editor e: editors.forEach())
         switchSortSource.add(e);
       Collections.sort(switchSortSource, switchSorter);
-      
+
       // Clear popup of all but title & first separator:
       if (pswitcher!=null) {
         int size=pswitcher.getComponentCount();
         for (int ps=2; ps<size; ps++)
           pswitcher.remove(2);
-      }      
+      }
 
       // Add to whichever menu needs it. Be careful: You must
       // make a new menu item each time, EVEN when adding it to
@@ -349,8 +359,8 @@ public class Menus {
         ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)
         :mu.doMenuItem(
           e.getTitle(), switchListener, -1,
-          f12 
-            ?KeyMapper.key(KeyEvent.VK_F12,0) 
+          f12
+            ?KeyMapper.key(KeyEvent.VK_F12,0)
             :null
         );
     switchMenuToEditor.put(jmi, e);
@@ -437,24 +447,21 @@ public class Menus {
     );
 
     //File menu section 4:
+    String
+      lblOpenFromDocDir="Current document directory",
+      lblOpenFromRecentDir="Recent directory",
+      lblOpenFromFave="Favorite directory",
+      lblOpenFromSSH="SSH...";
     file.addSeparator();
     fileOpenFrom=mu.doMenu("Open from", KeyEvent.VK_F);
     mu.add(
       file
       ,mu.add(
         fileOpenFrom
-        ,fileOpenFromDocDir=mu.doMenuItem(
-          "Current document directory", fileListener, KeyEvent.VK_C
-        )
-        ,fileOpenFromRecentDir=mu.doMenu(
-          "Recent directory", KeyEvent.VK_R
-        )
-        ,fileOpenFromFave=mu.doMenu(
-          "Favorite directory", KeyEvent.VK_F
-        )
-        ,fileOpenFromSSH=mu.doMenuItem(
-          "SSH...", fileListener, KeyEvent.VK_S
-        )
+        ,fileOpenFromDocDir   =mu.doMenuItem(lblOpenFromDocDir, fileListener, KeyEvent.VK_C)
+        ,fileOpenFromRecentDir=mu.doMenu(lblOpenFromRecentDir, KeyEvent.VK_R)
+        ,fileOpenFromFave     =mu.doMenu(lblOpenFromFave, KeyEvent.VK_F)
+        ,fileOpenFromSSH      =mu.doMenuItem(lblOpenFromSSH, fileListener, KeyEvent.VK_S)
       )
       ,mu.add(
         mu.doMenu("Save to", KeyEvent.VK_V)
@@ -486,7 +493,7 @@ public class Menus {
       ,
       fileReopen=mu.doMenu("Re-open", KeyEvent.VK_R)
     );
-
+    pOpenFrom=fileOpenFrom.getPopupMenu();
     //File menu section 5 (Exit)
     file.addSeparator();
     file.add(fileExit  =mu.doMenuItem(
@@ -508,18 +515,8 @@ public class Menus {
     switchNextUnsaved=mu.doMenuItem(
       "Next unsaved file", switchListener, KeyEvent.VK_X
     );
-    if (currentOS.isOSX){
-      pswitcher=new JPopupMenu();
-      JLabel lbl=new javax.swing.JLabel("Switch:");
-      lbl.setFont(switcher.getFont());
-      lbl.setBorder(
-        new javax.swing.border.EmptyBorder(
-          new java.awt.Insets(2,10,2,2)
-        )
-      );
-      pswitcher.add(lbl);
-      pswitcher.addSeparator();
-    }
+    if (currentOS.isOSX)
+      pswitcher=makeLabelledPopup("Switch:");
 
 
     //SEARCH:
@@ -735,6 +732,20 @@ public class Menus {
       ,helpAbout   =mu.doMenuItem("About Klonk",                   helpListener, KeyEvent.VK_A)
       ,helpShortcut=mu.doMenuItem("Shortcuts and hidden features", helpListener, KeyEvent.VK_S)
     );
+  }
+
+  private JPopupMenu makeLabelledPopup(String label) {
+    JPopupMenu menu=new JPopupMenu();
+    JLabel lbl=new javax.swing.JLabel(label);
+    lbl.setFont(file.getFont());
+    lbl.setBorder(
+      new javax.swing.border.EmptyBorder(
+        new java.awt.Insets(2,10,2,2)
+      )
+    );
+    menu.add(lbl);
+    menu.addSeparator();
+    return menu;
   }
 
   //////////////////////
