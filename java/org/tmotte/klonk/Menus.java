@@ -705,7 +705,7 @@ public class Menus {
       ,externalRunBatch=mu.doMenuItem(
         "Run batch program",
         externalItemListener, KeyEvent.VK_R,
-        KeyMapper.key(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK)
+        KeyMapper.keyByOS(KeyEvent.VK_E)
       )
     );
 
