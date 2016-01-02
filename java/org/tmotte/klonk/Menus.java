@@ -63,7 +63,6 @@ public class Menus {
   //Visual component instances:
   private JMenuBar bar=new JMenuBar();
   private JMenu file, fileReopen, fileOpenFromRecentDir, fileSaveToRecentDir,
-                fileOpenFrom,
                 fileFave, fileOpenFromFave, fileSaveToFave,
                 search, mark, switcher, undo, select, align, external, options, help;
   private JMenuItem fileOpen, fileSave, fileNew, fileSaveAs, fileClose,
@@ -84,7 +83,7 @@ public class Menus {
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
-  private JPopupMenu pswitcher, pOpenFrom;
+  private JPopupMenu pswitcher, pOpenFrom, pSaveTo;
 
   /////////////////////
   //                 //
@@ -128,7 +127,7 @@ public class Menus {
   public void attachTo(JPanel pnlEditor) {
     if (currentOS.isOSX) {
       KeyMapper.accel(
-        pnlEditor, "switch1",
+        pnlEditor, "switch2",
         new AbstractAction() {
           public void actionPerformed(ActionEvent ae) {
             pswitcher.show(pnlEditor, 0, 0);
@@ -144,6 +143,15 @@ public class Menus {
           }
         },
         KeyEvent.VK_O, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
+      );
+      KeyMapper.accel(
+        pnlEditor, "saveto2",
+        new AbstractAction() {
+          public void actionPerformed(ActionEvent ae) {
+            pSaveTo.show(pnlEditor, 0, 0);
+          }
+        },
+        KeyEvent.VK_T, KeyEvent.META_DOWN_MASK
       );
     }
   }
@@ -447,6 +455,7 @@ public class Menus {
       )
     );
 
+
     //File menu section 4:
     String
       lblOpenFromDocDir="Current document directory",
@@ -454,7 +463,10 @@ public class Menus {
       lblOpenFromFave="Favorite directory",
       lblOpenFromSSH="SSH...";
     file.addSeparator();
-    fileOpenFrom=mu.doMenu("Open from", KeyEvent.VK_F);
+    //Used for popups:
+    JMenu
+      fileOpenFrom=mu.doMenu("Open from", KeyEvent.VK_F),
+      fileSaveTo=mu.doMenu("Save to", KeyEvent.VK_V);
     mu.add(
       file
       ,mu.add(
@@ -465,7 +477,7 @@ public class Menus {
         ,fileOpenFromSSH      =mu.doMenuItem(lblOpenFromSSH, fileListener, KeyEvent.VK_S)
       )
       ,mu.add(
-        mu.doMenu("Save to", KeyEvent.VK_V)
+        fileSaveTo
         ,fileSaveToDocDir=mu.doMenuItem(
           "Current document directory", fileListener, KeyEvent.VK_C
         )
@@ -494,8 +506,10 @@ public class Menus {
       ,
       fileReopen=mu.doMenu("Re-open", KeyEvent.VK_R)
     );
-    pOpenFrom=fileOpenFrom.getPopupMenu();
-    labelPopup(pOpenFrom, "Open from:");
+    if (currentOSX.isOSX) {
+      pOpenFrom=makePopup(fileOpenFrom, "Open from:");
+      pSaveTo=makePopup(fileSaveTo, "Save to:");
+    }
 
     //File menu section 5 (Exit)
     file.addSeparator();
@@ -737,6 +751,11 @@ public class Menus {
     );
   }
 
+  private JPopupMenu makePopup(JMenu from, String label) {
+    JPopupMenu menu=from.getPopupMenu();
+    labelPopup(menu, label);
+    return menu;
+  }
   private JPopupMenu makeLabelledPopup(String label) {
     JPopupMenu menu=new JPopupMenu();
     labelPopup(menu, label);
