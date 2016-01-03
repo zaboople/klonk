@@ -165,9 +165,9 @@ public class BootContext {
 
     // Basic logging & persistence:
     Setter<Throwable> failHandler=userNotify.getExceptionHandler();
-    KPersist persist=new KPersist(home, failHandler);
-    FontOptions editorFont=persist.getFontAndColors();
     CurrentOS currentOS=new CurrentOS();
+    KPersist persist=new KPersist(home, failHandler, currentOS);
+    FontOptions editorFont=persist.getFontAndColors();
 
     //Main controller:
     CtrlMain ctrlMain=new CtrlMain(userNotify, persist, currentOS);

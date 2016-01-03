@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Properties;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.UserServer;
 import org.tmotte.klonk.config.option.FontOptions;
@@ -23,9 +24,11 @@ public class KPersist {
   public final static int maxRecent=15;
   public final static int maxFavorite=50;
 
+  private Setter<Throwable> logFail;
+  private CurrentOS currentOS;
+
   private File mainFile;
   private Properties properties=new Properties();
-  private Setter<Throwable> logFail;
   private boolean hasChanges=false;
 
   private FontOptions fontOptionsCache;
@@ -34,8 +37,9 @@ public class KPersist {
   private List<UserServer> recentSSHCache;
   private KeyConfig keyConfig;
 
-  public KPersist(KHome home, Setter<Throwable> logFail) {
+  public KPersist(KHome home, Setter<Throwable> logFail, CurrentOS currentOS) {
     this.logFail=logFail;
+    this.currentOS=currentOS;
     try {
       mainFile=home.nameFile("klonk.properties");
       if (!mainFile.exists())
@@ -173,7 +177,10 @@ public class KPersist {
   public String getDefaultLineDelimiter() {
     String s=properties.getProperty("DefaultLineDelimiter");
     if (s==null)
-      return LineDelimiterOptions.CRLFs;
+      return
+        currentOS.isMSWindows
+          ?LineDelimiterOptions.CRLFs
+          :LineDelimiterOptions.LFs;
     else
       return LineDelimiterOptions.translateFromReadable(s);
   }
