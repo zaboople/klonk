@@ -1,13 +1,11 @@
 -OSX
-  -Is there anything we can do about the default About menu?
-  -Default line delimiter on macos should be LF, not CRLF
   -File Save As is broken - we feed apple the file path and they stuff it in the filename box. Don't worry, open from recent & save to recent are ok.
   -I need alt-g to replace F3 or at least enhance it.
   -Consider using the default java runtime and shrinking the deploy: -Bruntime=
   -Insert spaces to align doesn't show the right shortcut.
   -Shift-home & Shift-end don't work. They just move the cursor, they don't select.
     -Also ctrl-home and ctrl-end don't work.
-  -Maybe I should do an "Open files" feature where I can just chunk things to the clipboard Ctrl-Alt-O?. Or else startup a listener on a port. Ugh.
+  -Command-line invocation sucks. Maybe I should do an "Open files" feature where I can just chunk things to the clipboard Ctrl-Alt-O?. Or else startup a listener on a port. Ugh.
   -KeyMapping
     -We really need a sorted properties file
   -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE

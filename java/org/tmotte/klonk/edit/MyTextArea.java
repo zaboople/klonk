@@ -532,13 +532,13 @@ public class MyTextArea extends JTextArea {
         }
         else
         if (code==e.VK_HOME && currentOS.isOSX && !KeyMapper.ctrlPressed(e)){
-          // Pressing ctrl-x on macintosh should select all:
+          // Pressing home on OSX should go to beginning of line
           doHomeEnd(true);
           e.consume();
         }
         else
         if (code==e.VK_END && currentOS.isOSX && !KeyMapper.ctrlPressed(e)){
-          // Pressing ctrl-x on macintosh should select all:
+          // Pressing end on OSX should go to end of line
           doHomeEnd(false);
           e.consume();
         }
