@@ -30,6 +30,7 @@
   <li><a href="#ssh">SSH</a></li>
   <li><a href="#shutdown">Shutting Down Klonk</a></li>
   <li><a href="#keys">Other Shortcut Keys</a></li>
+  <li><a href="#macos">Macintosh Quirks</a></li>
 </ul>
 
 <h2><a name="intro">Introduction</a></h2>
@@ -386,6 +387,43 @@ As is typical, ESC will close a dialog/popup window without taking action, effec
 <h3> Ctrl-W</h3>
 <p>
 The primary shortcut for closing the current file is Ctrl-F4, but since Ctrl-W is also a common shortcut for this type of action, it is supported as well.
+</p>
+
+<h2><a name="macos"> Macintosh Quirks </a></h2>
+<p>
+You may have found yourself in the unfortunate position of using an Apple computer like myself. This creates challenges...
+</p>
+
+<h3>Minor challenges</h3>
+<ul>
+<li>In the top menu, Apple insists on creating a "Klonk" menu that Klonk itself has little control over. This includes an incorrect "About" menu item (the correct one is over at the right under "Help").</li>
+<li>
+In the "Help" menu, Apple places a useless search box.
+</li>
+</ul>
+
+<h3>Command-line invocation</h3>
+<p>Opening files from the MacOS command-line terminal is not so great; we use a bash script to make it better, although it's still noticeably slow (up to 10 seconds delay, because of the Mac's lack of support for "directory watching") (long story):
+</p>
+<ol>
+<li>Find the famous "brew" application on the internet and install it</li>
+<li>Get gnu coreutils, which gives us the greadlink command<pre>
+  brew install coreutils
+</pre></li>
+<li>Put this bash script in a file, called, say "edit"<pre>
+  app="/Applications/Klonk.app/Contents/MacOS/Klonk"
+  if [[ $1 == "" ]]
+  then
+    $app &
+  else
+    greadlink -f "$@" | xargs $app &
+  fi
+</pre></li>
+<li>Make sure that file is in our path and executable (setting your $PATH and using the chmod command... you can google for those)</li>
+</ol>
+
+<h3>Menu Shortcuts</h3>
+<p>Long story short, unlike Microsoft, Apple makes it really hard to access menu items via the keyboard. So we created the "MacOS shortcuts" menu, which lists a series of items that are already in <i>other</i> menus, but here they have designated keyboard shortcuts that instantly take you to a "popup" menu (as opposed to a sub-menu). This may sound confusing at first, but it's recommended for keyboard hogs who hate mousing thru menus.
 </p>
 
 </body>

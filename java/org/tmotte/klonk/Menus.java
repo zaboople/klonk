@@ -49,6 +49,8 @@ public class Menus {
   private Map<JMenuItem,Editor> switchMenuToEditor=new Hashtable<>();
   private MenuUtils mu=new MenuUtils();
   private CurrentOS currentOS;
+  private JPanel osxAttachPopupsTo;
+
   // Used when sorting the Switch menu & recent menus, respectively:
   private List<Editor> switchSortSource=new ArrayList<>(20);
   private Map<JMenu, List<String>> recentSortSources=new HashMap<>();
@@ -67,7 +69,7 @@ public class Menus {
   private JMenuBar bar=new JMenuBar();
   private JMenu file, fileReopen, fileOpenFromRecentDir, fileSaveToRecentDir,
                 fileFave, fileOpenFromFave, fileSaveToFave,
-                search, mark, switcher, undo, select, align, external, options, help;
+                search, mark, switcher, undo, select, align, external, options, osxShortcuts, help;
   private JMenuItem fileOpen, fileSave, fileNew, fileSaveAs, fileClose,
                     fileCloseOthers, fileCloseAll,
                     filePrint,
@@ -84,9 +86,10 @@ public class Menus {
                     weirdInsertToAlign, weirdInsertToAlignBelow, weirdBackspaceToAlign, weirdBackspaceToAlignBelow,
                     externalRunBatch,
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
-                    osxShortcuts,
+                    osxSwitch, osxOpenFrom, osxSaveTo, osxSelect, osxFavorite, osxReopen,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
+  // These are for osx only:
   private JPopupMenu pswitcher, pOpenFrom, pSaveTo, pSelect, pFavorite, pReopen;
 
   /////////////////////
@@ -129,50 +132,8 @@ public class Menus {
   }
   /** This is a workaround for osx making it to hard to keyboard your way to a top menu. */
   public void attachPopups(JPanel pnlEditor) {
-    if (currentOS.isOSX) {
-      AbstractAction popupShower=
-        new AbstractAction() {
-          public void actionPerformed(ActionEvent ae) {
-            Object src=ae.getSource();
-            if (src instanceof JPopupMenu)
-              ((JPopupMenu)src).show(pnlEditor, 0, 0);
-            else
-              throw new RuntimeException("Unexpected thing received popup event "+src.getClass()+" "+src);
-          }
-        };
-
-      KeyMapper.accel(
-        pReopen, "reopen2", popupShower,
-        KeyEvent.VK_R, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
-      );
-      KeyMapper.accel(
-        pOpenFrom, "openfrom2", popupShower,
-        KeyEvent.VK_O, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
-      );
-      KeyMapper.accel(
-        pSaveTo, "saveto2", popupShower,
-        KeyEvent.VK_T, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
-      );
-      KeyMapper.accel(
-        pFavorite, "favorite2", popupShower,
-        KeyEvent.VK_I, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK
-      );
-      KeyMapper.accel(
-        pSelect, "selection2", popupShower,
-        KeyEvent.VK_L, KeyEvent.META_DOWN_MASK
-      );
-      //For some reason this one can't do the same as the others probably
-      //because the JTextArea is intercepting the keystroke:
-      KeyMapper.accel(
-        pnlEditor, "switch2",
-        new AbstractAction() {
-          public void actionPerformed(ActionEvent ae) {
-            pswitcher.show(pnlEditor, 0, 0);
-          }
-        },
-        KeyEvent.VK_I, KeyEvent.META_DOWN_MASK
-      );
-    }
+    if (currentOS.isOSX)
+      osxAttachPopupsTo=pnlEditor;
   }
   public Doer getEditorSwitchListener() {
     return new Doer() {
@@ -446,7 +407,7 @@ public class Menus {
 
     file=mu.doMenu(bar, "File", KeyEvent.VK_F);
 
-    //File menu section 1:
+    //FILE MENU SECTION 1:
     mu.add(
        file
       ,fileOpen =mu.doMenuItem(
@@ -481,7 +442,7 @@ public class Menus {
       )
     );
 
-    //File menu section 2 (print):
+    //FILE MENU SECTION 2 (PRINT):
     file.addSeparator();
     mu.add(
        file
@@ -491,7 +452,7 @@ public class Menus {
       )
     );
 
-    //File menu section 3:
+    //FILE MENU SECTION 3:
     file.addSeparator();
     if (currentOS.isMSWindows || currentOS.isOSX)
       file.add(fileDocDirExplore =mu.doMenuItem(
@@ -508,7 +469,7 @@ public class Menus {
     );
 
 
-    //File menu section 4:
+    //FILE MENU SECTION 4:
     String
       lblOpenFromDocDir="Current document directory",
       lblOpenFromRecentDir="Recent directory",
@@ -565,7 +526,7 @@ public class Menus {
       pReopen=makePopup(fileReopen, "Reopen file:");
     }
 
-    //File menu section 5 (Exit)
+    //FILE MENU SECTION 5 (EXIT)
     file.addSeparator();
     file.add(fileExit  =mu.doMenuItem(
       "Exit",    fileListener, KeyEvent.VK_X,
@@ -713,7 +674,7 @@ public class Menus {
     );
 
 
-    //Selection:
+    //SELECTION:
     mu.add(
       select=mu.doMenu(bar, "Selection",   selectListener, KeyEvent.VK_E)
       ,selectUpperCase=mu.doMenuItem(
@@ -780,6 +741,37 @@ public class Menus {
         KeyMapper.keyByOS(KeyEvent.VK_E)
       )
     );
+
+    //OSX SHORTCUTS:
+    if (currentOS.isOSX)
+      mu.add(
+        osxShortcuts=mu.doMenu(bar, "MacOS Shortcuts", 0)
+        ,osxOpenFrom=mu.doMenuItem(
+          "Open from...", osxShortcutListener, 0,
+          KeyMapper.key(KeyEvent.VK_O, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
+        )
+        ,osxSaveTo=mu.doMenuItem(
+          "Save to...", osxShortcutListener, 0,
+          KeyMapper.key(KeyEvent.VK_T, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
+        )
+        ,osxFavorite=mu.doMenuItem(
+          "Open favorite file...", osxShortcutListener, 0,
+          KeyMapper.key(KeyEvent.VK_I, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
+        )
+        ,osxReopen=mu.doMenuItem(
+          "Reopen...", osxShortcutListener, 0,
+          KeyMapper.key(KeyEvent.VK_R, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
+        )
+        ,osxSwitch=mu.doMenuItem(
+          "Switch menu...", osxShortcutListener, 0,
+          KeyMapper.key(KeyEvent.VK_I, KeyMapper.shortcutByOS())
+        )
+        ,osxSelect=mu.doMenuItem(
+          "Selection menu...", osxShortcutListener, 0,
+          KeyMapper.key(KeyEvent.VK_L, KeyMapper.shortcutByOS())
+        )
+      );
+
 
     //OPTIONS:
     mu.add(
@@ -1047,6 +1039,27 @@ public class Menus {
         if (s==optionFavorites)       ctrlOptions.doFavorites();
         else
         if (s==optionSSH)             ctrlOptions.doSSH();
+      }
+    }
+    ,
+    osxShortcutListener=new AbstractAction() {
+      public void actionPerformed(ActionEvent event) {
+        Object o=event.getSource();
+        JPopupMenu jpm;
+        if (o==osxOpenFrom) jpm=pOpenFrom;
+        else
+        if (o==osxSaveTo)   jpm=pSaveTo;
+        else
+        if (o==osxFavorite) jpm=pFavorite;
+        else
+        if (o==osxReopen)   jpm=pReopen;
+        else
+        if (o==osxSelect)   jpm=pSelect;
+        else
+        if (o==osxSwitch)   jpm=pswitcher;
+        else
+          throw new RuntimeException("No popup menu matched: "+o);
+        jpm.show(osxAttachPopupsTo, 0, 0);
       }
     }
     ,
