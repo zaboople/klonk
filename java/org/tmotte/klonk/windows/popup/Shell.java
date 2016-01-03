@@ -401,14 +401,20 @@ public class Shell {
 
   private void listen(){
 
-    //Alt-D focuses combobox:
+    //Alt-D focuses combobox... this probably shouldn't be
+    //attached to btnRun but ok it works:
     Action jcbAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         jcbPrevious.requestFocusInWindow();
         jcbPrevious.getEditor().selectAll();
       }
     };
-    KeyMapper.accel(btnRun, jcbAction, KeyMapper.key(KeyEvent.VK_D, KeyEvent.ALT_DOWN_MASK));
+    KeyMapper.accel(
+      btnRun, jcbAction,
+      currentOS.isOSX
+        ?KeyMapper.key(KeyEvent.VK_L, KeyMapper.shortcutByOS())
+        :KeyMapper.key(KeyEvent.VK_D, KeyEvent.ALT_DOWN_MASK)
+    );
 
     //File:
     Action fileAction=new AbstractAction() {
@@ -427,7 +433,10 @@ public class Shell {
       public void actionPerformed(ActionEvent event) {exec();}
     };
     btnRun.addActionListener(runAction);
-    KeyMapper.accel(btnRun, runAction, KeyMapper.key(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
+    KeyMapper.accel(
+      btnRun, runAction,
+      KeyMapper.key(KeyEvent.VK_E, KeyMapper.shortcutByOS())
+    );
     jcbPrevious.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
       public void keyPressed(KeyEvent e){
         final int code=e.getKeyCode();
