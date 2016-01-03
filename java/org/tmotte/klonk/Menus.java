@@ -743,7 +743,7 @@ public class Menus {
     );
 
     //OSX SHORTCUTS:
-    if (currentOS.isOSX)
+    if (currentOS.isOSX){
       mu.add(
         osxShortcuts=mu.doMenu(bar, "MacOS Shortcuts", 0)
         ,osxOpenFrom=mu.doMenuItem(
@@ -755,13 +755,17 @@ public class Menus {
           KeyMapper.key(KeyEvent.VK_T, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
         )
         ,osxFavorite=mu.doMenuItem(
-          "Open favorite file...", osxShortcutListener, 0,
+          "Favorite files...", osxShortcutListener, 0,
           KeyMapper.key(KeyEvent.VK_I, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
         )
         ,osxReopen=mu.doMenuItem(
-          "Reopen...", osxShortcutListener, 0,
+          "Reopen file...", osxShortcutListener, 0,
           KeyMapper.key(KeyEvent.VK_R, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
         )
+      );
+      osxShortcuts.addSeparator();
+      mu.add(
+        osxShortcuts
         ,osxSwitch=mu.doMenuItem(
           "Switch menu...", osxShortcutListener, 0,
           KeyMapper.key(KeyEvent.VK_I, KeyMapper.shortcutByOS())
@@ -771,6 +775,7 @@ public class Menus {
           KeyMapper.key(KeyEvent.VK_L, KeyMapper.shortcutByOS())
         )
       );
+    }
 
 
     //OPTIONS:
