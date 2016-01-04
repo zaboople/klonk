@@ -18,8 +18,7 @@ import org.tmotte.klonk.ssh.SSHFile;
 
 /**
  * The FileDialog/JFileChooser classes already do most of the work, so this just does a minimal
- * bit of upkeep and whatnot. It used to be in the Popups class, but at the risk of earning the title
- * of Wrapper/Facade/Factory Abuser, I moved it down here so Popups could be more focused on its primary task.
+ * bit of upkeep and whatnot.
  */
 public class FileDialogWrapper {
 
@@ -58,7 +57,7 @@ public class FileDialogWrapper {
 
   public File show(boolean forSave, File startFile, File startDir) {
     init();
-    if (currentOS.isOSX && SSHFile.cast(startFile)==null || SSHFile.cast(startDir)==null)
+    if (currentOS.isOSX && SSHFile.cast(startFile)==null && SSHFile.cast(startDir)==null)
       try {
         // Broken on MS Windows XP. If you do "save as" and the old file
         // name is longer than the new one, the last characters from the old
