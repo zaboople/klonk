@@ -68,8 +68,13 @@ public class FileDialogWrapper {
         // So we make a new one every time, which doesn't seem to use that much
         // memory.
         FileDialog fd=new java.awt.FileDialog(mainFrame);
-        if (startFile!=null)
-          fd.setFile(startFile.getCanonicalPath().trim());
+        if (startFile!=null) {
+          //On OSX, passing the full filename screws up everything unlike
+          //Windows. So we have to set the file name & dir name individually.
+          fd.setFile(startFile.getName());
+          if (startDir==null)
+            fd.setDirectory(startFile.getParentFile().getCanonicalPath());
+        }
         if (startDir!=null)
           fd.setDirectory(startDir.getCanonicalPath());
         fd.setTitle(forSave ?"Save" :"Open");
