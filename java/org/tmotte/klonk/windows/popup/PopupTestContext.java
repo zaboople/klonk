@@ -39,7 +39,7 @@ public class PopupTestContext  {
 
   public KPersist getPersist() {
     if (persist==null)
-      persist=new KPersist(getHome(), getFail());
+      persist=new KPersist(getHome(), getFail(), currentOS);
     return persist;
   }
   protected KHome getHome() {
