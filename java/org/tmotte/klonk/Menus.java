@@ -590,7 +590,9 @@ public class Menus {
       ,
       searchGoToLine=mu.doMenuItem(
         "Go to line number...", searchListener, KeyEvent.VK_O,
-        KeyMapper.key(KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK)
+        currentOS.isOSX
+          ?KeyMapper.key(KeyEvent.VK_T, KeyMapper.shortcutByOS())
+          :KeyMapper.key(KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK)
       )
     );
 
