@@ -115,6 +115,7 @@ public class BootContext {
   private FileListen fileListen;
   private KLog klog;
   private UserNotify userNotify;
+  private CurrentOS currentOS;
 
   /**
    * This gives us the 1st layer of the application, enough to
@@ -134,10 +135,14 @@ public class BootContext {
         args[i]=null;
         argStdOut=true;
       }
+    currentOS=getCurrentOS();
     home=new KHome(
       argHomeDir!=null
         ?argHomeDir
-        :KHome.nameIt(System.getProperty("user.home"), ".klonk")
+        :KHome.nameIt(
+          System.getProperty("user.home"), 
+          currentOS.isMSWindows ?"klonk" :".klonk"
+        )
     );
     String pid=ManagementFactory.getRuntimeMXBean().getName();
     String processID=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
@@ -147,9 +152,9 @@ public class BootContext {
     userNotify=new UserNotify(klog);
     fileListen=new FileListen(klog, processID, home);
   }
-  private KHome getHome() { return home; }
   private UserNotify getLog()   { return userNotify;  }
   private FileListen getFileListener() { return fileListen; }
+  private KHome getHome() { return home; }
 
 
   //////////////////////////
@@ -165,7 +170,6 @@ public class BootContext {
 
     // Basic logging & persistence:
     Setter<Throwable> failHandler=userNotify.getExceptionHandler();
-    CurrentOS currentOS=new CurrentOS();
     KPersist persist=new KPersist(home, failHandler, currentOS);
     FontOptions editorFont=persist.getFontAndColors();
 
