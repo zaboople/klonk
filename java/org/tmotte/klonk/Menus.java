@@ -78,7 +78,7 @@ public class Menus {
                     fileFaveAddFile, fileFaveAddDir,
                     fileExit,
                     searchFind, searchReplace, searchRepeat, searchRepeatBackwards, searchGoToLine,
-                    switchBackToFront, switchFrontToBack, switchNextUnsaved,
+                    switchBackToFront, switchFrontToBack, switchNextUnsaved, pSwitchNextUnsaved,
                     markSet, markGoToPrevious, markGoToNext, markClearCurrent, markClearAll,
                     undoUndo, undoRedo,
                     undoToBeginning, undoRedoToEnd, undoClearUndos, undoClearRedos, undoClearBoth,
@@ -328,7 +328,7 @@ public class Menus {
       ++i;
       if (i>=emin)
         break;
-      makeSwitchMenuItem(switcher,  e, i==0, i==1);
+      makeSwitchMenuItem(switcher,  e, i==0, i==1, -1);
     }
 
     // Build second menu (containing all items) and/or popup switcher menu:
@@ -343,10 +343,11 @@ public class Menus {
         switchSortSource.add(e);
       Collections.sort(switchSortSource, switchSorter);
 
-      // Clear popup of all but title & first separator:
+      // Clear popup of all but first 2 and last 2 items:
+      // (We could do it this way this with our main switcher but never bothered)
       if (pswitcher!=null) {
         int size=pswitcher.getComponentCount();
-        for (int ps=2; ps<size; ps++)
+        for (int ps=2; ps<size-2; ps++)
           pswitcher.remove(2);
       }
 
@@ -354,11 +355,13 @@ public class Menus {
       // make a new menu item each time, EVEN when adding it to
       // different menus:
       Editor firstEditor=editors.getFirst();
+      int count=-1;
       for (Editor e: switchSortSource) {
+        count++;
         if (secondSet)
-          makeSwitchMenuItem(switcher,  e, e==firstEditor, false);
+          makeSwitchMenuItem(switcher,  e, e==firstEditor, false, -1);
         if (pswitcher!=null)
-          makeSwitchMenuItem(pswitcher, e, e==firstEditor, false);
+          makeSwitchMenuItem(pswitcher, e, e==firstEditor, false, 2+count);
       }
     }
 
@@ -374,7 +377,7 @@ public class Menus {
   }
   /** Only called by setSwitchMenu() */
   private void makeSwitchMenuItem(
-      javax.swing.JComponent c, Editor e, boolean checked, boolean f12
+      javax.swing.JComponent c, Editor e, boolean checked, boolean f12, int index
     ) {
     JMenuItem jmi=
       checked
@@ -386,7 +389,10 @@ public class Menus {
             :null
         );
     switchMenuToEditor.put(jmi, e);
-    c.add(jmi);
+    if (index>0)
+      c.add(jmi, index);
+    else
+      c.add(jmi);
   }
   /** Also only used by setSwitchMenu() */
   private static Comparator<Editor> switchSorter=new Comparator<Editor> () {
@@ -558,8 +564,14 @@ public class Menus {
     switchNextUnsaved=mu.doMenuItem(
       "Next unsaved file", switchListener, KeyEvent.VK_X
     );
-    if (currentOS.isOSX)
+    if (currentOS.isOSX) {
       pswitcher=makeLabelledPopup("Switch:");
+      pSwitchNextUnsaved=mu.doMenuItem(
+        "Next unsaved file", switchListener
+      );
+      pswitcher.addSeparator();
+      pswitcher.add(pSwitchNextUnsaved);
+    }
 
 
     //SEARCH:
@@ -974,7 +986,7 @@ public class Menus {
         if (s==switchFrontToBack)
           ctrlMain.doSendFrontToBack();
         else
-        if (s==switchNextUnsaved)
+        if (s==switchNextUnsaved || s==pSwitchNextUnsaved)
           ctrlMain.doSwitchToNextUnsaved();
         else {
           Editor e=switchMenuToEditor.get(s);
