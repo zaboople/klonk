@@ -90,9 +90,25 @@ public class CtrlOptions {
     }
   }
 
+  public void doFontBigger() {
+    fontOptions.setFontSize(fontOptions.getFontSize()+1);
+    pushFont();
+  }
+  public void doFontSmaller() {
+    int i=fontOptions.getFontSize()-1;
+    if (i>0) {
+      fontOptions.setFontSize(i);
+      pushFont();
+    }
+    else
+      statusBar.showBad("Cannot make font any smaller");
+  }
   public void doFontAndColors() {
     if (!fontPicker.show(fontOptions))
       return;
+    pushFont();
+  }
+  private void pushFont() {
     for (Editor e: editors.forEach())
       e.setFont(fontOptions);
     for (Setter<FontOptions> setter: fontListeners)

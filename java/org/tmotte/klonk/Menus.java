@@ -85,7 +85,8 @@ public class Menus {
                     selectUpperCase, selectLowerCase, selectSortLines, selectGetSelectionSize,  selectGetAsciiValues,
                     weirdInsertToAlign, weirdInsertToAlignBelow, weirdBackspaceToAlign, weirdBackspaceToAlignBelow,
                     externalRunBatch,
-                    optionTabsAndIndents, optionLineDelimiters, optionFont, optionFavorites, optionSSH,
+                    optionTabsAndIndents, optionLineDelimiters, optionFont, optionFontBigger, optionFontSmaller,
+                    optionFavorites, optionSSH,
                     osxSwitch, osxOpenFrom, osxSaveTo, osxSelect, osxFavorite, osxReopen,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
@@ -812,6 +813,16 @@ public class Menus {
       ,optionAutoTrim=mu.doMenuItemCheckbox(
         "Auto-trim trailing spaces on save", optionListener, KeyEvent.VK_A, false
       )
+      ,
+      optionFontBigger=mu.doMenuItem(
+        "Make font bigger", optionListener, KeyEvent.VK_B,
+        KeyMapper.key(KeyEvent.VK_EQUALS, KeyMapper.shortcutByOS())
+      )
+      ,
+      optionFontSmaller=mu.doMenuItem(
+        "Make font smaller", optionListener, KeyEvent.VK_B,
+        KeyMapper.key(KeyEvent.VK_MINUS, KeyMapper.shortcutByOS())
+      )
     );
     options.addSeparator();
     mu.add(
@@ -1067,6 +1078,10 @@ public class Menus {
         if (s==optionLineDelimiters)  ctrlOptions.doLineDelimiters();
         else
         if (s==optionFont)            ctrlOptions.doFontAndColors();
+        else
+        if (s==optionFontBigger)      ctrlOptions.doFontBigger();
+        else
+        if (s==optionFontSmaller)     ctrlOptions.doFontSmaller();
         else
         if (s==optionFavorites)       ctrlOptions.doFavorites();
         else
