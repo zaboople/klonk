@@ -74,7 +74,7 @@ public class Menus {
                     fileCloseOthers, fileCloseAll,
                     filePrint,
                     fileDocDirExplore, fileClipboardDoc, fileClipboardDocDir,
-                    fileOpenFromDocDir, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
+                    fileOpenFromDocDir, fileOpenFromList, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
                     fileFaveAddFile, fileFaveAddDir,
                     fileExit,
                     searchFind, searchReplace, searchRepeat, searchRepeatBackwards, searchGoToLine,
@@ -470,11 +470,6 @@ public class Menus {
 
 
     //FILE MENU SECTION 4:
-    String
-      lblOpenFromDocDir="Current document directory",
-      lblOpenFromRecentDir="Recent directory",
-      lblOpenFromFave="Favorite directory",
-      lblOpenFromSSH="SSH...";
     file.addSeparator();
     //Used for popups:
     JMenu
@@ -484,10 +479,26 @@ public class Menus {
       file
       ,mu.add(
         fileOpenFrom
-        ,fileOpenFromDocDir   =mu.doMenuItem(lblOpenFromDocDir, fileListener, KeyEvent.VK_C)
-        ,fileOpenFromRecentDir=mu.doMenu(lblOpenFromRecentDir, KeyEvent.VK_R)
-        ,fileOpenFromFave     =mu.doMenu(lblOpenFromFave, KeyEvent.VK_F)
-        ,fileOpenFromSSH      =mu.doMenuItem(lblOpenFromSSH, fileListener, KeyEvent.VK_S)
+        ,fileOpenFromDocDir   =mu.doMenuItem(
+          "Current document directory", fileListener, KeyEvent.VK_C
+        )
+        ,fileOpenFromRecentDir=mu.doMenu(
+          "Recent directory", KeyEvent.VK_R
+        )
+        ,fileOpenFromFave     =mu.doMenu(
+          "Favorite directory", KeyEvent.VK_F
+        )
+        ,fileOpenFromList     =
+          currentOS.isOSX
+            ?mu.doMenuItem(
+              "List...", fileListener, KeyEvent.VK_F,
+              KeyMapper.key(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK)
+            )
+            :null
+        ,null
+        ,fileOpenFromSSH      =mu.doMenuItem(
+          "SSH...", fileListener, KeyEvent.VK_S
+        )
       )
       ,mu.add(
         fileSaveTo
@@ -865,6 +876,8 @@ public class Menus {
         if (s==fileClipboardDocDir)  ctrlFileOther.doClipboardDocDir();
         else
         if (s==fileOpenFromDocDir)   ctrlMain.doOpenFromDocDir();
+        else
+        if (s==fileOpenFromList)     ctrlMain.doOpenFromList();
         else
         if (s==fileOpenFromSSH)      ctrlMain.doOpenFromSSH();
         else

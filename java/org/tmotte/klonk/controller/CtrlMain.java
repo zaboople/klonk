@@ -27,6 +27,7 @@ import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.ssh.IFileGet;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
+import org.tmotte.klonk.windows.popup.OpenFileList;
 import org.tmotte.klonk.windows.popup.YesNoCancel;
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
 import org.tmotte.klonk.windows.popup.ssh.SSHOpenFrom;
@@ -56,6 +57,7 @@ public class CtrlMain  {
   private YesNoCancel yesNo, yesNoCancel;
   private MainDisplay layout;
   private SSHOpenFrom sshOpenFrom;
+  private OpenFileList openFileList;
   private CurrentOS currentOS;
 
   //Editors list:
@@ -90,6 +92,7 @@ public class CtrlMain  {
       StatusUpdate statusBar,
       FileDialogWrapper fileDialog,
       SSHOpenFrom sshOpenFrom,
+      OpenFileList openFileList,
       YesNoCancel yesNoCancel,
       YesNoCancel yesNo
     ) {
@@ -97,6 +100,7 @@ public class CtrlMain  {
     this.statusBar=statusBar;
     this.fileDialog=fileDialog;
     this.sshOpenFrom=sshOpenFrom;
+    this.openFileList=openFileList;
     this.yesNoCancel=yesNoCancel;
     this.yesNo=yesNo;
   }
@@ -120,7 +124,7 @@ public class CtrlMain  {
   public Editors getEditors() {
     return editorMgr;
   }
-  public Setter<List<String>> getFileReceiver() {
+  public Setter<List<String>> getAsyncFileReceiver() {
     return new Setter<List<String>>(){
       public @Override void set(List<String> files)
         {doLoadAsync(files);}
@@ -243,6 +247,13 @@ public class CtrlMain  {
     file=fileDialog.showForDir(false, file);
     if (file!=null)
       loadFile(file);
+  }
+  public void doOpenFromList() {
+    List<String> files=openFileList.show();
+    if (files!=null)
+      loadFiles(files);
+    else
+      statusBar.show("Nothing to load.");
   }
   public void doOpenFromSSH() {
     File file=getSSHRecent(false);

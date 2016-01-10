@@ -1,4 +1,5 @@
 -OSX
+  -The popup file switcher needs a next unsaved file dammit
   -We ought to make it where you can pick between fixed-width and not fixed-width fonts in the picker.
   -I need alt-g to replace F3 or at least enhance it.
   -Consider using the default java runtime and shrinking the deploy (leave after the = blank): -Bruntime=
@@ -6,10 +7,13 @@
   -Shift-home & Shift-end don't work. They just move the cursor, they don't select.
     -Also ctrl-home and ctrl-end don't work.
   -Command-line invocation sucks. Maybe I should do an "Open files" feature where I can just chunk things to the clipboard Ctrl-Alt-O?. Or else startup a listener on a port. Ugh.
+    -Automatically paste the clipboard in if it has something.
   -KeyMapping
     -We really need a sorted properties file
   -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
   -Right click menu is still on ctrl-everything, shouldn't it go option-everything... and preserve ctrl-everything...
+    -Undo, Redo, Cut, Copy, Paste
+    -Also the top menu for undo/redo
 
 -Current
   -Switch ms windows exe build to use the new thing I found

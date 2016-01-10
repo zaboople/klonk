@@ -39,6 +39,7 @@ import org.tmotte.klonk.windows.popup.GoToLine;
 import org.tmotte.klonk.windows.popup.KAlert;
 import org.tmotte.klonk.windows.popup.LineDelimiters;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
+import org.tmotte.klonk.windows.popup.OpenFileList;
 import org.tmotte.klonk.windows.popup.Help;
 import org.tmotte.klonk.windows.popup.Shell;
 import org.tmotte.klonk.windows.popup.TabsAndIndents;
@@ -101,7 +102,7 @@ public class BootContext {
         CtrlMain cm=context.createMainController();
         cm.doNew();
         cm.doLoadFiles(args);
-        context.getFileListener().startDirectoryListener(cm.getFileReceiver());
+        context.getFileListener().startDirectoryListener(cm.getAsyncFileReceiver());
       }
     });
   }
@@ -140,7 +141,7 @@ public class BootContext {
       argHomeDir!=null
         ?argHomeDir
         :KHome.nameIt(
-          System.getProperty("user.home"), 
+          System.getProperty("user.home"),
           currentOS.isMSWindows ?"klonk" :".klonk"
         )
     );
@@ -202,8 +203,13 @@ public class BootContext {
       yesNo      =new YesNoCancel(mainFrame, false);
     userNotify.setUI(alerter, false);
 
-    //SSH Login:
+    // SSH Login:
     IUserPass iUserPass=new SSHLogin(mainFrame, alerter);
+
+    // Open file from list:
+    OpenFileList openFileList=new OpenFileList(
+      mainFrame, editorFont, currentOS
+    );
 
     // File dialog + SSH:
     // This gets a special user notifier that schedules thread-safe alerts
@@ -256,6 +262,7 @@ public class BootContext {
       fontListeners.add(shell.getFontListener());
       fontListeners.add(favorites.getFontListener());
       fontListeners.add(findAndReplace.getFontListener());
+      fontListeners.add(openFileList.getFontListener());
 
       CtrlFavorites ctrlFavorites=new CtrlFavorites(
         persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
@@ -286,6 +293,7 @@ public class BootContext {
       statusBar,
       fileDialogWrapper,
       new SSHOpenFrom(mainFrame),
+      openFileList,
       yesNoCancel,
       yesNo
     );

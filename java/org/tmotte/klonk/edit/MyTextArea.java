@@ -220,7 +220,7 @@ public class MyTextArea extends JTextArea {
       throw new RuntimeException(e);
     }
   }
-  public void betterReplaceRange(String s, int start, int end) throws Exception {
+  public void betterReplaceRange(String s, int start, int end) {
     forceDoubleUp=start!=end && s!=null &&  s.length()>0;
     try {
       if (start!=end){

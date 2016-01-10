@@ -14,13 +14,15 @@ public class MenuUtils {
 
   public static JMenu add(JMenu menu, JMenuItem... items) {
     for (JMenuItem i: items)
-      menu.add(i);
+      if (i!=null)
+        menu.add(i);
     return menu;
   }
 
   public static JPopupMenu add(JPopupMenu menu, JMenuItem... items) {
     for (JMenuItem i: items)
-      menu.add(i);
+      if (i!=null)
+        menu.add(i);
     return menu;
   }
 
@@ -32,7 +34,7 @@ public class MenuUtils {
   public static JMenu doMenu(JMenuBar bar, String title, int hotkey) {
     return doMenu(bar, title, null, hotkey);
   }
-  
+
   public static JMenu doMenu(String title, MenuListener listener, int hotkey) {
     JMenu f=new JMenu(title);
     if (hotkey>-1)
@@ -44,8 +46,8 @@ public class MenuUtils {
   public static JMenu doMenu(String title, int hotkey) {
     return doMenu(title, null, hotkey);
   }
-  
-  
+
+
   public static JMenuItem doMenuItem(String title, Action listener) {
     return doMenuItem(title, listener, -1, null);
   }
@@ -60,7 +62,7 @@ public class MenuUtils {
       j.addActionListener(listener);
     if (ks!=null){
       //Both of the following *should* work alone, but each is flawed unless we use them together:
-      //- Without the first the accelerator key won't show up in the menu; 
+      //- Without the first the accelerator key won't show up in the menu;
       //- Without the second the response time will be much slower
       //  for heavily/repetitively used accelerators.
       j.setAccelerator(ks);
@@ -82,7 +84,7 @@ public class MenuUtils {
     j.setState(isOn);
     return j;
   }
-  
-  
+
+
 
 }
