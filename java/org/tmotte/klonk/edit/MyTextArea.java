@@ -531,15 +531,15 @@ public class MyTextArea extends JTextArea {
           e.consume();
         }
         else
-        if (code==e.VK_HOME && currentOS.isOSX && !KeyMapper.ctrlPressed(e)){
+        if (code==e.VK_HOME && currentOS.isOSX){
           // Pressing home on OSX should go to beginning of line
-          doHomeEnd(true);
+          doHomeEnd(true, KeyMapper.shiftPressed(e), KeyMapper.ctrlPressed(e));
           e.consume();
         }
         else
-        if (code==e.VK_END && currentOS.isOSX && !KeyMapper.ctrlPressed(e)){
+        if (code==e.VK_END && currentOS.isOSX){
           // Pressing end on OSX should go to end of line
-          doHomeEnd(false);
+          doHomeEnd(false, KeyMapper.shiftPressed(e), KeyMapper.ctrlPressed(e));
           e.consume();
         }
       } catch (Exception ex) {
@@ -643,16 +643,28 @@ public class MyTextArea extends JTextArea {
     }
   }
 
-  private void doHomeEnd(boolean home) throws Exception {
-    int row=getLineOfOffset(getCaret().getDot());
-    if (home)
-      setCaretPosition(getLineStartOffset(row));
-    else {
-      int eol=getLineEndOffset(row);
-      if (getLineCount()-1!=row)
-        eol-=1;
-      setCaretPosition(eol);
+  private void doHomeEnd(boolean home, boolean shiftPressed, boolean ctrlPressed) throws Exception {
+    int pos;
+    if (home){
+      if (ctrlPressed)
+        pos=0;
+      else
+        pos=getLineStartOffset(getLineOfOffset(getCaret().getDot()));
+    } else {
+      int lineCount=getLineCount();
+      if (ctrlPressed)
+        pos=getLineEndOffset(lineCount-1);
+      else {
+        int row=getLineOfOffset(getCaret().getDot());
+        pos=getLineEndOffset(row);
+        if (getLineCount()-1!=row)
+          pos-=1;
+      }
     }
+    if (shiftPressed)
+      moveCaretPosition(pos);
+    else
+      setCaretPosition(pos);
   }
 
   private void doControlArrow(boolean left, boolean shift) throws Exception {
