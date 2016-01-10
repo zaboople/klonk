@@ -15,8 +15,6 @@
     -Also the top menu for undo/redo
 
 -Current
-  -Switch ms windows exe build to use the new thing I found
-
   -Ctrl - and Ctrl + should resize font
 
   -SSH Sudo

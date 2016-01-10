@@ -63,7 +63,8 @@
     Creates source zip &amp; binaries zip in dist directory. This only works on ms windows.
 
   NOTE: To make a macintosh distribution file, run the "jar" task and then lib/makedmg. This
-    only works on Java 8 and above.
+    only works on Java 8 and above. You can also use lib/makewin.bat to make a windows installer,
+    although this is not as clean as jsmooth.
 
     </echo>
   </target>
