@@ -734,13 +734,21 @@ public class Menus {
       align=mu.doMenu(bar, "Align", KeyEvent.VK_A)
       ,
       weirdInsertToAlign=mu.doMenuItem(
-        "Insert spaces to align cursor to above",
+        "Insert spaces to align cursor to above"+(
+          currentOS.isOSX
+            ?"  ( ^ space)"
+            :""
+        ),
         alignItemListener, KeyEvent.VK_I,
         KeyMapper.key(KeyEvent.VK_SPACE, KeyEvent.CTRL_DOWN_MASK)
       )
       ,
       weirdInsertToAlignBelow=mu.doMenuItem(
-        "Insert spaces to align cursor to below",
+        "Insert spaces to align cursor to below"+(
+          currentOS.isOSX
+            ?"  (^ ⇧ space)"
+            :""
+        ),
         alignItemListener, KeyEvent.VK_N,
         KeyMapper.key(KeyEvent.VK_SPACE, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
