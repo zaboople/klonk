@@ -38,18 +38,22 @@ import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
 
 public class Help {
+
+  // DI:
   private JFrame parentFrame;
+  private CurrentOS currentOS;
   private String homeDir;
   private FontOptions fontOptions;
 
+  // Controls:
   private JButton btnOK;
   private JDialog win;
   private JTextPane jtp;
   private JScrollPane jsp;
   private Container mtaContainer;
 
+  // State:
   private boolean initialized;
-
 
   public Help(JFrame parentFrame, String homeDir, FontOptions fontOptions) {
     this.parentFrame=parentFrame;

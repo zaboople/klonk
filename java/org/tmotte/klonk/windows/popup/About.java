@@ -34,12 +34,17 @@ import org.tmotte.klonk.windows.Positioner;
 
 public class About {
 
+  // DI:
+  private CurrentOS currentOS;
   private JFrame parentFrame;
+
+  // Controls:
   private JDialog win;
   private JTextPane jtpLicense, jtpVersion, jtpJavaVersion;
   private JScrollPane jspLicense;
   private JButton btnOK;
 
+  // State:
   private boolean initialized=false;
 
   /////////////////////

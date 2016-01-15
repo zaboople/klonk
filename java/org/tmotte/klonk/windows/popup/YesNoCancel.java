@@ -29,9 +29,13 @@ import org.tmotte.common.swang.KeyMapper;
 import java.awt.FocusTraversalPolicy;
 
 public class YesNoCancel {
+
+  // DI:
   private JFrame parentFrame;
   private boolean haveCancel=true;
+  private CurrentOS currentOS;
 
+  // State:
   private int yesOrNoOrCancel=-1;
   private JDialog win;
   private JLabel msgLabel;

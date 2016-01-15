@@ -30,14 +30,18 @@ public class GoToLine {
   // INSTANCE VARIABLES: //
   /////////////////////////
 
+  // DI:
   private JFrame parentFrame;
+  private CurrentOS currentOS;
   private Setter<String> complainer;
 
+  // Controls:
   private JDialog win;
   private JTextField jtfRow;
   private JButton btnOK, btnCancel;
   private boolean initialized;
 
+  // State:
   private boolean badEntry=false, cancelled=false;
   private int result=-1;
 

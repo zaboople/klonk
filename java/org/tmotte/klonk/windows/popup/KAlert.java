@@ -33,16 +33,20 @@ import org.tmotte.klonk.config.msg.Setter;
  */
 public class KAlert implements Setter<String> {
 
+  // DI:
+  private JFrame parentFrame;
+  private CurrentOS currentOS;
+
+  // Controls:
   private JDialog win;
   private JTextPane errorLabel;
   private JEditorPane sizer;
-  private JFrame parentFrame;
   private JButton ok;
   private Setter<Throwable> errorHandler;
   int baseSizerHeight;
   int baseLabelHeight;
 
-
+  // State:
   private boolean initialized=false;
 
   /////////////////////

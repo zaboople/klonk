@@ -30,7 +30,8 @@ import org.tmotte.klonk.windows.Positioner;
 
 public class Shell {
 
-  //DI components:
+  // DI:
+  private CurrentOS currentOS;
   private JFrame parentFrame;
   private Setter<Throwable> fail;
   private FileDialogWrapper fdw;
@@ -42,19 +43,18 @@ public class Shell {
     public void set(FontOptions fo){setFont(fo);}
   };
 
-  //Visual components:
+  // Controls:
   private JFrame win;
   private MyTextArea mtaOutput;
   private JButton btnRun, btnClose, btnSwitch, btnSelectFile, btnForgetFile, btnStop;
   private JComboBox<String> jcbPrevious;
-  private DefaultComboBoxModel<String> jcbPreviousData;
   private Font fontBold;
-  private CurrentOS currentOS;
 
-  //State:
+  // State:
   private boolean shownBefore=false;
   private List<String> persistedFiles;
   private boolean initialized=false;
+  private DefaultComboBoxModel<String> jcbPreviousData;
 
   public Shell(
      JFrame parentFrame,

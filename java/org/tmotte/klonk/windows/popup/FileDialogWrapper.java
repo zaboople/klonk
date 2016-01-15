@@ -22,17 +22,19 @@ import org.tmotte.klonk.ssh.SSHFile;
  */
 public class FileDialogWrapper {
 
+  // DI:
   private JFrame mainFrame;
   private CurrentOS currentOS;
+
+  // State:
   private boolean initialized=false;
 
+  // Controls:
   //JFileChooser sucks but not as bad when used in native mode on windows,
   //and it works great with my SSH tricks:
   private JFileChooser fileChooser;
   private FileView fileView;
   private FileSystemView fileSystemView;
-
-
 
   public FileDialogWrapper(JFrame mainFrame, CurrentOS currentOS, FileSystemView fsv, FileView fv){
     this.mainFrame=mainFrame;

@@ -31,12 +31,17 @@ import org.tmotte.klonk.config.option.LineDelimiterOptions;
 
 public class LineDelimiters {
 
-  private JDialog win;
+  // DI:
   private JFrame parentFrame;
+  private CurrentOS currentOS;
+
+  // Controls:
+  private JDialog win;
   private String[] jcOptions;
   private JComboBox<String> jcbDefault, jcbThis;
   private JButton btnDefault, btnThis, btnClose;
 
+  // State:
   private LineDelimiterListener listener;
   private boolean initialized=false;
 

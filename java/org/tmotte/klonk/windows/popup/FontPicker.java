@@ -50,29 +50,30 @@ public class FontPicker {
   /////////////////////////
 
 
-  //Injected:
+  // DI:
   private JFrame parentFrame;
   private Setter<String> alerter;
   private CurrentOS currentOS;
   private FontOptions fontOptions;
 
-  //State:
+  // State:
   private boolean ok=false;
   private Map<String,Font> goodFonts, badFonts;
   private Color selectedForeground, selectedBackground, selectedCaret;
-
-  private JDialog win;
+  private boolean initialized=false;
   private DefaultListModel<String> fontNameData;
   private DefaultListModel<Integer> fontSizeData;
   private JList<String> jlFonts;
   private JList<Integer> jlFontSize;
+
+  // Controls:
+  private JDialog win;
   private JScrollPane  jspFonts, jspFontSize;
   private JButton btnOK, btnCancel;
   private JColorChooser colorChooser;
   private MyTextArea mta;
   private JScrollPane jspMTA;
   private JRadioButton jrbForeground, jrbBackground, jrbCaret;
-  private boolean initialized=false;
 
 
   /////////////////////

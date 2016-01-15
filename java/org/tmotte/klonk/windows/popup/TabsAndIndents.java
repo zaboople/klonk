@@ -41,19 +41,23 @@ public class TabsAndIndents {
   // INSTANCE VARIABLES: //
   /////////////////////////
 
+  // DI:
+  private CurrentOS currentOS;
   private JFrame parentFrame;
-  private JDialog win;
+
+  // State:
   private boolean ok=false;
   private boolean initialized=false;
+  private TabAndIndentOptions options;
 
+  // Controls:
+  private JDialog win;
   private JRadioButton jrbThisTabs, jrbThisSpaces, jrbDefTabs, jrbDefSpaces;
   private JSpinner jspSpacesSize;
   private JSpinner jspTabSize;
   private JCheckBox chkIndentOnHardReturn;
   private JRadioButton jrbTabIndentsLine, jrbTabIsTab;
   private JButton btnOK, btnCancel;
-
-  private TabAndIndentOptions options;
 
   /////////////////////
   // PUBLIC METHODS: //

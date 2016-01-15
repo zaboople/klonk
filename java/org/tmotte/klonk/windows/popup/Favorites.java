@@ -44,20 +44,23 @@ public class Favorites {
   // INSTANCE VARIABLES: //
   /////////////////////////
 
+  // DI:
   private JFrame parentFrame;
-
-  private FontOptions fontOptions;
-  private JDialog win;
-  private MyTextArea mtaFiles, mtaDirs;
-  private JButton btnOK, btnCancel;
-  private Font fontBold;
-  private boolean initialized=false;
   private CurrentOS currentOS;
+  private FontOptions fontOptions;
   private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
     public void set(FontOptions fo){setFont(fo);}
   };
 
+  // State:
+  private boolean initialized=false;
   private boolean result;
+
+  // Controls:
+  private JDialog win;
+  private MyTextArea mtaFiles, mtaDirs;
+  private JButton btnOK, btnCancel;
+  private Font fontBold;
 
 
   /////////////////////

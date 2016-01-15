@@ -44,19 +44,22 @@ public class OpenFileList {
   // INSTANCE VARIABLES: //
   /////////////////////////
 
-  private JFrame parentFrame;
-
-  private FontOptions fontOptions;
-  private JDialog win;
-  private MyTextArea mtaFiles;
-  private JButton btnOK, btnCancel;
-  private Font fontBold;
-  private boolean initialized=false;
+  // DI:
   private CurrentOS currentOS;
+  private JFrame parentFrame;
+  private FontOptions fontOptions;
   private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
     public void set(FontOptions fo){setFont(fo);}
   };
 
+  // Controls:
+  private JDialog win;
+  private MyTextArea mtaFiles;
+  private JButton btnOK, btnCancel;
+  private Font fontBold;
+
+  // State:
+  private boolean initialized=false;
   private boolean result;
 
 
