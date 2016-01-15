@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.JEditorPane;
 import javax.swing.JWindow;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
@@ -40,14 +41,14 @@ public class KAlert implements Setter<String> {
   private Setter<Throwable> errorHandler;
   int baseSizerHeight;
   int baseLabelHeight;
-  
-  
+
+
   private boolean initialized=false;
 
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
-  
+
   public KAlert(JFrame frame) {
     parentFrame=frame;
   }
@@ -97,7 +98,7 @@ public class KAlert implements Setter<String> {
   //////////////////////
   // PRIVATE METHODS: //
   //////////////////////
-  
+
   private void init() {
     if (!initialized){
       create();
@@ -111,15 +112,15 @@ public class KAlert implements Setter<String> {
 
     errorLabel=new JTextPane();
     errorLabel.setEditable(false); // as before
-    errorLabel.setBorder(null);       
+    errorLabel.setBorder(null);
     errorLabel.setOpaque(false);
-    
+
     sizer=new JEditorPane();
     errorLabel.setText("ABCDEFG\naaa\n\neee\neifif");
     sizer.setText(errorLabel.getText());
     baseSizerHeight=sizer.getPreferredSize().height;
     baseLabelHeight=errorLabel.getPreferredSize().height;
-    
+
     ok=new JButton("OK");
   }
   private void layout() {
@@ -146,7 +147,7 @@ public class KAlert implements Setter<String> {
     KeyMapper.accel(ok, btnActions, KeyEvent.VK_ESCAPE);
     KeyMapper.accel(ok, btnActions, KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK);
   }
-  
+
   private void show(String message, Throwable e) {
     if (message==null)
       message="Whoops... ";
@@ -162,7 +163,7 @@ public class KAlert implements Setter<String> {
     win.toFront();
   }
 
-  
+
   ///////////
   // TEST: //
   ///////////
@@ -183,7 +184,7 @@ public class KAlert implements Setter<String> {
           ka.show(
             "I dislike you and everything and whatever and so on and howdy and man oh man am I tired "
            +"and this is going to be such a gigantically long sentence that it has no business fitting "
-           +"in a window like this it's just too big and it goes on forever keep trying it's almost " 
+           +"in a window like this it's just too big and it goes on forever keep trying it's almost "
            +"long enough ok now you're cooking just a little more lordy that's enough. Blah blah blah blah"
            +"blah blah blah.\n\n"
            +"Continuing with even more text about nothing in particular, yet something easily understood, "
@@ -202,7 +203,7 @@ public class KAlert implements Setter<String> {
           e.printStackTrace();
         }
       }
-    });  
+    });
   }
   private static void throwTest() {
     new Runnable() {

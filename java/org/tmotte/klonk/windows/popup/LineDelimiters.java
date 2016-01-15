@@ -24,6 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
@@ -35,7 +36,7 @@ public class LineDelimiters {
   private String[] jcOptions;
   private JComboBox<String> jcbDefault, jcbThis;
   private JButton btnDefault, btnThis, btnClose;
-  
+
   private LineDelimiterListener listener;
   private boolean initialized=false;
 
@@ -46,7 +47,7 @@ public class LineDelimiters {
   public LineDelimiters(JFrame frame) {
     parentFrame=frame;
   }
-  
+
 
   public void show(LineDelimiterOptions current, LineDelimiterListener listener) {
     init();
@@ -86,7 +87,7 @@ public class LineDelimiters {
     win.setVisible(false);
   }
 
-  
+
   ///////////////////////////////
   // CREATE / LAYOUT / LISTEN: //
   ///////////////////////////////
@@ -94,12 +95,12 @@ public class LineDelimiters {
   private void init() {
     if (!initialized){
       create();
-      layout(); 
+      layout();
       listen();
       initialized=true;
     }
   }
-  
+
   private void create() {
     win=new JDialog(parentFrame, true);
     win.setTitle("Line delimiters");
@@ -114,11 +115,11 @@ public class LineDelimiters {
     GridBug gb=new GridBug(win.getContentPane());
     gb.gridXY(0);
     gb.anchor=gb.WEST;
-  
+
     Insets insets=gb.insets;
     insets.right=10;
     insets.left=10;
-        
+
     //Label for default:
     insets.top=10;
     gb.weightx=1.0;
@@ -128,7 +129,7 @@ public class LineDelimiters {
     insets.top=3;
     gb.gridwidth=1;
     gb.addY(getFirstPicker());
-    
+
     //Label for this:
     insets.top=10;
     gb.gridx=0;
@@ -143,7 +144,7 @@ public class LineDelimiters {
     insets.top=10;
     gb.anchor=gb.CENTER;
     gb.addY(btnClose);
-  
+
     win.pack();
   }
   private Component getFirstLabel() {
@@ -174,9 +175,9 @@ public class LineDelimiters {
     gb.addX(btn);
     return gb.container;
   }
-  
-  
-  private void listen() { 
+
+
+  private void listen() {
     jcbDefault.addItemListener(
       new ItemListener() {
         public void itemStateChanged(ItemEvent e) {
@@ -191,7 +192,7 @@ public class LineDelimiters {
         }
       }
     );
-    
+
     Action closeAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         clickClose();
@@ -200,7 +201,7 @@ public class LineDelimiters {
     btnClose.addActionListener(closeAction);
     KeyMapper.accel(btnClose, closeAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
     KeyMapper.accel(btnClose, closeAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
-    btnClose.setMnemonic(KeyEvent.VK_C);    
+    btnClose.setMnemonic(KeyEvent.VK_C);
     btnDefault.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {clickSetDefault();}
     });
@@ -208,11 +209,11 @@ public class LineDelimiters {
       public void actionPerformed(ActionEvent e) {clickSetThis();}
     });
   }
- 
+
   ///////////////////////
   // STATIC UTILITIES: //
   ///////////////////////
-  
+
   private static int getSelectedOption(String option) {
     if (option.equals(LineDelimiterOptions.CRs))
       return 0;
@@ -231,19 +232,19 @@ public class LineDelimiters {
       LineDelimiterOptions.translateToReadable(LineDelimiterOptions.CRLFs),
     };
   }
-  
-  
+
+
   ///////////
   // TEST: //
   ///////////
- 
+
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         final LineDelimiterOptions kdo=new LineDelimiterOptions();
         new LineDelimiters(PopupTestContext.makeMainFrame()).show(
           kdo,
-          new LineDelimiterListener(){ 
+          new LineDelimiterListener(){
             public void setDefault(String i) {
               kdo.defaultOption=i;
               System.out.println(kdo);

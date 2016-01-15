@@ -23,17 +23,19 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import java.awt.FocusTraversalPolicy;
 
 public class YesNoCancel {
+  private JFrame parentFrame;
+  private boolean haveCancel=true;
+
   private int yesOrNoOrCancel=-1;
   private JDialog win;
   private JLabel msgLabel;
-  private JFrame parentFrame;
   private JButton btnYes, btnNo, btnCancel;
-  private boolean haveCancel=true;
   private boolean initialized=false;
 
   /////////////////////
@@ -47,7 +49,7 @@ public class YesNoCancel {
     parentFrame=frame;
     this.haveCancel=haveCancel;
   }
-  
+
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
@@ -89,7 +91,7 @@ public class YesNoCancel {
     init();
     doF3Stuff();
   }
-  
+
 
   //////////////////////
   // PRIVATE METHODS: //
@@ -133,7 +135,7 @@ public class YesNoCancel {
     grid.weightx=1.0;
     grid.addY(p);
   }
-  
+
   private JPanel layoutButtons() {
     JPanel panel=new JPanel();
     GridBug gb=new GridBug(panel);
@@ -142,7 +144,7 @@ public class YesNoCancel {
     insets.bottom=15;
     insets.left=5;
     insets.right=5;
-    
+
     gb.gridXY(0);
     gb.add(btnYes);
     gb.addX(btnNo);
@@ -155,7 +157,7 @@ public class YesNoCancel {
   // EVENTS: //
   /////////////
 
-  
+
   private void listen() {
     listen(btnYes,    YesNoCancelAnswer.YES);
     listen(btnNo,     YesNoCancelAnswer.NO);
@@ -182,28 +184,28 @@ public class YesNoCancel {
         click(YesNoCancelAnswer.CANCEL);
     }
   };
-      
-  
+
+
   private class KeyMonster extends KeyAdapter {
     int result;
     public void keyPressed(KeyEvent e){
       int code=e.getKeyCode();
-      if (code==KeyEvent.VK_ESCAPE) 
+      if (code==KeyEvent.VK_ESCAPE)
         click(YesNoCancelAnswer.CANCEL);
       else
-      if (code==KeyEvent.VK_W && KeyMapper.ctrlPressed(e)) 
+      if (code==KeyEvent.VK_W && KeyMapper.ctrlPressed(e))
         click(YesNoCancelAnswer.CANCEL);
       else
-      if (code==KeyEvent.VK_ENTER) 
+      if (code==KeyEvent.VK_ENTER)
         click(result);
       else
-      if (code==KeyEvent.VK_Y) 
+      if (code==KeyEvent.VK_Y)
         click(YesNoCancelAnswer.YES);
       else
-      if (code==KeyEvent.VK_N) 
+      if (code==KeyEvent.VK_N)
         click(YesNoCancelAnswer.NO);
       else
-      if (code==KeyEvent.VK_C && btnCancel!=null) 
+      if (code==KeyEvent.VK_C && btnCancel!=null)
         click(YesNoCancelAnswer.CANCEL);
       else
       if (code==KeyEvent.VK_LEFT || code==KeyEvent.VK_KP_LEFT){
@@ -222,7 +224,7 @@ public class YesNoCancel {
     }
   };
   private boolean arrow(Component c, JButton btnWas, JButton... btnIs) {
-    if (c==btnWas) 
+    if (c==btnWas)
       for (JButton b: btnIs)
         if (b!=null) {
           b.requestFocusInWindow();
@@ -237,15 +239,15 @@ public class YesNoCancel {
     KeyMapper.accel(btnYes, btnActions, KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK);
   }
   private void click(int result) {
-    win.setVisible(false);  
+    win.setVisible(false);
     yesOrNoOrCancel=result;
   }
- 
- 
+
+
   ///////////
   // TEST: //
   ///////////
- 
+
   public static void main(String[] args) {
     final boolean doCancel=Boolean.parseBoolean(args[0]);
     final String message=args[1];
@@ -255,6 +257,6 @@ public class YesNoCancel {
         YesNoCancel ky=new YesNoCancel(m, doCancel);
         System.out.println(ky.show(message));
       }
-    });  
+    });
   }
 }

@@ -1,8 +1,17 @@
 -OSX
+  -Insert spaces to align doesn't show the right shortcut.
+  -By default all your F-this and F-that function buttons are owned by apple.
   -We ought to make it where you can pick between fixed-width and not fixed-width fonts in the picker.
+    FontRenderContext frc = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
+    for (Font font : fonts) {
+        Rectangle2D iBounds = font.getStringBounds("i", frc);
+        Rectangle2D mBounds = font.getStringBounds("m", frc);
+        if (iBounds.getWidth() == mBounds.getWidth()) {
+            monoFonts1.add(font);
+        }
+    }
   -I need alt-g to replace F3 or at least enhance it.
   -Consider using the default java runtime and shrinking the deploy (leave after the = blank): -Bruntime=
-  -Insert spaces to align doesn't show the right shortcut.
   -Switch the file listener to using nio shared memory mappings.
     -Automatically paste the clipboard in if it has something.
   -KeyMapping

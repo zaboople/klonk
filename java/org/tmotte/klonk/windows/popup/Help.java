@@ -31,6 +31,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.ScrollPaneConstants;
 import org.tmotte.common.io.Loader;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.msg.Setter;
@@ -48,8 +49,8 @@ public class Help {
   private Container mtaContainer;
 
   private boolean initialized;
-  
-  
+
+
   public Help(JFrame parentFrame, String homeDir, FontOptions fontOptions) {
     this.parentFrame=parentFrame;
     this.homeDir=homeDir;
@@ -68,20 +69,20 @@ public class Help {
     win.paintAll(win.getGraphics());
     win.toFront();
   }
-  
+
   ////////////////////////
   //  PRIVATE METHODS:  //
   ////////////////////////
-  
+
   private void click() {
-    win.setVisible(false);  
+    win.setVisible(false);
   }
 
   private void init() {
     if (!initialized) {
       create();
-      layout(); 
-      listen();    
+      layout();
+      listen();
       initialized=true;
     }
   }
@@ -89,10 +90,10 @@ public class Help {
   // CREATE/LAYOUT/LISTEN: //
   private void create() {
     win=new JDialog(parentFrame, true);
-    
+
     jtp=new JTextPane();
-    jtp.setEditable(false); 
-    jtp.setBorder(null);       
+    jtp.setEditable(false);
+    jtp.setBorder(null);
     jtp.setOpaque(false);
     jtp.setContentType("text/html");
 
@@ -105,8 +106,8 @@ public class Help {
           jtp.scrollToReference(desc);
         }
       }
-    });    
-    
+    });
+
     String helpText=Loader.loadUTF8String(getClass(), "Help.txt");
     helpText=helpText.replace("$[Home]", homeDir);
     jtp.setText(helpText);
@@ -155,11 +156,11 @@ public class Help {
       }
     });
   }
-    
+
   /////////////
   /// TEST: ///
   /////////////
-  
+
   public static void main(final String[] args) throws Exception{
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
@@ -168,7 +169,7 @@ public class Help {
         );
         h.show(new Rectangle(800,400));
       }
-    });       
+    });
   }
-  
+
 }

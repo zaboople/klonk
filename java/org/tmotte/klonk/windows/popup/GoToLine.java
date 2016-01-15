@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.msg.Setter;
@@ -39,7 +40,7 @@ public class GoToLine {
 
   private boolean badEntry=false, cancelled=false;
   private int result=-1;
-  
+
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
@@ -65,14 +66,14 @@ public class GoToLine {
       doShow();
     return result;
   }
-  
-  
+
+
   ////////////////////////
   //                    //
   //  PRIVATE METHODS:  //
   //                    //
   ////////////////////////
-  
+
   private void doShow() {
     win.setVisible(true);
     win.toFront();
@@ -82,7 +83,7 @@ public class GoToLine {
   private void click(boolean action) {
     badEntry=false;
     cancelled=!action;
-    win.setVisible(false);  
+    win.setVisible(false);
     if (action){
       try {
         result=Integer.parseInt(jtfRow.getText());
@@ -106,8 +107,8 @@ public class GoToLine {
   private void init() {
     if (!initialized) {
       create();
-      layout(); 
-      listen();    
+      layout();
+      listen();
       initialized=true;
     }
   }
@@ -125,7 +126,7 @@ public class GoToLine {
   }
 
   /////////////
-  
+
   private void layout() {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
@@ -153,7 +154,7 @@ public class GoToLine {
     gb.insets.left=0;
     gb.insets.right=5;
     gb.addX(jtfRow);
-    
+
     return jp;
   }
   private JPanel getButtons() {
@@ -176,7 +177,7 @@ public class GoToLine {
     };
     btnOK.addActionListener(okAction);
     KeyMapper.accel(btnOK, okAction, KeyMapper.key(KeyEvent.VK_ENTER));
-    
+
     Action cancelAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(false);}
     };
@@ -189,11 +190,11 @@ public class GoToLine {
       }
     });
   }
-  
+
   /////////////
   /// TEST: ///
   /////////////
-  
+
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
@@ -206,6 +207,6 @@ public class GoToLine {
           e.printStackTrace();
         }
       }
-    });  
-  }  
+    });
+  }
 }

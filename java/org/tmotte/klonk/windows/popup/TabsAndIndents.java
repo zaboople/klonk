@@ -29,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
@@ -44,16 +45,16 @@ public class TabsAndIndents {
   private JDialog win;
   private boolean ok=false;
   private boolean initialized=false;
-  
+
   private JRadioButton jrbThisTabs, jrbThisSpaces, jrbDefTabs, jrbDefSpaces;
   private JSpinner jspSpacesSize;
   private JSpinner jspTabSize;
   private JCheckBox chkIndentOnHardReturn;
-  private JRadioButton jrbTabIndentsLine, jrbTabIsTab;  
+  private JRadioButton jrbTabIndentsLine, jrbTabIsTab;
   private JButton btnOK, btnCancel;
-    
+
   private TabAndIndentOptions options;
-  
+
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
@@ -65,7 +66,7 @@ public class TabsAndIndents {
     init();
     this.options=options;
     ok=false;
-    
+
     //Set values from input:
     jrbThisTabs.setSelected(options.indentionMode==options.INDENT_TABS);
     jrbThisSpaces.setSelected(options.indentionMode==options.INDENT_SPACES);
@@ -75,8 +76,8 @@ public class TabsAndIndents {
     jspTabSize.setValue(options.tabSize);
     chkIndentOnHardReturn.setSelected(options.indentOnHardReturn);
     jrbTabIndentsLine.setSelected(options.tabIndentsLine);
-    jrbTabIsTab.setSelected(!jrbTabIndentsLine.isSelected());  
-    
+    jrbTabIsTab.setSelected(!jrbTabIndentsLine.isSelected());
+
     //Display:
     Point pt=parentFrame.getLocation();
     win.pack();
@@ -86,7 +87,7 @@ public class TabsAndIndents {
     win.toFront();
     return ok;
   }
-  
+
   ////////////////////////
   //                    //
   //  PRIVATE METHODS:  //
@@ -101,50 +102,50 @@ public class TabsAndIndents {
       options.tabIndentsLine    =jrbTabIndentsLine.isSelected();
       options.tabSize         =Integer.parseInt(jspTabSize.getValue().toString());
       options.indentSpacesSize=Integer.parseInt(jspSpacesSize.getValue().toString());
-      options.indentionMode=jrbThisTabs.isSelected() 
+      options.indentionMode=jrbThisTabs.isSelected()
         ?options.INDENT_TABS
         :options.INDENT_SPACES;
-      options.indentionModeDefault=jrbDefTabs.isSelected() 
+      options.indentionModeDefault=jrbDefTabs.isSelected()
         ?options.INDENT_TABS
         :options.INDENT_SPACES;
     }
-    win.setVisible(false);  
+    win.setVisible(false);
   }
   private JPanel getBorder(JPanel jp) {
     jp.setBorder(BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
     return jp;
   }
-  
+
   ///////////////////////////
   // CREATE/LAYOUT/LISTEN: //
   ///////////////////////////
-  
+
   private void init() {
     if (!initialized) {
       create();
-      layout(); 
+      layout();
       listen();
       initialized=true;
-    }  
+    }
   }
   private void create() {
-    jrbThisTabs  =new JRadioButton("Tabs"); 
+    jrbThisTabs  =new JRadioButton("Tabs");
     jrbThisSpaces=new JRadioButton("Spaces");
-    jrbDefTabs   =new JRadioButton("Tabs"); 
+    jrbDefTabs   =new JRadioButton("Tabs");
     jrbDefSpaces =new JRadioButton("Spaces");
     jspSpacesSize=new JSpinner(new SpinnerNumberModel(1,1,99,1));
     jspTabSize   =new JSpinner(new SpinnerNumberModel(0,0,99,1));
 
     chkIndentOnHardReturn=new JCheckBox(
-      "<html><body>Auto-indent when new line is entered</body></html>" 
+      "<html><body>Auto-indent when new line is entered</body></html>"
     );
     jrbTabIndentsLine=new JRadioButton(
-      "<html><body><b>Tab</b> key indents line <br>(use <b>Ctrl</b> - <b>Tab</b> to insert tab)</body></html>"     
+      "<html><body><b>Tab</b> key indents line <br>(use <b>Ctrl</b> - <b>Tab</b> to insert tab)</body></html>"
     );
     jrbTabIsTab=new JRadioButton(
-        "<html><body><b>Tab</b> key inserts tab character</body></html>" 
+        "<html><body><b>Tab</b> key inserts tab character</body></html>"
     );
-  
+
     win=new JDialog(parentFrame, true);
     win.setTitle("Tabs & indents");
     btnOK    =new JButton("OK");
@@ -152,8 +153,8 @@ public class TabsAndIndents {
     btnCancel=new JButton("Cancel");
     btnCancel.setMnemonic(KeyEvent.VK_C);
   }
-  
-  
+
+
   private void layout() {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
@@ -190,7 +191,7 @@ public class TabsAndIndents {
     gb.gridwidth=2;
     JLabel label=new JLabel("<html><b>Indention: Tabs or Spaces</b></html>");
     gb.add(label);
-    
+
     //Add buttons:
     gb.gridwidth=1;
     gb.insets.top=2;
@@ -323,11 +324,11 @@ public class TabsAndIndents {
       Radios.create(jrbTabIndentsLine,  jrbTabIsTab)
     );
   }
-  
+
   /////////////
   /// TEST: ///
   /////////////
-  
+
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
@@ -337,7 +338,7 @@ public class TabsAndIndents {
         new TabsAndIndents(PopupTestContext.makeMainFrame()).show(ti);
         System.out.println(ti);
       }
-    });  
+    });
   }
-  
+
 }
