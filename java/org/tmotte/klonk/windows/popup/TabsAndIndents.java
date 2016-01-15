@@ -321,8 +321,7 @@ public class TabsAndIndents {
       public void actionPerformed(ActionEvent event) {click(false);}
     };
     btnCancel.addActionListener(cancelAction);
-    KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
-    KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
+    KeyMapper.easyCancel(btnCancel, cancelAction);
 
     Radios.doUpDownArrows(
       Radios.create(jrbThisTabs,        jrbThisSpaces),

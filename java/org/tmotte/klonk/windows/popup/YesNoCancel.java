@@ -198,7 +198,7 @@ public class YesNoCancel {
       if (code==KeyEvent.VK_ESCAPE)
         click(YesNoCancelAnswer.CANCEL);
       else
-      if (code==KeyEvent.VK_W && KeyMapper.ctrlPressed(e))
+      if (code==KeyEvent.VK_W && KeyMapper.modifierPressed(e, currentOS))
         click(YesNoCancelAnswer.CANCEL);
       else
       if (code==KeyEvent.VK_ENTER)

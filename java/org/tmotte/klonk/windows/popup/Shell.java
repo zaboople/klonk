@@ -463,9 +463,7 @@ public class Shell {
       public void actionPerformed(ActionEvent event) {close();}
     };
     btnClose.addActionListener(closeAction);
-    KeyMapper.accel(btnClose, closeAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
-    KeyMapper.accel(btnClose, closeAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
-    KeyMapper.accel(btnClose, closeAction, KeyMapper.key(KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));
+    KeyMapper.easyCancel(btnClose, closeAction);
     win.addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e){
         closing();

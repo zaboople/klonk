@@ -1,14 +1,16 @@
 package org.tmotte.common.swang;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
-import javax.swing.KeyStroke;
+import javax.swing.JButton;
 import javax.swing.JComponent;
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-
+import javax.swing.KeyStroke;
 
 public class KeyMapper {
+
+  static Toolkit toolkit=Toolkit.getDefaultToolkit();
 
   //////////////////////////////////////////////////////////
   // ADDING HOTKEYS TO COMPONENTS; NOTE HOW THE COMPONENT //
@@ -76,6 +78,7 @@ public class KeyMapper {
   public static boolean altPressed(int mods) {
     return (mods & KeyEvent.ALT_DOWN_MASK)==KeyEvent.ALT_DOWN_MASK;
   }
+
   /** This is the macintosh "command" key */
   public static boolean metaPressed(int mods, CurrentOS currentOS) {
     return currentOS.isOSX && (mods & KeyEvent.META_DOWN_MASK)==KeyEvent.META_DOWN_MASK;
@@ -91,12 +94,26 @@ public class KeyMapper {
     return currentOS.isOSX && optionPressed(k.getModifiersEx(), currentOS);
   }
 
+  /**
+   * Tells us if the default modifier for the OS (Ctrl or Command or what)
+   * was pressed.
+   */
+  public static boolean modifierPressed(int mods, CurrentOS currentOS) {
+    int s=currentOS.isOSX
+      ?KeyEvent.META_DOWN_MASK
+      :KeyEvent.CTRL_DOWN_MASK;
+    return (mods & s) == s;
+  }
+  public static boolean modifierPressed(KeyEvent k, CurrentOS currentOS) {
+    return modifierPressed(k.getModifiersEx(), currentOS);
+  }
+
   ///////////////////////////////
   // CREATE KeyStroke OBJECTS: //
   ///////////////////////////////
 
   public static int shortcutByOS(){
-    return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    return toolkit.getMenuShortcutKeyMask();
   }
   public static KeyStroke keyByOS(int hotKey) {
     return KeyStroke.getKeyStroke(hotKey, shortcutByOS());
@@ -117,4 +134,9 @@ public class KeyMapper {
     return key(hotKey, mod);
   }
 
+  public static void easyCancel(JButton btnCancel, Action action){
+    KeyMapper.accel(btnCancel, action, KeyMapper.key(KeyEvent.VK_ESCAPE));
+    KeyMapper.accel(btnCancel, action, KeyMapper.keyByOS(KeyEvent.VK_W));
+    KeyMapper.accel(btnCancel, action, KeyMapper.key(KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));
+  }
 }

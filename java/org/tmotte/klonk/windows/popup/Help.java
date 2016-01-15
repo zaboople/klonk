@@ -152,8 +152,7 @@ public class Help {
       }
     };
     btnOK.addActionListener(okAction);
-    KeyMapper.accel(btnOK, okAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
-    KeyMapper.accel(btnOK, okAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
+    KeyMapper.easyCancel(btnOK, okAction);
     jtp.addKeyListener(new KeyAdapter() {
       public void keyPressed(KeyEvent ke) {
         if (ke.getKeyCode()==KeyEvent.VK_TAB)

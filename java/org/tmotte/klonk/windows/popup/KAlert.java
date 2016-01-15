@@ -149,8 +149,7 @@ public class KAlert implements Setter<String> {
     };
     ok.addActionListener(btnActions);
     ok.setMnemonic(KeyEvent.VK_K);
-    KeyMapper.accel(ok, btnActions, KeyEvent.VK_ESCAPE);
-    KeyMapper.accel(ok, btnActions, KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK);
+    KeyMapper.easyCancel(ok, btnActions);
   }
 
   private void show(String message, Throwable e) {

@@ -205,8 +205,7 @@ public class LineDelimiters {
       }
     };
     btnClose.addActionListener(closeAction);
-    KeyMapper.accel(btnClose, closeAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
-    KeyMapper.accel(btnClose, closeAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
+    KeyMapper.easyCancel(btnClose, closeAction);
     btnClose.setMnemonic(KeyEvent.VK_C);
     btnDefault.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {clickSetDefault();}

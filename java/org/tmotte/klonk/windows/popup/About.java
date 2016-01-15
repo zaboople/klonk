@@ -161,9 +161,7 @@ public class About {
       }
     };
     btnOK.addActionListener(btnActions);
-    KeyMapper.accel(btnOK, btnActions, KeyEvent.VK_ESCAPE);
-    KeyMapper.accel(btnOK, btnActions, KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK);
-    KeyMapper.accel(btnOK, btnActions, KeyEvent.VK_ENTER);
+    KeyMapper.easyCancel(btnOK, btnActions);
   }
 
 

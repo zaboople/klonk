@@ -460,8 +460,7 @@ public class SSHOptionPicker {
       public void actionPerformed(ActionEvent event) {click(false);}
     };
     btnCancel.addActionListener(cancelAction);
-    KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_ESCAPE));
-    KeyMapper.accel(btnCancel, cancelAction, KeyMapper.key(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
+    KeyMapper.easyCancel(btnCancel, cancelAction);
   }
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
