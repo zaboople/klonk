@@ -197,14 +197,14 @@ public class BootContext {
 
     // Our general purpose hello-ok, yes-no-cancel and yes-no popups;
     // Also backfills alerter into our general-purpose notifier:
-    final KAlert alerter=new KAlert(mainFrame);
+    final KAlert alerter=new KAlert(mainFrame, currentOS);
     YesNoCancel
-      yesNoCancel=new YesNoCancel(mainFrame, true),
-      yesNo      =new YesNoCancel(mainFrame, false);
+      yesNoCancel=new YesNoCancel(mainFrame, currentOS, true),
+      yesNo      =new YesNoCancel(mainFrame, currentOS, false);
     userNotify.setUI(alerter, false);
 
     // SSH Login:
-    IUserPass iUserPass=new SSHLogin(mainFrame, alerter);
+    IUserPass iUserPass=new SSHLogin(mainFrame, currentOS, alerter);
 
     // Open file from list:
     OpenFileList openFileList=new OpenFileList(
@@ -229,7 +229,7 @@ public class BootContext {
     //Search popups:
     FindAndReplace findAndReplace=
       new FindAndReplace(mainFrame, alerter, statusBar, currentOS, editorFont);
-    GoToLine goToLine=new GoToLine(mainFrame, alerter);
+    GoToLine goToLine=new GoToLine(mainFrame, currentOS, alerter);
 
     //Shell:
     Shell shell=new Shell(
@@ -240,14 +240,14 @@ public class BootContext {
 
     //Various option popups:
     Favorites favorites=new Favorites(mainFrame, editorFont, currentOS);
-    TabsAndIndents tabsAndIndents=new TabsAndIndents(mainFrame);
+    TabsAndIndents tabsAndIndents=new TabsAndIndents(mainFrame, currentOS);
     FontPicker fontPicker=new FontPicker(mainFrame, alerter, currentOS);
-    SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, fileDialogWrapper);
-    LineDelimiters kDelims=new LineDelimiters(mainFrame);
+    SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, currentOS, fileDialogWrapper);
+    LineDelimiters kDelims=new LineDelimiters(mainFrame, currentOS);
 
     //Help:
-    Help help=new Help(mainFrame, home.getUserHome(), editorFont);
-    About about=new About(mainFrame);
+    Help help=new Help(mainFrame, currentOS, home.getUserHome(), editorFont);
+    About about=new About(mainFrame, currentOS);
 
 
     // MENUS: //
@@ -292,7 +292,7 @@ public class BootContext {
       layout.getMainDisplay(),
       statusBar,
       fileDialogWrapper,
-      new SSHOpenFrom(mainFrame),
+      new SSHOpenFrom(mainFrame, currentOS),
       openFileList,
       yesNoCancel,
       yesNo

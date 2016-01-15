@@ -46,11 +46,12 @@ public class YesNoCancel {
   // INITIALIZATION: //
   /////////////////////
 
-  public YesNoCancel(JFrame frame) {
-    this(frame, true);
+  public YesNoCancel(JFrame frame, CurrentOS currentOS) {
+    this(frame, currentOS, true);
   }
-  public YesNoCancel(JFrame frame, boolean haveCancel) {
+  public YesNoCancel(JFrame frame, CurrentOS currentOS, boolean haveCancel) {
     parentFrame=frame;
+    this.currentOS=currentOS;
     this.haveCancel=haveCancel;
   }
 
@@ -257,8 +258,9 @@ public class YesNoCancel {
     final String message=args[1];
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        JFrame m=PopupTestContext.makeMainFrame();
-        YesNoCancel ky=new YesNoCancel(m, doCancel);
+        PopupTestContext ptc=new PopupTestContext();
+        JFrame m=ptc.makeMainFrame();
+        YesNoCancel ky=new YesNoCancel(m, ptc.getCurrentOS(), doCancel);
         System.out.println(ky.show(message));
       }
     });

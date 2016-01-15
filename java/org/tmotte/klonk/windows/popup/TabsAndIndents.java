@@ -63,9 +63,11 @@ public class TabsAndIndents {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public TabsAndIndents(JFrame parentFrame) {
+  public TabsAndIndents(JFrame parentFrame, CurrentOS currentOS) {
     this.parentFrame=parentFrame;
+    this.currentOS=currentOS;
   }
+
   public boolean show(TabAndIndentOptions options) {
     init();
     this.options=options;
@@ -339,7 +341,8 @@ public class TabsAndIndents {
         TabAndIndentOptions ti=new TabAndIndentOptions();
         ti.indentionMode=ti.INDENT_TABS;
         ti.indentionModeDefault=ti.INDENT_SPACES;
-        new TabsAndIndents(PopupTestContext.makeMainFrame()).show(ti);
+        PopupTestContext ptc=new PopupTestContext();
+        new TabsAndIndents(ptc.makeMainFrame(), ptc.getCurrentOS()).show(ti);
         System.out.println(ti);
       }
     });

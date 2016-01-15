@@ -51,8 +51,9 @@ public class About {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public About(JFrame frame) {
+  public About(JFrame frame, CurrentOS currentOS) {
     this.parentFrame=frame;
+    this.currentOS=currentOS;
   }
 
   public void show() {
@@ -173,7 +174,8 @@ public class About {
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        new About(PopupTestContext.makeMainFrame()).show();
+        PopupTestContext ptc=new PopupTestContext();
+        new About(ptc.makeMainFrame(), ptc.getCurrentOS()).show();
       }
     });
   }

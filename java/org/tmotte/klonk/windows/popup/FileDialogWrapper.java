@@ -74,7 +74,7 @@ public class FileDialogWrapper {
           //On OSX, passing the full filename screws up everything unlike
           //Windows. So we have to set the file name & dir name individually.
           fd.setFile(startFile.getName());
-          if (startDir==null)
+          if (startDir==null && startFile.getParentFile()!=null)
             fd.setDirectory(startFile.getParentFile().getCanonicalPath());
         }
         if (startDir!=null)

@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
@@ -45,40 +46,45 @@ public class SSHLogin implements IUserPass {
   // INSTANCE VARIABLES: //
   /////////////////////////
 
+  // DI:
   private JFrame parentFrame;
+  private CurrentOS currentOS;
   private Setter<String> alerter;
 
+  // Controls:
   private JTextField jtfUsername;
   private JPasswordField jpfPass;
   private JDialog win;
   private JButton btnOK, btnCancel;
   private JLabel lblHost, lblError, lblErrorText;
-  private boolean ok=false, badEntry=false;
-  private boolean initialized=false;
-    
+
+  // State:
+  private boolean ok=false, badEntry=false, initialized=false;
+
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
 
-  public SSHLogin(JFrame parentFrame, Setter<String> alerter) {
+  public SSHLogin(JFrame parentFrame, CurrentOS currentOS, Setter<String> alerter) {
     this.parentFrame=parentFrame;
+    this.currentOS=currentOS;
     this.alerter=alerter;
   }
   public @Override String getUser() {
-    return ok 
+    return ok
       ?jtfUsername.getText().trim()
       :null;
   }
   public @Override String getPass() {
-    return ok 
+    return ok
       ?new String(jpfPass.getPassword())
       :null;
-  } 
-  public @Override boolean get(String user, String host, boolean authFail, boolean needsPassword) {  
+  }
+  public @Override boolean get(String user, String host, boolean authFail, boolean needsPassword) {
     return show(user, host, authFail, needsPassword);
   }
   public boolean show(String user, String host, boolean authFail, boolean needsPassword) {
-    
+
     //Initialize:
     init();
     if (user!=null)
@@ -89,15 +95,15 @@ public class SSHLogin implements IUserPass {
     lblError.setVisible(authFail);
     lblErrorText.setVisible(authFail);
     lblErrorText.setText(authFail ?"User/password failed" :"");
-    
+
     //Position:
     win.pack();
-    Point pt=parentFrame.getLocation();    
+    Point pt=parentFrame.getLocation();
     win.setLocation(pt.x+20, pt.y+20);
 
-    //Display cycle: No we don't need a loop, we just 
+    //Display cycle: No we don't need a loop, we just
     //leave the screen up until we pass validation. This is because
-    //we display the error inline and not in another pop-up:    
+    //we display the error inline and not in another pop-up:
     badEntry=true;
     ok=true;
     win.pack();
@@ -105,29 +111,29 @@ public class SSHLogin implements IUserPass {
       jpfPass.requestFocusInWindow();
     win.setVisible(true);
     win.toFront();
-    return ok;  
+    return ok;
   }
-  
- 
+
+
   ///////////////////////////
   // CREATE/LAYOUT/LISTEN: //
   ///////////////////////////
-  
+
   private void init() {
     if (!initialized) {
       create();
-      layout(); 
+      layout();
       listen();
       initialized=true;
     }
   }
-  
+
   private void create() {
     win=new JDialog(parentFrame, true);
     win.setTitle("SSH Login");
     jtfUsername=new JTextField();
     jtfUsername.setColumns(20);
-    jpfPass=new JPasswordField();    
+    jpfPass=new JPasswordField();
     jpfPass.setColumns(20);
     btnOK    =new JButton("OK");
     btnOK.setMnemonic(KeyEvent.VK_K);
@@ -140,8 +146,8 @@ public class SSHLogin implements IUserPass {
     lblErrorText=new JLabel("");
     lblErrorText.setForeground(Color.RED);
   }
-  
-  
+
+
   private void layout() {
     GridBug gb=new GridBug(win);
     gb.weightXY(0).gridXY(0);
@@ -156,7 +162,7 @@ public class SSHLogin implements IUserPass {
     gb.fill=gb.HORIZONTAL;
     gb.anchor=gb.WEST;
     gb.setX(0).setY(0);
-    
+
     gb.insets.top=5;
     gb.insets.bottom=1;
     gb.insets.left=5;
@@ -166,12 +172,12 @@ public class SSHLogin implements IUserPass {
     gb.setX(0).addY(new JLabel("Host: "));
     gb.weightXY(1, 0);
     gb.addX(lblHost);
-        
+
     gb.weightXY(0, 0);
     gb.setX(0).addY(new JLabel("User name: "));
     gb.weightXY(1, 0);
     gb.addX(jtfUsername);
-    
+
     gb.weightXY(0, 0);
     gb.setX(0).addY(new JLabel("Password: "));
     gb.weightXY(1, 0);
@@ -181,7 +187,7 @@ public class SSHLogin implements IUserPass {
     gb.setX(0).addY(lblError);
     gb.weightXY(1, 0);
     gb.addX(lblErrorText);
-    
+
     return jp;
   }
   private JPanel makeButtonPanel() {
@@ -219,21 +225,21 @@ public class SSHLogin implements IUserPass {
         click(false);
       }
     });
-    
+
   }
-  
+
 
   /** @param action true means OK, false means Cancel */
   private void click(boolean action) {
     ok=action;
     badEntry=false;
-    if (ok && 
+    if (ok &&
         (
-        jtfUsername.getText().trim().equals("") 
-        || 
+        jtfUsername.getText().trim().equals("")
+        ||
         (
-          jpfPass.isEnabled()==true 
-          && 
+          jpfPass.isEnabled()==true
+          &&
           new String(jpfPass.getPassword()).trim().equals(""))
         )
       ){
@@ -250,30 +256,34 @@ public class SSHLogin implements IUserPass {
   private String debugVals(){
     return " badEntry:"+badEntry+" ok "+ok;
   }
-    
+
   private void debug(String val) {
     System.out.println("DEBUG "+val);
   }
-  
+
   /////////////
   /// TEST: ///
   /////////////
-  
+
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        JFrame m=PopupTestContext.makeMainFrame();
-        testWindow(m, "aname", "test1.youknowthat.server.danglblangdingdongwhat.com", false, false);
-        testWindow(m, "aname", "test2.who.perv.com", true, true);
-        testWindow(m, "aname", "needs.password.only.com", false, true);
-        testWindow(m, null, "test3.bleagh.com", false, true);
+        PopupTestContext ptc=new PopupTestContext();
+        JFrame m=ptc.makeMainFrame();
+        KAlert ka=new KAlert(m, ptc.getCurrentOS());
+        SSHLogin sh=new SSHLogin(m, ptc.getCurrentOS(), ka);
+        testWindow(m, sh, "aname", "test1.youknowthat.server.danglblangdingdongwhat.com", false, false);
+        testWindow(m, sh, "aname", "test2.who.perv.com", true, true);
+        testWindow(m, sh, "aname", "needs.password.only.com", false, true);
+        testWindow(m, sh, null, "test3.bleagh.com", false, true);
       }
-    });  
+    });
   }
-  private static void testWindow(JFrame m, String user, String host, boolean authFail, boolean needsPassword) {
-    SSHLogin win=new SSHLogin(m, new KAlert(m));
-    System.out.println("RESULT: "+win.show(user, host, authFail, needsPassword));
-    System.out.println("user/pass: "+win.getUser()+" "+win.getPass());        
+  private static void testWindow(
+      JFrame m, SSHLogin sh, String user, String host, boolean authFail, boolean needsPassword
+    ) {
+    System.out.println("RESULT: "+sh.show(user, host, authFail, needsPassword));
+    System.out.println("user/pass: "+sh.getUser()+" "+sh.getPass());
   }
-  
+
 }

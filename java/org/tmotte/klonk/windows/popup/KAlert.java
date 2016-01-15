@@ -53,8 +53,9 @@ public class KAlert implements Setter<String> {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public KAlert(JFrame frame) {
+  public KAlert(JFrame frame, CurrentOS currentOS) {
     parentFrame=frame;
+    this.currentOS=currentOS;
   }
   /** Implements Setter interface */
   public @Override void set(String message){
@@ -176,8 +177,9 @@ public class KAlert implements Setter<String> {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          JFrame frame=PopupTestContext.makeMainFrame();
-          KAlert ka=new KAlert(frame);
+          PopupTestContext ptc=new PopupTestContext();
+          JFrame frame=ptc.makeMainFrame();
+          KAlert ka=new KAlert(frame, ptc.getCurrentOS());
           ka.show("Small warning thing okay.");
           ka.show("Small warning thing okay but larger.");
           ka.show("Small warning thing okay but it's just a bit larger than before.");

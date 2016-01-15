@@ -1,6 +1,7 @@
 package org.tmotte.klonk.windows.popup.ssh;
 import java.io.File;
 import javax.swing.JFrame;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.klonk.config.msg.UserNotify;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.ssh.SSH;
@@ -60,11 +61,11 @@ class Test {
         try {
           UserNotify notifier=new UserNotify(System.out);
           JFrame m=ptc.getMainFrame();
-          KAlert alerter=new KAlert(m);
+          KAlert alerter=new KAlert(m, ptc.getCurrentOS());
           SSHConnections conns=new SSHConnections(notifier)
             .withOptions(options)
             .withLogin(
-              new SSHLogin(m, alerter)
+              new SSHLogin(m, ptc.getCurrentOS(), alerter)
             );
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
             new org.tmotte.klonk.windows.popup.FileDialogWrapper(

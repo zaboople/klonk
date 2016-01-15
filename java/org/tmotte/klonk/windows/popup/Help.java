@@ -55,8 +55,9 @@ public class Help {
   // State:
   private boolean initialized;
 
-  public Help(JFrame parentFrame, String homeDir, FontOptions fontOptions) {
+  public Help(JFrame parentFrame, CurrentOS currentOS, String homeDir, FontOptions fontOptions) {
     this.parentFrame=parentFrame;
+    this.currentOS=currentOS;
     this.homeDir=homeDir;
     this.fontOptions=fontOptions;
   }
@@ -168,8 +169,9 @@ public class Help {
   public static void main(final String[] args) throws Exception{
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
+        PopupTestContext ptc=new PopupTestContext();
         Help h=new Help(
-          PopupTestContext.makeMainFrame(), ".", new FontOptions()
+          ptc.makeMainFrame(), ptc.getCurrentOS(), ".", new FontOptions()
         );
         h.show(new Rectangle(800,400));
       }

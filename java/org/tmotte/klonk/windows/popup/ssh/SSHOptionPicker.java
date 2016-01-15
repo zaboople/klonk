@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.windows.Positioner;
@@ -33,9 +34,16 @@ import org.tmotte.klonk.config.option.SSHOptions;
 
 public class SSHOptionPicker {
 
+  // DI:
   private JFrame parentFrame;
+  private CurrentOS currentOS;
   private FileDialogWrapper fdw;
 
+  // State:
+  private boolean initialized;
+  private boolean result=false;
+
+  // Controls:
   private JDialog win;
   private JCheckBox
     jcbKnownHosts,
@@ -58,14 +66,11 @@ public class SSHOptionPicker {
     JCheckBox read=new JCheckBox(" "), write=new JCheckBox(" "), execute=new JCheckBox(" ");
   }
   private TripleCheck tcUser, tcGroup, tcOther;
-
   private JButton btnOK, btnCancel;
 
-  private boolean initialized;
-  private boolean result=false;
-
-  public SSHOptionPicker(JFrame parentFrame, FileDialogWrapper fdw) {
+  public SSHOptionPicker(JFrame parentFrame, CurrentOS currentOS, FileDialogWrapper fdw) {
     this.parentFrame=parentFrame;
+    this.currentOS=currentOS;
     this.fdw=fdw;
   }
   public boolean show(SSHOptions options, final List<String> servers) {
@@ -505,7 +510,7 @@ public class SSHOptionPicker {
           PopupTestContext ptc=new PopupTestContext();
           JFrame parentFrame=ptc.makeMainFrame();
           SSHOptionPicker pop=new SSHOptionPicker(
-            parentFrame, new FileDialogWrapper(parentFrame, ptc.getCurrentOS())
+            parentFrame, ptc.getCurrentOS(), new FileDialogWrapper(parentFrame, ptc.getCurrentOS())
           );
           SSHOptions sopt=new SSHOptions();
           List<String> servers=new ArrayList<>();

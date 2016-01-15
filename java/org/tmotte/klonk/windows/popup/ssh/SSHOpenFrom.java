@@ -20,6 +20,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.KPersist;
@@ -29,8 +30,12 @@ import org.tmotte.klonk.windows.popup.PopupTestContext;
 
 public class SSHOpenFrom {
 
+  // DI:
   private JFrame parentFrame;
-  private JDialog win;  
+  private CurrentOS currentOS;
+
+  // Controls:
+  private JDialog win;
   private JComboBox<String> jcbPrevious;
   private JCheckBox jcbSudo;
   private DefaultComboBoxModel<String> jcbPreviousData;
@@ -38,15 +43,17 @@ public class SSHOpenFrom {
   private JButton btnOK, btnCancel;
   private JLabel lblError;
   private JPanel pnlError;
-  
+
+  // State:
   private boolean shownBefore=false;
   private boolean initialized=false;
-  private SSHOpenFromResult result=null;
   private boolean failed=false;
+  private SSHOpenFromResult result=null;
 
-  public SSHOpenFrom(JFrame parentFrame) {
+  public SSHOpenFrom(JFrame parentFrame, CurrentOS currentOS) {
     this.parentFrame=parentFrame;
-  }  
+    this.currentOS=currentOS;
+  }
 
   private void doShow() {
     win.setVisible(true);
@@ -55,14 +62,14 @@ public class SSHOpenFrom {
 
   public SSHOpenFromResult show(boolean forSave, List<UserServer> recent) {
     init();
-    
+
     //Dynamic title:
     win.setTitle(forSave ?"Save to SHH" :"Open from SSH");
-    
+
     //Sudo always off:
     jcbSudo.setVisible(false);
     jcbSudo.setSelected(false);
-    
+
     //Dynamic previous:
     jcbPreviousData.removeAllElements();
     if (recent.size()==0)
@@ -115,7 +122,7 @@ public class SSHOpenFrom {
       }
     }
     if (!failed)
-      win.setVisible(false);      
+      win.setVisible(false);
   }
 
   ///////////////////////////
@@ -126,8 +133,8 @@ public class SSHOpenFrom {
   private void init() {
     if (!initialized) {
       create();
-      layout(); 
-      listen();    
+      layout();
+      listen();
       initialized=true;
     }
   }
@@ -135,13 +142,13 @@ public class SSHOpenFrom {
     win=new JDialog(parentFrame, true);
     win.setResizable(true);
     win.setTitle("blargh");
-    
+
     jcbPreviousData=new DefaultComboBoxModel<>();
 
     jcbPrevious=new JComboBox<>(jcbPreviousData);
     jcbPrevious.setEditable(true);
     jcbPrevious.setMaximumRowCount(KPersist.maxRecent);
-    
+
     jcbSudo=new JCheckBox("");
 
     jtfFile=new JTextField();
@@ -154,7 +161,7 @@ public class SSHOpenFrom {
     btnOK    =new JButton("OK");
     btnOK.setMnemonic(KeyEvent.VK_K);
     btnCancel=new JButton("Cancel");
-    btnCancel.setMnemonic(KeyEvent.VK_C); 
+    btnCancel.setMnemonic(KeyEvent.VK_C);
   }
   private void layout(){
     GridBug gb=new GridBug(win);
@@ -171,7 +178,7 @@ public class SSHOpenFrom {
     gb.addY(getButtons());
     gb.weightXY(0);
     gb.addY(getErrorPanel());
-    win.pack();  
+    win.pack();
   }
   private JPanel getInputPanel() {
     JPanel jp=new JPanel();
@@ -181,23 +188,23 @@ public class SSHOpenFrom {
 
     gb.insets.top=5;
     gb.insets.bottom=2;
-    gb.insets.left=10;    
+    gb.insets.left=10;
     gb.add(new JLabel(""));
     gb.addX(new JLabel("User@Host"));
     gb.addX(new JLabel("File"));
     //gb.addX(new JLabel("Sudo"));
     gb.addX(new JLabel(""));
-    
+
     gb.insets.top=2;
     gb.insets.left=5;
     gb.setX(0);
     gb.addY(new JLabel("ssh:"));
-    
+
     gb.insets.left=1;
-    gb.fill=gb.HORIZONTAL;    
+    gb.fill=gb.HORIZONTAL;
     gb.weightXY(0.3, 0);
     gb.addX(jcbPrevious);
-    
+
     gb.insets.left=5;
     gb.weightXY(0.7, 0);
     jtfFile.setColumns(50);
@@ -205,7 +212,7 @@ public class SSHOpenFrom {
 
     gb.weightXY(0, 0);
     gb.addX(jcbSudo);
-    
+
     return jp;
   }
   private JPanel getErrorPanel() {
@@ -215,7 +222,7 @@ public class SSHOpenFrom {
     gb.insets.top=0;
     gb.weightXY(1, 0);
     gb.anchor=gb.WEST;
-    gb.add(lblError);  
+    gb.add(lblError);
     return panel;
   }
   private JPanel getButtons() {
@@ -231,14 +238,14 @@ public class SSHOpenFrom {
     gb.addX(btnCancel);
     return panel;
   }
-  
+
   private void listen(){
     Action okAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(true);}
     };
     btnOK.addActionListener(okAction);
     KeyMapper.accel(btnOK, okAction, KeyMapper.key(KeyEvent.VK_ENTER));
-    
+
     Action cancelAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(false);}
     };
@@ -255,8 +262,9 @@ public class SSHOpenFrom {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          JFrame parentFrame=PopupTestContext.makeMainFrame();
-          SSHOpenFrom w=new SSHOpenFrom(parentFrame);
+          PopupTestContext ptc=new PopupTestContext();
+          JFrame parentFrame=ptc.makeMainFrame();
+          SSHOpenFrom w=new SSHOpenFrom(parentFrame, ptc.getCurrentOS());
           List<UserServer> uss=new ArrayList<>();
 
           System.out.println(w.show(false, uss));
@@ -266,14 +274,14 @@ public class SSHOpenFrom {
           System.out.println(w.show(true, uss));
 
           uss.add(new UserServer("sploong", "twabbada.lob.net"));
-          System.out.println(w.show(false, uss));         
-          
+          System.out.println(w.show(false, uss));
+
         } catch (Exception e) {
           e.printStackTrace();
         }
       }
-    });  
-  }  
+    });
+  }
 
 }
 

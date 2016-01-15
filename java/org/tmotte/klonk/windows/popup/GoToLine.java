@@ -49,8 +49,9 @@ public class GoToLine {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public GoToLine(JFrame parentFrame, Setter<String> complainer) {
+  public GoToLine(JFrame parentFrame, CurrentOS currentOS, Setter<String> complainer) {
     this.parentFrame=parentFrame;
+    this.currentOS=currentOS;
     this.complainer=complainer;
   }
   public int show() {
@@ -203,9 +204,10 @@ public class GoToLine {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          JFrame parentFrame=PopupTestContext.makeMainFrame();
-          KAlert alerter=new KAlert(parentFrame);
-          GoToLine gtl=new GoToLine(parentFrame, alerter);
+          PopupTestContext ptc=new PopupTestContext();
+          JFrame parentFrame=ptc.makeMainFrame();
+          KAlert alerter=new KAlert(parentFrame, ptc.getCurrentOS());
+          GoToLine gtl=new GoToLine(parentFrame, ptc.getCurrentOS(), alerter);
           System.out.println(gtl.show());
         } catch (Exception e) {
           e.printStackTrace();

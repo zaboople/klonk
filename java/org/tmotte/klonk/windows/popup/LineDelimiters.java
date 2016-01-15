@@ -49,8 +49,9 @@ public class LineDelimiters {
   // INITIALIZATION: //
   /////////////////////
 
-  public LineDelimiters(JFrame frame) {
+  public LineDelimiters(JFrame frame, CurrentOS currentOS) {
     parentFrame=frame;
+    this.currentOS=currentOS;
   }
 
 
@@ -247,7 +248,10 @@ public class LineDelimiters {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         final LineDelimiterOptions kdo=new LineDelimiterOptions();
-        new LineDelimiters(PopupTestContext.makeMainFrame()).show(
+        PopupTestContext ptc=new PopupTestContext();
+        new LineDelimiters(
+          ptc.makeMainFrame(), ptc.getCurrentOS()
+        ).show(
           kdo,
           new LineDelimiterListener(){
             public void setDefault(String i) {
