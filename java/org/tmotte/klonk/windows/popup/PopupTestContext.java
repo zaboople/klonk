@@ -90,7 +90,7 @@ public class PopupTestContext  {
     });
     mainFrame.setVisible(true);
     mainFrame.setBounds(new java.awt.Rectangle(400,400,300,300));
-      mainFrame.toFront();
+    mainFrame.toFront();
     return mainFrame;
   }
 
