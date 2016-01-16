@@ -403,14 +403,14 @@ public class Shell {
 
     //Alt-D focuses combobox... this probably shouldn't be
     //attached to btnRun but ok it works:
-    Action jcbAction=new AbstractAction() {
+    Action actionJCB=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         jcbPrevious.requestFocusInWindow();
         jcbPrevious.getEditor().selectAll();
       }
     };
     KeyMapper.accel(
-      btnRun, jcbAction,
+      jcbPrevious, actionJCB,
       currentOS.isOSX
         ?KeyMapper.key(KeyEvent.VK_L, KeyMapper.shortcutByOS())
         :KeyMapper.key(KeyEvent.VK_D, KeyEvent.ALT_DOWN_MASK)
@@ -421,18 +421,23 @@ public class Shell {
       public void actionPerformed(ActionEvent event) {showFileDialog();}
     };
     btnSelectFile.addActionListener(fileAction);
+    currentOS.fixEnterKey(btnSelectFile, fileAction);
 
     //Forget:
     Action forgetAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {forget();}
     };
     btnForgetFile.addActionListener(forgetAction);
+    currentOS.fixEnterKey(btnForgetFile, forgetAction);
 
     //Run:
     Action runAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {exec();}
     };
     btnRun.addActionListener(runAction);
+    currentOS.fixEnterKey(btnRun, runAction);
+
+    // Hotwire run to modifier-E everywhere:
     KeyMapper.accel(
       btnRun, runAction,
       KeyMapper.key(KeyEvent.VK_E, KeyMapper.shortcutByOS())
@@ -454,6 +459,7 @@ public class Shell {
       }
     };
     btnStop.addActionListener(stopAction);
+    currentOS.fixEnterKey(btnStop, stopAction);
 
     //Output:
     mtaOutput.addKeyListener(textAreaListener);
@@ -463,6 +469,7 @@ public class Shell {
       public void actionPerformed(ActionEvent event) {close();}
     };
     btnClose.addActionListener(closeAction);
+    currentOS.fixEnterKey(btnClose, closeAction);
     KeyMapper.easyCancel(btnClose, closeAction);
     win.addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e){
@@ -478,6 +485,7 @@ public class Shell {
       btnSwitch, switchAction, KeyMapper.key(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK)
     );
     btnSwitch.addActionListener(switchAction);
+    currentOS.fixEnterKey(btnSwitch, switchAction);
   }
   private KeyAdapter textAreaListener=new KeyAdapter() {
     public void keyPressed(KeyEvent e){

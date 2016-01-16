@@ -474,7 +474,10 @@ public class FontPicker {
       public void actionPerformed(ActionEvent event) {click(true);}
     };
     btnOK.addActionListener(okAction);
+
+    // This means clicking enter anywhere activates ok
     KeyMapper.accel(btnOK, okAction, KeyMapper.key(KeyEvent.VK_ENTER));
+
     Action cancelAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(false);}
     };

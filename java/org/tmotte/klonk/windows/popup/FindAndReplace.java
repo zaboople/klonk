@@ -479,6 +479,9 @@ public class FindAndReplace {
     doButtonEvents(btnFind,     buttonListener, KeyMapper.key(KeyEvent.VK_F3));
     doButtonEvents(btnFind,     buttonListener, KeyMapper.key(KeyEvent.VK_ENTER));
     doButtonEvents(btnReverse,  buttonListener, KeyMapper.key(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK));
+    currentOS.fixEnterKey(btnFind, buttonListener);
+    currentOS.fixEnterKey(btnReverse, buttonListener);
+    currentOS.fixEnterKey(btnCancel, buttonListener);
     KeyMapper.easyCancel(btnCancel, buttonListener);
     mtaFind.addFocusListener(new FocusAdapter(){
       public void focusGained(FocusEvent fe) {

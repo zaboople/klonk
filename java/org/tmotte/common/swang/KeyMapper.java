@@ -134,9 +134,9 @@ public class KeyMapper {
     return key(hotKey, mod);
   }
 
-  public static void easyCancel(JButton btnCancel, Action action){
-    KeyMapper.accel(btnCancel, action, KeyMapper.key(KeyEvent.VK_ESCAPE));
-    KeyMapper.accel(btnCancel, action, KeyMapper.keyByOS(KeyEvent.VK_W));
-    KeyMapper.accel(btnCancel, action, KeyMapper.key(KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));
+  public static void easyCancel(JButton btn, Action action){
+    KeyMapper.accel(btn, action, KeyMapper.key(KeyEvent.VK_ESCAPE));
+    KeyMapper.accel(btn, action, KeyMapper.keyByOS(KeyEvent.VK_W));
+    KeyMapper.accel(btn, action, KeyMapper.key(KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));
   }
 }

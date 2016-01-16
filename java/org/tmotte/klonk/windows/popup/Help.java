@@ -153,6 +153,7 @@ public class Help {
     };
     btnOK.addActionListener(okAction);
     KeyMapper.easyCancel(btnOK, okAction);
+    currentOS.fixEnterKey(btnOK, okAction);
     jtp.addKeyListener(new KeyAdapter() {
       public void keyPressed(KeyEvent ke) {
         if (ke.getKeyCode()==KeyEvent.VK_TAB)

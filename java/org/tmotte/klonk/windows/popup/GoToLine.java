@@ -181,6 +181,8 @@ public class GoToLine {
       public void actionPerformed(ActionEvent event) {click(true);}
     };
     btnOK.addActionListener(okAction);
+
+    // Pressing enter anywhere means ok:
     KeyMapper.accel(btnOK, okAction, KeyMapper.key(KeyEvent.VK_ENTER));
 
     Action cancelAction=new AbstractAction() {

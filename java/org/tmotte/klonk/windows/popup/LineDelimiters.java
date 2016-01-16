@@ -206,7 +206,9 @@ public class LineDelimiters {
     };
     btnClose.addActionListener(closeAction);
     KeyMapper.easyCancel(btnClose, closeAction);
+    currentOS.fixEnterKey(btnClose, closeAction);
     btnClose.setMnemonic(KeyEvent.VK_C);
+
     btnDefault.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {clickSetDefault();}
     });

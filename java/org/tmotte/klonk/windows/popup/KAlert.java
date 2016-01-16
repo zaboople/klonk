@@ -142,14 +142,15 @@ public class KAlert implements Setter<String> {
     gb.addY(ok);
   }
   private void listen() {
-    Action btnActions=new AbstractAction() {
+    Action actions=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         win.setVisible(false);
       }
     };
-    ok.addActionListener(btnActions);
+    ok.addActionListener(actions);
     ok.setMnemonic(KeyEvent.VK_K);
-    KeyMapper.easyCancel(ok, btnActions);
+    currentOS.fixEnterKey(ok, actions);
+    KeyMapper.easyCancel(ok, actions);
   }
 
   private void show(String message, Throwable e) {

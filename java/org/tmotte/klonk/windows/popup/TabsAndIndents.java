@@ -315,6 +315,8 @@ public class TabsAndIndents {
       public void actionPerformed(ActionEvent event) {click(true);}
     };
     btnOK.addActionListener(okAction);
+
+    // Enter will click OK from anywhere on the window:
     KeyMapper.accel(btnOK, okAction, KeyMapper.key(KeyEvent.VK_ENTER));
 
     Action cancelAction=new AbstractAction() {

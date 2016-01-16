@@ -155,13 +155,14 @@ public class About {
   }
 
   private void listen(){
-    Action btnActions=new AbstractAction() {
+    Action actions=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {
         win.setVisible(false);
       }
     };
-    btnOK.addActionListener(btnActions);
-    KeyMapper.easyCancel(btnOK, btnActions);
+    btnOK.addActionListener(actions);
+    currentOS.fixEnterKey(btnOK, actions);
+    KeyMapper.easyCancel(btnOK, actions);
   }
 
 
