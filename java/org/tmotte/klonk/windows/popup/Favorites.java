@@ -36,6 +36,7 @@ import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.windows.Positioner;
 
 public class Favorites {
@@ -276,15 +277,17 @@ public class Favorites {
       public void actionPerformed(ActionEvent event) {click(true);}
     };
     btnOK.addActionListener(okAction);
+    currentOS.fixEnterKey(btnOK, okAction);
 
     Action cancelAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(false);}
     };
     btnCancel.addActionListener(cancelAction);
+    currentOS.fixEnterKey(btnCancel, cancelAction);
     KeyMapper.easyCancel(btnCancel, cancelAction);
   }
 
-  private class MTAKeyListen extends  KeyAdapter {
+  private class MTAKeyListen extends KeyAdapter {
     JComponent prev, next;
     MyTextArea mta;
     public MTAKeyListen(MyTextArea mta, JComponent prev, JComponent next){
@@ -322,9 +325,12 @@ public class Favorites {
         files.add("bbbbb");
         files.add("CCCC/cc/c/c///ccc");
         dirs.add("dddddddddd");
-        new Favorites(
-          ptc.makeMainFrame(), new FontOptions(), ptc.getCurrentOS()
-        ).show(files, dirs);
+        if (!
+          new Favorites(
+            ptc.makeMainFrame(), new FontOptions(), ptc.getCurrentOS()
+          ).show(files, dirs)
+          )
+          System.out.println("\n** CANCELLED **\n");
         System.out.println("\nFILES: ");
         for (String s: files)
           System.out.println(s);
