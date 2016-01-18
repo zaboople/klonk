@@ -240,12 +240,14 @@ public class OpenFileList {
       public void actionPerformed(ActionEvent event) {click(true);}
     };
     btnOK.addActionListener(okAction);
+    currentOS.fixEnterKey(btnOK, okAction);
 
     Action cancelAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(false);}
     };
     btnCancel.addActionListener(cancelAction);
     KeyMapper.easyCancel(btnCancel, cancelAction);
+    currentOS.fixEnterKey(btnCancel, cancelAction);
   }
 
   private class MTAKeyListen extends  KeyAdapter {

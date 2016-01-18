@@ -107,7 +107,8 @@ public class FileListenMemoryMap {
 
       // Keep reading 256 byte blocks until one is blank. We'll start
       // writing there.
-      byte[] checkBuffer=new byte[256];
+      int bufSize=256;
+      byte[] checkBuffer=new byte[bufSize];
       boolean ready=false;
       while (!ready) {
         mem.get(checkBuffer);
