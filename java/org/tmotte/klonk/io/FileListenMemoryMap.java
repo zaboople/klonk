@@ -128,7 +128,7 @@ public class FileListenMemoryMap {
 
   //////////////
   // TESTING: //
-  //////////////K0fnL44c,mlkJ6d
+  //////////////
 
   public static void main(String[] args) throws Exception {
     KHome khome=new KHome("./test/home");
