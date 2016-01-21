@@ -145,7 +145,7 @@ public class MyTextArea extends JTextArea {
     jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     //Powers of 2 seem to be the best unit increment here:
     JScrollBar jsb=jsp.getVerticalScrollBar();
-    jsb.setUnitIncrement(16);
+    jsb.setUnitIncrement(currentOS.isOSX ?4 :16);
     //Default scroll mode is the "BLIT" scroll mode, which doesn't seem to be as fast.
     JViewport jvp=jsp.getViewport();
     jvp.setScrollMode(jvp.SIMPLE_SCROLL_MODE);

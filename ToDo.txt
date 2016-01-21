@@ -1,4 +1,5 @@
 -OSX
+  -Scrollbar jitter is maddening
   -FontPicker fails to scroll things into view
   -I need alt-g to replace F3 or at least enhance it.
   -By default all your F-this and F-that function buttons are owned by apple.
