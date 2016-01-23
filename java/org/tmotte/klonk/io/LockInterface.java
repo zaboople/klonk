@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface LockInterface {
   public boolean lockOrSignal(String[] fileNames);
-  public boolean startListener(Setter<List<String>> fileReceiver);
+  public void startListener(Setter<List<String>> fileReceiver);
   public Doer getLockRemover();
 }

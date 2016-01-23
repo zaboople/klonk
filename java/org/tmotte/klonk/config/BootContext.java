@@ -26,6 +26,7 @@ import org.tmotte.klonk.controller.CtrlSearch;
 import org.tmotte.klonk.controller.CtrlSelection;
 import org.tmotte.klonk.controller.CtrlUndo;
 import org.tmotte.klonk.io.FileListen;
+import org.tmotte.klonk.io.FileListenMemoryMap;
 import org.tmotte.klonk.io.KLog;
 import org.tmotte.klonk.io.LockInterface;
 import org.tmotte.klonk.ssh.IUserPass;
@@ -152,7 +153,9 @@ public class BootContext {
       ?new KLog(System.out)
       :new KLog(home, processID);
     userNotify=new UserNotify(klog);
-    locker=new FileListen(klog, processID, home);
+    locker=currentOS.isOSX
+      ?new FileListenMemoryMap(home, klog)
+      :new FileListen(klog, processID, home);
   }
   private UserNotify getLog()   { return userNotify;  }
   private LockInterface getLockInterface() { return locker; }

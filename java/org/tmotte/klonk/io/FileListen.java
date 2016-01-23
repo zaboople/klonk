@@ -39,7 +39,10 @@ public class FileListen implements LockInterface {
     this.log=klog;
     this.pidName=pid;
     this.homeWatch=home.mkdir("watch");
-    this.seizeFile=home.nameFile("seize");
+    this.seizeFile=getSeizeFile(home);
+  }
+  public static File getSeizeFile(KHome home) {
+    return home.nameFile("seize");
   }
 
   //////////////////////////
@@ -49,20 +52,19 @@ public class FileListen implements LockInterface {
   public boolean lockOrSignal(String[] fileNames){
     log.log("FileListen.lockOrSignal()...");
     locker=new Locker(seizeFile, log);
-    return locker.lock() || makePID(fileNames);
+    return locker.lock() || handOff(fileNames);
   }
   public Doer getLockRemover() {
     return new Doer(){
       public @Override void doIt() {removeLock();}
     };
   }
-  public boolean startListener(Setter<List<String>> fileReceiver){
+  public void startListener(Setter<List<String>> fileReceiver){
     this.fileReceiver=fileReceiver;
     log.log("FileListen.startListener()...");
     Thread thread=new Thread(new Listener());
     thread.setDaemon(true);
     thread.start();
-    return true;
   }
 
   ////////////////////////
@@ -78,22 +80,22 @@ public class FileListen implements LockInterface {
   }
 
   /** Always returns false */
-  private boolean makePID(String[] fileNames) {
+  private boolean handOff(String[] fileNames) {
     if (fileNames==null || fileNames.length==0)
       return false;
     try {
-      log.log("FileListen.makePID(): I am going to write the pid...");
+      log.log("FileListen.handOff(): I am going to write the pid...");
       File pidFile=homeWatch.nameFile(DO_NOT_TOUCH+pidName);
       FileOutputStream os=new FileOutputStream(pidFile);
       FileLock flocker=os.getChannel().lock();
       if (flocker==null) {
-        log.log("FileListen.makePID(): Could not get lock");
+        log.log("FileListen.handOff(): Could not get lock");
         return false;
       }
       PrintWriter pw=new PrintWriter(new OutputStreamWriter(os));
       for (String s: fileNames)
         if (s!=null) {
-          log.log("FileListen.makePID(): Making pid for "+s);
+          log.log("FileListen.handOff(): Making handoff for "+s);
           pw.println(new File(s).getAbsolutePath());
         }
       pw.flush();

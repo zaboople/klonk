@@ -1,5 +1,5 @@
 -OSX
-  -Hitting Alt-Arrow at the end of file when the last line ends with a period causes a bad location exception.
+  -Hitting Option-Arrow at the end of file when the last line ends with a period causes a bad location exception.
   -Cursor does not move with mousewheel, only with page down.
   -Scrollbar jitter is maddening
     /Users/tmotte/dev/projects/dataplatform/services/gauth/README.md
@@ -117,3 +117,4 @@
           at java.awt.EventQueue.dispatchEventImpl(Unknown Source)
           at java.awt.EventQueue.access$200(Unknown Source)
           at java.awt.EventQueue$3.run(Unknown Source)
+wefwe fwef.

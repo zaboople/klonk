@@ -7,38 +7,107 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import org.tmotte.klonk.config.KHome;
+import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.Getter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class FileListenMemoryMap {
+/**
+ * Created because MacOS sucks and they don't have any real support for directory
+ * watchers; they use polling and default to 10 seconds, and changing the 10 requires
+ * doing "forbidden" APIs. Using a memory map works just as well and gets
+ * pretty decent performance, even though it really is just polling, but I
+ * control the poll interval.
+ */
+public class FileListenMemoryMap implements LockInterface {
 
-  interface NeedsLock<T> {
+
+  // DI STUFF: //
+
+  private final File mapFile;
+  private final KLog klog;
+
+  // STATE: //
+
+  /** The memory map can be this big */
+  private final int mapCapacity=256 * 256;
+  /** Our polling interval */
+  private final int waitBetween=2000;
+  /** Use this to check the map for changes on both read & write: */
+  private byte[] checkBuffer=new byte[128];
+  /** Used exclusively for reading all the requested files from other processes: */
+  private byte[] readBuffer=new byte[mapCapacity];
+  /** The basis of our memory map: */
+  private FileChannel fileChannel;
+  /** Locks the memory map file so we can read/write exclusively: */
+  private Locker locker;
+
+  /** We use this to declare ourselves the running application or
+    hand off and bail. */
+  private File seizeFile;
+
+
+  public FileListenMemoryMap(KHome home, KLog klog) {
+    try {
+      this.mapFile=new File(home.dir, "sharedmap");
+      this.seizeFile=FileListen.getSeizeFile(home);
+      this.klog=klog;
+      if (!mapFile.exists())
+        mapFile.createNewFile();
+      fileChannel=new RandomAccessFile(mapFile, "rw").getChannel();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public boolean lockOrSignal(String[] fileNames) {
+    klog.log("FileListenMemoryMap.lockOrSignal()...");
+    try {
+      locker=new Locker(seizeFile, klog);
+      if (locker.lock())
+        return true;
+      StringBuilder sb=new StringBuilder();
+      for (String file : fileNames)
+        if (file!=null) {
+          sb.append(file);
+          sb.append("\n");
+        }
+      write(sb.toString());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    return false;
+  }
+  public void startListener(Setter<List<String>> fileReceiver) {
+    startListener(waitBetween, fileReceiver);
+  }
+  public Doer getLockRemover(){
+    return new Doer(){
+      public @Override void doIt() {
+        locker.unlock();
+      }
+    };
+  }
+
+  //////////////////////
+  // PRIVATE METHODS: //
+  //////////////////////
+
+  private interface NeedsLock<T> {
     public T get() throws Exception;
   }
 
-  final File mapFile;
-  final KLog klog;
-  final int mapCapacity=256 * 256;
-  private int currPos;
-  private byte[] blankBuffer=new byte[256];
-  private FileChannel fileChannel;
-
-  public FileListenMemoryMap(File homeDir, KLog klog) throws Exception {
-    this.mapFile=new File(homeDir, "sharedmap");
-    this.klog=klog;
-    if (!mapFile.exists())
-      mapFile.createNewFile();
-    fileChannel=new RandomAccessFile(mapFile, "rw").getChannel();
-  }
   private <T> T withLock(NeedsLock<T> toCall) throws Exception {
     FileLock lock=null;
     for (int i=0; lock==null && i<1000; i++) {
       try {
         lock=fileChannel.tryLock();
       } catch (java.nio.channels.OverlappingFileLockException e) {
-        System.err.println("FIXME overlapping");
+        throw new RuntimeException(
+          "This should only happen when multiple threads are getting locks", e
+        );
       }
       if (lock==null)
         Thread.sleep(50);
@@ -52,8 +121,13 @@ public class FileListenMemoryMap {
     }
   }
 
-  public void startListener(long sleepTime, final Setter<List<String>> fileReceiver) throws Exception {
-    MappedByteBuffer mbb=fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, mapCapacity);
+  public void startListener(long sleepTime, final Setter<List<String>> fileReceiver) {
+    MappedByteBuffer mbb;
+    try {
+      mbb=fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, mapCapacity);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
     Thread thread=new Thread(){
       public void run() {
         while (true) {
@@ -77,24 +151,41 @@ public class FileListenMemoryMap {
   }
 
   private List<String> read(MappedByteBuffer mem) throws Exception {
-    return withLock(() -> {
-      //Note that the FileChannel.size() does not necessarily match the capacity
-      //we assign to the buffer.
-      mem.position(0);
 
-      byte[] buf=new byte[mapCapacity];
-      mem.get(buf);
-      String totalString=new String(buf).trim();
+    // Look for files being sent in:
+    mem.position(0);
+    mem.get(checkBuffer);
+    boolean found=false;
+    for (int i=0; !found && i<checkBuffer.length; i++)
+      if (checkBuffer[i]!=0)
+        found=true;
+    if (!found)
+      return java.util.Collections.emptyList();
+
+    // Apparently we found something, so get it. Lock everybody else
+    // out so we get clean data:
+    resetBuffer(checkBuffer);
+    return withLock(() -> {
+      mem.position(0);
+      mem.get(readBuffer);
+      String totalString=new String(readBuffer).trim();
       mem.clear();
       if (totalString.length()>0) {
-        for (int i=0; i<buf.length; i++)
-          buf[i]=0;
-        mem.put(buf);
-        return java.util.Arrays.asList(totalString.split("\n"));
+        resetBuffer(readBuffer);
+        mem.put(readBuffer);
+        String[] values=totalString.split("\n");
+        List<String> result=new ArrayList<>(values.length);
+        for (String s : values)
+          result.add(s.trim());
+        return result;
       }
-      else
-        return java.util.Collections.emptyList();
+      return java.util.Collections.emptyList();
     });
+  }
+
+  private void resetBuffer(byte[] buf) {
+    for (int i=0; i<buf.length; i++)
+      buf[i]=0;
   }
 
 
@@ -107,10 +198,8 @@ public class FileListenMemoryMap {
       while (!mem.isLoaded())
         Thread.sleep(100);
 
-      // Keep reading 256 byte blocks until one is blank. We'll start
+      // Keep reading byte blocks until one is blank. We'll start
       // writing there.
-      int bufSize=256;
-      byte[] checkBuffer=new byte[bufSize];
       boolean ready=false;
       while (!ready) {
         mem.get(checkBuffer);
@@ -119,9 +208,11 @@ public class FileListenMemoryMap {
           if (checkBuffer[i]!=0)
             maybe=false;
         ready=maybe;
+        if (!ready) System.out.println("."+lines);
       }
 
-      mem.position(mem.position()-bufSize);
+      // Now write all the lines:
+      mem.position(mem.position()-checkBuffer.length);
       mem.put(lines.getBytes());
       mem.force();
       return true;
@@ -129,7 +220,9 @@ public class FileListenMemoryMap {
   }
 
   //////////////
+  //          //
   // TESTING: //
+  //          //
   //////////////
 
   public static void main(String[] args) throws Exception {
@@ -145,7 +238,7 @@ public class FileListenMemoryMap {
         startTestWriter(khome, klog, random);
   }
   private static void startTestReader(KHome khome, KLog klog, Random random) throws Exception {
-    FileListenMemoryMap reader=new FileListenMemoryMap(khome.dir, klog);
+    FileListenMemoryMap reader=new FileListenMemoryMap(khome, klog);
     reader.startListener(
       1500,
       new Setter<List<String>> () {
@@ -181,7 +274,7 @@ public class FileListenMemoryMap {
                   toPrint+=".\n";
                 }
                 System.out.print("\nPRT:\n"+toPrint);
-                final FileListenMemoryMap writer=new FileListenMemoryMap(khome.dir, klog);
+                final FileListenMemoryMap writer=new FileListenMemoryMap(khome, klog);
                 writer.write(toPrint);
               } catch (Exception e) {
                 e.printStackTrace();

@@ -515,7 +515,6 @@ public class CtrlMain  {
         } catch (Exception e) {
           userNotify.alert(e);
         }
-        fileNames.clear();
       }
     });
   }
@@ -541,13 +540,14 @@ public class CtrlMain  {
       userNotify.alert("No such file: "+file);
       return;
     }
-    for (Editor ed: editorMgr.forEach())
-      if (ed.sameFile(file)){
-        editorSwitch(ed);
-        userNotify.alert("File is already open: "+ed.getTitle());
-        return;
-      }
     try {
+      file=file.getCanonicalFile();
+      for (Editor ed: editorMgr.forEach())
+        if (ed.sameFile(file)){
+          editorSwitch(ed);
+          userNotify.alert("File is already open: "+ed.getTitle());
+          return;
+        }
       // Find a free editor first; we're going to try to avoid screen updates
       // (thus the false on editorSwitch() and newEditor()) because the
       // loadFile() function will force that no matter what.
@@ -568,7 +568,6 @@ public class CtrlMain  {
   private boolean loadFile(Editor e, File file) {
     try {
       statusBar.show("Loading: "+file+"...");
-      file=file.getCanonicalFile();
       e.loadFile(file, persist.getDefaultLineDelimiter());
       fileIsLoaded(e, file);
     } catch (Exception ex) {
