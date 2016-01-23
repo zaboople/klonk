@@ -27,6 +27,7 @@ import org.tmotte.klonk.controller.CtrlSelection;
 import org.tmotte.klonk.controller.CtrlUndo;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
+import org.tmotte.klonk.io.LockInterface;
 import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.windows.MainLayout;
@@ -78,7 +79,7 @@ public class BootContext {
     System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
 
     //Find out if the application is already running:
-    if (!context.getFileListener().lockOrSignal(args)) {
+    if (!context.getLockInterface().lockOrSignal(args)) {
       context.getLog().log("Klonk is handing off to another process.");
       System.exit(0);
       return;
@@ -102,7 +103,7 @@ public class BootContext {
         CtrlMain cm=context.createMainController();
         cm.doNew();
         cm.doLoadFiles(args);
-        context.getFileListener().startDirectoryListener(cm.getAsyncFileReceiver());
+        context.getLockInterface().startListener(cm.getAsyncFileReceiver());
       }
     });
   }
@@ -113,7 +114,7 @@ public class BootContext {
   /////////////////////////////////////////
 
   private KHome home;
-  private FileListen fileListen;
+  private LockInterface locker;
   private KLog klog;
   private UserNotify userNotify;
   private CurrentOS currentOS;
@@ -151,10 +152,10 @@ public class BootContext {
       ?new KLog(System.out)
       :new KLog(home, processID);
     userNotify=new UserNotify(klog);
-    fileListen=new FileListen(klog, processID, home);
+    locker=new FileListen(klog, processID, home);
   }
   private UserNotify getLog()   { return userNotify;  }
-  private FileListen getFileListener() { return fileListen; }
+  private LockInterface getLockInterface() { return locker; }
   private KHome getHome() { return home; }
 
 
@@ -298,7 +299,7 @@ public class BootContext {
       yesNo
     );
     ctrlMain.setListeners(
-      fileListen.getLockRemover(),
+      locker.getLockRemover(),
       sshConns.getFileResolver(),
       menus.getEditorSwitchListener(),
       menus.getRecentFileListener(),

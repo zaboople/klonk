@@ -19,13 +19,15 @@ public class FileListenMemoryMap {
   }
 
   final File mapFile;
+  final KLog klog;
   final int mapCapacity=256 * 256;
   private int currPos;
   private byte[] blankBuffer=new byte[256];
   private FileChannel fileChannel;
 
-  public FileListenMemoryMap(File homeDir) throws Exception {
-    mapFile=new File(homeDir, "sharedmap");
+  public FileListenMemoryMap(File homeDir, KLog klog) throws Exception {
+    this.mapFile=new File(homeDir, "sharedmap");
+    this.klog=klog;
     if (!mapFile.exists())
       mapFile.createNewFile();
     fileChannel=new RandomAccessFile(mapFile, "rw").getChannel();
@@ -58,14 +60,14 @@ public class FileListenMemoryMap {
           try {
             Thread.sleep(sleepTime);
           } catch (InterruptedException ie) {
-            System.err.println("FIXME caught1 "+ie);
+            klog.log(ie);
           }
           try {
             List<String> files=read(mbb);
             if (files.size()>0)
               fileReceiver.set(files);
           } catch (Exception e) {
-            System.err.println("FIXME caught2 "+e);
+            klog.log(e);
           }
         }
       }
@@ -137,13 +139,13 @@ public class FileListenMemoryMap {
 
     for (String a: args)
       if (a.startsWith("-r"))
-        startTestReader(khome, random);
+        startTestReader(khome, klog, random);
       else
       if (a.startsWith("-w"))
-        startTestWriter(khome, random);
+        startTestWriter(khome, klog, random);
   }
-  private static void startTestReader(KHome khome, Random random) throws Exception {
-    FileListenMemoryMap reader=new FileListenMemoryMap(khome.dir);
+  private static void startTestReader(KHome khome, KLog klog, Random random) throws Exception {
+    FileListenMemoryMap reader=new FileListenMemoryMap(khome.dir, klog);
     reader.startListener(
       1500,
       new Setter<List<String>> () {
@@ -162,7 +164,7 @@ public class FileListenMemoryMap {
       }
     }.start();
   }
-  private static void startTestWriter(KHome khome, Random random) throws Exception {
+  private static void startTestWriter(KHome khome, KLog klog, Random random) throws Exception {
     for (int i=1; i<2; i++){
       Thread ttt=
         new Thread() {
@@ -179,7 +181,7 @@ public class FileListenMemoryMap {
                   toPrint+=".\n";
                 }
                 System.out.print("\nPRT:\n"+toPrint);
-                final FileListenMemoryMap writer=new FileListenMemoryMap(khome.dir);
+                final FileListenMemoryMap writer=new FileListenMemoryMap(khome.dir, klog);
                 writer.write(toPrint);
               } catch (Exception e) {
                 e.printStackTrace();

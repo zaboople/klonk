@@ -24,23 +24,28 @@ import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.Doer;
 
-public class FileListen {
- 
-  final static String DO_NOT_TOUCH="DO-NOT-TOUCH---";
- 
-  Setter<List<String>> fileReceiver;
-  KLog log;
-  KHome homeWatch;
-  Locker locker;
-  File seizeFile;
-  String pidName;
-  
+public class FileListen implements LockInterface {
+
+  private final static String DO_NOT_TOUCH="DO-NOT-TOUCH---";
+
+  private Setter<List<String>> fileReceiver;
+  private KLog log;
+  private KHome homeWatch;
+  private Locker locker;
+  private File seizeFile;
+  private String pidName;
+
   public FileListen(KLog klog, String pid, KHome home) {
     this.log=klog;
     this.pidName=pid;
     this.homeWatch=home.mkdir("watch");
-    this.seizeFile=home.nameFile("seize");    
+    this.seizeFile=home.nameFile("seize");
   }
+
+  //////////////////////////
+  // INTERFACE FUNCTIONS: //
+  //////////////////////////
+
   public boolean lockOrSignal(String[] fileNames){
     log.log("FileListen.lockOrSignal()...");
     locker=new Locker(seizeFile, log);
@@ -51,22 +56,27 @@ public class FileListen {
       public @Override void doIt() {removeLock();}
     };
   }
-  public void removeLock() {
+  public boolean startListener(Setter<List<String>> fileReceiver){
+    this.fileReceiver=fileReceiver;
+    log.log("FileListen.startListener()...");
+    Thread thread=new Thread(new Listener());
+    thread.setDaemon(true);
+    thread.start();
+    return true;
+  }
+
+  ////////////////////////
+  // PRIVATE FUNCTIONS: //
+  ////////////////////////
+
+  private void removeLock() {
     try {deleteOldPIDFiles();}
     catch (Exception e) {
       log.log(e, "FileListen.removeLock: Failed to delete old pid files.");
     }
     locker.unlock();
   }
-  public boolean startDirectoryListener(Setter<List<String>> fileReceiver){
-    this.fileReceiver=fileReceiver;
-    log.log("FileListen.startDirectoryListener()...");
-    Thread thread=new Thread(new Listener());
-    thread.setDaemon(true);
-    thread.start();
-    return true;
-  }
-  
+
   /** Always returns false */
   private boolean makePID(String[] fileNames) {
     if (fileNames==null || fileNames.length==0)
@@ -88,7 +98,7 @@ public class FileListen {
         }
       pw.flush();
       os.flush();
-      flocker.release();//This must happen before close or an error 
+      flocker.release();//This must happen before close or an error
       pw.close();
       pidFile.renameTo(homeWatch.nameFile(pidName));
     } catch (Exception e) {
@@ -96,13 +106,13 @@ public class FileListen {
     }
     return false;
   }
-  
-  
+
+
   private class Listener implements Runnable {
     public void run(){
       WatchService service;
       try {
-        service=makeWatcher(StandardWatchEventKinds.ENTRY_MODIFY, 
+        service=makeWatcher(StandardWatchEventKinds.ENTRY_MODIFY,
                             StandardWatchEventKinds.ENTRY_CREATE);
         //This is ok because we delete the file after loading it, just
         //in case we get an event for it as well:
@@ -131,7 +141,7 @@ public class FileListen {
           }
           if (!key.reset())
             log.log("FileListen couldn't reset key");
-        } 
+        }
       } catch (Exception e) {
         log.log(e, "FileListen: Errors listening to watch directory, probably time to exit");
       }
@@ -192,7 +202,7 @@ public class FileListen {
       File file=homeWatch.nameFile(name);
       log.log("Deleting old: "+file);
       file.delete();
-    } 
+    }
   }
-  
+
 }
