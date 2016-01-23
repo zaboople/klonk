@@ -689,9 +689,8 @@ public class MyTextArea extends JTextArea {
     else {
       int endRow=getLineEndOffset(row),
           lineCount=getLineCount();
-      if (row!=lineCount && endRow==cpos+1)
-        //When there is another row, end of row
-        //is a linefeed, so you're one behind:
+      if (row!=lineCount-1 && endRow==cpos+1)
+        //When there is another row, end of row is a linefeed, so you're one behind:
         endRow=getLineEndOffset(row+1);
       String selectable=getText(cpos, endRow-cpos);
       upTo=Selectable.getRight(selectable, shift);
