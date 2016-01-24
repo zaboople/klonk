@@ -47,8 +47,24 @@ import org.tmotte.klonk.windows.Positioner;
 
 public class FindAndReplace {
 
+  public static String getFindAgainString(CurrentOS currentOS){
+    return currentOS.isOSX
+      ?"Command-G"
+      :"F3";
+  }
+  public static KeyStroke getFindAgainKey(CurrentOS currentOS){
+    return currentOS.isOSX
+      ?KeyMapper.key(KeyEvent.VK_G, KeyEvent.META_DOWN_MASK)
+      :KeyMapper.key(KeyEvent.VK_F3);
+  }
+  public static KeyStroke getFindAgainReverseKey(CurrentOS currentOS){
+    return currentOS.isOSX
+      ?KeyMapper.key(KeyEvent.VK_G, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
+      :KeyMapper.key(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK);
+  }
+
   //Display components:
-  JDialog win;
+  private JDialog win;
   private MyTextArea mtaFind, mtaReplace;
   private JComponent contFind, contReplace;
   private JCheckBox chkReplace, chkCase, chkReplaceAll, chkConfirmReplace, chkRegex, chkRegexMultiline;
@@ -476,9 +492,9 @@ public class FindAndReplace {
 
   private void listen() {
     addCheckBoxListeners(chkReplace, chkReplaceAll, chkCase, chkRegex, chkRegexMultiline);
-    doButtonEvents(btnFind,     buttonListener, KeyMapper.key(KeyEvent.VK_F3));
+    doButtonEvents(btnFind,     buttonListener, getFindAgainKey(currentOS));
     doButtonEvents(btnFind,     buttonListener, KeyMapper.key(KeyEvent.VK_ENTER));
-    doButtonEvents(btnReverse,  buttonListener, KeyMapper.key(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK));
+    doButtonEvents(btnReverse,  buttonListener, getFindAgainReverseKey(currentOS));
     currentOS.fixEnterKey(btnFind, buttonListener);
     currentOS.fixEnterKey(btnReverse, buttonListener);
     currentOS.fixEnterKey(btnCancel, buttonListener);

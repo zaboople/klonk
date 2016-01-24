@@ -238,10 +238,10 @@ public class YesNoCancel {
     return false;
   }
   private void doF3Stuff() {
-    btnYes.setText("Yes (F3)");
+    btnYes.setText("Yes ("+FindAndReplace.getFindAgainString(currentOS)+")");
     win.pack();
-    KeyMapper.accel(btnYes, btnActions, KeyEvent.VK_F3);
-    KeyMapper.accel(btnYes, btnActions, KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK);
+    KeyMapper.accel(btnYes, btnActions, FindAndReplace.getFindAgainKey(currentOS));
+    KeyMapper.accel(btnYes, btnActions, FindAndReplace.getFindAgainReverseKey(currentOS));
   }
   private void click(int result) {
     win.setVisible(false);

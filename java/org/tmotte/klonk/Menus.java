@@ -41,6 +41,7 @@ import org.tmotte.klonk.controller.CtrlOther;
 import org.tmotte.klonk.controller.CtrlSearch;
 import org.tmotte.klonk.controller.CtrlSelection;
 import org.tmotte.klonk.controller.CtrlUndo;
+import org.tmotte.klonk.windows.popup.FindAndReplace;
 
 public class Menus {
 
@@ -600,12 +601,12 @@ public class Menus {
       ,
       searchRepeat=mu.doMenuItem(
         "Repeat find/replace", searchListener, KeyEvent.VK_P,
-        KeyMapper.key(KeyEvent.VK_F3)
+        FindAndReplace.getFindAgainKey(currentOS)
       )
       ,
       searchRepeatBackwards=mu.doMenuItem(
         "...Backwards", searchListener, KeyEvent.VK_B,
-        KeyMapper.key(KeyEvent.VK_F3, KeyEvent.SHIFT_DOWN_MASK)
+        FindAndReplace.getFindAgainReverseKey(currentOS)
       )
     );
     search.addSeparator();
