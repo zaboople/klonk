@@ -1,8 +1,5 @@
 -OSX
-  -Hitting Option-Arrow at the end of file when the last line ends with a period causes a bad location exception.
   -Cursor does not move with mousewheel, only with page down.
-  -Scrollbar jitter is maddening
-    /Users/tmotte/dev/projects/dataplatform/services/gauth/README.md
   -FontPicker fails to scroll things into view
   -I need alt-g to replace F3 or at least enhance it.
   -By default all your F-this and F-that function buttons are owned by apple.

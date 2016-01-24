@@ -80,7 +80,7 @@ The java flags Pattern.MULTILINE & Pattern.DOTALL are turned on by default, beca
 </p>
 
 <p>
-Also note that when using find-replace with regular expressions, a "$" character in your replacement text will be interpreted as a "backreference" to a "group". If that is not what you intended, or you have no idea what it even means, you can prevent errors by quoting the "$" with a "\", like so:
+Also note that when using find-replace with regular expressions, a "$" and number - e.g. "$1" - in your replacement text will be interpreted as a "backreference" to a "group". If that is not what you intended, or you have no idea what it even means, you can prevent errors by quoting the "$" with a "\", like so:
 </p>
 <pre>  \$</pre>
 

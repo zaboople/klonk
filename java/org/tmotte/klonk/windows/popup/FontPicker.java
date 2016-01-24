@@ -123,17 +123,25 @@ public class FontPicker {
 
     //Set font name, size:
     {
-      int i=fontNameData.indexOf(fontOptions.getFontName());
+      final int i=fontNameData.indexOf(fontOptions.getFontName());
       if (i!=-1) {
         jlFonts.setSelectedIndex(i);
-        jlFonts.ensureIndexIsVisible(i);
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            jlFonts.ensureIndexIsVisible(i);
+          }
+        });
       }
     }
     {
-      int i=fontSizeData.indexOf(fontOptions.getFontSize());
+      final int i=fontSizeData.indexOf(fontOptions.getFontSize());
       if (i!=-1) {
         jlFontSize.setSelectedIndex(i);
-        jlFontSize.ensureIndexIsVisible(i);
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            jlFontSize.ensureIndexIsVisible(i);
+          }
+        });
       }
     }
 
