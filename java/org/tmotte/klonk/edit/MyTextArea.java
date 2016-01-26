@@ -79,6 +79,7 @@ public class MyTextArea extends JTextArea {
     getInputMap().put(KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.CTRL_DOWN_MASK), "none");
     getInputMap().put(KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.SHIFT_DOWN_MASK), "none");
     getInputMap().put(KeyMapper.key(KeyEvent.VK_DELETE,     KeyEvent.CTRL_DOWN_MASK), "none");
+    setMargin(new java.awt.Insets(2,4,2,4));
   }
   public MyTextArea addUndoListener(UndoListener ul) {
     if (undoListeners==null)
@@ -143,12 +144,15 @@ public class MyTextArea extends JTextArea {
   public JScrollPane makeVerticalScrollable(){
     jsp=new JScrollPane(this);
     jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-    //Powers of 2 seem to be the best unit increment here:
+
+    // Powers of 2 seem to be the best unit increment here:
     JScrollBar jsb=jsp.getVerticalScrollBar();
-    jsb.setUnitIncrement(currentOS.isOSX ?48 :16);
-    //Default scroll mode is the "BLIT" scroll mode, which doesn't seem to be as fast.
+    jsb.setUnitIncrement(currentOS.isOSX ?8 :16);
+
+    // Default scroll mode is the "BLIT" scroll mode, which doesn't seem to be as fast.
     JViewport jvp=jsp.getViewport();
     jvp.setScrollMode(jvp.SIMPLE_SCROLL_MODE);
+
     return jsp;
   }
   public boolean isAnythingSelected() {

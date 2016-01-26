@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JScrollPane;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -37,8 +38,8 @@ import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.edit.Spaceable;
-import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.edit.UndoEvent;
+import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.io.FileMetaData;
 import org.tmotte.klonk.io.KFileIO;
 
@@ -79,11 +80,18 @@ public class Editor {
     this.lineBreaker=lineBreaker;
     this.currentOS=currentOS;
     jta=new MyTextArea(currentOS);
-    jta.setMargin(new java.awt.Insets(2,4,2,4));
     jta.setDragEnabled(false);
-    jta.makeVerticalScrollable();
+    JScrollPane jsp=jta.makeVerticalScrollable();
+
+    // This seem to eliminate the java 8 problem for Mac OSX with
+    // vertical scrollbar jitter.
+    // https://bugs.openjdk.java.net/browse/JDK-8147994
+    if (currentOS.isOSX)
+      jsp.setHorizontalScrollBarPolicy(jsp.HORIZONTAL_SCROLLBAR_ALWAYS);
+
     jta.addUndoListener(undoL);
     jta.addUndoListener(myUndoListener);
+
     setWordWrap(wordWrap);
     setAutoTrim(autoTrim);
     setEvents(currentOS);

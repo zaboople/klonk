@@ -1,15 +1,20 @@
 -OSX
   -KeyMapping
+    -Clear current mark should/could be Shift F4
     -F3 should be able to replace Alt-G
     -By default all your F-this and F-that function buttons are owned by apple.
       F3, F4, F8, F9, F12
       -KeyMapping
         -We really need a sorted properties file
-  -Consider using the default java runtime and shrinking the deploy (leave after the = blank): -Bruntime=
   -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
   -Right click menu is still on ctrl-everything, shouldn't it go option-everything... and preserve ctrl-everything...
     -Undo, Redo, Cut, Copy, Paste
     -Also the top menu for undo/redo
+
+  -Jitter: This is known. One suggested fix was trying to prevent horizontal events by consuming them but apparently this didn't help.
+    https://bugs.openjdk.java.net/browse/JDK-8147994
+  -Consider using the default java runtime and shrinking the deploy (leave after the = blank): -Bruntime=
+    Didn't work. Couldn't find java when I did this.
 
 -Current
   -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.
