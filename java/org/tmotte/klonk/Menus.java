@@ -661,12 +661,12 @@ public class Menus {
       ,
       undoUndo=mu.doMenuItem(
         "Undo", undoItemListener, KeyEvent.VK_U,
-        KeyMapper.key(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK)
+        KeyMapper.keyByOS(KeyEvent.VK_Z)
       )
       ,
       undoRedo=mu.doMenuItem(
         "Redo", undoItemListener, KeyEvent.VK_R,
-        KeyMapper.key(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
+        KeyMapper.keyByOS(KeyEvent.VK_Z, KeyEvent.SHIFT_DOWN_MASK)
       )
     );
     undo.addSeparator();

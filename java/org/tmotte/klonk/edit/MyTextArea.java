@@ -254,11 +254,11 @@ public class MyTextArea extends JTextArea {
       menu,
       mnuUndo=MenuUtils.doMenuItem(
         "Undo", myRightClickListener, KeyEvent.VK_U,
-        KeyMapper.key(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK)
+        KeyMapper.keyByOS(KeyEvent.VK_Z)
       ),
       mnuRedo=MenuUtils.doMenuItem(
         "Redo", myRightClickListener, KeyEvent.VK_R,
-        KeyMapper.key(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK|InputEvent.SHIFT_DOWN_MASK)
+        KeyMapper.keyByOS(KeyEvent.VK_Z, InputEvent.SHIFT_DOWN_MASK)
       )
     );
     menu.addSeparator();
@@ -266,15 +266,15 @@ public class MyTextArea extends JTextArea {
       menu,
       mnuCut=MenuUtils.doMenuItem(
         "Cut", myRightClickListener, KeyEvent.VK_C,
-        KeyMapper.key(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK)
+        KeyMapper.keyByOS(KeyEvent.VK_X)
       ),
       mnuCopy=MenuUtils.doMenuItem(
         "Copy", myRightClickListener, KeyEvent.VK_P,
-        KeyMapper.key(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)
+        KeyMapper.keyByOS(KeyEvent.VK_C)
       ),
       mnuPaste=MenuUtils.doMenuItem(
         "Paste", myRightClickListener, KeyEvent.VK_P,
-        KeyMapper.key(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK)
+        KeyMapper.keyByOS(KeyEvent.VK_V)
       )
     );
     menu.addSeparator();
@@ -282,7 +282,7 @@ public class MyTextArea extends JTextArea {
       menu,
       mnuSelectAll=MenuUtils.doMenuItem(
         "Select All", myRightClickListener, KeyEvent.VK_T,
-        KeyMapper.key(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK)
+        KeyMapper.keyByOS(KeyEvent.VK_A)
       )
     );
   }

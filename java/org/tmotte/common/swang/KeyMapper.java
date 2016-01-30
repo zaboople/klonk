@@ -118,6 +118,9 @@ public class KeyMapper {
   public static KeyStroke keyByOS(int hotKey) {
     return KeyStroke.getKeyStroke(hotKey, shortcutByOS());
   }
+  public static KeyStroke keyByOS(int hotKey, int extra) {
+    return KeyStroke.getKeyStroke(hotKey, shortcutByOS() | extra);
+  }
   public static KeyStroke key(int hotKey) {
     return KeyStroke.getKeyStroke(hotKey, 0);
   }
