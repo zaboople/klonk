@@ -6,10 +6,6 @@
       F3, F4, F8, F9, F12
       -KeyMapping
         -We really need a sorted properties file
-  -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
-  -Right click menu is still on ctrl-everything, shouldn't it go option-everything... and preserve ctrl-everything...
-    -Undo, Redo, Cut, Copy, Paste, Select-All
-    -Also the top menu for undo/redo
 
 
 -Current
