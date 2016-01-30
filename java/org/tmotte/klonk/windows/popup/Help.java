@@ -113,7 +113,7 @@ public class Help {
       }
     });
 
-    String helpText=Loader.loadUTF8String(getClass(), "Help.txt");
+    String helpText=Loader.loadUTF8String(getClass(), "Help.html");
     helpText=helpText.replace("$[Home]", homeDir);
     jtp.setText(helpText);
     jsp=new JScrollPane(jtp);

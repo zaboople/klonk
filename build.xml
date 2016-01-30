@@ -119,7 +119,7 @@
 
     <!--Copies the help.txt & about.txt file:-->
     <copy todir="${build.dir}">
-      <fileset dir="${java.dir}" includes="**/*.txt"/>
+      <fileset dir="${java.dir}" includes="**/*.txt,**/*.html"/>
     </copy>
     <!--Version number & license for about screen-->
     <copy tofile="${build.dir}/org/tmotte/klonk/windows/popup/About-Version-Number.txt"
