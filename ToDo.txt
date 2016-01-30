@@ -8,16 +8,14 @@
         -We really need a sorted properties file
   -To display an indicator that a window was modified, you need to use the Swing property Window.documentModified. It can be set on any subclass of JComponent that implements a top-level window using the putClientProperty() method. The value of the property is either Boolean.TRUE or Boolean.FALSE
   -Right click menu is still on ctrl-everything, shouldn't it go option-everything... and preserve ctrl-everything...
-    -Undo, Redo, Cut, Copy, Paste
+    -Undo, Redo, Cut, Copy, Paste, Select-All
     -Also the top menu for undo/redo
 
-  -Jitter: This is known. One suggested fix was trying to prevent horizontal events by consuming them but apparently this didn't help.
-    https://bugs.openjdk.java.net/browse/JDK-8147994
-  -Consider using the default java runtime and shrinking the deploy (leave after the = blank): -Bruntime=
-    Didn't work. Couldn't find java when I did this.
 
 -Current
-  -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.
+  -Shell
+    -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.
+    -We should be able to make the shell textbox act like our normal editor using our Selectable class.
 
   -We ought to make it where you can pick between fixed-width and not fixed-width fonts in the picker.
     FontRenderContext frc = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
@@ -29,44 +27,35 @@
         }
     }
 
-  -We should be able to make the shell textbox act like our normal editor using our Selectable class.
+  -Tabs & Indents allows invalid input - letters instead of numbers
 
-  -SSH Sudo
+  -Cursor does not move with mousewheel, only with page down.
 
-  -Help should should show the name of your current log file.
+  -File open ought to start off the session with the last directory opened.
+   It's annoying when it defaults to my stupid home directory. 
+   But make sure to avoid SSH dirs.
 
-  -Alt-f-d doesn't work with ssh and needs to be disabled.
-
-  -Hey and a menu item for File-Delete? With confirm of course. Hmph.
-
+-Hard
   -Load file & Find/replace are abusive. Fix them.
     -Load file ought to be able to find out about LF/CR/CRLF after the fact. Or just read a few lines. I don't know.
 
-  -Tabs & Indents allows invalid input - letters instead of numbers
-
   -When I switch windows the cursor position frequently goes somewhere else
 
-  -Ctrl-W ought to just close the editor if no files are open. It makes no difference.
-
+  -How about dual-window mode. Only two windows, that's it.
 
 -Maybe
-  -Cursor does not move with mousewheel, only with page down.
+  -Hey and a menu item for File-Delete? With confirm of course. Hmph.
 
   -SSH Todo:
+    Alt-f-d doesn't work with ssh and needs to be disabled.
+    Sudo
     Single quotes in the filename are a bit of a problem, and double quotes, and whatever else.
     When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore
     What about when a host key changes or is missing? Will we blow up?
 
-  -File open ought to start off the session with the last directory opened.
-   It's annoying when it defaults to my stupid home directory. Well ...ssh. Ugh.
-
-  -Favorite commands.
-
-
   -Maybe a more sophisticated version of find/replace, where I break up the String? It is pretty slow on an 8MB file.
     -Loop thru 20000 characters at a time, appending last searchFor.length() from previous to first.
     -Note that java.util.regex.Matcher does have the ability to tell you that the end of a string is a partial match.
-  -How about dual-window mode. Only two windows, that's it.
   -About should show an icon
   -Undo
     -Undo to last save?
@@ -75,18 +64,24 @@
   -Indents & Tabs, Fonts should only enable ok button when something changes.
     -Also should show message when ok is clicked.
 
--Long term problems
+-On hold / Long term problems
   -Weird background bugs
     -Do you see that doo doo where java says it's starting up with mixed mode "sharing"?
     -Mostly when it runs two at once.
-    -Exe alternatives?
-      -Consider jexepack, which costs $100 or you get an alert everytime you open it.
+    
+  -Exe alternatives?
+    -Consider jexepack, which costs $100 or you get an alert everytime you open it.
+    -javapackager seems to only create an annoying installer and you have to install a second thing.
 
   -Slow scrolling:
     -Too many key listeners?
     -Noticed that it seems to slow down with a lot of windows open. Hmph. Don't tell me I have to resort to... oh gawd no. Not recreating jtextareas when I switch windows. Horrors.
 
+  -OSX Jitter: This is known. One suggested fix was trying to prevent horizontal events by consuming them but apparently this didn't help.
+    https://bugs.openjdk.java.net/browse/JDK-8147994
 
+  -OSX:Consider using the default java runtime and shrinking the deploy (leave after the = blank): -Bruntime=
+    Didn't work. Couldn't find java when I did this.
 
 -Fixed?
   -New Klonk Bug - I have a fix in place per the ideas offered on stacko:
