@@ -187,7 +187,7 @@ public class BootContext {
 
     JFrame mainFrame=new JFrame("Klonk");
     mainFrame.setIconImage(getAppIcon(this));
-    MainLayout layout=new MainLayout(mainFrame, ctrlMain.getAppCloseListener());
+    MainLayout layout=new MainLayout(mainFrame, ctrlMain.getAppCloseListener(), currentOS);
     layout.show(
       persist.getWindowBounds(
         new java.awt.Rectangle(10, 10, 300, 300)

@@ -1,13 +1,8 @@
 package org.tmotte.klonk.windows;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
@@ -16,6 +11,11 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -28,10 +28,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.klonk.config.msg.Doer;
-import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.MainDisplay;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 
 public class MainLayout {
@@ -40,11 +41,12 @@ public class MainLayout {
   // INITIALIZATION: //
   /////////////////////
 
-  //Core stuff:
+  // DI stuff:
   private JFrame frame;
   private Doer appCloseListener;
+  private CurrentOS currentOS;
 
-  //Main editor window components:
+  // Main editor window components:
   private JLabel lblRow=new JLabel(),
                  lblCol=new JLabel(),
                  lblMsg=new JLabel(),
@@ -54,18 +56,19 @@ public class MainLayout {
                  pnlSaveAlert=new JPanel(),
                  pnlCapsLock=new JPanel(),
                  pStatus=new JPanel();
-
-  //Other items:
   private GridBug editorGB=new GridBug(pnlEditor);
   private Color noChangeColor;
+
+  // State:
   private boolean hasStatus=false;
   private StatusUpdate statusUpdate;
 
   public MainLayout(
-      JFrame frame, Doer appCloseListener
+      JFrame frame, Doer appCloseListener, CurrentOS currentOS
     ) {
     this.frame=frame;
     this.appCloseListener=appCloseListener;
+    this.currentOS=currentOS;
     doEvents();
     layout();
   }
@@ -127,6 +130,8 @@ public class MainLayout {
     frame.setTitle("Klonk: "+title);
   }
   private void showChangeThis(boolean chg) {
+    if (currentOS.isOSX)
+      frame.getRootPane().putClientProperty("Window.documentModified", chg ? Boolean.TRUE :Boolean.FALSE);
     pnlSaveThisAlert.setBackground(chg ?Color.RED :noChangeColor);
   }
   private void showChangeAny(boolean chg) {
