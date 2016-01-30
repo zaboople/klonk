@@ -131,7 +131,9 @@ public class MainLayout {
   }
   private void showChangeThis(boolean chg) {
     if (currentOS.isOSX)
-      frame.getRootPane().putClientProperty("Window.documentModified", chg ? Boolean.TRUE :Boolean.FALSE);
+      frame.getRootPane().putClientProperty(
+        "Window.documentModified", chg ? Boolean.TRUE :Boolean.FALSE
+      );
     pnlSaveThisAlert.setBackground(chg ?Color.RED :noChangeColor);
   }
   private void showChangeAny(boolean chg) {
