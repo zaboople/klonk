@@ -9,7 +9,8 @@
 
 
 -Current
-  -Tabs & Indents allows invalid input - letters instead of numbers
+ 
+  -Fonts are too damn small all over
 
   -Shell
     -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.

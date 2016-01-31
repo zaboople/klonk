@@ -92,7 +92,7 @@ public class GoToLine {
     if (action){
       try {
         result=Integer.parseInt(jtfRow.getText());
-      } catch (Exception e) {
+      } catch (NumberFormatException e) {
         complainer.set("Value entered is not a valid number ");
         badEntry=true;
         return;
