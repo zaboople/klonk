@@ -9,6 +9,8 @@
 
 
 -Current
+  -Tabs & Indents allows invalid input - letters instead of numbers
+
   -Shell
     -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.
     -We should be able to make the shell textbox act like our normal editor using our Selectable class.
@@ -22,8 +24,6 @@
             monoFonts1.add(font);
         }
     }
-
-  -Tabs & Indents allows invalid input - letters instead of numbers
 
   -Cursor does not move with mousewheel, only with page down.
 

@@ -643,7 +643,8 @@ public class Menus {
       ,
       markClearCurrent=mu.doMenuItem(
         "Clear current mark",
-        markItemListener, KeyEvent.VK_C
+        markItemListener, KeyEvent.VK_C, 
+        KeyMapper.key(KeyEvent.VK_F4, KeyEvent.SHIFT_DOWN_MASK)
       )
       ,
       markClearAll=mu.doMenuItem(
@@ -846,8 +847,12 @@ public class Menus {
     //HELP:
     mu.add(
       help=mu.doMenu(bar, "Help",   KeyEvent.VK_H)
-      ,helpAbout   =mu.doMenuItem("About Klonk",                   helpListener, KeyEvent.VK_A)
-      ,helpShortcut=mu.doMenuItem("Shortcuts and hidden features", helpListener, KeyEvent.VK_S)
+      ,helpAbout   =mu.doMenuItem(
+        "About Klonk",                   helpListener, KeyEvent.VK_A
+      )
+      ,helpShortcut=mu.doMenuItem(
+        "Shortcuts and hidden features", helpListener, KeyEvent.VK_S, KeyMapper.key(KeyEvent.VK_F1)
+      )
     );
   }
 
