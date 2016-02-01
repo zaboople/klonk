@@ -52,6 +52,7 @@ import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
 import org.tmotte.klonk.windows.popup.ssh.SSHLogin;
 import org.tmotte.klonk.windows.popup.ssh.SSHOpenFrom;
 import org.tmotte.klonk.windows.popup.ssh.SSHOptionPicker;
+import org.tmotte.common.swang.MinimumFont;
 
 /**
  * This implements a sort-of framework-free IoC/DI (inversion of control/dependency injection) architecture.
@@ -201,6 +202,7 @@ public class BootContext {
 
     // Our general purpose hello-ok, yes-no-cancel and yes-no popups;
     // Also backfills alerter into our general-purpose notifier:
+    PopupInfo popupInfo=new PopupInfo(mainFrame, currentOS, new MinimumFont(14));
     final KAlert alerter=new KAlert(mainFrame, currentOS);
     YesNoCancel
       yesNoCancel=new YesNoCancel(mainFrame, currentOS, true),
@@ -244,7 +246,7 @@ public class BootContext {
 
     //Various option popups:
     Favorites favorites=new Favorites(mainFrame, editorFont, currentOS);
-    TabsAndIndents tabsAndIndents=new TabsAndIndents(mainFrame, currentOS);
+    TabsAndIndents tabsAndIndents=new TabsAndIndents(popupInfo);
     FontPicker fontPicker=new FontPicker(mainFrame, alerter, currentOS);
     SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, currentOS, fileDialogWrapper);
     LineDelimiters kDelims=new LineDelimiters(mainFrame, currentOS);

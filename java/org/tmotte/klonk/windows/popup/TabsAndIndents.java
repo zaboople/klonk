@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -34,6 +35,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
+import org.tmotte.klonk.config.PopupInfo;
 
 public class TabsAndIndents {
 
@@ -42,8 +44,7 @@ public class TabsAndIndents {
   /////////////////////////
 
   // DI:
-  private CurrentOS currentOS;
-  private JFrame parentFrame;
+  private PopupInfo pInfo;
 
   // State:
   private boolean ok=false;
@@ -63,9 +64,8 @@ public class TabsAndIndents {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public TabsAndIndents(JFrame parentFrame, CurrentOS currentOS) {
-    this.parentFrame=parentFrame;
-    this.currentOS=currentOS;
+  public TabsAndIndents(PopupInfo pInfo) {
+    this.pInfo=pInfo;
   }
 
   public boolean show(TabAndIndentOptions options) {
@@ -85,7 +85,7 @@ public class TabsAndIndents {
     jrbTabIsTab.setSelected(!jrbTabIndentsLine.isSelected());
 
     //Display:
-    Point pt=parentFrame.getLocation();
+    Point pt=pInfo.parentFrame.getLocation();
     win.pack();
     win.setLocation(pt.x+20, pt.y+20);
     win.setVisible(true);
@@ -152,12 +152,13 @@ public class TabsAndIndents {
         "<html><body><b>Tab</b> key inserts tab character</body></html>"
     );
 
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("Tabs & indents");
     btnOK    =new JButton("OK");
     btnOK.setMnemonic(KeyEvent.VK_K);
     btnCancel=new JButton("Cancel");
     btnCancel.setMnemonic(KeyEvent.VK_C);
+
   }
 
 
@@ -174,6 +175,10 @@ public class TabsAndIndents {
     gb.addY(getAutoIndentPanel());
     makeSeparator(gb);
     gb.addY(getButtonPanel());
+
+    org.tmotte.common.swang.MinimumFont mf=new org.tmotte.common.swang.MinimumFont(14);
+    mf.set(win);
+
   }
   private void makeSeparator(GridBug gb) {
     gb.insets.left=5; gb.insets.right=5;
@@ -343,7 +348,7 @@ public class TabsAndIndents {
         ti.indentionMode=ti.INDENT_TABS;
         ti.indentionModeDefault=ti.INDENT_SPACES;
         PopupTestContext ptc=new PopupTestContext();
-        new TabsAndIndents(ptc.makeMainFrame(), ptc.getCurrentOS()).show(ti);
+        new TabsAndIndents(ptc.getPopupInfo()).show(ti);
         System.out.println(ti);
       }
     });

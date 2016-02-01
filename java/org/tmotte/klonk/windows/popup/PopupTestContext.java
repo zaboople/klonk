@@ -9,12 +9,14 @@ import java.awt.event.WindowListener;
 import java.util.List;
 import javax.swing.JFrame;
 import org.tmotte.common.swang.CurrentOS;
+import org.tmotte.common.swang.MinimumFont;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.BootContext;
+import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.controller.CtrlMain;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
@@ -34,7 +36,10 @@ public class PopupTestContext  {
   KPersist persist;
   JFrame mainFrame;
   Setter<Throwable> fail;
+  MinimumFont minFont;
+  PopupInfo popupInfo;
   CurrentOS currentOS=new CurrentOS();
+
 
 
   public KPersist getPersist() {
@@ -53,6 +58,11 @@ public class PopupTestContext  {
       mainFrame=makeMainFrame();
     return mainFrame;
   }
+  public PopupInfo getPopupInfo() {
+    if (popupInfo==null)
+      popupInfo=new PopupInfo(getMainFrame(), getCurrentOS(), getMinFont());
+    return popupInfo;
+  }
   public Setter<Throwable> getFail() {
     if (fail==null)
       fail=new Setter<Throwable>() {
@@ -67,6 +77,12 @@ public class PopupTestContext  {
   }
   public CurrentOS getCurrentOS() {
     return currentOS;
+  }
+
+  private MinimumFont getMinFont() {
+    if (minFont==null)
+      minFont=new MinimumFont(14);
+    return minFont;
   }
 
   ////////////////
