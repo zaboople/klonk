@@ -345,9 +345,10 @@ public class Shell {
     win.pack();
     win.setBounds(r);
     win.setPreferredSize(new Dimension(r.width, r.height));
-    setFont(mtaOutput);
 
+    // Set fonts, all controls first, then text area:
     pInfo.fontOptions.getControlsFont().set(win);
+    setFont(mtaOutput);
   }
   private Container getFileSelectPanel() {
     GridBug gb=new GridBug(new JPanel());
