@@ -6,11 +6,13 @@
       F3, F4, F8, F9, F12
       -KeyMapping
         -We really need a sorted properties file
-
+  -Document all the changes
 
 -Current
- 
+
   -Fonts are too damn small all over
+    -Need to document how to change font size or add an option window.
+    -Add minimum font to font options window
 
   -Shell
     -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.
@@ -29,7 +31,7 @@
   -Cursor does not move with mousewheel, only with page down.
 
   -File open ought to start off the session with the last directory opened.
-   It's annoying when it defaults to my stupid home directory. 
+   It's annoying when it defaults to my stupid home directory.
    But make sure to avoid SSH dirs.
 
 -Hard
@@ -65,7 +67,7 @@
   -Weird background bugs
     -Do you see that doo doo where java says it's starting up with mixed mode "sharing"?
     -Mostly when it runs two at once.
-    
+
   -Exe alternatives?
     -Consider jexepack, which costs $100 or you get an alert everytime you open it.
     -javapackager seems to only create an annoying installer and you have to install a second thing.

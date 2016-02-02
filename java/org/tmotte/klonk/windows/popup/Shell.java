@@ -12,27 +12,27 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
-import org.tmotte.common.text.StringChunker;
 import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
-import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.common.text.StringChunker;
 import org.tmotte.klonk.config.KPersist;
+import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 
 public class Shell {
 
   // DI:
-  private CurrentOS currentOS;
-  private JFrame parentFrame;
+  private PopupInfo pInfo;
   private Setter<Throwable> fail;
   private FileDialogWrapper fdw;
   private KPersist persist;
@@ -57,21 +57,19 @@ public class Shell {
   private DefaultComboBoxModel<String> jcbPreviousData;
 
   public Shell(
-     JFrame parentFrame,
+     PopupInfo pInfo,
      Setter<Throwable> fail,
      KPersist persist,
      FileDialogWrapper fdw,
      Image icon,
-     Getter<String> currFileGetter,
-     CurrentOS currentOS
+     Getter<String> currFileGetter
     ) {
-    this.parentFrame=parentFrame;
+    this.pInfo=pInfo;
     this.fail=fail;
     this.fdw=fdw;
     this.persist=persist;
     this.icon=icon;
     this.currFileGetter=currFileGetter;
-    this.currentOS=currentOS;
   }
   public Setter<FontOptions> getFontListener() {
     return fontListener;
@@ -80,7 +78,7 @@ public class Shell {
     init();
     if (!jcbPrevious.hasFocus() && !mtaOutput.hasFocus())
       jcbPrevious.requestFocusInWindow();
-    Positioner.set(parentFrame, win, shownBefore || (win.getBounds().x>-1 && win.getBounds().y>-1));
+    Positioner.set(pInfo.parentFrame, win, shownBefore || (win.getBounds().x>-1 && win.getBounds().y>-1));
     shownBefore=true;
     win.setVisible(true);
     win.toFront();
@@ -114,7 +112,7 @@ public class Shell {
   }
   private void switchBack() {
     preserveBounds();
-    parentFrame.toFront();
+    pInfo.parentFrame.toFront();
   }
   private void preserveBounds() {
     persist.setShellWindowBounds(win.getBounds());
@@ -316,7 +314,7 @@ public class Shell {
     btnSwitch.setMnemonic(KeyEvent.VK_B);
   }
   private MyTextArea getMTA(){
-    MyTextArea mta=new MyTextArea(currentOS);
+    MyTextArea mta=new MyTextArea(pInfo.currentOS);
     mta.setLineWrap(true);
     mta.setWrapStyleWord(false);
     mta.setEditable(true);
@@ -348,6 +346,8 @@ public class Shell {
     win.setBounds(r);
     win.setPreferredSize(new Dimension(r.width, r.height));
     setFont(mtaOutput);
+
+    pInfo.fontOptions.getControlsFont().set(win);
   }
   private Container getFileSelectPanel() {
     GridBug gb=new GridBug(new JPanel());
@@ -411,7 +411,7 @@ public class Shell {
     };
     KeyMapper.accel(
       jcbPrevious, actionJCB,
-      currentOS.isOSX
+      pInfo.currentOS.isOSX
         ?KeyMapper.key(KeyEvent.VK_L, KeyMapper.shortcutByOS())
         :KeyMapper.key(KeyEvent.VK_D, KeyEvent.ALT_DOWN_MASK)
     );
@@ -421,21 +421,21 @@ public class Shell {
       public void actionPerformed(ActionEvent event) {showFileDialog();}
     };
     btnSelectFile.addActionListener(fileAction);
-    currentOS.fixEnterKey(btnSelectFile, fileAction);
+    pInfo.currentOS.fixEnterKey(btnSelectFile, fileAction);
 
     //Forget:
     Action forgetAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {forget();}
     };
     btnForgetFile.addActionListener(forgetAction);
-    currentOS.fixEnterKey(btnForgetFile, forgetAction);
+    pInfo.currentOS.fixEnterKey(btnForgetFile, forgetAction);
 
     //Run:
     Action runAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {exec();}
     };
     btnRun.addActionListener(runAction);
-    currentOS.fixEnterKey(btnRun, runAction);
+    pInfo.currentOS.fixEnterKey(btnRun, runAction);
 
     // Hotwire run to modifier-E everywhere:
     KeyMapper.accel(
@@ -459,7 +459,7 @@ public class Shell {
       }
     };
     btnStop.addActionListener(stopAction);
-    currentOS.fixEnterKey(btnStop, stopAction);
+    pInfo.currentOS.fixEnterKey(btnStop, stopAction);
 
     //Output:
     mtaOutput.addKeyListener(textAreaListener);
@@ -469,7 +469,7 @@ public class Shell {
       public void actionPerformed(ActionEvent event) {close();}
     };
     btnClose.addActionListener(closeAction);
-    currentOS.fixEnterKey(btnClose, closeAction);
+    pInfo.currentOS.fixEnterKey(btnClose, closeAction);
     KeyMapper.easyCancel(btnClose, closeAction);
     win.addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e){
@@ -485,7 +485,7 @@ public class Shell {
       btnSwitch, switchAction, KeyMapper.key(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK)
     );
     btnSwitch.addActionListener(switchAction);
-    currentOS.fixEnterKey(btnSwitch, switchAction);
+    pInfo.currentOS.fixEnterKey(btnSwitch, switchAction);
   }
   private KeyAdapter textAreaListener=new KeyAdapter() {
     public void keyPressed(KeyEvent e){
@@ -512,13 +512,12 @@ public class Shell {
       public void run() {
         PopupTestContext ptc=new PopupTestContext();
         Shell shell=new Shell(
-          ptc.getMainFrame(), ptc.getFail(), ptc.getPersist(),
+          ptc.getPopupInfo(), ptc.getFail(), ptc.getPersist(),
           new FileDialogWrapper(ptc.getMainFrame(), ptc.getCurrentOS()),
           ptc.getPopupIcon(),
           new Getter<String>() {
             public String get() {return null;}
-          },
-          ptc.getCurrentOS()
+          }
         );
         shell.show();
         //Won't work because previous command is not synchronous

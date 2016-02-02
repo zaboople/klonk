@@ -34,8 +34,8 @@ import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
-import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.config.PopupInfo;
+import org.tmotte.klonk.config.option.TabAndIndentOptions;
 
 public class TabsAndIndents {
 
@@ -176,8 +176,7 @@ public class TabsAndIndents {
     makeSeparator(gb);
     gb.addY(getButtonPanel());
 
-    org.tmotte.common.swang.MinimumFont mf=new org.tmotte.common.swang.MinimumFont(14);
-    mf.set(win);
+    pInfo.fontOptions.getControlsFont().set(win);
 
   }
   private void makeSeparator(GridBug gb) {

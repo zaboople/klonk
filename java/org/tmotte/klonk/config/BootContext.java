@@ -177,7 +177,7 @@ public class BootContext {
     // Basic logging & persistence:
     Setter<Throwable> failHandler=userNotify.getExceptionHandler();
     KPersist persist=new KPersist(home, failHandler, currentOS);
-    FontOptions editorFont=persist.getFontAndColors();
+    FontOptions fontOptions=persist.getFontAndColors();
 
     //Main controller:
     CtrlMain ctrlMain=new CtrlMain(userNotify, persist, currentOS);
@@ -202,7 +202,9 @@ public class BootContext {
 
     // Our general purpose hello-ok, yes-no-cancel and yes-no popups;
     // Also backfills alerter into our general-purpose notifier:
-    PopupInfo popupInfo=new PopupInfo(mainFrame, currentOS, new MinimumFont(14));
+    PopupInfo popupInfo=new PopupInfo(
+      mainFrame, currentOS, fontOptions
+    );
     final KAlert alerter=new KAlert(mainFrame, currentOS);
     YesNoCancel
       yesNoCancel=new YesNoCancel(mainFrame, currentOS, true),
@@ -214,7 +216,7 @@ public class BootContext {
 
     // Open file from list:
     OpenFileList openFileList=new OpenFileList(
-      mainFrame, editorFont, currentOS
+      mainFrame, fontOptions, currentOS
     );
 
     // File dialog + SSH:
@@ -234,25 +236,24 @@ public class BootContext {
 
     //Search popups:
     FindAndReplace findAndReplace=
-      new FindAndReplace(mainFrame, alerter, statusBar, currentOS, editorFont);
+      new FindAndReplace(mainFrame, alerter, statusBar, currentOS, fontOptions);
     GoToLine goToLine=new GoToLine(mainFrame, currentOS, alerter);
 
     //Shell:
     Shell shell=new Shell(
-      mainFrame, failHandler, persist, fileDialogWrapper,
-      getPopupIcon(this), ctrlMain.getCurrFileNameGetter(),
-      currentOS
+      popupInfo, failHandler, persist, fileDialogWrapper,
+      getPopupIcon(this), ctrlMain.getCurrFileNameGetter()
     );
 
     //Various option popups:
-    Favorites favorites=new Favorites(mainFrame, editorFont, currentOS);
+    Favorites favorites=new Favorites(mainFrame, fontOptions, currentOS);
     TabsAndIndents tabsAndIndents=new TabsAndIndents(popupInfo);
     FontPicker fontPicker=new FontPicker(mainFrame, alerter, currentOS);
     SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, currentOS, fileDialogWrapper);
     LineDelimiters kDelims=new LineDelimiters(mainFrame, currentOS);
 
     //Help:
-    Help help=new Help(mainFrame, currentOS, home.getUserHome(), editorFont);
+    Help help=new Help(mainFrame, currentOS, home.getUserHome(), fontOptions);
     About about=new About(mainFrame, currentOS);
 
 

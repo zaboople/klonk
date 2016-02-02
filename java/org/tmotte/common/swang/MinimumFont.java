@@ -6,6 +6,12 @@ import java.awt.Label;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+/**
+ * Allows me to increase the font for general-purpose controls
+ * to a manageable size because Swing defaults to stupid tiny.
+ * Just uses a JLabel to establish the system default font,
+ * and derives a "more reasonable" font from that.
+ */
 public class MinimumFont {
   Font font;
 
@@ -15,6 +21,15 @@ public class MinimumFont {
   public MinimumFont(Font font) {
     this.font=font;
   }
+
+  public void setSize(int size) {
+    this.font=getFont(size, font);
+  }
+  public int getSize() {
+    return font.getSize();
+  }
+
+
   public void set(JComponent... jcs) {
     for (JComponent jc : jcs){
       set(jc);
@@ -49,8 +64,9 @@ public class MinimumFont {
   }
 
   private static Font getFont(int minSize) {
-    JLabel jlabel=new JLabel("nothing");
-    Font f=jlabel.getFont();
+    return getFont(minSize, new JLabel().getFont());
+  }
+  private static Font getFont(int minSize, Font f) {
     f=new Font(
       f.getFontName(),
       f.getStyle(),
