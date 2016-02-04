@@ -244,16 +244,30 @@ public class CtrlMain  {
     File file=fileResolver.get(dir);
     if (file==null)
       return;
+    doOpenFrom(file);
+  }
+  public void doOpenFrom(File file) {
     file=fileDialog.showForDir(false, file);
     if (file!=null)
       loadFile(file);
   }
   public void doOpenFromList() {
     List<String> files=openFileList.show();
-    if (files!=null)
-      loadFiles(files);
-    else
+    if (files==null)
       statusBar.show("Nothing to load.");
+    else {
+      File oneDir=files.size()==1
+        ?fileResolver.get(files.get(0))
+        :null;
+      if (oneDir!=null)
+        oneDir=oneDir.isDirectory()
+          ?oneDir
+          :null;
+      if (oneDir!=null)
+        doOpenFrom(oneDir);
+      else
+        loadFiles(files);
+    }
   }
   public void doOpenFromSSH() {
     File file=getSSHRecent(false);
@@ -532,7 +546,9 @@ public class CtrlMain  {
     for (String s: fileNames) loadFile(s);
   }
   private void loadFile(String fileName) {
-    loadFile(fileResolver.get(fileName));
+    File file=fileResolver.get(fileName);
+    if (file!=null)
+      loadFile(file);
   }
   /** Makes sure file isn't already loaded, and finds an editor to load it into: **/
   private void loadFile(File file) {
