@@ -11,15 +11,25 @@ import javax.swing.JLabel;
  * to a manageable size because Swing defaults to stupid tiny.
  * Just uses a JLabel to establish the system default font,
  * and derives a "more reasonable" font from that.
+ *
+ * Note that this only accounts for bold and normal Fonts.
+ * So a bold-italic font would get replaced with bold, no italics.
+ * This is sloppy, but less expensive memory-wise.
  */
 public class MinimumFont {
   Font font;
+  Font fontBold;
 
   public MinimumFont(int size) {
     this(getFont(size));
   }
-  public MinimumFont(Font font) {
+  private MinimumFont(Font font) {
     this.font=font;
+    this.fontBold=new Font(
+      font.getFontName(),
+      font.getStyle() | Font.BOLD,
+      font.getSize()
+    );
   }
 
   public void setSize(int size) {
@@ -59,8 +69,18 @@ public class MinimumFont {
         set(c);
   }
   private void setFont(Component jc) {
-    if (jc.getFont().getSize() < font.getSize())
-      jc.setFont(font);
+    Font old=jc.getFont();
+    if (old.getSize() < font.getSize()){
+      if (old.isItalic())
+        jc.setFont(
+          old.deriveFont(old.getStyle(), font.getSize())
+        );
+      else
+      if (old.isBold())
+        jc.setFont(fontBold);
+      else
+        jc.setFont(font);
+    }
   }
 
   private static Font getFont(int minSize) {

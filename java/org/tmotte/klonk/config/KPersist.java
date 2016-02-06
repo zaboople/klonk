@@ -194,6 +194,7 @@ public class KPersist {
   public KPersist setFontAndColors(FontOptions fo) {
     set("EditorText.Font.Name", fo.getFontName());
     setInt("EditorText.Font.Size", fo.getFontSize());
+    setInt("EditorText.Font.Style", fo.getFontStyle());
     setColor("EditorText.Font.Color", fo.getColor());
     setColor("EditorText.Background", fo.getBackgroundColor());
     setColor("EditorText.Caret.Color", fo.getCaretColor());
@@ -212,6 +213,9 @@ public class KPersist {
       );
       fo.setFontSize(
         getInt("EditorText.Font.Size", fo.getFontSize())
+      );
+      fo.setFontStyle(
+        getInt("EditorText.Font.Style", fo.getFontStyle())
       );
       fo.setColor(
         getColor("EditorText.Font.Color", fo.getColor())

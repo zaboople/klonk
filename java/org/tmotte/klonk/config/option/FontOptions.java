@@ -7,6 +7,7 @@ import org.tmotte.common.text.DelimitedString;
 public class FontOptions {
   private Font font;
   private int fontSize=12;
+  private int fontStyle=Font.PLAIN;
   private String fontName=new Font(Font.MONOSPACED, 0, 12).getFontName();
   private Color fontColor=Color.BLACK;
   private Color caretColor=Color.BLACK;
@@ -25,7 +26,7 @@ public class FontOptions {
   }
   public Font getFont() {
     if (font==null)
-      font=new Font(fontName, Font.PLAIN, fontSize);
+      font=new Font(fontName, fontStyle, fontSize);
     return font;
   }
   public String getFontName() {
@@ -33,6 +34,9 @@ public class FontOptions {
   }
   public int getFontSize() {
     return fontSize;
+  }
+  public int getFontStyle() {
+    return fontStyle;
   }
   public MinimumFont getControlsFont() {
     return minFont;
@@ -46,6 +50,11 @@ public class FontOptions {
   }
   public FontOptions setFontSize(int size) {
     this.fontSize=size;
+    this.font=null;
+    return this;
+  }
+  public FontOptions setFontStyle(int style) {
+    this.fontStyle=style;
     this.font=null;
     return this;
   }

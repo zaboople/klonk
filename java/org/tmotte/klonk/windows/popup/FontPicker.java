@@ -74,6 +74,7 @@ public class FontPicker {
   private MyTextArea mta;
   private JScrollPane jspMTA;
   private JRadioButton jrbForeground, jrbBackground, jrbCaret;
+  private JCheckBox jcbBold, jcbItalic;
 
 
   /////////////////////
@@ -102,6 +103,7 @@ public class FontPicker {
       else {
         fontOptions.setFontName(jlFonts.getSelectedValue());
         fontOptions.setFontSize(jlFontSize.getSelectedValue());
+        fontOptions.setFontStyle(getSelectedStyle());
         fontOptions.setColor(selectedForeground);
         fontOptions.setBackgroundColor(selectedBackground);
         fontOptions.setCaretColor(selectedCaret);
@@ -123,7 +125,7 @@ public class FontPicker {
 
     //Set font name, size:
     {
-      final int i=fontNameData.indexOf(fontOptions.getFontName());
+      final int i=fontNameData.indexOf(fontOptions.getFont().getFamily());
       if (i!=-1) {
         jlFonts.setSelectedIndex(i);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -150,6 +152,10 @@ public class FontPicker {
     selectedBackground=fontOptions.getBackgroundColor();
     selectedCaret     =fontOptions.getCaretColor();
     setColorChooserColor();
+
+    //Set up style:
+    jcbBold.setSelected((fontOptions.getFontStyle() & Font.BOLD) > 0);
+    jcbItalic.setSelected((fontOptions.getFontStyle() & Font.ITALIC) > 0);
 
     //Set up text area:
     mta.setFont(fontOptions.getFont());
@@ -192,12 +198,10 @@ public class FontPicker {
     jlFonts.setVisibleRowCount(-1);
     jlFonts.setCellRenderer(new MyFontRenderer(jlFonts.getFont()));
     jspFonts = new JScrollPane(jlFonts);
-    for (Font f: GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()) {
-      String name=f.getName();
-      fontNameData.addElement(name);
-      if (f.canDisplayUpTo("abcdefgh")!=-1)
-        badFonts.put(name, f);
-      else{
+    for (Font f: GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()){
+      String name=f.getFamily();
+      if (goodFonts.get(name)==null && f.canDisplayUpTo("abcdefgh")==-1){
+        fontNameData.addElement(name);
         f=f.deriveFont(0, 14);
         goodFonts.put(name, f);
       }
@@ -208,6 +212,13 @@ public class FontPicker {
     jspFontSize = new JScrollPane(jlFontSize);
     for (int i=5; i<40; i++)
       fontSizeData.addElement(i);
+
+    jcbBold=new JCheckBox("Bold");
+    jcbBold.setFont(jcbBold.getFont().deriveFont(Font.BOLD));
+    jcbBold.setMnemonic(KeyEvent.VK_B);
+    jcbItalic=new JCheckBox("Italic");
+    jcbItalic.setFont(jcbItalic.getFont().deriveFont(Font.ITALIC));
+    jcbItalic.setMnemonic(KeyEvent.VK_I);
 
     jrbForeground=new JRadioButton("Foreground");
     jrbForeground.setMnemonic(KeyEvent.VK_O);
@@ -303,12 +314,15 @@ public class FontPicker {
   private JPanel getTopPanel() {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
-    gb.weightXY(0.7, 1);
+    gb.weightXY(0.6, 1);
     gb.fill=gb.BOTH;
     gb.add(getFontListPanel());
 
-    gb.weightx=0.3;
+    gb.weightx=0.2;
     gb.addX(getFontSizePanel());
+
+    gb.weightx=0.2;
+    gb.addX(getFontStylePanel());
     return jp;
   }
   private JPanel getFontListPanel() {
@@ -345,7 +359,7 @@ public class FontPicker {
     gb.weightXY(1,0);
     JLabel label=new JLabel("Font Size:");
     label.setFont(label.getFont().deriveFont(Font.BOLD));
-    label.setDisplayedMnemonic(KeyEvent.VK_O);
+    label.setDisplayedMnemonic(KeyEvent.VK_Z);
     label.setLabelFor(jlFontSize);
     gb.insets.top=10;
     gb.add(label);
@@ -354,6 +368,28 @@ public class FontPicker {
     gb.insets.top=0;
     gb.fill=gb.BOTH;
     gb.addY(jspFontSize);
+
+    return panel;
+  }
+  private JPanel getFontStylePanel(){
+    JPanel panel=new JPanel();
+    GridBug gb=new GridBug(panel);
+    gb.weightXY(0).gridXY(0);
+    gb.anchor=gb.NORTHWEST;
+    gb.insets.left=5;
+    gb.insets.right=5;
+
+    gb.weightXY(1,0);
+    JLabel label=new JLabel("Font Style:");
+    label.setFont(label.getFont().deriveFont(Font.BOLD));
+    gb.insets.top=10;
+    gb.add(label);
+
+    gb.insets.top=0;
+    gb.fill=gb.NONE;
+    gb.addY(jcbBold);
+    gb.weightXY(1,1);
+    gb.addY(jcbItalic);
 
     return panel;
   }
@@ -433,26 +469,38 @@ public class FontPicker {
   private void listen() {
 
     //Font name & size change:
-    jlFonts.addListSelectionListener(new ListSelectionListener(){
-      public void valueChanged(ListSelectionEvent lse) {
-        changeFont();
-      }
-    });
-    jlFontSize.addListSelectionListener(new ListSelectionListener(){
-      public void valueChanged(ListSelectionEvent lse) {
-        changeFont();
-      }
-    });
+    {
+      ListSelectionListener lsl=new ListSelectionListener(){
+        public void valueChanged(ListSelectionEvent lse) {
+          changeFont();
+        }
+      };
+      jlFonts.addListSelectionListener(lsl);
+      jlFontSize.addListSelectionListener(lsl);
+    }
 
-    //Radio button change:
-    ActionListener clisten=new ActionListener(){
-      public void actionPerformed(ActionEvent ce) {
-        setColorChooserColor();
-      }
-    };
-    jrbForeground.addActionListener(clisten);
-    jrbBackground.addActionListener(clisten);
-    jrbCaret.addActionListener(clisten);
+    //Font style change:
+    {
+      ChangeListener styleListen=new ChangeListener(){
+        public void stateChanged(ChangeEvent ce) {
+          changeFont();
+        }
+      };
+      jcbBold.addChangeListener(styleListen);
+      jcbItalic.addChangeListener(styleListen);
+    }
+
+    //Color chooser radio button change:
+    {
+      ActionListener clisten=new ActionListener(){
+        public void actionPerformed(ActionEvent ce) {
+          setColorChooserColor();
+        }
+      };
+      jrbForeground.addActionListener(clisten);
+      jrbBackground.addActionListener(clisten);
+      jrbCaret.addActionListener(clisten);
+    }
 
     //Color change:
     colorChooser.getSelectionModel().addChangeListener(new ChangeListener(){
@@ -497,7 +545,12 @@ public class FontPicker {
     if (mta==null || jlFonts==null || jlFontSize==null ||
         jlFonts.isSelectionEmpty() || jlFontSize.isSelectionEmpty())
       return;
-    mta.setFont(new Font(jlFonts.getSelectedValue(), 0, jlFontSize.getSelectedValue()));
+    mta.setFont(
+      new Font(
+        jlFonts.getSelectedValue(),
+        getSelectedStyle(),
+        jlFontSize.getSelectedValue())
+      );
   }
   private void setColorChooserColor() {
     if (colorChooser==null || jrbForeground==null || jrbBackground==null || jrbCaret==null)
@@ -510,6 +563,9 @@ public class FontPicker {
     else
     if (jrbCaret.isSelected())
       colorChooser.setColor(selectedCaret);
+  }
+  private int getSelectedStyle() {
+    return Font.PLAIN | (jcbBold.isSelected() ?Font.BOLD :0) | (jcbItalic.isSelected() ?Font.ITALIC :0);
   }
 
   /** Listening to the textareas for tab & enter keys: */
