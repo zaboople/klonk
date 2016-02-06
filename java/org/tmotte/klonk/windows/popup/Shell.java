@@ -38,7 +38,6 @@ public class Shell {
   private KPersist persist;
   private Getter<String> currFileGetter;
   private Image icon;
-  private FontOptions fontOptions;
   private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
     public void set(FontOptions fo){setFont(fo);}
   };
@@ -118,12 +117,10 @@ public class Shell {
     persist.setShellWindowBounds(win.getBounds());
   }
   private void setFont(FontOptions f) {
-    this.fontOptions=f;
     if (initialized)
-      setFont(mtaOutput);
+      setFont(f, mtaOutput);
   }
-  private void setFont(JTextComponent mta) {
-    FontOptions f=fontOptions;
+  private void setFont(FontOptions f, JTextComponent mta) {
     mta.setFont(f.getFont());
     mta.setForeground(f.getColor());
     mta.setBackground(f.getBackgroundColor());
@@ -269,8 +266,6 @@ public class Shell {
     }
   }
   private void create(){
-    fontOptions=persist.getFontAndColors();
-
     jcbPreviousData=new DefaultComboBoxModel<>();
     fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
     persistedFiles=new LinkedList<>();
@@ -318,7 +313,6 @@ public class Shell {
     mta.setLineWrap(true);
     mta.setWrapStyleWord(false);
     mta.setEditable(true);
-    setFont(mta);
     return mta;
   }
 
@@ -348,7 +342,7 @@ public class Shell {
 
     // Set fonts, all controls first, then text area:
     pInfo.fontOptions.getControlsFont().set(win);
-    setFont(mtaOutput);
+    setFont(pInfo.fontOptions, mtaOutput);
   }
   private Container getFileSelectPanel() {
     GridBug gb=new GridBug(new JPanel());
