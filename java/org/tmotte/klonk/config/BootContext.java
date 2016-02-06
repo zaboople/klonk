@@ -200,11 +200,11 @@ public class BootContext {
 
     // POPUP WINDOWS: //
 
+    // Stuff that is common to everything:
+    PopupInfo popupInfo=new PopupInfo(mainFrame, currentOS);
+
     // Our general purpose hello-ok, yes-no-cancel and yes-no popups;
     // Also backfills alerter into our general-purpose notifier:
-    PopupInfo popupInfo=new PopupInfo(
-      mainFrame, currentOS, fontOptions
-    );
     final KAlert alerter=new KAlert(mainFrame, currentOS);
     YesNoCancel
       yesNoCancel=new YesNoCancel(mainFrame, currentOS, true),
@@ -236,18 +236,18 @@ public class BootContext {
 
     //Search popups:
     FindAndReplace findAndReplace=
-      new FindAndReplace(mainFrame, alerter, statusBar, currentOS, fontOptions);
+      new FindAndReplace(popupInfo, fontOptions, alerter, statusBar);
     GoToLine goToLine=new GoToLine(mainFrame, currentOS, alerter);
 
     //Shell:
     Shell shell=new Shell(
-      popupInfo, failHandler, persist, fileDialogWrapper,
+      popupInfo, fontOptions, failHandler, persist, fileDialogWrapper,
       getPopupIcon(this), ctrlMain.getCurrFileNameGetter()
     );
 
     //Various option popups:
     Favorites favorites=new Favorites(mainFrame, fontOptions, currentOS);
-    TabsAndIndents tabsAndIndents=new TabsAndIndents(popupInfo);
+    TabsAndIndents tabsAndIndents=new TabsAndIndents(popupInfo, fontOptions);
     FontPicker fontPicker=new FontPicker(mainFrame, alerter, currentOS);
     SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, currentOS, fileDialogWrapper);
     LineDelimiters kDelims=new LineDelimiters(mainFrame, currentOS);

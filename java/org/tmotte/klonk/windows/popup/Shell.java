@@ -33,6 +33,7 @@ public class Shell {
 
   // DI:
   private PopupInfo pInfo;
+  private FontOptions fontOptions;
   private Setter<Throwable> fail;
   private FileDialogWrapper fdw;
   private KPersist persist;
@@ -57,6 +58,7 @@ public class Shell {
 
   public Shell(
      PopupInfo pInfo,
+     FontOptions fontOptions,
      Setter<Throwable> fail,
      KPersist persist,
      FileDialogWrapper fdw,
@@ -64,6 +66,7 @@ public class Shell {
      Getter<String> currFileGetter
     ) {
     this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
     this.fail=fail;
     this.fdw=fdw;
     this.persist=persist;
@@ -117,10 +120,12 @@ public class Shell {
     persist.setShellWindowBounds(win.getBounds());
   }
   private void setFont(FontOptions f) {
+    this.fontOptions=f;
     if (initialized)
       setFont(f, mtaOutput);
   }
   private void setFont(FontOptions f, JTextComponent mta) {
+    f.getControlsFont().set(win);
     mta.setFont(f.getFont());
     mta.setForeground(f.getColor());
     mta.setBackground(f.getBackgroundColor());
@@ -340,9 +345,7 @@ public class Shell {
     win.setBounds(r);
     win.setPreferredSize(new Dimension(r.width, r.height));
 
-    // Set fonts, all controls first, then text area:
-    pInfo.fontOptions.getControlsFont().set(win);
-    setFont(pInfo.fontOptions, mtaOutput);
+    setFont(fontOptions, mtaOutput);
   }
   private Container getFileSelectPanel() {
     GridBug gb=new GridBug(new JPanel());
@@ -507,7 +510,7 @@ public class Shell {
       public void run() {
         PopupTestContext ptc=new PopupTestContext();
         Shell shell=new Shell(
-          ptc.getPopupInfo(), ptc.getFail(), ptc.getPersist(),
+          ptc.getPopupInfo(), ptc.getFontOptions(), ptc.getFail(), ptc.getPersist(),
           new FileDialogWrapper(ptc.getMainFrame(), ptc.getCurrentOS()),
           ptc.getPopupIcon(),
           new Getter<String>() {

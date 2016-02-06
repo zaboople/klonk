@@ -36,6 +36,7 @@ import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.PopupInfo;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 
 public class TabsAndIndents {
@@ -46,6 +47,7 @@ public class TabsAndIndents {
 
   // DI:
   private PopupInfo pInfo;
+  private FontOptions fontOptions;
 
   // State:
   private boolean ok=false;
@@ -65,8 +67,9 @@ public class TabsAndIndents {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public TabsAndIndents(PopupInfo pInfo) {
+  public TabsAndIndents(PopupInfo pInfo, FontOptions fontOptions) {
     this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
   }
 
   public boolean show(TabAndIndentOptions options) {
@@ -177,7 +180,7 @@ public class TabsAndIndents {
     makeSeparator(gb);
     gb.addY(getButtonPanel());
 
-    pInfo.fontOptions.getControlsFont().set(win);
+    fontOptions.getControlsFont().set(win);
 
   }
   private void makeSeparator(GridBug gb) {
@@ -348,7 +351,7 @@ public class TabsAndIndents {
         ti.indentionMode=ti.INDENT_TABS;
         ti.indentionModeDefault=ti.INDENT_SPACES;
         PopupTestContext ptc=new PopupTestContext();
-        new TabsAndIndents(ptc.getPopupInfo()).show(ti);
+        new TabsAndIndents(ptc.getPopupInfo(), ptc.getFontOptions()).show(ti);
         System.out.println(ti);
       }
     });

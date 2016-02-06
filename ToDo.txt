@@ -11,6 +11,7 @@
 -Current
 
   -Fonts are too damn small all over
+    -Make it where PopupInfo has something fonts can register to hear changes with
     -Need to document how to change font size or add an option window.
     -Add minimum font to font options window
 

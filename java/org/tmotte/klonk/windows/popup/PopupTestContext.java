@@ -12,6 +12,7 @@ import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.BootContext;
@@ -58,8 +59,11 @@ public class PopupTestContext  {
   }
   public PopupInfo getPopupInfo() {
     if (popupInfo==null)
-      popupInfo=new PopupInfo(getMainFrame(), getCurrentOS(), getPersist().getFontAndColors());
+      popupInfo=new PopupInfo(getMainFrame(), getCurrentOS());
     return popupInfo;
+  }
+  public FontOptions getFontOptions() {
+    return getPersist().getFontAndColors();
   }
   public Setter<Throwable> getFail() {
     if (fail==null)

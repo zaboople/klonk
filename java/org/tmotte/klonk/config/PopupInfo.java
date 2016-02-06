@@ -6,11 +6,9 @@ import org.tmotte.common.swang.CurrentOS;
 public class PopupInfo {
   public final JFrame parentFrame;
   public final CurrentOS currentOS;
-  public final FontOptions fontOptions;
 
-  public PopupInfo(JFrame parentFrame, CurrentOS currentOS, FontOptions fo) {
+  public PopupInfo(JFrame parentFrame, CurrentOS currentOS) {
     this.parentFrame=parentFrame;
     this.currentOS=currentOS;
-    this.fontOptions=fo;
   }
 }

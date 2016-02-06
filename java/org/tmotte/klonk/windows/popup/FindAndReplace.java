@@ -64,6 +64,13 @@ public class FindAndReplace {
       :KeyMapper.key(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK);
   }
 
+
+  //DI:
+  private PopupInfo pInfo;
+  private FontOptions fontOptions;
+  private Setter<String> alerter;
+  private StatusUpdate statusBar;
+
   //Display components:
   private JDialog win;
   private MyTextArea mtaFind, mtaReplace;
@@ -71,36 +78,24 @@ public class FindAndReplace {
   private JCheckBox chkReplace, chkCase, chkReplaceAll, chkConfirmReplace, chkRegex, chkRegexMultiline;
   private JButton btnFind, btnReverse, btnCancel;
   private JLabel lblFind;
-
-  //Fonts:
   private Font fontBold, fontNormal;
-  private FontOptions fontOptions;
-  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
-    public void set(FontOptions fo){setFont(fo);}
-  };
 
   //Other windows. Yes we technically violate our singleton sort-of-a-rule here, creating
   //extra instances of YesNoCancel
-  private JFrame parentFrame;
   private YesNoCancel popupAskReplace, popupAskReplaceAll;
 
   //Internal state:
   private boolean everShown=false;
   private boolean skipReplace=false;
   private boolean initialized=false;
-
-  //This is so we can send updates back to the main window ourselves, as well
-  //as to an alert popup:
-  private Setter<String> alerter;
-  private StatusUpdate statusBar;
-
   //Note that these are transient (so to speak) and require single-threaded
   //behavior from the class.
   private MyTextArea target;
   private Finder finder=new Finder();
+  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
+    public void set(FontOptions fo){setFont(fo);}
+  };
 
-  //Injected for MyTextArea:
-  private CurrentOS currentOS;
 
 
 
@@ -109,17 +104,15 @@ public class FindAndReplace {
   /////////////////////
 
   public FindAndReplace(
-      JFrame parentFrame,
+      PopupInfo pInfo,
+      FontOptions fontOptions,
       Setter<String> alerter,
-      StatusUpdate statusBar,
-      CurrentOS currentOS,
-      FontOptions fontOptions
+      StatusUpdate statusBar
     ) {
-    this.parentFrame=parentFrame;
+    this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
     this.statusBar=statusBar;
     this.alerter=alerter;
-    this.currentOS=currentOS;
-    this.fontOptions=fontOptions;
   }
   public Setter<FontOptions> getFontListener() {
     return fontListener;
@@ -158,7 +151,7 @@ public class FindAndReplace {
     enableReplace();
     mtaFind.requestFocusInWindow();
     //Do all the rectangle/point/dimension stuff:
-    Positioner.set(parentFrame, win, everShown);
+    Positioner.set(pInfo.parentFrame, win, everShown);
     everShown|=true;
     show();
     while (finder.lastError!=null) {
@@ -244,7 +237,7 @@ public class FindAndReplace {
   private boolean confirmReplace(int startPos, int endPos) throws Exception {
     YesNoCancel asker=getAskReplaceWindow();
     Point caretPoint=target.getVisualCaretPosition();
-    Rectangle dim =parentFrame.getBounds();
+    Rectangle dim =pInfo.parentFrame.getBounds();
     int tooLow=dim.y+dim.height,
         tooRight=dim.x+dim.width;
     int top, left;
@@ -289,7 +282,7 @@ public class FindAndReplace {
   private void create() {
     fontNormal=new JLabel().getFont();
     fontBold=fontNormal.deriveFont(Font.BOLD);
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("Find & Replace");
 
     //Find label & text box:
@@ -338,7 +331,7 @@ public class FindAndReplace {
 
   }
   private MyTextArea makeTextArea() {
-    MyTextArea mta=new MyTextArea(currentOS);
+    MyTextArea mta=new MyTextArea(pInfo.currentOS);
     mta.setRows(3);//This doesn't work right because we set the font different.
     mta.setLineWrap(false);
     mta.setWrapStyleWord(false);
@@ -346,7 +339,7 @@ public class FindAndReplace {
   }
   private YesNoCancel getAskReplaceWindow() {
     if (popupAskReplace==null) {
-      popupAskReplace=new YesNoCancel(parentFrame, currentOS, false);
+      popupAskReplace=new YesNoCancel(pInfo.parentFrame, pInfo.currentOS, false);
       popupAskReplace.setMessage("Replace selection?");
       popupAskReplace.setupForFindReplace();
     }
@@ -354,7 +347,7 @@ public class FindAndReplace {
   }
   private YesNoCancel getAskReplaceAllWindow() {
     if (popupAskReplaceAll==null) {
-      popupAskReplaceAll=new YesNoCancel(parentFrame, currentOS, false);
+      popupAskReplaceAll=new YesNoCancel(pInfo.parentFrame, pInfo.currentOS, false);
       popupAskReplaceAll.setMessage("Replace all now?");
     }
     return popupAskReplaceAll;
@@ -409,7 +402,7 @@ public class FindAndReplace {
     win.pack();
 
     enableReplace();
-    setFont();
+    setFont(fontOptions);
   }
   private Container getBottomPanel() {
     GridBug gb=new GridBug(new JPanel());
@@ -463,11 +456,6 @@ public class FindAndReplace {
   }
 
   private void setFont(FontOptions f) {
-    this.fontOptions=f;
-    setFont();
-  }
-  private void setFont() {
-    FontOptions f=fontOptions;
     if (mtaFind!=null && mtaReplace!=null) {
       mtaFind.setFont(f.getFont());
       mtaFind.setForeground(f.getColor());
@@ -493,12 +481,12 @@ public class FindAndReplace {
 
   private void listen() {
     addCheckBoxListeners(chkReplace, chkReplaceAll, chkCase, chkRegex, chkRegexMultiline);
-    doButtonEvents(btnFind,     buttonListener, getFindAgainKey(currentOS));
+    doButtonEvents(btnFind,     buttonListener, getFindAgainKey(pInfo.currentOS));
     doButtonEvents(btnFind,     buttonListener, KeyMapper.key(KeyEvent.VK_ENTER));
-    doButtonEvents(btnReverse,  buttonListener, getFindAgainReverseKey(currentOS));
-    currentOS.fixEnterKey(btnFind, buttonListener);
-    currentOS.fixEnterKey(btnReverse, buttonListener);
-    currentOS.fixEnterKey(btnCancel, buttonListener);
+    doButtonEvents(btnReverse,  buttonListener, getFindAgainReverseKey(pInfo.currentOS));
+    pInfo.currentOS.fixEnterKey(btnFind, buttonListener);
+    pInfo.currentOS.fixEnterKey(btnReverse, buttonListener);
+    pInfo.currentOS.fixEnterKey(btnCancel, buttonListener);
     KeyMapper.easyCancel(btnCancel, buttonListener);
     mtaFind.addFocusListener(new FocusAdapter(){
       public void focusGained(FocusEvent fe) {
