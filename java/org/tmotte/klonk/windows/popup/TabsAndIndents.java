@@ -16,7 +16,6 @@ import java.awt.event.KeyListener;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -119,10 +118,6 @@ public class TabsAndIndents {
         :options.INDENT_SPACES;
     }
     win.setVisible(false);
-  }
-  private JPanel getBorder(JPanel jp) {
-    jp.setBorder(BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-    return jp;
   }
 
   ///////////////////////////

@@ -27,9 +27,11 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.JWindow;
 import javax.swing.ListCellRenderer;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -37,10 +39,11 @@ import javax.swing.event.ListSelectionListener;
 import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
+import org.tmotte.common.swang.MinimumFont;
 import org.tmotte.common.swang.Radios;
+import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 
@@ -52,9 +55,8 @@ public class FontPicker {
 
 
   // DI:
-  private JFrame parentFrame;
+  private PopupInfo pInfo;
   private Setter<String> alerter;
-  private CurrentOS currentOS;
   private FontOptions fontOptions;
 
   // State:
@@ -76,16 +78,17 @@ public class FontPicker {
   private JScrollPane jspMTA;
   private JRadioButton jrbForeground, jrbBackground, jrbCaret;
   private JCheckBox jcbBold, jcbItalic;
+  private JSpinner jspControlSize;
+  private JLabel jlCFO, jlEFO;
 
 
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
 
-  public FontPicker(JFrame parentFrame, Setter<String> alerter, CurrentOS currentOS) {
-    this.parentFrame=parentFrame;
+  public FontPicker(PopupInfo pInfo, Setter<String> alerter) {
+    this.pInfo=pInfo;
     this.alerter=alerter;
-    this.currentOS=currentOS;
   }
   public boolean show(FontOptions fontOptions) {
     init();
@@ -105,6 +108,7 @@ public class FontPicker {
         fontOptions.setFontName(jlFonts.getSelectedValue());
         fontOptions.setFontSize(jlFontSize.getSelectedValue());
         fontOptions.setFontStyle(getSelectedStyle());
+        fontOptions.setControlsFont(Integer.parseInt(jspControlSize.getValue().toString()));
         fontOptions.setColor(selectedForeground);
         fontOptions.setBackgroundColor(selectedBackground);
         fontOptions.setCaretColor(selectedCaret);
@@ -123,6 +127,10 @@ public class FontPicker {
 
     //Basic initialization:
     this.fontOptions=fontOptions;
+
+    //General fonts:
+    fontOptions.getControlsFont().set(win);
+    jspControlSize.setValue(fontOptions.getControlsFont().getSize());
 
     //Set font name, size:
     {
@@ -148,6 +156,7 @@ public class FontPicker {
       }
     }
 
+
     //Set up color:
     selectedForeground=fontOptions.getColor();
     selectedBackground=fontOptions.getBackgroundColor();
@@ -165,7 +174,7 @@ public class FontPicker {
     mta.setBackground(fontOptions.getBackgroundColor());
     mta.setCaretColor(fontOptions.getCaretColor());
 
-    Positioner.set(parentFrame, win, false);
+    Positioner.set(pInfo.parentFrame, win, false);
   }
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
@@ -173,9 +182,25 @@ public class FontPicker {
     win.setVisible(false);
   }
 
-  ///////////////////////////
-  // CREATE/LAYOUT/LISTEN: //
-  ///////////////////////////
+  private void changeFont() {
+    int size=Integer.parseInt(jspControlSize.getValue().toString());
+    new MinimumFont(size).set(win);
+    new MinimumFont(size + 3).set(jlCFO, jlEFO);
+
+    if (mta==null || jlFonts==null || jlFontSize==null ||
+        jlFonts.isSelectionEmpty() || jlFontSize.isSelectionEmpty())
+      return;
+    mta.setFont(
+      new Font(
+        jlFonts.getSelectedValue(),
+        getSelectedStyle(),
+        jlFontSize.getSelectedValue())
+      );
+  }
+
+  /////////////
+  // CREATE: //
+  /////////////
 
   private void init() {
     if (!initialized) {
@@ -187,8 +212,15 @@ public class FontPicker {
   }
 
   private void create(){
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("Font Options");
+
+    jlCFO=new JLabel("General Font Options:");
+    jlCFO.setFont(jlCFO.getFont().deriveFont(Font.BOLD));
+    jspControlSize=new JSpinner(new SpinnerNumberModel(1,1,99,1));
+
+    jlEFO=new JLabel("Editor Font Options:");
+    jlEFO.setFont(jlEFO.getFont().deriveFont(Font.BOLD));
 
     goodFonts=new HashMap<>();
     badFonts =new HashMap<>();
@@ -234,7 +266,7 @@ public class FontPicker {
     //This eliminates the preview so we can customize:
     colorChooser.setPreviewPanel(new JPanel());
 
-    mta=new MyTextArea(currentOS);
+    mta=new MyTextArea(pInfo.currentOS);
     mta.setRows(4);//This doesn't work right because we set the font different.
     mta.setLineWrap(false);
     mta.setWrapStyleWord(false);
@@ -279,40 +311,110 @@ public class FontPicker {
         font=goodFonts.get(value);
       if (font==null)
         font=defaultFont;
-      setFont(font);
+      this.setFont(font);
       setText(value);
       return this;
     }
   }
 
-
+  /////////////
+  // LAYOUT: //
+  /////////////
 
   private void layout() {
     GridBug gb=new GridBug(win);
     gb.gridXY(0);
-
-    gb.weightXY(1);
+    gb.weightXY(0);
+    gb.setInsets(10, 5, 0, 5);
     gb.fill=gb.BOTH;
     gb.anchor=gb.NORTHWEST;
-    gb.add(getTopPanel());
 
+    gb.addY(layoutTop());
+
+    makeSeparator(gb);
+
+    gb.fill=gb.BOTH;
+    gb.weightXY(1);
+    gb.addY(layoutBottom());
+    win.pack();
+  }
+
+  private void makeSeparator(GridBug gb) {
+    int il=gb.insets.left, ir=gb.insets.right;
+    gb.insets.left=5; gb.insets.right=5;
+    JSeparator j=new JSeparator(JSeparator.HORIZONTAL);
+    gb.addY(j);
+    gb.insets.left=il; gb.insets.right=ir;
+  }
+
+  private JPanel layoutTop() {
+    JPanel jp=new JPanel();
+    GridBug gb=new GridBug(jp);
+    gb.gridXY(0);
+    gb.weightXY(0);
+    gb.fill=gb.BOTH;
+    gb.anchor=gb.NORTHWEST;
+    gb.setInsets(5);
+
+    // Title:
+    gb.gridwidth=2;
+    gb.setX(0);
+    gb.addX(jlCFO);
+
+    gb.gridwidth=1;
+
+    // Spinner:
+    gb.insets.left=10;
+    gb.setX(0).setY(1);
+    gb.gridXY(0, 2);
+    gb.weightXY(0, 1);
+    gb.fill=gb.NONE;
+    gb.add(jspControlSize);
+
+    // Spinner label;
+    gb.insets.left=4;
+    gb.fill=gb.VERTICAL;
+    gb.weightXY(1, 0);
+    gb.addX(new JLabel("Minimum font size for various controls"));
+    return jp;
+  }
+
+  private JPanel layoutBottom() {
+    JPanel jp=new JPanel();
+    GridBug gb=new GridBug(jp);
+    gb.gridXY(0);
+    gb.weightXY(0);
+    gb.anchor=gb.NORTHWEST;
+
+    // Label:
+    gb.insets.left=5;
+    gb.addY(jlEFO);
+
+    // Font name, size< style:
+    gb.fill=gb.BOTH;
+    gb.weightXY(1);
+    gb.addY(getEditorFontSelectionPanel());
+
+    // Colors:
     gb.insets.top=5;
     gb.weightXY(1, 0);
     gb.fill=gb.HORIZONTAL;
     gb.addY(getColorPanel());
 
+    // Preview:
     gb.insets.top=0;
     gb.weightXY(1);
     gb.fill=gb.BOTH;
     gb.addY(getPreviewPanel());
 
+    // Buttons:
     gb.weightXY(1, 0);
     gb.fill=gb.HORIZONTAL;
     gb.addY(getButtonPanel());
 
-    win.pack();
+    return jp;
   }
-  private JPanel getTopPanel() {
+  private JPanel getEditorFontSelectionPanel() {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
     gb.weightXY(0.6, 1);
@@ -322,7 +424,8 @@ public class FontPicker {
     gb.weightx=0.2;
     gb.addX(getFontSizePanel());
 
-    gb.weightx=0.2;
+    gb.weightx=0;
+    gb.fill=gb.VERTICAL;
     gb.addX(getFontStylePanel());
     return jp;
   }
@@ -466,8 +569,23 @@ public class FontPicker {
     return panel;
   }
 
+  /////////////
+  // LISTEN: //
+  /////////////
 
   private void listen() {
+
+    //Controls font size change:
+    {
+      ChangeListener styleListen=new ChangeListener(){
+        public void stateChanged(ChangeEvent ce) {
+          new MinimumFont(Integer.parseInt(jspControlSize.getValue().toString()))
+            ;
+          changeFont();
+        }
+      };
+      jspControlSize.addChangeListener(styleListen);
+    }
 
     //Font name & size change:
     {
@@ -542,17 +660,6 @@ public class FontPicker {
     KeyMapper.easyCancel(btnCancel, cancelAction);
   }
 
-  private void changeFont() {
-    if (mta==null || jlFonts==null || jlFontSize==null ||
-        jlFonts.isSelectionEmpty() || jlFontSize.isSelectionEmpty())
-      return;
-    mta.setFont(
-      new Font(
-        jlFonts.getSelectedValue(),
-        getSelectedStyle(),
-        jlFontSize.getSelectedValue())
-      );
-  }
   private void setColorChooserColor() {
     if (colorChooser==null || jrbForeground==null || jrbBackground==null || jrbCaret==null)
       return;
@@ -595,18 +702,16 @@ public class FontPicker {
       public void run() {
         try {
           FontOptions fo=new FontOptions();
-          System.out.println(fo);
-          FontPicker fp=new FontPicker(
-            ptc.makeMainFrame(),
+          System.out.println("Before: "+fo);
+          new FontPicker(
+            ptc.getPopupInfo(),
             new Setter<String>(){
               public void set(String s) {
                 System.out.println("!!!!\n"+s+"\n!!!!");
               }
-            },
-            ptc.getCurrentOS()
-          );
-          fp.show(fo);
-          System.out.println(fo);
+            }
+          ).show(fo);
+          System.out.println("After:  "+fo);
         } catch (Exception e) {
           e.printStackTrace();
         }

@@ -11,11 +11,14 @@
 -Current
 
   -Fonts are too damn small all over
+    -Font window never gets shrunk
+    -Main window needs to get setting back
     -Make it where PopupInfo has something fonts can register to hear changes with
     -Need to document how to change font size or add an option window.
     -Add minimum font to font options window
 
   -Shell
+    -Shows Ctrl-E on both windows and mac when it should command-e on mac
     -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.
     -We should be able to make the shell textbox act like our normal editor using our Selectable class.
 

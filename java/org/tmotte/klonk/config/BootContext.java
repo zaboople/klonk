@@ -241,14 +241,14 @@ public class BootContext {
 
     //Shell:
     Shell shell=new Shell(
-      popupInfo, fontOptions, failHandler, persist, fileDialogWrapper,
+      popupInfo, fontOptions, persist, fileDialogWrapper,
       getPopupIcon(this), ctrlMain.getCurrFileNameGetter()
     );
 
     //Various option popups:
     Favorites favorites=new Favorites(mainFrame, fontOptions, currentOS);
     TabsAndIndents tabsAndIndents=new TabsAndIndents(popupInfo, fontOptions);
-    FontPicker fontPicker=new FontPicker(mainFrame, alerter, currentOS);
+    FontPicker fontPicker=new FontPicker(popupInfo, alerter);
     SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, currentOS, fileDialogWrapper);
     LineDelimiters kDelims=new LineDelimiters(mainFrame, currentOS);
 

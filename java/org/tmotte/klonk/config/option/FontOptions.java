@@ -76,8 +76,12 @@ public class FontOptions {
   }
   public String toString() {
     DelimitedString ds=new DelimitedString(", ");
-    ds.addEach("Caret:"+getCaretColor(), "BG:"+getBackgroundColor(), "Color:"+getColor(),
-               "Font: "+getFont(), "Name: "+getFontName(), "Size: "+getFontSize());
+    ds.addEach(
+      "Caret:"+getCaretColor(), "BG:"+getBackgroundColor(), "Color:"+getColor(),
+      "Font: "+getFont(), "Name: "+getFontName(), "Size: "+getFontSize(),
+      "Minimum control size: "+getControlsFont().getSize()
+    );
+
     return ds.toString();
   }
 

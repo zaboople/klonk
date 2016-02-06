@@ -34,7 +34,6 @@ public class Shell {
   // DI:
   private PopupInfo pInfo;
   private FontOptions fontOptions;
-  private Setter<Throwable> fail;
   private FileDialogWrapper fdw;
   private KPersist persist;
   private Getter<String> currFileGetter;
@@ -59,7 +58,6 @@ public class Shell {
   public Shell(
      PopupInfo pInfo,
      FontOptions fontOptions,
-     Setter<Throwable> fail,
      KPersist persist,
      FileDialogWrapper fdw,
      Image icon,
@@ -67,7 +65,6 @@ public class Shell {
     ) {
     this.pInfo=pInfo;
     this.fontOptions=fontOptions;
-    this.fail=fail;
     this.fdw=fdw;
     this.persist=persist;
     this.icon=icon;
@@ -99,7 +96,7 @@ public class Shell {
       try {
         jcbPrevious.getEditor().setItem(file.getCanonicalPath());
       } catch (Exception e) {
-        fail.set(e);
+        throw new RuntimeException(e);
       }
   }
 
@@ -510,7 +507,7 @@ public class Shell {
       public void run() {
         PopupTestContext ptc=new PopupTestContext();
         Shell shell=new Shell(
-          ptc.getPopupInfo(), ptc.getFontOptions(), ptc.getFail(), ptc.getPersist(),
+          ptc.getPopupInfo(), ptc.getFontOptions(), ptc.getPersist(),
           new FileDialogWrapper(ptc.getMainFrame(), ptc.getCurrentOS()),
           ptc.getPopupIcon(),
           new Getter<String>() {

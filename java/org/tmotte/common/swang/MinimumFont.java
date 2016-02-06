@@ -11,12 +11,13 @@ import javax.swing.JLabel;
  * to a manageable size because Swing defaults to stupid tiny.
  * Just uses a JLabel to establish the system default font,
  * and derives a "more reasonable" font from that.
- *
- * Note that this only accounts for bold and normal Fonts.
- * So a bold-italic font would get replaced with bold, no italics.
- * This is sloppy, but less expensive memory-wise.
  */
 public class MinimumFont {
+
+  ///////////////////////////////
+  // Initialization & Get/Set: //
+  ///////////////////////////////
+
   Font font;
   Font fontBold;
 
@@ -24,21 +25,19 @@ public class MinimumFont {
     this(getFont(size));
   }
   private MinimumFont(Font font) {
-    this.font=font;
-    this.fontBold=new Font(
-      font.getFontName(),
-      font.getStyle() | Font.BOLD,
-      font.getSize()
-    );
+    setFont(font);
   }
 
   public void setSize(int size) {
-    this.font=getFont(size, font);
+    setFont(getFont(size, font));
   }
   public int getSize() {
     return font.getSize();
   }
 
+  ///////////////////////////////////////
+  // Public font assignment functions: //
+  ///////////////////////////////////////
 
   public void set(JComponent... jcs) {
     for (JComponent jc : jcs){
@@ -58,6 +57,10 @@ public class MinimumFont {
       expand((Container)c);
   }
 
+  ////////////////////////////////////////
+  // Private font assignment functions: //
+  ////////////////////////////////////////
+
   private void expand(JComponent jc) {
     if (jc.getComponentCount() > 0)
       for (Component c : jc.getComponents())
@@ -70,18 +73,40 @@ public class MinimumFont {
   }
   private void setFont(Component jc) {
     Font old=jc.getFont();
-    if (old.getSize() < font.getSize()){
+    if (font.isBold())
+      System.out.println("MAN WTF MAN");
+    if (old.getSize() != font.getSize()){
       if (old.isItalic())
+        //Rare case, so we waste memory:
         jc.setFont(
           old.deriveFont(old.getStyle(), font.getSize())
         );
       else
       if (old.isBold())
+        //Occasional case, yeah it's bold:
         jc.setFont(fontBold);
       else
+        //Typical case:
         jc.setFont(font);
     }
   }
+
+  //////////////////////////
+  // Internal State Mgmt: //
+  //////////////////////////
+
+  private void setFont(Font font) {
+    this.font=font;
+    this.fontBold=new Font(
+      font.getFontName(),
+      font.getStyle() | Font.BOLD,
+      font.getSize()
+    );
+  }
+
+  /////////////////////////////////////
+  // Utilities for making new fonts: //
+  /////////////////////////////////////
 
   private static Font getFont(int minSize) {
     return getFont(minSize, new JLabel().getFont());
@@ -89,8 +114,8 @@ public class MinimumFont {
   private static Font getFont(int minSize, Font f) {
     f=new Font(
       f.getFontName(),
-      f.getStyle(),
-      f.getSize() < minSize ?minSize :f.getSize()
+      Font.PLAIN,
+      minSize
     );
     return f;
   }
