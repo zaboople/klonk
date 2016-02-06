@@ -7,9 +7,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -26,11 +26,11 @@ import javax.swing.JTextField;
 import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
+import org.tmotte.klonk.config.PopupInfo;
+import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.windows.Positioner;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.windows.popup.PopupTestContext;
-import org.tmotte.klonk.config.option.SSHOptions;
-
 
 public class SSHOptionPicker {
 

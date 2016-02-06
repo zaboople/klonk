@@ -36,6 +36,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.PopupInfo;
 
 public class Help {
 

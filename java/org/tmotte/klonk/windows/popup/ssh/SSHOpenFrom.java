@@ -1,7 +1,7 @@
 package org.tmotte.klonk.windows.popup.ssh;
-import java.awt.Rectangle;
-import java.awt.Insets;
 import java.awt.Color;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -24,6 +24,7 @@ import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.KPersist;
+import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.msg.UserServer;
 import org.tmotte.klonk.windows.Positioner;
 import org.tmotte.klonk.windows.popup.PopupTestContext;
