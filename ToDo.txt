@@ -9,28 +9,13 @@
   -Document all the changes
 
 -Current
-
-  -Fonts are too damn small all over
-    -Font window never gets shrunk
-    -Main window needs to get setting back
-    -Make it where PopupInfo has something fonts can register to hear changes with
-    -Need to document how to change font size or add an option window.
-    -Add minimum font to font options window
+  -Indents, Font don't show message when ok is clicked.
 
   -Shell
     -Shows Ctrl-E on both windows and mac when it should command-e on mac
     -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.
     -We should be able to make the shell textbox act like our normal editor using our Selectable class.
 
-  -We ought to make it where you can pick between fixed-width and not fixed-width fonts in the picker.
-    FontRenderContext frc = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
-    for (Font font : fonts) {
-        Rectangle2D iBounds = font.getStringBounds("i", frc);
-        Rectangle2D mBounds = font.getStringBounds("m", frc);
-        if (iBounds.getWidth() == mBounds.getWidth()) {
-            monoFonts1.add(font);
-        }
-    }
 
   -Cursor does not move with mousewheel, only with page down.
 
@@ -65,7 +50,16 @@
     -You could have undostep include whether selection is forwards or backwards. Just a boolean.
   -Selected text color, selected background color
   -Indents & Tabs, Fonts should only enable ok button when something changes.
-    -Also should show message when ok is clicked.
+
+  -We ought to make it where you can pick between fixed-width and not fixed-width fonts in the picker.
+    FontRenderContext frc = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
+    for (Font font : fonts) {
+        Rectangle2D iBounds = font.getStringBounds("i", frc);
+        Rectangle2D mBounds = font.getStringBounds("m", frc);
+        if (iBounds.getWidth() == mBounds.getWidth()) {
+            monoFonts1.add(font);
+        }
+    }
 
 -On hold / Long term problems
   -Weird background bugs
