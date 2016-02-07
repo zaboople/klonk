@@ -643,7 +643,7 @@ public class Menus {
       ,
       markClearCurrent=mu.doMenuItem(
         "Clear current mark",
-        markItemListener, KeyEvent.VK_C, 
+        markItemListener, KeyEvent.VK_C,
         KeyMapper.key(KeyEvent.VK_F4, KeyEvent.SHIFT_DOWN_MASK)
       )
       ,
