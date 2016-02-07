@@ -20,20 +20,20 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.msg.UserServer;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.windows.Positioner;
 import org.tmotte.klonk.windows.popup.PopupTestContext;
 
 public class SSHOpenFrom {
 
   // DI:
-  private JFrame parentFrame;
-  private CurrentOS currentOS;
+  private PopupInfo pInfo;
+  private FontOptions fontOptions;
 
   // Controls:
   private JDialog win;
@@ -51,9 +51,10 @@ public class SSHOpenFrom {
   private boolean failed=false;
   private SSHOpenFromResult result=null;
 
-  public SSHOpenFrom(JFrame parentFrame, CurrentOS currentOS) {
-    this.parentFrame=parentFrame;
-    this.currentOS=currentOS;
+  public SSHOpenFrom(PopupInfo pInfo, FontOptions fontOptions) {
+    this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
+    pInfo.addFontListener(fo -> setFont(fo));
   }
 
   private void doShow() {
@@ -82,12 +83,12 @@ public class SSHOpenFrom {
       jcbPrevious.requestFocusInWindow();
     if (!shownBefore)
       win.pack();
-    Rectangle parentRect=parentFrame.getBounds(), thisRect=win.getBounds();
+    Rectangle parentRect=pInfo.parentFrame.getBounds(), thisRect=win.getBounds();
     if (parentRect.width / 2 > thisRect.width){
       thisRect.width=parentRect.width / 2;
       win.setBounds(thisRect);
     }
-    Positioner.set(parentFrame, win, false);
+    Positioner.set(pInfo.parentFrame, win, false);
     failed=true;
     shownBefore=true;
     lblError.setVisible(false);
@@ -140,7 +141,7 @@ public class SSHOpenFrom {
     }
   }
   private void create(){
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setResizable(true);
     win.setTitle("blargh");
 
@@ -179,7 +180,8 @@ public class SSHOpenFrom {
     gb.addY(getButtons());
     gb.weightXY(0);
     gb.addY(getErrorPanel());
-    win.pack();
+
+    setFont(fontOptions);
   }
   private JPanel getInputPanel() {
     JPanel jp=new JPanel();
@@ -239,6 +241,13 @@ public class SSHOpenFrom {
     gb.addX(btnCancel);
     return panel;
   }
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
+    if (win!=null){
+      fontOptions.getControlsFont().set(win);
+      win.pack();
+    }
+  }
 
   private void listen(){
     Action okAction=new AbstractAction() {
@@ -263,8 +272,7 @@ public class SSHOpenFrom {
       public void run() {
         try {
           PopupTestContext ptc=new PopupTestContext();
-          JFrame parentFrame=ptc.makeMainFrame();
-          SSHOpenFrom w=new SSHOpenFrom(parentFrame, ptc.getCurrentOS());
+          SSHOpenFrom w=new SSHOpenFrom(ptc.getPopupInfo(), ptc.getFontOptions());
           List<UserServer> uss=new ArrayList<>();
 
           System.out.println(w.show(false, uss));

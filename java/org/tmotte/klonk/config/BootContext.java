@@ -251,7 +251,7 @@ public class BootContext {
     LineDelimiters kDelims=new LineDelimiters(mainFrame, currentOS);
 
     //Help:
-    Help help=new Help(mainFrame, currentOS, home.getUserHome(), fontOptions);
+    Help help=new Help(popupInfo, fontOptions, home.getUserHome());
     About about=new About(mainFrame, currentOS);
 
 
@@ -290,7 +290,7 @@ public class BootContext {
       layout.getMainDisplay(),
       statusBar,
       fileDialogWrapper,
-      new SSHOpenFrom(mainFrame, currentOS),
+      new SSHOpenFrom(popupInfo, fontOptions),
       openFileList,
       yesNoCancel,
       yesNo

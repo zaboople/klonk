@@ -409,8 +409,9 @@ public class SSHOptionPicker {
     return panel;
   }
   private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
     if (win!=null)
-      fo.getControlsFont().set(win);
+      fontOptions.getControlsFont().set(win);
   }
 
   /////////////

@@ -108,11 +108,7 @@ public class FindAndReplace {
     this.fontOptions=fontOptions;
     this.statusBar=statusBar;
     this.alerter=alerter;
-    pInfo.addFontListener(
-      new Setter<FontOptions>(){
-        public void set(FontOptions fo){setFont(fo);}
-      }
-    );
+    pInfo.addFontListener(fo -> setFont(fo));
   }
   public void doFind(MyTextArea target)    {doFind(target, false);}
   public void doReplace(MyTextArea target) {doFind(target, true);}

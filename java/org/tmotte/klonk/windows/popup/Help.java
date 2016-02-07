@@ -41,10 +41,9 @@ import org.tmotte.klonk.config.PopupInfo;
 public class Help {
 
   // DI:
-  private JFrame parentFrame;
-  private CurrentOS currentOS;
-  private String homeDir;
+  private PopupInfo pInfo;
   private FontOptions fontOptions;
+  private String homeDir;
 
   // Controls:
   private JButton btnOK;
@@ -56,18 +55,18 @@ public class Help {
   // State:
   private boolean initialized;
 
-  public Help(JFrame parentFrame, CurrentOS currentOS, String homeDir, FontOptions fontOptions) {
-    this.parentFrame=parentFrame;
-    this.currentOS=currentOS;
-    this.homeDir=homeDir;
+  public Help(PopupInfo pInfo, FontOptions fontOptions, String homeDir) {
+    this.pInfo=pInfo;
     this.fontOptions=fontOptions;
+    this.homeDir=homeDir;
+    pInfo.addFontListener(fo -> setFont(fo));
   }
   public void show() {
     show(null);
   }
   public void show(Rectangle bounds) {
     init();
-    Point pt=parentFrame.getLocation();
+    Point pt=pInfo.parentFrame.getLocation();
     if (bounds!=null)
       win.setBounds(bounds);
     win.setLocation(pt.x+20, pt.y+20);
@@ -75,6 +74,12 @@ public class Help {
     win.paintAll(win.getGraphics());
     win.toFront();
   }
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
+    if (win!=null)
+      fontOptions.getControlsFont().set(win);
+  }
+
 
   ////////////////////////
   //  PRIVATE METHODS:  //
@@ -95,7 +100,7 @@ public class Help {
 
   // CREATE/LAYOUT/LISTEN: //
   private void create() {
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
 
     jtp=new JTextPane();
     jtp.setEditable(false);
@@ -138,9 +143,10 @@ public class Help {
     gb.fill=gb.NONE;
     gb.addY(btnOK);
 
+    setFont(fontOptions);
     win.pack();
 
-    Rectangle rect=parentFrame.getBounds();
+    Rectangle rect=pInfo.parentFrame.getBounds();
     rect.x+=20; rect.y+=20;
     rect.width=Math.max(rect.width-40, 100);
     rect.height=Math.max(rect.height-40, 100);
@@ -154,7 +160,7 @@ public class Help {
     };
     btnOK.addActionListener(okAction);
     KeyMapper.easyCancel(btnOK, okAction);
-    currentOS.fixEnterKey(btnOK, okAction);
+    pInfo.currentOS.fixEnterKey(btnOK, okAction);
     jtp.addKeyListener(new KeyAdapter() {
       public void keyPressed(KeyEvent ke) {
         if (ke.getKeyCode()==KeyEvent.VK_TAB)
@@ -172,7 +178,7 @@ public class Help {
       public void run() {
         PopupTestContext ptc=new PopupTestContext();
         Help h=new Help(
-          ptc.makeMainFrame(), ptc.getCurrentOS(), ".", new FontOptions()
+          ptc.getPopupInfo(), ptc.getFontOptions(), "."
         );
         h.show(new Rectangle(800,400));
       }

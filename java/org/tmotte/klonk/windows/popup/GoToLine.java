@@ -20,9 +20,10 @@ import javax.swing.JTextField;
 import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.klonk.config.msg.Setter;
-import org.tmotte.klonk.windows.Positioner;
 import org.tmotte.klonk.config.PopupInfo;
+import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.windows.Positioner;
 
 public class GoToLine {
 

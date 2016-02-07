@@ -27,6 +27,7 @@ import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
 import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.option.FontOptions;
 
 /**
  * Always has one button - OK - and a message. Can display

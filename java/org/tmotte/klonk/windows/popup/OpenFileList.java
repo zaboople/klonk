@@ -71,11 +71,7 @@ public class OpenFileList {
     ) {
     this.pInfo=pInfo;
     this.fontOptions=fontOptions;
-    pInfo.addFontListener(
-      new Setter<FontOptions>(){
-        public void set(FontOptions fo){setFont(fo);}
-      }
-    );
+    pInfo.addFontListener(fo -> setFont(fo));
   }
   public List<String> show() {
     init();

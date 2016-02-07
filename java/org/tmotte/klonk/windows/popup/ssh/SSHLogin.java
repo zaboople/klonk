@@ -36,6 +36,7 @@ import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.ssh.SSH;
 import org.tmotte.klonk.windows.popup.KAlert;

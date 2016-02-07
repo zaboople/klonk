@@ -1,11 +1,11 @@
 package org.tmotte.klonk.windows.popup;
 import java.awt.Component;
-import java.awt.Rectangle;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -20,8 +20,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.JWindow;
 import javax.swing.ScrollPaneConstants;
@@ -31,6 +31,7 @@ import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
 import org.tmotte.klonk.config.PopupInfo;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.windows.Positioner;
 
 public class About {
