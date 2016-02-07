@@ -95,14 +95,13 @@ public class Favorites {
 
   private void setFont(FontOptions fo) {
     this.fontOptions=fo;
-    if (initialized) {
+    if (win!=null) {
       fo.getControlsFont().set(win);
       setFont(mtaFiles);
       setFont(mtaDirs);
       mainLabel.setFont(
         mainLabel.getFont().deriveFont(Font.BOLD, fo.getControlsFont().getSize() + 2)
       );
-
       //Makes the mta assert its designated row count:
       win.pack();
     }
@@ -159,7 +158,6 @@ public class Favorites {
       layout();
       listen();
       initialized=true;
-      setFont(fontOptions);
     }
   }
   private void create(){
@@ -196,7 +194,7 @@ public class Favorites {
     gb.fill=gb.HORIZONTAL;
     gb.addY(getButtons());
 
-    win.pack();
+    setFont(fontOptions);
   }
   private Container getInputPanel() {
     GridBug gb=new GridBug(new JPanel());
