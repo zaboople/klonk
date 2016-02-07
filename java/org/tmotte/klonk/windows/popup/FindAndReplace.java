@@ -78,7 +78,7 @@ public class FindAndReplace {
   private JCheckBox chkReplace, chkCase, chkReplaceAll, chkConfirmReplace, chkRegex, chkRegexMultiline;
   private JButton btnFind, btnReverse, btnCancel;
   private JLabel lblFind;
-  private Font fontBold, fontNormal;
+  private Font fontBold, fontPlain;
 
   //Other windows. Yes we technically violate our singleton sort-of-a-rule here, creating
   //extra instances of YesNoCancel
@@ -92,11 +92,6 @@ public class FindAndReplace {
   //behavior from the class.
   private MyTextArea target;
   private Finder finder=new Finder();
-  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
-    public void set(FontOptions fo){setFont(fo);}
-  };
-
-
 
 
   /////////////////////
@@ -113,9 +108,11 @@ public class FindAndReplace {
     this.fontOptions=fontOptions;
     this.statusBar=statusBar;
     this.alerter=alerter;
-  }
-  public Setter<FontOptions> getFontListener() {
-    return fontListener;
+    pInfo.addFontListener(
+      new Setter<FontOptions>(){
+        public void set(FontOptions fo){setFont(fo);}
+      }
+    );
   }
   public void doFind(MyTextArea target)    {doFind(target, false);}
   public void doReplace(MyTextArea target) {doFind(target, true);}
@@ -280,8 +277,8 @@ public class FindAndReplace {
   }
 
   private void create() {
-    fontNormal=new JLabel().getFont();
-    fontBold=fontNormal.deriveFont(Font.BOLD);
+    fontPlain=new JLabel().getFont();
+    fontBold=fontPlain.deriveFont(Font.BOLD);
     win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("Find & Replace");
 
@@ -456,6 +453,13 @@ public class FindAndReplace {
   }
 
   private void setFont(FontOptions f) {
+    fontOptions=f;
+    if (win!=null)
+      f.getControlsFont().set(win);
+    if (fontBold!=null)
+      fontBold=fontBold.deriveFont(Font.BOLD, f.getControlsFont().getSize());
+    if (fontPlain!=null)
+      fontPlain=fontPlain.deriveFont(Font.PLAIN, f.getControlsFont().getSize());
     if (mtaFind!=null && mtaReplace!=null) {
       mtaFind.setFont(f.getFont());
       mtaFind.setForeground(f.getColor());
@@ -514,7 +518,7 @@ public class FindAndReplace {
           if (jcb.isSelected())
             jcb.setFont(fontBold);
           else
-            jcb.setFont(fontNormal);
+            jcb.setFont(fontPlain);
         }
         if (jcb==chkRegex) {
           chkRegexMultiline.setVisible(chkRegex.isSelected());

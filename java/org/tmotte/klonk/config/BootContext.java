@@ -266,7 +266,6 @@ public class BootContext {
     {
       //FIXME delete
       //This cannot be an array because of "generic array creation" compiler fail:
-      popupInfo.addFontListener(findAndReplace.getFontListener());
       popupInfo.addFontListener(openFileList.getFontListener());
 
       CtrlFavorites ctrlFavorites=new CtrlFavorites(
