@@ -84,6 +84,10 @@ public class Shell {
   //                    //
   ////////////////////////
 
+  ////////////////////////
+  // WINDOW STATE MGMT: //
+  ////////////////////////
+
   private void showFileDialog() {
     File file=new File(jcbPrevious.getEditor().getItem().toString());
     file=fdw.show(false, file, null);
@@ -94,8 +98,6 @@ public class Shell {
         throw new RuntimeException(e);
       }
   }
-
-
   private void closing() {
     preserveBounds();
     persist.checkSave();
@@ -123,6 +125,9 @@ public class Shell {
     }
   }
 
+  ///////////////////////////////
+  // COMMAND STORE & RETRIEVE: //
+  ///////////////////////////////
 
   private void forget() {
     int index=getIndexOf(
@@ -166,8 +171,9 @@ public class Shell {
   }
 
 
-
-
+  ////////////////////////
+  // COMMAND EXECUTION: //
+  ////////////////////////
 
   private void exec() {
     die();
