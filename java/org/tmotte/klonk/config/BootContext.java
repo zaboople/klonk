@@ -252,7 +252,7 @@ public class BootContext {
 
     //Help:
     Help help=new Help(popupInfo, fontOptions, home.getUserHome());
-    About about=new About(mainFrame, currentOS);
+    About about=new About(popupInfo, fontOptions);
 
 
     // MENUS: //

@@ -26,7 +26,6 @@ import javax.swing.JTextPane;
 import javax.swing.JWindow;
 import javax.swing.ScrollPaneConstants;
 import org.tmotte.common.io.Loader;
-import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.text.StackTracer;
@@ -37,8 +36,8 @@ import org.tmotte.klonk.windows.Positioner;
 public class About {
 
   // DI:
-  private CurrentOS currentOS;
-  private JFrame parentFrame;
+  private PopupInfo pInfo;
+  private FontOptions fontOptions;
 
   // Controls:
   private JDialog win;
@@ -53,20 +52,27 @@ public class About {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public About(JFrame frame, CurrentOS currentOS) {
-    this.parentFrame=frame;
-    this.currentOS=currentOS;
+  public About(PopupInfo pInfo, FontOptions fontOptions) {
+    this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
+    pInfo.addFontListener(fo -> setFont(fo));
   }
 
   public void show() {
     init();
-    Positioner.set(parentFrame, win);
+    Positioner.set(pInfo.parentFrame, win);
     btnOK.requestFocusInWindow();
     win.pack();
     win.setVisible(true);
     win.toFront();
   }
-
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
+    if (win!=null){
+      fontOptions.getControlsFont().set(win);
+      win.pack();
+    }
+  }
 
   //////////////////////
   // PRIVATE METHODS: //
@@ -82,7 +88,7 @@ public class About {
   }
 
   private void create(){
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("About Klonk");
     win.setPreferredSize(new Dimension(400,400));
 
@@ -152,7 +158,7 @@ public class About {
     gb.insets.bottom=10;
     gb.addY(btnOK);
 
-    win.pack();
+    setFont(fontOptions);
 
   }
 
@@ -163,7 +169,7 @@ public class About {
       }
     };
     btnOK.addActionListener(actions);
-    currentOS.fixEnterKey(btnOK, actions);
+    pInfo.currentOS.fixEnterKey(btnOK, actions);
     KeyMapper.easyCancel(btnOK, actions);
   }
 
@@ -176,7 +182,7 @@ public class About {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         PopupTestContext ptc=new PopupTestContext();
-        new About(ptc.makeMainFrame(), ptc.getCurrentOS()).show();
+        new About(ptc.getPopupInfo(), ptc.getFontOptions()).show();
       }
     });
   }

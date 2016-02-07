@@ -76,8 +76,10 @@ public class Help {
   }
   private void setFont(FontOptions fo) {
     this.fontOptions=fo;
-    if (win!=null)
+    if (win!=null){
       fontOptions.getControlsFont().set(win);
+      win.pack();
+    }
   }
 
 
@@ -144,7 +146,6 @@ public class Help {
     gb.addY(btnOK);
 
     setFont(fontOptions);
-    win.pack();
 
     Rectangle rect=pInfo.parentFrame.getBounds();
     rect.x+=20; rect.y+=20;
