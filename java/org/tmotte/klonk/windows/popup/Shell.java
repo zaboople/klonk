@@ -38,9 +38,6 @@ public class Shell {
   private KPersist persist;
   private Getter<String> currFileGetter;
   private Image icon;
-  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
-    public void set(FontOptions fo){setFont(fo);}
-  };
 
   // Controls:
   private JFrame win;
@@ -69,9 +66,11 @@ public class Shell {
     this.persist=persist;
     this.icon=icon;
     this.currFileGetter=currFileGetter;
-  }
-  public Setter<FontOptions> getFontListener() {
-    return fontListener;
+    pInfo.addFontListener(
+      new Setter<FontOptions>(){
+        public void set(FontOptions fo){setFont(fo);}
+      }
+    );
   }
   public void show() {
     init();
