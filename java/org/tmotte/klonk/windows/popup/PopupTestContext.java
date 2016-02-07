@@ -24,8 +24,6 @@ import org.tmotte.klonk.Menus;
 
 /**
  * For testing popups without the overhead of the main application running.
- * It should be noted that 90% of the tests herein only use the makeMainFrame() function.
- * Shell is the exception, but then again, it is a complicated animal.
  */
 public class PopupTestContext  {
 
