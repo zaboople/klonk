@@ -248,7 +248,7 @@ public class BootContext {
     TabsAndIndents tabsAndIndents=new TabsAndIndents(popupInfo, fontOptions);
     FontPicker fontPicker=new FontPicker(popupInfo, alerter);
     SSHOptionPicker sshOptionPicker=new SSHOptionPicker(popupInfo, fontOptions, fileDialogWrapper);
-    LineDelimiters kDelims=new LineDelimiters(mainFrame, currentOS);
+    LineDelimiters kDelims=new LineDelimiters(popupInfo, fontOptions);
 
     //Help:
     Help help=new Help(popupInfo, fontOptions, home.getUserHome());

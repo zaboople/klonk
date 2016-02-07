@@ -33,8 +33,8 @@ import org.tmotte.klonk.config.option.FontOptions;
 public class LineDelimiters {
 
   // DI:
-  private JFrame parentFrame;
-  private CurrentOS currentOS;
+  private PopupInfo pInfo;
+  private FontOptions fontOptions;
 
   // Controls:
   private JDialog win;
@@ -50,9 +50,10 @@ public class LineDelimiters {
   // INITIALIZATION: //
   /////////////////////
 
-  public LineDelimiters(JFrame frame, CurrentOS currentOS) {
-    parentFrame=frame;
-    this.currentOS=currentOS;
+  public LineDelimiters(PopupInfo pInfo, FontOptions fontOptions) {
+    this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
+    pInfo.addFontListener(fo -> setFont(fo));
   }
 
 
@@ -65,7 +66,7 @@ public class LineDelimiters {
     btnDefault.setEnabled(false);
     btnThis.setEnabled(false);
     //And now the normal bs:
-    Point pt=parentFrame.getLocation();
+    Point pt=pInfo.parentFrame.getLocation();
     win.setLocation(pt.x+20, pt.y+20);
     win.setVisible(true);
     win.paintAll(win.getGraphics());
@@ -77,6 +78,14 @@ public class LineDelimiters {
   //////////////////////
   // PRIVATE METHODS: //
   //////////////////////
+
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
+    if (win!=null){
+      fontOptions.getControlsFont().set(win);
+      win.pack();
+    }
+  }
 
   private void clickSetDefault() {
     btnDefault.setEnabled(false);
@@ -109,7 +118,7 @@ public class LineDelimiters {
   }
 
   private void create() {
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("Line delimiters");
     jcOptions =getOptions();
     jcbDefault=new JComboBox<String>(jcOptions);
@@ -152,7 +161,7 @@ public class LineDelimiters {
     gb.anchor=gb.CENTER;
     gb.addY(btnClose);
 
-    win.pack();
+    setFont(fontOptions);
   }
   private Component getFirstLabel() {
     return getLabel("<html>Set <b>default</b> delimiter to: </html>");
@@ -207,7 +216,7 @@ public class LineDelimiters {
     };
     btnClose.addActionListener(closeAction);
     KeyMapper.easyCancel(btnClose, closeAction);
-    currentOS.fixEnterKey(btnClose, closeAction);
+    pInfo.currentOS.fixEnterKey(btnClose, closeAction);
     btnClose.setMnemonic(KeyEvent.VK_C);
 
     btnDefault.addActionListener(new ActionListener() {
@@ -251,21 +260,20 @@ public class LineDelimiters {
       public void run() {
         final LineDelimiterOptions kdo=new LineDelimiterOptions();
         PopupTestContext ptc=new PopupTestContext();
-        new LineDelimiters(
-          ptc.makeMainFrame(), ptc.getCurrentOS()
-        ).show(
-          kdo,
-          new LineDelimiterListener(){
-            public void setDefault(String i) {
-              kdo.defaultOption=i;
-              System.out.println(kdo);
+        new LineDelimiters(ptc.getPopupInfo(), ptc.getFontOptions())
+          .show(
+            kdo,
+            new LineDelimiterListener(){
+              public void setDefault(String i) {
+                kdo.defaultOption=i;
+                System.out.println(kdo);
+              }
+              public void setThis(String i)    {
+                kdo.thisFile=i;
+                System.out.println(kdo);
+              }
             }
-            public void setThis(String i)    {
-              kdo.thisFile=i;
-              System.out.println(kdo);
-            }
-          }
-        );
+          );
         System.out.println(kdo);
       }
     });

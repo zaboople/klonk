@@ -103,7 +103,7 @@ public class About {
       jtp.setBorder(null);
       jtp.setOpaque(false);
     }
-    Font font=jtpVersion.getFont().deriveFont(Font.BOLD, 14);
+    Font font=jtpVersion.getFont().deriveFont(Font.BOLD);
     jtpVersion.setFont(font);
     jtpJavaVersion.setFont(font);
 
@@ -159,7 +159,6 @@ public class About {
     gb.addY(btnOK);
 
     setFont(fontOptions);
-
   }
 
   private void listen(){
