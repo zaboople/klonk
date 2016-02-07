@@ -32,9 +32,9 @@ public class GoToLine {
   /////////////////////////
 
   // DI:
-  private JFrame parentFrame;
-  private CurrentOS currentOS;
-  private Setter<String> complainer;
+  private PopupInfo pInfo;
+  private FontOptions fontOptions;
+  private Setter<String> alerter;
 
   // Controls:
   private JDialog win;
@@ -50,10 +50,11 @@ public class GoToLine {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public GoToLine(JFrame parentFrame, CurrentOS currentOS, Setter<String> complainer) {
-    this.parentFrame=parentFrame;
-    this.currentOS=currentOS;
-    this.complainer=complainer;
+  public GoToLine(PopupInfo pInfo, FontOptions fontOptions, Setter<String> alerter) {
+    this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
+    this.alerter=alerter;
+    pInfo.addFontListener(fo -> setFont(fo));
   }
   public int show() {
     init();
@@ -63,7 +64,7 @@ public class GoToLine {
       jtfRow.moveCaretPosition(s.length());
     }
     win.pack();
-    Positioner.set(parentFrame, win, false);
+    Positioner.set(pInfo.parentFrame, win, false);
 
     result=-1;
     badEntry=true;
@@ -72,7 +73,6 @@ public class GoToLine {
       doShow();
     return result;
   }
-
 
   ////////////////////////
   //                    //
@@ -94,15 +94,23 @@ public class GoToLine {
       try {
         result=Integer.parseInt(jtfRow.getText());
       } catch (NumberFormatException e) {
-        complainer.set("Value entered is not a valid number ");
+        alerter.set("Value entered is not a valid number ");
         badEntry=true;
         return;
       }
       if (result<=0) {
-        complainer.set("Value must be greater than 0");
+        alerter.set("Value must be greater than 0");
         badEntry=true;
         return;
       }
+    }
+  }
+
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
+    if (win!=null){
+      fontOptions.getControlsFont().set(win);
+      win.pack();
     }
   }
 
@@ -120,7 +128,7 @@ public class GoToLine {
   }
 
   private void create(){
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setResizable(false);
     win.setTitle("Go to line");
     jtfRow=new JTextField();
@@ -143,7 +151,7 @@ public class GoToLine {
     gb.fill=gb.HORIZONTAL;
     gb.weightXY(1);
     gb.addY(getButtons());
-    win.pack();
+    setFont(fontOptions);
   }
   private JPanel getInputPanel() {
     JPanel jp=new JPanel();
@@ -207,9 +215,8 @@ public class GoToLine {
       public void run() {
         try {
           PopupTestContext ptc=new PopupTestContext();
-          JFrame parentFrame=ptc.makeMainFrame();
-          KAlert alerter=new KAlert(parentFrame, ptc.getCurrentOS());
-          GoToLine gtl=new GoToLine(parentFrame, ptc.getCurrentOS(), alerter);
+          KAlert alerter=new KAlert(ptc.getMainFrame(), ptc.getCurrentOS());
+          GoToLine gtl=new GoToLine(ptc.getPopupInfo(), ptc.getFontOptions(), alerter);
           System.out.println(gtl.show());
         } catch (Exception e) {
           e.printStackTrace();

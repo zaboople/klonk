@@ -235,7 +235,7 @@ public class BootContext {
     //Search popups:
     FindAndReplace findAndReplace=
       new FindAndReplace(popupInfo, fontOptions, alerter, statusBar);
-    GoToLine goToLine=new GoToLine(mainFrame, currentOS, alerter);
+    GoToLine goToLine=new GoToLine(popupInfo, fontOptions, alerter);
 
     //Shell:
     Shell shell=new Shell(
