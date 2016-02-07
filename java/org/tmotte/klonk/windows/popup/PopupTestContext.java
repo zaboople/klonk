@@ -20,7 +20,6 @@ import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.controller.CtrlMain;
 import org.tmotte.klonk.io.FileListen;
 import org.tmotte.klonk.io.KLog;
-import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.Menus;
 
 /**
