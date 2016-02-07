@@ -49,8 +49,8 @@ public class SSHLogin implements IUserPass {
   /////////////////////////
 
   // DI:
-  private JFrame parentFrame;
-  private CurrentOS currentOS;
+  private PopupInfo pInfo;
+  private FontOptions fontOptions;
   private Setter<String> alerter;
 
   // Controls:
@@ -67,10 +67,11 @@ public class SSHLogin implements IUserPass {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public SSHLogin(JFrame parentFrame, CurrentOS currentOS, Setter<String> alerter) {
-    this.parentFrame=parentFrame;
-    this.currentOS=currentOS;
+  public SSHLogin(PopupInfo pInfo, FontOptions fontOptions, Setter<String> alerter) {
+    this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
     this.alerter=alerter;
+    pInfo.addFontListener(fo -> setFont(fo));
   }
   public @Override String getUser() {
     return ok
@@ -100,7 +101,7 @@ public class SSHLogin implements IUserPass {
 
     //Position:
     win.pack();
-    Point pt=parentFrame.getLocation();
+    Point pt=pInfo.parentFrame.getLocation();
     win.setLocation(pt.x+20, pt.y+20);
 
     //Display cycle: No we don't need a loop, we just
@@ -114,6 +115,13 @@ public class SSHLogin implements IUserPass {
     win.setVisible(true);
     win.toFront();
     return ok;
+  }
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
+    if (win!=null){
+      fontOptions.getControlsFont().set(win);
+      win.pack();
+    }
   }
 
 
@@ -131,7 +139,7 @@ public class SSHLogin implements IUserPass {
   }
 
   private void create() {
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("SSH Login");
     jtfUsername=new JTextField();
     jtfUsername.setColumns(20);
@@ -155,6 +163,8 @@ public class SSHLogin implements IUserPass {
     gb.weightXY(0).gridXY(0);
     gb.addY(makeInputs());
     gb.addY(makeButtonPanel());
+
+    setFont(fontOptions);
   }
   private JPanel makeInputs() {
     JPanel jp=new JPanel();
@@ -269,18 +279,17 @@ public class SSHLogin implements IUserPass {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         PopupTestContext ptc=new PopupTestContext();
-        JFrame m=ptc.makeMainFrame();
-        KAlert ka=new KAlert(m, ptc.getCurrentOS());
-        SSHLogin sh=new SSHLogin(m, ptc.getCurrentOS(), ka);
-        testWindow(m, sh, "aname", "test1.youknowthat.server.danglblangdingdongwhat.com", false, false);
-        testWindow(m, sh, "aname", "test2.who.perv.com", true, true);
-        testWindow(m, sh, "aname", "needs.password.only.com", false, true);
-        testWindow(m, sh, null, "test3.bleagh.com", false, true);
+        KAlert ka=new KAlert(ptc.getPopupInfo(), ptc.getFontOptions());
+        SSHLogin sh=new SSHLogin(ptc.getPopupInfo(), ptc.getFontOptions(), ka);
+        testWindow(sh, "aname", "test1.youknowthat.server.danglblangdingdongwhat.com", false, false);
+        testWindow(sh, "aname", "test2.who.perv.com", true, true);
+        testWindow(sh, "aname", "needs.password.only.com", false, true);
+        testWindow(sh, null, "test3.bleagh.com", false, true);
       }
     });
   }
   private static void testWindow(
-      JFrame m, SSHLogin sh, String user, String host, boolean authFail, boolean needsPassword
+      SSHLogin sh, String user, String host, boolean authFail, boolean needsPassword
     ) {
     System.out.println("RESULT: "+sh.show(user, host, authFail, needsPassword));
     System.out.println("user/pass: "+sh.getUser()+" "+sh.getPass());

@@ -36,8 +36,8 @@ import org.tmotte.klonk.config.option.FontOptions;
 public class KAlert implements Setter<String> {
 
   // DI:
-  private JFrame parentFrame;
-  private CurrentOS currentOS;
+  private PopupInfo pInfo;
+  private FontOptions fontOptions;
 
   // Controls:
   private JDialog win;
@@ -55,9 +55,10 @@ public class KAlert implements Setter<String> {
   // PUBLIC METHODS: //
   /////////////////////
 
-  public KAlert(JFrame frame, CurrentOS currentOS) {
-    parentFrame=frame;
-    this.currentOS=currentOS;
+  public KAlert(PopupInfo pInfo, FontOptions fontOptions) {
+    this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
+    pInfo.addFontListener(fo -> setFont(fo));
   }
   /** Implements Setter interface */
   public @Override void set(String message){
@@ -94,7 +95,11 @@ public class KAlert implements Setter<String> {
     }
     win.pack();
     ok.requestFocusInWindow();
-    show();
+
+    Point pt=pInfo.parentFrame.getLocation();
+    win.setLocation(pt.x+20, pt.y+20);
+    win.setVisible(true);
+    win.toFront();
   }
 
   public void fail(Throwable e) {
@@ -115,7 +120,7 @@ public class KAlert implements Setter<String> {
     }
   }
   private void create() {
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
 
     errorLabel=new JTextPane();
     errorLabel.setEditable(false); // as before
@@ -142,6 +147,8 @@ public class KAlert implements Setter<String> {
     gb.insets.top=5;
     gb.insets.bottom=10;
     gb.addY(ok);
+
+    setFont(fontOptions);
   }
   private void listen() {
     Action actions=new AbstractAction() {
@@ -151,7 +158,7 @@ public class KAlert implements Setter<String> {
     };
     ok.addActionListener(actions);
     ok.setMnemonic(KeyEvent.VK_K);
-    currentOS.fixEnterKey(ok, actions);
+    pInfo.currentOS.fixEnterKey(ok, actions);
     KeyMapper.easyCancel(ok, actions);
   }
 
@@ -163,11 +170,12 @@ public class KAlert implements Setter<String> {
   private String getAlert(String message, Throwable e) {
     return message+"\n\n"+StackTracer.getStackTrace(e).replaceAll("\t", "    ");
   }
-  private void show() {
-    Point pt=parentFrame.getLocation();
-    win.setLocation(pt.x+20, pt.y+20);
-    win.setVisible(true);
-    win.toFront();
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
+    if (win!=null){
+      fontOptions.getControlsFont().set(win);
+      win.pack();
+    }
   }
 
 
@@ -180,8 +188,7 @@ public class KAlert implements Setter<String> {
       public void run() {
         try {
           PopupTestContext ptc=new PopupTestContext();
-          JFrame frame=ptc.makeMainFrame();
-          KAlert ka=new KAlert(frame, ptc.getCurrentOS());
+          KAlert ka=new KAlert(ptc.getPopupInfo(), ptc.getFontOptions());
           ka.show("Small warning thing okay.");
           ka.show("Small warning thing okay but larger.");
           ka.show("Small warning thing okay but it's just a bit larger than before.");
@@ -205,7 +212,6 @@ public class KAlert implements Setter<String> {
           );
           ka.show("I dislike you");
           ka.fail(new RuntimeException("I had a smoochy smooch"));
-          frame.dispose();
           return;
         } catch (Exception e) {
           e.printStackTrace();

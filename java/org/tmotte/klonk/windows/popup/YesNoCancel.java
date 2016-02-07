@@ -33,9 +33,9 @@ import org.tmotte.klonk.config.option.FontOptions;
 public class YesNoCancel {
 
   // DI:
-  private JFrame parentFrame;
+  private PopupInfo pInfo;
+  private FontOptions fontOptions;
   private boolean haveCancel=true;
-  private CurrentOS currentOS;
 
   // State:
   private int yesOrNoOrCancel=-1;
@@ -48,13 +48,14 @@ public class YesNoCancel {
   // INITIALIZATION: //
   /////////////////////
 
-  public YesNoCancel(JFrame frame, CurrentOS currentOS) {
-    this(frame, currentOS, true);
+  public YesNoCancel(PopupInfo pInfo, FontOptions fontOptions) {
+    this(pInfo, fontOptions, true);
   }
-  public YesNoCancel(JFrame frame, CurrentOS currentOS, boolean haveCancel) {
-    parentFrame=frame;
-    this.currentOS=currentOS;
+  public YesNoCancel(PopupInfo pInfo, FontOptions fontOptions, boolean haveCancel) {
+    this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
     this.haveCancel=haveCancel;
+    pInfo.addFontListener(fo -> setFont(fo));
   }
 
   /////////////////////
@@ -70,7 +71,7 @@ public class YesNoCancel {
     return show(null);
   }
   public YesNoCancelAnswer show(String message) {
-    Point pt=parentFrame.getLocation();
+    Point pt=pInfo.parentFrame.getLocation();
     return show(pt.x+20, pt.y+20, message);
   }
   public YesNoCancelAnswer show(int x, int y) {
@@ -113,7 +114,7 @@ public class YesNoCancel {
     }
   }
   private void create(boolean doCancel) {
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     msgLabel=new JLabel();
     btnYes=new JButton("Yes");
     btnYes.setMnemonic(KeyEvent.VK_Y);
@@ -141,6 +142,8 @@ public class YesNoCancel {
     insets.top=insets.bottom=0;
     grid.weightx=1.0;
     grid.addY(p);
+
+    setFont(fontOptions);
   }
 
   private JPanel layoutButtons() {
@@ -158,6 +161,14 @@ public class YesNoCancel {
     if (btnCancel!=null)
       gb.addX(btnCancel);
     return panel;
+  }
+
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
+    if (win!=null){
+      fontOptions.getControlsFont().set(win);
+      win.pack();
+    }
   }
 
   /////////////
@@ -200,7 +211,7 @@ public class YesNoCancel {
       if (code==KeyEvent.VK_ESCAPE)
         click(YesNoCancelAnswer.CANCEL);
       else
-      if (code==KeyEvent.VK_W && KeyMapper.modifierPressed(e, currentOS))
+      if (code==KeyEvent.VK_W && KeyMapper.modifierPressed(e, pInfo.currentOS))
         click(YesNoCancelAnswer.CANCEL);
       else
       if (code==KeyEvent.VK_ENTER)
@@ -240,10 +251,10 @@ public class YesNoCancel {
     return false;
   }
   private void doF3Stuff() {
-    btnYes.setText("Yes ("+FindAndReplace.getFindAgainString(currentOS)+")");
+    btnYes.setText("Yes ("+FindAndReplace.getFindAgainString(pInfo.currentOS)+")");
     win.pack();
-    KeyMapper.accel(btnYes, btnActions, FindAndReplace.getFindAgainKey(currentOS));
-    KeyMapper.accel(btnYes, btnActions, FindAndReplace.getFindAgainReverseKey(currentOS));
+    KeyMapper.accel(btnYes, btnActions, FindAndReplace.getFindAgainKey(pInfo.currentOS));
+    KeyMapper.accel(btnYes, btnActions, FindAndReplace.getFindAgainReverseKey(pInfo.currentOS));
   }
   private void click(int result) {
     win.setVisible(false);
@@ -262,7 +273,9 @@ public class YesNoCancel {
       public void run() {
         PopupTestContext ptc=new PopupTestContext();
         JFrame m=ptc.makeMainFrame();
-        YesNoCancel ky=new YesNoCancel(m, ptc.getCurrentOS(), doCancel);
+        YesNoCancel ky=new YesNoCancel(
+          ptc.getPopupInfo(), ptc.getFontOptions(), doCancel
+        );
         System.out.println(ky.show(message));
       }
     });

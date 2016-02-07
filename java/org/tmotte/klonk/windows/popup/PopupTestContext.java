@@ -37,6 +37,7 @@ public class PopupTestContext  {
   JFrame mainFrame;
   Setter<Throwable> fail;
   PopupInfo popupInfo;
+  FontOptions fontOptions;
   CurrentOS currentOS=new CurrentOS();
 
 
@@ -63,7 +64,9 @@ public class PopupTestContext  {
     return popupInfo;
   }
   public FontOptions getFontOptions() {
-    return getPersist().getFontAndColors();
+    if (fontOptions==null)
+      fontOptions=getPersist().getFontAndColors();
+    return fontOptions;
   }
   public Setter<Throwable> getFail() {
     if (fail==null)

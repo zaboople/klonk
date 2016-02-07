@@ -61,11 +61,11 @@ class Test {
         try {
           UserNotify notifier=new UserNotify(System.out);
           JFrame m=ptc.getMainFrame();
-          KAlert alerter=new KAlert(m, ptc.getCurrentOS());
+          KAlert alerter=new KAlert(ptc.getPopupInfo(), ptc.getFontOptions());
           SSHConnections conns=new SSHConnections(notifier)
             .withOptions(options)
             .withLogin(
-              new SSHLogin(m, ptc.getCurrentOS(), alerter)
+              new SSHLogin(ptc.getPopupInfo(), ptc.getFontOptions(), alerter)
             );
           org.tmotte.klonk.windows.popup.FileDialogWrapper fdw=
             new org.tmotte.klonk.windows.popup.FileDialogWrapper(

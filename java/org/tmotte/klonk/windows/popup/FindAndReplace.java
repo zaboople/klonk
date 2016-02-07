@@ -332,7 +332,7 @@ public class FindAndReplace {
   }
   private YesNoCancel getAskReplaceWindow() {
     if (popupAskReplace==null) {
-      popupAskReplace=new YesNoCancel(pInfo.parentFrame, pInfo.currentOS, false);
+      popupAskReplace=new YesNoCancel(pInfo, fontOptions, false);
       popupAskReplace.setMessage("Replace selection?");
       popupAskReplace.setupForFindReplace();
     }
@@ -340,7 +340,7 @@ public class FindAndReplace {
   }
   private YesNoCancel getAskReplaceAllWindow() {
     if (popupAskReplaceAll==null) {
-      popupAskReplaceAll=new YesNoCancel(pInfo.parentFrame, pInfo.currentOS, false);
+      popupAskReplaceAll=new YesNoCancel(pInfo, fontOptions, false);
       popupAskReplaceAll.setMessage("Replace all now?");
     }
     return popupAskReplaceAll;

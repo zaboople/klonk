@@ -205,14 +205,14 @@ public class BootContext {
 
     // Our general purpose hello-ok, yes-no-cancel and yes-no popups;
     // Also backfills alerter into our general-purpose notifier:
-    final KAlert alerter=new KAlert(mainFrame, currentOS);
+    final KAlert alerter=new KAlert(popupInfo, fontOptions);
     YesNoCancel
-      yesNoCancel=new YesNoCancel(mainFrame, currentOS, true),
-      yesNo      =new YesNoCancel(mainFrame, currentOS, false);
+      yesNoCancel=new YesNoCancel(popupInfo, fontOptions, true),
+      yesNo      =new YesNoCancel(popupInfo, fontOptions, false);
     userNotify.setUI(alerter, false);
 
     // SSH Login:
-    IUserPass iUserPass=new SSHLogin(mainFrame, currentOS, alerter);
+    IUserPass iUserPass=new SSHLogin(popupInfo, fontOptions, alerter);
 
     // Open file from list:
     OpenFileList openFileList=new OpenFileList(popupInfo, fontOptions);
