@@ -1,5 +1,5 @@
 -OSX
-  -KeyMapping
+  -KeyMapping, fuh
     -Clear current mark should/could be Shift F4
     -F3 should be able to replace Alt-G
     -By default all your F-this and F-that function buttons are owned by apple.
