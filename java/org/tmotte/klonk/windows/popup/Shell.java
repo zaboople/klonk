@@ -113,16 +113,14 @@ public class Shell {
   }
   private void setFont(FontOptions f) {
     this.fontOptions=f;
-    if (initialized)
-      setFont(f, mtaOutput);
-  }
-  private void setFont(FontOptions f, JTextComponent mta) {
-    f.getControlsFont().set(win);
-    mta.setFont(f.getFont());
-    mta.setForeground(f.getColor());
-    mta.setBackground(f.getBackgroundColor());
-    mta.setCaretColor(f.getCaretColor());
-    win.pack();//To make rowcount work
+    if (win!=null) {
+      f.getControlsFont().set(win);
+      mtaOutput.setFont(f.getFont());
+      mtaOutput.setForeground(f.getColor());
+      mtaOutput.setBackground(f.getBackgroundColor());
+      mtaOutput.setCaretColor(f.getCaretColor());
+      win.pack();//To make rowcount work
+    }
   }
 
 
@@ -333,11 +331,11 @@ public class Shell {
     Rectangle r=persist.getShellWindowBounds(
       new Rectangle(-1, -1, 450, 450)
     );
-    win.pack();
+
+    setFont(fontOptions);
+
     win.setBounds(r);
     win.setPreferredSize(new Dimension(r.width, r.height));
-
-    setFont(fontOptions, mtaOutput);
   }
   private Container getFileSelectPanel() {
     GridBug gb=new GridBug(new JPanel());

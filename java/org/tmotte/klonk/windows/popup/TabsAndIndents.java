@@ -68,6 +68,7 @@ public class TabsAndIndents {
   public TabsAndIndents(PopupInfo pInfo, FontOptions fontOptions) {
     this.pInfo=pInfo;
     this.fontOptions=fontOptions;
+    pInfo.addFontListener(fo -> setFont(fo));
   }
 
   public boolean show(TabAndIndentOptions options) {
@@ -101,6 +102,14 @@ public class TabsAndIndents {
   //  PRIVATE METHODS:  //
   //                    //
   ////////////////////////
+
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
+    if (win!=null){
+      fontOptions.getControlsFont().set(win);
+      win.pack();
+    }
+  }
 
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
@@ -174,8 +183,7 @@ public class TabsAndIndents {
     makeSeparator(gb);
     gb.addY(getButtonPanel());
 
-    fontOptions.getControlsFont().set(win);
-
+    setFont(fontOptions);
   }
   private void makeSeparator(GridBug gb) {
     gb.insets.left=5; gb.insets.right=5;

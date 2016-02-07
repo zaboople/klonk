@@ -72,10 +72,9 @@ public class MinimumFont {
         set(c);
   }
   private void setFont(Component jc) {
+    //Warning, JFrames have no font
     Font old=jc.getFont();
-    if (font.isBold())
-      System.out.println("MAN WTF MAN");
-    if (old.getSize() != font.getSize()){
+    if (old != null && old.getSize() != font.getSize()){
       if (old.isItalic())
         //Rare case, so we waste memory:
         jc.setFont(
