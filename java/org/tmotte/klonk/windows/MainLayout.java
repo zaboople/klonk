@@ -17,6 +17,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -24,7 +26,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -34,6 +35,8 @@ import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.MainDisplay;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
+import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.PopupInfo;
 
 public class MainLayout {
 
@@ -43,8 +46,9 @@ public class MainLayout {
 
   // DI stuff:
   private JFrame frame;
-  private Doer appCloseListener;
+  private FontOptions fontOptions;
   private CurrentOS currentOS;
+  private Doer appCloseListener;
 
   // Main editor window components:
   private JLabel lblRow=new JLabel(),
@@ -62,15 +66,19 @@ public class MainLayout {
   // State:
   private boolean hasStatus=false;
   private StatusUpdate statusUpdate;
+  private Set<Component> noFontChange=new HashSet<>();
 
   public MainLayout(
-      JFrame frame, Doer appCloseListener, CurrentOS currentOS
+      PopupInfo pInfo, FontOptions fontOptions, Doer appCloseListener
     ) {
-    this.frame=frame;
+    this.frame=pInfo.parentFrame;
+    this.currentOS=pInfo.currentOS;
+    this.fontOptions=fontOptions;
     this.appCloseListener=appCloseListener;
-    this.currentOS=currentOS;
     doEvents();
     layout();
+    noFontChange.add(pnlEditor);
+    pInfo.addFontListener(fo -> setFont(fo));
   }
 
   /////////////////////
@@ -110,13 +118,16 @@ public class MainLayout {
     };
   }
 
-
   public void show(Rectangle rect, boolean maximized) {
     Positioner.fix(rect);
     frame.setBounds(rect);
     if (maximized)
       frame.setExtendedState(frame.MAXIMIZED_BOTH);
     frame.setVisible(true);
+  }
+
+  public void finalBootCall() {
+    setFont(fontOptions);
   }
 
 
@@ -168,6 +179,11 @@ public class MainLayout {
   private void showCapsLock(boolean visible) {
     pnlCapsLock.setVisible(visible);
   }
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
+    fontOptions.getControlsFont().set(frame, noFontChange);
+  }
+
 
   private void setCurrentEditor(Component c) {
     pnlEditor.removeAll();
@@ -187,7 +203,6 @@ public class MainLayout {
    * @param rect The boundaries of the main window.
    */
   private void layout() {
-
 
     //Set up editor panel:
     editorGB.gridXY(0).weightXY(1);
@@ -213,6 +228,8 @@ public class MainLayout {
     layoutStatusPanel();
     gb.addY(pStatus);
     pnlCapsLock.setVisible(false);
+
+    setFont(fontOptions);
 
     //Must be packed BEFORE set location step!
     frame.pack();

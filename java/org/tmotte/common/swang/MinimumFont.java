@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Label;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import java.util.Set;
 
 /**
  * Allows me to increase the font for general-purpose controls
@@ -44,32 +45,42 @@ public class MinimumFont {
       set(jc);
     }
   }
-  public void set(JComponent jc) {
+  public void set(JComponent jc, Set<Component> ignore) {
+    if (ignore!=null && ignore.contains(jc))
+      return;
     setFont(jc);
-    expand(jc);
+    expand(jc, ignore);
   }
-  public void set(Component c) {
+  public void set(JComponent jc) {
+    set(jc, null);
+  }
+  public void set(Component c, Set<Component> ignore) {
+    if (ignore!=null && ignore.contains(c))
+      return;
     setFont(c);
     if (c instanceof JComponent)
-      expand((JComponent)c);
+      expand((JComponent)c, ignore);
     else
     if (c instanceof Container)
-      expand((Container)c);
+      expand((Container)c, ignore);
+  }
+  public void set(Component c) {
+    set(c, null);
   }
 
   ////////////////////////////////////////
   // Private font assignment functions: //
   ////////////////////////////////////////
 
-  private void expand(JComponent jc) {
+  private void expand(JComponent jc, Set<Component> ignore) {
     if (jc.getComponentCount() > 0)
       for (Component c : jc.getComponents())
-        set(c);
+        set(c, ignore);
   }
-  private void expand(Container jc) {
+  private void expand(Container jc, Set<Component> ignore) {
     if (jc.getComponentCount() > 0)
       for (Component c : jc.getComponents())
-        set(c);
+        set(c, ignore);
   }
   private void setFont(Component jc) {
     //Warning, JFrames have no font

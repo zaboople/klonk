@@ -183,12 +183,13 @@ public class BootContext {
     CtrlMain ctrlMain=new CtrlMain(userNotify, persist, currentOS);
     Editors editors=ctrlMain.getEditors();
 
-
-    // MAIN WINDOW LAYOUT: //
-
+    //Main frame:
     JFrame mainFrame=new JFrame("Klonk");
     mainFrame.setIconImage(getAppIcon(this));
-    MainLayout layout=new MainLayout(mainFrame, ctrlMain.getAppCloseListener(), currentOS);
+    PopupInfo popupInfo=new PopupInfo(mainFrame, currentOS);
+
+    // MAIN WINDOW LAYOUT: //
+    MainLayout layout=new MainLayout(popupInfo, fontOptions, ctrlMain.getAppCloseListener());
     layout.show(
       persist.getWindowBounds(
         new java.awt.Rectangle(10, 10, 300, 300)
@@ -199,9 +200,6 @@ public class BootContext {
 
 
     // POPUP WINDOWS: //
-
-    // Stuff that is common to everything:
-    PopupInfo popupInfo=new PopupInfo(mainFrame, currentOS);
 
     // Our general purpose hello-ok, yes-no-cancel and yes-no popups;
     // Also backfills alerter into our general-purpose notifier:
@@ -281,6 +279,7 @@ public class BootContext {
     }
     menus.attachPopups(layout.getMainPanel());
     mainFrame.setJMenuBar(menus.getMenuBar());
+    layout.finalBootCall();
 
     // PUSH THINGS BACK TO MAIN CONTROLLER: //
     // AND RETURN:                          //
