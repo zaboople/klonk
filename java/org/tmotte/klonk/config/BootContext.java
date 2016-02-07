@@ -215,9 +215,7 @@ public class BootContext {
     IUserPass iUserPass=new SSHLogin(mainFrame, currentOS, alerter);
 
     // Open file from list:
-    OpenFileList openFileList=new OpenFileList(
-      mainFrame, fontOptions, currentOS
-    );
+    OpenFileList openFileList=new OpenFileList(popupInfo, fontOptions);
 
     // File dialog + SSH:
     // This gets a special user notifier that schedules thread-safe alerts
@@ -264,10 +262,6 @@ public class BootContext {
           .setWordWrap(persist.getWordWrap())
           .setAutoTrim(persist.getAutoTrim());
     {
-      //FIXME delete
-      //This cannot be an array because of "generic array creation" compiler fail:
-      popupInfo.addFontListener(openFileList.getFontListener());
-
       CtrlFavorites ctrlFavorites=new CtrlFavorites(
         persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
       );

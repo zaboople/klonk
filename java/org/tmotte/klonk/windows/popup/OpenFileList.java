@@ -46,12 +46,9 @@ public class OpenFileList {
   /////////////////////////
 
   // DI:
-  private CurrentOS currentOS;
-  private JFrame parentFrame;
+  private PopupInfo pInfo;
   private FontOptions fontOptions;
-  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
-    public void set(FontOptions fo){setFont(fo);}
-  };
+
 
   // Controls:
   private JDialog win;
@@ -69,16 +66,16 @@ public class OpenFileList {
   /////////////////////
 
   public OpenFileList(
-      JFrame parentFrame,
-      FontOptions fontOptions,
-      CurrentOS currentOS
+      PopupInfo pInfo,
+      FontOptions fontOptions
     ) {
-    this.parentFrame=parentFrame;
+    this.pInfo=pInfo;
     this.fontOptions=fontOptions;
-    this.currentOS=currentOS;
-  }
-  public Setter<FontOptions> getFontListener() {
-    return fontListener;
+    pInfo.addFontListener(
+      new Setter<FontOptions>(){
+        public void set(FontOptions fo){setFont(fo);}
+      }
+    );
   }
   public List<String> show() {
     init();
@@ -88,7 +85,7 @@ public class OpenFileList {
       mtaFiles.betterReplaceRange(s, 0, mtaFiles.getText().length());
       btnOK.requestFocusInWindow();
     }
-    Positioner.set(parentFrame, win, false);
+    Positioner.set(pInfo.parentFrame, win, false);
     win.setVisible(true);
     win.toFront();
     List<String> files=null;
@@ -158,7 +155,7 @@ public class OpenFileList {
     }
   }
   private void create(){
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("Open filenames from list");
     fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
     mtaFiles=getMTA();
@@ -169,7 +166,7 @@ public class OpenFileList {
     setFont(mtaFiles);
   }
   private MyTextArea getMTA(){
-    MyTextArea mta=new MyTextArea(currentOS);
+    MyTextArea mta=new MyTextArea(pInfo.currentOS);
     mta.setRows(7);
     mta.setColumns(60);
     mta.setLineWrap(false);
@@ -241,14 +238,14 @@ public class OpenFileList {
       public void actionPerformed(ActionEvent event) {click(true);}
     };
     btnOK.addActionListener(okAction);
-    currentOS.fixEnterKey(btnOK, okAction);
+    pInfo.currentOS.fixEnterKey(btnOK, okAction);
 
     Action cancelAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(false);}
     };
     btnCancel.addActionListener(cancelAction);
     KeyMapper.easyCancel(btnCancel, cancelAction);
-    currentOS.fixEnterKey(btnCancel, cancelAction);
+    pInfo.currentOS.fixEnterKey(btnCancel, cancelAction);
   }
 
   private class MTAKeyListen extends  KeyAdapter {
@@ -284,11 +281,7 @@ public class OpenFileList {
       PopupTestContext ptc=new PopupTestContext();
       public void run() {
         List<String> files=
-          new OpenFileList(
-            ptc.makeMainFrame(),
-            new FontOptions(),
-            ptc.getCurrentOS()
-          ).show();
+          new OpenFileList(ptc.getPopupInfo(), new FontOptions()).show();
         System.out.println();
         if (files!=null)
           for (String s: files)
