@@ -226,8 +226,7 @@ public class BootContext {
       .withLogin(iUserPass)
       .withOptions(sshOpts);
     FileDialogWrapper fileDialogWrapper=new FileDialogWrapper(
-      mainFrame,
-      currentOS,
+      popupInfo,
       new SSHFileSystemView(sshConns, sshUN),
       new SSHFileView()
     );

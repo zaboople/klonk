@@ -518,7 +518,7 @@ public class SSHOptionPicker {
           PopupTestContext ptc=new PopupTestContext();
           SSHOptionPicker pop=new SSHOptionPicker(
             ptc.getPopupInfo(), ptc.getFontOptions(),
-            new FileDialogWrapper(ptc.getMainFrame(), ptc.getCurrentOS())
+            new FileDialogWrapper(ptc.getPopupInfo())
           );
           SSHOptions sopt=new SSHOptions();
           List<String> servers=new ArrayList<>();

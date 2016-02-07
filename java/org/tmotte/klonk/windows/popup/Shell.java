@@ -507,7 +507,7 @@ public class Shell {
         PopupTestContext ptc=new PopupTestContext();
         Shell shell=new Shell(
           ptc.getPopupInfo(), ptc.getFontOptions(), ptc.getPersist(),
-          new FileDialogWrapper(ptc.getMainFrame(), ptc.getCurrentOS()),
+          new FileDialogWrapper(ptc.getPopupInfo()),
           ptc.getPopupIcon(),
           new Getter<String>() {
             public String get() {return null;}

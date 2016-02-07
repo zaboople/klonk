@@ -29,7 +29,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JWindow;
-import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.SimpleClipboard;
@@ -48,7 +47,6 @@ public class OpenFileList {
   // DI:
   private PopupInfo pInfo;
   private FontOptions fontOptions;
-
 
   // Controls:
   private JDialog win;
@@ -102,8 +100,9 @@ public class OpenFileList {
 
   private void setFont(FontOptions f) {
     this.fontOptions=f;
-    if (initialized) {
+    if (win!=null) {
       setFont(mtaFiles);
+      f.getControlsFont().set(win);
       //Makes the mta assert its designated row count:
       win.pack();
     }
@@ -277,7 +276,7 @@ public class OpenFileList {
       PopupTestContext ptc=new PopupTestContext();
       public void run() {
         List<String> files=
-          new OpenFileList(ptc.getPopupInfo(), new FontOptions()).show();
+          new OpenFileList(ptc.getPopupInfo(), ptc.getFontOptions()).show();
         System.out.println();
         if (files!=null)
           for (String s: files)

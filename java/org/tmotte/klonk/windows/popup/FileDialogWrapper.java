@@ -1,7 +1,7 @@
 package org.tmotte.klonk.windows.popup;
-import java.awt.Image;
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 import org.tmotte.common.swang.CurrentOS;
+import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.ssh.SSHFile;
 
@@ -23,8 +24,7 @@ import org.tmotte.klonk.ssh.SSHFile;
 public class FileDialogWrapper {
 
   // DI:
-  private JFrame mainFrame;
-  private CurrentOS currentOS;
+  private PopupInfo pInfo;
 
   // State:
   private boolean initialized=false;
@@ -36,14 +36,13 @@ public class FileDialogWrapper {
   private FileView fileView;
   private FileSystemView fileSystemView;
 
-  public FileDialogWrapper(JFrame mainFrame, CurrentOS currentOS, FileSystemView fsv, FileView fv){
-    this.mainFrame=mainFrame;
-    this.currentOS=currentOS;
+  public FileDialogWrapper(PopupInfo pInfo, FileSystemView fsv, FileView fv){
+    this.pInfo=pInfo;
     this.fileSystemView=fsv;
     this.fileView=fv;
   }
-  public FileDialogWrapper(JFrame mainFrame, CurrentOS currentOS){
-    this(mainFrame, currentOS, null, null);
+  public FileDialogWrapper(PopupInfo pInfo){
+    this(pInfo, null, null);
   }
 
 
@@ -59,7 +58,7 @@ public class FileDialogWrapper {
 
   public File show(boolean forSave, File startFile, File startDir) {
     init();
-    if (currentOS.isOSX && SSHFile.cast(startFile)==null && SSHFile.cast(startDir)==null)
+    if (pInfo.currentOS.isOSX && SSHFile.cast(startFile)==null && SSHFile.cast(startDir)==null)
       try {
         // Broken on MS Windows XP. If you do "save as" and the old file
         // name is longer than the new one, the last characters from the old
@@ -69,7 +68,7 @@ public class FileDialogWrapper {
         // On OSX? Well, then we can't reuse file dialogs or errors start dumping out.
         // So we make a new one every time, which doesn't seem to use that much
         // memory.
-        FileDialog fd=new java.awt.FileDialog(mainFrame);
+        FileDialog fd=new java.awt.FileDialog(pInfo.parentFrame);
         if (startFile!=null) {
           //On OSX, passing the full filename screws up everything unlike
           //Windows. So we have to set the file name & dir name individually.
@@ -107,8 +106,8 @@ public class FileDialogWrapper {
       if (startDir!=null)
         fileChooser.setCurrentDirectory(startDir);
       int returnVal=forSave
-        ?fileChooser.showSaveDialog(mainFrame)
-        :fileChooser.showOpenDialog(mainFrame);
+        ?fileChooser.showSaveDialog(pInfo.parentFrame)
+        :fileChooser.showOpenDialog(pInfo.parentFrame);
       if (returnVal==fileChooser.APPROVE_OPTION)
         return fileChooser.getSelectedFile();
       else
@@ -137,9 +136,7 @@ public class FileDialogWrapper {
     else
       javax.swing.SwingUtilities.invokeLater(new Runnable() {
         public void run() {
-          FileDialogWrapper fdw=new FileDialogWrapper(
-            PopupTestContext.makeMainFrame(), new CurrentOS()
-          );
+          FileDialogWrapper fdw=new FileDialogWrapper(new PopupTestContext().getPopupInfo());
           File d=new File(args[0]),
               f=new File(args[1]);
           System.out.println("For save: >"+fdw.show(true, null, null)+"<");
