@@ -1,9 +1,9 @@
 package org.tmotte.klonk.windows.popup;
-import java.awt.Font;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -32,12 +32,11 @@ import javax.swing.JWindow;
 import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
-import org.tmotte.common.swang.CurrentOS;
-import org.tmotte.klonk.edit.MyTextArea;
-import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.config.msg.Setter;
-import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.PopupInfo;
+import org.tmotte.klonk.config.msg.Doer;
+import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 
 public class Favorites {
@@ -47,12 +46,8 @@ public class Favorites {
   /////////////////////////
 
   // DI:
-  private JFrame parentFrame;
-  private CurrentOS currentOS;
+  private PopupInfo pInfo;
   private FontOptions fontOptions;
-  private final Setter<FontOptions> fontListener=new Setter<FontOptions>(){
-    public void set(FontOptions fo){setFont(fo);}
-  };
 
   // State:
   private boolean initialized=false;
@@ -63,19 +58,21 @@ public class Favorites {
   private MyTextArea mtaFiles, mtaDirs;
   private JButton btnOK, btnCancel;
   private Font fontBold;
+  private JLabel mainLabel;
 
 
   /////////////////////
   // PUBLIC METHODS: //
   /////////////////////
 
-  public Favorites(JFrame parentFrame, FontOptions fontOptions, CurrentOS currentOS) {
-    this.parentFrame=parentFrame;
+  public Favorites(PopupInfo pInfo, FontOptions fontOptions) {
+    this.pInfo=pInfo;
     this.fontOptions=fontOptions;
-    this.currentOS=currentOS;
-  }
-  public Setter<FontOptions> getFontListener() {
-    return fontListener;
+    pInfo.addFontListener(
+      new Setter<FontOptions>(){
+        public void set(FontOptions fo){setFont(fo);}
+      }
+    );
   }
   public boolean show(Collection<String> files, Collection<String> dirs) {
     init();
@@ -84,7 +81,7 @@ public class Favorites {
     load(mtaDirs,  dirs);
     if (!mtaFiles.hasFocus() && !mtaDirs.hasFocus())
       mtaFiles.requestFocusInWindow();
-    Positioner.set(parentFrame, win, false);
+    Positioner.set(pInfo.parentFrame, win, false);
     win.setVisible(true);
     win.toFront();
     if (result){
@@ -100,15 +97,29 @@ public class Favorites {
   //                    //
   ////////////////////////
 
-  private void setFont(FontOptions f) {
-    this.fontOptions=f;
+  private void setFont(FontOptions fo) {
+    this.fontOptions=fo;
     if (initialized) {
+      fo.getControlsFont().set(win);
       setFont(mtaFiles);
       setFont(mtaDirs);
+      mainLabel.setFont(
+        mainLabel.getFont().deriveFont(Font.BOLD, fo.getControlsFont().getSize() + 2)
+      );
+
       //Makes the mta assert its designated row count:
       win.pack();
     }
   }
+  private void setFont(MyTextArea mta) {
+    FontOptions f=fontOptions;
+    mta.setFont(f.getFont());
+    mta.setForeground(f.getColor());
+    mta.setBackground(f.getBackgroundColor());
+    mta.setCaretColor(f.getCaretColor());
+  }
+
+
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
     win.setVisible(false);
@@ -142,14 +153,6 @@ public class Favorites {
     }
   }
 
-  private void setFont(MyTextArea mta) {
-    FontOptions f=fontOptions;
-    mta.setFont(f.getFont());
-    mta.setForeground(f.getColor());
-    mta.setBackground(f.getBackgroundColor());
-    mta.setCaretColor(f.getCaretColor());
-  }
-
   ///////////////////////////
   // CREATE/LAYOUT/LISTEN: //
   ///////////////////////////
@@ -160,10 +163,11 @@ public class Favorites {
       layout();
       listen();
       initialized=true;
+      setFont(fontOptions);
     }
   }
   private void create(){
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("Favorite files");
     fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
     mtaFiles=getMTA();
@@ -176,7 +180,7 @@ public class Favorites {
     setFont(mtaDirs);
   }
   private MyTextArea getMTA(){
-    MyTextArea mta=new MyTextArea(currentOS);
+    MyTextArea mta=new MyTextArea(pInfo.currentOS);
     mta.setRows(7);
     mta.setColumns(60);
     mta.setLineWrap(false);
@@ -195,6 +199,7 @@ public class Favorites {
     gb.weightXY(1,0);
     gb.fill=gb.HORIZONTAL;
     gb.addY(getButtons());
+
     win.pack();
   }
   private Container getInputPanel() {
@@ -207,11 +212,8 @@ public class Favorites {
     gb.insets.bottom=5;
     gb.insets.left=5;
     {
-      JLabel j=new JLabel("Enter file/directory names one per line, in order of preference:");
-      Font f=j.getFont();
-      f=f.deriveFont(Font.BOLD, f.getSize()+1);
-      j.setFont(f);
-      gb.addY(j);
+      mainLabel=new JLabel("Enter file/directory names one per line, in order of preference:");
+      gb.addY(mainLabel);
     }
 
     gb.anchor=gb.WEST;
@@ -278,13 +280,13 @@ public class Favorites {
       public void actionPerformed(ActionEvent event) {click(true);}
     };
     btnOK.addActionListener(okAction);
-    currentOS.fixEnterKey(btnOK, okAction);
+    pInfo.currentOS.fixEnterKey(btnOK, okAction);
 
     Action cancelAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {click(false);}
     };
     btnCancel.addActionListener(cancelAction);
-    currentOS.fixEnterKey(btnCancel, cancelAction);
+    pInfo.currentOS.fixEnterKey(btnCancel, cancelAction);
     KeyMapper.easyCancel(btnCancel, cancelAction);
   }
 
@@ -328,7 +330,7 @@ public class Favorites {
         dirs.add("dddddddddd");
         if (!
           new Favorites(
-            ptc.makeMainFrame(), new FontOptions(), ptc.getCurrentOS()
+            ptc.getPopupInfo(), new FontOptions()
           ).show(files, dirs)
           )
           System.out.println("\n** CANCELLED **\n");

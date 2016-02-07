@@ -246,7 +246,7 @@ public class BootContext {
     );
 
     //Various option popups:
-    Favorites favorites=new Favorites(mainFrame, fontOptions, currentOS);
+    Favorites favorites=new Favorites(popupInfo, fontOptions);
     TabsAndIndents tabsAndIndents=new TabsAndIndents(popupInfo, fontOptions);
     FontPicker fontPicker=new FontPicker(popupInfo, alerter);
     SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, currentOS, fileDialogWrapper);
@@ -264,12 +264,10 @@ public class BootContext {
           .setWordWrap(persist.getWordWrap())
           .setAutoTrim(persist.getAutoTrim());
     {
+      //FIXME delete
       //This cannot be an array because of "generic array creation" compiler fail:
-      List<Setter<FontOptions>> fontListeners=new java.util.ArrayList<>(10);
-      fontListeners.add(shell.getFontListener());
-      fontListeners.add(favorites.getFontListener());
-      fontListeners.add(findAndReplace.getFontListener());
-      fontListeners.add(openFileList.getFontListener());
+      popupInfo.addFontListener(findAndReplace.getFontListener());
+      popupInfo.addFontListener(openFileList.getFontListener());
 
       CtrlFavorites ctrlFavorites=new CtrlFavorites(
         persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
@@ -284,8 +282,8 @@ public class BootContext {
         ,new CtrlOther    (shell, help, about)
         ,new CtrlOptions  (
           editors, statusBar, persist, ctrlFavorites,
-          ctrlMain.getLineDelimiterListener(), fontListeners, sshConns,
-          sshOptionPicker, tabsAndIndents, favorites, fontPicker, kDelims
+          ctrlMain.getLineDelimiterListener(), popupInfo.getFontListeners(),
+          sshConns, sshOptionPicker, tabsAndIndents, favorites, fontPicker, kDelims
         )
       );
     }
