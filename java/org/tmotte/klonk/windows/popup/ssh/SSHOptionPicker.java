@@ -27,6 +27,7 @@ import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.PopupInfo;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.windows.Positioner;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
@@ -35,8 +36,8 @@ import org.tmotte.klonk.windows.popup.PopupTestContext;
 public class SSHOptionPicker {
 
   // DI:
-  private JFrame parentFrame;
-  private CurrentOS currentOS;
+  private PopupInfo pInfo;
+  private FontOptions fontOptions;
   private FileDialogWrapper fdw;
 
   // State:
@@ -68,10 +69,11 @@ public class SSHOptionPicker {
   private TripleCheck tcUser, tcGroup, tcOther;
   private JButton btnOK, btnCancel;
 
-  public SSHOptionPicker(JFrame parentFrame, CurrentOS currentOS, FileDialogWrapper fdw) {
-    this.parentFrame=parentFrame;
-    this.currentOS=currentOS;
+  public SSHOptionPicker(PopupInfo pInfo, FontOptions fontOptions, FileDialogWrapper fdw) {
+    this.pInfo=pInfo;
+    this.fontOptions=fontOptions;
     this.fdw=fdw;
+    pInfo.addFontListener(fo -> setFont(fo));
   }
   public boolean show(SSHOptions options, final List<String> servers) {
     init();
@@ -154,7 +156,7 @@ public class SSHOptionPicker {
   }
   /** For looping... well ok we aren't but so what */
   private void doShow() {
-    Positioner.set(parentFrame, win);
+    Positioner.set(pInfo.parentFrame, win);
     win.setVisible(true);
     win.toFront();
   }
@@ -187,7 +189,7 @@ public class SSHOptionPicker {
     }
   }
   private void create(){
-    win=new JDialog(parentFrame, true);
+    win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("SSH Configuration");
 
     jcbKnownHosts=new JCheckBox("Known hosts");
@@ -259,6 +261,8 @@ public class SSHOptionPicker {
 
     gb.weightXY(1);
     gb.addY(getButtons());
+
+    setFont(fontOptions);
     win.pack();
   }
   private JPanel getKnownPrivatePanel() {
@@ -404,6 +408,10 @@ public class SSHOptionPicker {
     gb.addX(btnCancel);
     return panel;
   }
+  private void setFont(FontOptions fo) {
+    if (win!=null)
+      fo.getControlsFont().set(win);
+  }
 
   /////////////
   // LISTEN: //
@@ -507,9 +515,9 @@ public class SSHOptionPicker {
       public void run() {
         try {
           PopupTestContext ptc=new PopupTestContext();
-          JFrame parentFrame=ptc.makeMainFrame();
           SSHOptionPicker pop=new SSHOptionPicker(
-            parentFrame, ptc.getCurrentOS(), new FileDialogWrapper(parentFrame, ptc.getCurrentOS())
+            ptc.getPopupInfo(), ptc.getFontOptions(),
+            new FileDialogWrapper(ptc.getMainFrame(), ptc.getCurrentOS())
           );
           SSHOptions sopt=new SSHOptions();
           List<String> servers=new ArrayList<>();

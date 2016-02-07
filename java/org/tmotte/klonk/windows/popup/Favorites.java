@@ -68,11 +68,7 @@ public class Favorites {
   public Favorites(PopupInfo pInfo, FontOptions fontOptions) {
     this.pInfo=pInfo;
     this.fontOptions=fontOptions;
-    pInfo.addFontListener(
-      new Setter<FontOptions>(){
-        public void set(FontOptions fo){setFont(fo);}
-      }
-    );
+    pInfo.addFontListener(fo -> setFont(fo));
   }
   public boolean show(Collection<String> files, Collection<String> dirs) {
     init();

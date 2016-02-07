@@ -247,7 +247,7 @@ public class BootContext {
     Favorites favorites=new Favorites(popupInfo, fontOptions);
     TabsAndIndents tabsAndIndents=new TabsAndIndents(popupInfo, fontOptions);
     FontPicker fontPicker=new FontPicker(popupInfo, alerter);
-    SSHOptionPicker sshOptionPicker=new SSHOptionPicker(mainFrame, currentOS, fileDialogWrapper);
+    SSHOptionPicker sshOptionPicker=new SSHOptionPicker(popupInfo, fontOptions, fileDialogWrapper);
     LineDelimiters kDelims=new LineDelimiters(mainFrame, currentOS);
 
     //Help:

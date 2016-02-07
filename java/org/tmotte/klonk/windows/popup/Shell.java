@@ -66,11 +66,7 @@ public class Shell {
     this.persist=persist;
     this.icon=icon;
     this.currFileGetter=currFileGetter;
-    pInfo.addFontListener(
-      new Setter<FontOptions>(){
-        public void set(FontOptions fo){setFont(fo);}
-      }
-    );
+    pInfo.addFontListener(fo -> setFont(fo));
   }
   public void show() {
     init();
