@@ -185,7 +185,7 @@ public class FontPicker {
   private void changeFont() {
     int size=Integer.parseInt(jspControlSize.getValue().toString());
     new MinimumFont(size).set(win);
-    new MinimumFont(size + 3).set(jlCFO, jlEFO);
+    new MinimumFont(size + 2).set(jlCFO, jlEFO);
 
     if (mta==null || jlFonts==null || jlFontSize==null ||
         jlFonts.isSelectionEmpty() || jlFontSize.isSelectionEmpty())
