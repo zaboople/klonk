@@ -469,10 +469,16 @@ public class Menus {
     mu.add(
       file,
       fileClipboardDoc=mu.doMenuItem(
-        "Copy document name to clipboard", fileListener, KeyEvent.VK_Y
+        "Copy document name to clipboard", fileListener, KeyEvent.VK_Y,
+        currentOS.isOSX
+          ?KeyMapper.key(KeyEvent.VK_Y, InputEvent.META_DOWN_MASK)
+          :null
       ),
       fileClipboardDocDir=mu.doMenuItem(
-        "Copy document directory to clipboard", fileListener, KeyEvent.VK_U
+        "Copy document directory to clipboard", fileListener, KeyEvent.VK_U,
+        currentOS.isOSX
+          ?KeyMapper.key(KeyEvent.VK_Y, InputEvent.META_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)
+          :null
       )
     );
 
