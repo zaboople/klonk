@@ -1,16 +1,11 @@
 -OSX
   -The popup menus in Menus.java should get the font resizing call - hopefully it works
   -KeyMapping, fuh
-    -HEY Command-Y is free - let's use it for copy file to clip eh
-      - Command-D looks free too... copy dir to clip?
+    -DONE! HEY Command-Y is free - let's use it for copy file to clip eh
     -AND HEY Command-M could be mark?
       and command < & command > next-previous? actually comma & period
-    -SO what about F11 & F12?
-    -F3 should be able to replace Alt-G
-    -By default all your F-this and F-that function buttons are owned by apple.
-      F3, F4, F8, F9, F11, F12
-      -KeyMapping
-        -We really need a sorted properties file
+    -SO what about F11 & F12? Oh gawd, not Command-Backquote, I so hate that...
+    -It sounds like the KeyMapping file business is a bust
   -Document all the changes
 
 -Current
