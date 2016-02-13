@@ -365,14 +365,20 @@ public class CtrlMain  {
     while (editorMgr.size()>0)
       if (!fileCloseLastFirst(true))
         return;
-    if (!layout.isMaximized()) {
-      persist.setWindowBounds(layout.getBounds());
-      persist.setWindowMaximized(false);
+    //All these !=null's are cases where we avoid NPE's when
+    //the system fails to boot properly and components are half-initialized.
+    //Otherwise we can't exit.
+    if (persist!=null) {
+      if (layout!=null && !layout.isMaximized()) {
+        persist.setWindowBounds(layout.getBounds());
+        persist.setWindowMaximized(false);
+      }
+      else
+        persist.setWindowMaximized(true);
+      persist.save();
     }
-    else
-      persist.setWindowMaximized(true);
-    persist.save();
-    lockRemover.doIt();
+    if (lockRemover!=null)
+      lockRemover.doIt();
     System.exit(0);
   }
 
