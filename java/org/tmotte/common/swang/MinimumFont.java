@@ -41,18 +41,17 @@ public class MinimumFont {
   ///////////////////////////////////////
 
   public void set(JComponent... jcs) {
-    for (JComponent jc : jcs){
+    for (JComponent jc : jcs)
       set(jc);
-    }
+  }
+  public void set(JComponent jc) {
+    set(jc, null);
   }
   public void set(JComponent jc, Set<Component> ignore) {
     if (ignore!=null && ignore.contains(jc))
       return;
     setFont(jc);
     expand(jc, ignore);
-  }
-  public void set(JComponent jc) {
-    set(jc, null);
   }
   public void set(Component c, Set<Component> ignore) {
     if (ignore!=null && ignore.contains(c))
