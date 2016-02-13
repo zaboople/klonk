@@ -254,10 +254,15 @@ public class BootContext {
 
     // MENUS: //
 
-    Menus menus=new Menus(editors, currentOS);
+    Menus menus=new Menus(editors, currentOS, fontOptions);
     menus.setFastUndos(persist.getFastUndos())
           .setWordWrap(persist.getWordWrap())
           .setAutoTrim(persist.getAutoTrim());
+
+    //Menu font options:
+    popupInfo.addFontListener(menus.getFontListener());
+
+    //Menu controller settings:
     {
       CtrlFavorites ctrlFavorites=new CtrlFavorites(
         persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
@@ -277,13 +282,13 @@ public class BootContext {
         )
       );
     }
+
+    //Attach osx popup items to main window, and assign menus to main window:
     menus.attachPopups(layout.getMainPanel());
     mainFrame.setJMenuBar(menus.getMenuBar());
-    layout.finalBootCall();
 
     // PUSH THINGS BACK TO MAIN CONTROLLER: //
     // AND RETURN:                          //
-
     ctrlMain.setLayoutAndPopups(
       layout.getMainDisplay(),
       statusBar,

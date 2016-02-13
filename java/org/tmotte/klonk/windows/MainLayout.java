@@ -126,10 +126,6 @@ public class MainLayout {
     frame.setVisible(true);
   }
 
-  public void finalBootCall() {
-    setFont(fontOptions);
-  }
-
 
   //////////////////////
   // PRIVATE METHODS: //
@@ -335,6 +331,5 @@ public class MainLayout {
     gb.addX(lblMsg).addX(lblMsgBad);
     return gb.container;
   }
-
 
 }

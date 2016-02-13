@@ -33,6 +33,7 @@ import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.controller.CtrlMain;
 import org.tmotte.klonk.controller.CtrlFileOther;
 import org.tmotte.klonk.controller.CtrlMarks;
@@ -91,8 +92,19 @@ public class Menus {
                     osxSwitch, osxOpenFrom, osxSaveTo, osxSelect, osxFavorite, osxReopen,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
-  // These are for osx only:
+
+  // These popup menus are for osx only:
+  private boolean extraPopups=false;
   private JPopupMenu pswitcher, pOpenFrom, pSaveTo, pSelect, pFavorite, pReopen;
+  private FontOptions fontOptions;
+  private Setter<FontOptions> fontListener=
+    (FontOptions fo) -> {
+      if (extraPopups)
+        fo.getControlsFont().set(
+          bar
+        );
+    };
+
 
   /////////////////////
   //                 //
@@ -105,10 +117,14 @@ public class Menus {
   // INITIALIZATION: //
   /////////////////////
 
-  public Menus(Editors editors, CurrentOS currentOS) {
+  public Menus(Editors editors, CurrentOS currentOS, FontOptions initialFontOptions) {
     this.editors=editors;
     this.currentOS=currentOS;
+    this.fontOptions=initialFontOptions;
+
+    extraPopups=currentOS.isOSX;
     create();
+    fontListener.set(initialFontOptions);
   }
   public void setControllers(
        CtrlMain ctrlMain
@@ -134,33 +150,26 @@ public class Menus {
   }
   /** This is a workaround for osx making it to hard to keyboard your way to a top menu. */
   public void attachPopups(JPanel pnlEditor) {
-    if (currentOS.isOSX)
+    if (extraPopups)
       osxAttachPopupsTo=pnlEditor;
   }
   public Doer getEditorSwitchListener() {
-    return new Doer() {
-      public void doIt() {editorChange();}
-    };
+    return () -> editorChange();
   }
   public Setter<List<String>> getRecentFileListener() {
-    return new Setter<List<String>>(){
-      public void set(List<String> files) {setRecentFiles(files);}
-    };
+    return (List<String> files) -> setRecentFiles(files);
   }
   public Setter<List<String>> getRecentDirListener() {
-    return new Setter<List<String>>(){
-      public void set(List<String> dirs){setRecentDirs(dirs);}
-    };
+    return (List<String> dirs) -> setRecentDirs(dirs);
   }
   public Setter<List<String>> getFavoriteFileListener() {
-    return new Setter<List<String>>(){
-      public void set(List<String> files) {setFavoriteFiles(files);}
-    };
+    return (List<String> files) -> setFavoriteFiles(files);
   }
   public Setter<List<String>> getFavoriteDirListener() {
-    return new Setter<List<String>>(){
-      public void set(List<String> dirs){setFavoriteDirs(dirs);}
-    };
+    return (List<String> dirs) -> setFavoriteDirs(dirs);
+  }
+  public Setter<FontOptions> getFontListener() {
+    return fontListener;
   }
 
 
@@ -169,11 +178,6 @@ public class Menus {
   // RECENT & FAVORITE FILES/DIRS SAVE/OPEN: //
   /////////////////////////////////////////////
 
-  public Menus setFavorites(Collection<String> favoriteFiles, Collection<String> favoriteDirs) {
-    setFavoriteFiles(favoriteFiles);
-    setFavoriteDirs(favoriteDirs);
-    return this;
-  }
   public void setFavoriteFiles(Collection<String> startList) {
     setFavorites(startList, fileFave, pFavorite, reopenListener, 2);
   }
@@ -544,7 +548,7 @@ public class Menus {
       ,
       fileReopen=mu.doMenu("Re-open", KeyEvent.VK_R)
     );
-    if (currentOS.isOSX) {
+    if (extraPopups) {
       pOpenFrom=makePopup(fileOpenFrom, "Open from:");
       pSaveTo=makePopup(fileSaveTo, "Save to:");
       pFavorite=makePopup(fileFave, "Favorite files:");
@@ -572,7 +576,7 @@ public class Menus {
     switchNextUnsaved=mu.doMenuItem(
       "Next unsaved file", switchListener, KeyEvent.VK_X
     );
-    if (currentOS.isOSX) {
+    if (extraPopups) {
       pswitcher=makeLabelledPopup("Switch:");
       pSwitchNextUnsaved=mu.doMenuItem(
         "Next unsaved file", switchListener
@@ -732,7 +736,7 @@ public class Menus {
         selectionItemListener, KeyEvent.VK_A
       )
     );
-    if (currentOS.isOSX) {
+    if (extraPopups) {
       pSelect=makePopup(select, "Selection:");
       pSelect.addPopupMenuListener(popupSelectListener);
     }
@@ -785,7 +789,7 @@ public class Menus {
     );
 
     //OSX SHORTCUTS:
-    if (currentOS.isOSX){
+    if (extraPopups){
       mu.add(
         osxShortcuts=mu.doMenu(bar, "MacOS Shortcuts", 0)
         ,osxOpenFrom=mu.doMenuItem(
