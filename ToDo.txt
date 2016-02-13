@@ -16,7 +16,6 @@
     -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.
     -We should be able to make the shell textbox act like our normal editor using our Selectable class.
 
-
   -Cursor does not move with mousewheel, only with page down.
 
   -File open ought to start off the session with the last directory opened.
