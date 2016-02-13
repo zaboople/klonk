@@ -193,7 +193,7 @@ public class OpenFileList {
     gb.insets.left=5;
     gb.insets.right=5;
     {
-      JLabel j=new JLabel("File names will be automatically be pasted below from the clipboard:");
+      JLabel j=new JLabel("File names are automatically be pasted below from the clipboard:");
       Font f=j.getFont();
       f=f.deriveFont(Font.BOLD, f.getSize()+1);
       j.setFont(f);

@@ -1,10 +1,7 @@
 -OSX
   -The popup menus in Menus.java should get the font resizing call - hopefully it works
   -KeyMapping, fuh
-    -AND HEY Command-M could be mark?
-      and command < & command > next-previous? actually comma & period
     -SO what about F11 & F12? Oh gawd, not Command-Backquote, I so hate that...
-    -It sounds like the KeyMapping file business is a bust
   -Document all the changes
 
 -Current
