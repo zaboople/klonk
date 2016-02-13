@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Label;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import java.util.Set;
 
 /**
@@ -47,24 +48,26 @@ public class MinimumFont {
   public void set(JComponent jc) {
     set(jc, null);
   }
-  public void set(JComponent jc, Set<Component> ignore) {
-    if (ignore!=null && ignore.contains(jc))
-      return;
-    setFont(jc);
-    expand(jc, ignore);
+  public void set(Component jc) {
+    set(jc, null);
   }
   public void set(Component c, Set<Component> ignore) {
+    if (c==null)
+      //Nulls happen during normal traversal, deal with it:
+      return;
     if (ignore!=null && ignore.contains(c))
       return;
     setFont(c);
+    if (c instanceof JMenu)
+      //This is necessary because at least on OSX the JComponent/Container
+      //functions frequently come up empty:
+      expand((JMenu)c, ignore);
+    else
     if (c instanceof JComponent)
       expand((JComponent)c, ignore);
     else
     if (c instanceof Container)
       expand((Container)c, ignore);
-  }
-  public void set(Component c) {
-    set(c, null);
   }
 
   ////////////////////////////////////////
@@ -80,6 +83,11 @@ public class MinimumFont {
     if (jc.getComponentCount() > 0)
       for (Component c : jc.getComponents())
         set(c, ignore);
+  }
+  private void expand(javax.swing.JMenu j, Set<Component> ignore) {
+    int count=j.getItemCount();
+    for (int i=0; i<count; i++)
+      set(j.getItem(i), ignore);
   }
   private void setFont(Component jc) {
     //Warning, JFrames have no font
@@ -128,4 +136,24 @@ public class MinimumFont {
     );
     return f;
   }
+
+  // Debugging: //
+  private boolean debugOn=false;
+  private void debug(Component jc) {
+    if (debugOn){
+      System.out.print("DEBUG ");
+      if (jc instanceof javax.swing.JMenu)
+        System.out.println("JMenu "+((javax.swing.JMenu)jc).getText()+" "+((javax.swing.JMenu)jc).getItemCount());
+      else
+      if (jc instanceof javax.swing.JMenuItem)
+        System.out.println("JMenuItem "+((javax.swing.JMenuItem)jc).getText()+" "+((javax.swing.JMenuItem)jc).getComponents().length);
+      else
+      if (jc instanceof javax.swing.JPopupMenu)
+        System.out.println("Popup "+((javax.swing.JPopupMenu)jc).getComponentCount());
+      else
+        System.out.println("? "+jc);
+      System.out.flush();
+    }
+  }
+
 }

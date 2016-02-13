@@ -93,16 +93,19 @@ public class Menus {
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
 
-  // These popup menus are for osx only:
+  // These popup menus are for osx only. All but pswitcher are "hard linked" to
+  // the main menu that they derive their data from, and are automatically updated
+  // with that data.
   private boolean extraPopups=false;
   private JPopupMenu pswitcher, pOpenFrom, pSaveTo, pSelect, pFavorite, pReopen;
   private FontOptions fontOptions;
   private Setter<FontOptions> fontListener=
     (FontOptions fo) -> {
+      fo.getControlsFont().set(bar);
       if (extraPopups)
-        fo.getControlsFont().set(
-          bar
-        );
+        //To some extent this is double coverage because it will traverse into the same
+        //items, but we need it to ensure that everything gets hit:
+        fo.getControlsFont().set(pswitcher, pOpenFrom, pSaveTo, pSelect, pFavorite, pReopen);
     };
 
 
@@ -180,17 +183,21 @@ public class Menus {
 
   public void setFavoriteFiles(Collection<String> startList) {
     setFavorites(startList, fileFave, pFavorite, reopenListener, 2);
+    fontOptions.getControlsFont().set(pFavorite);
   }
   public void setFavoriteDirs(Collection<String> startList) {
     setFavorites(startList, fileOpenFromFave, openFromListener, 0);
     setFavorites(startList, fileSaveToFave,   saveToListener, 0);
+    fontOptions.getControlsFont().set(fileOpenFromFave, fileSaveToFave);
   }
   public void setRecentFiles(List<String> startList) {
     setRecent(startList, fileReopen, pReopen, reopenListener);
+    fontOptions.getControlsFont().set(pReopen);
   }
-  public void setRecentDirs(List<String> startList) {
+  private void setRecentDirs(List<String> startList) {
     setRecent(startList, fileOpenFromRecentDir, openFromListener);
     setRecent(startList, fileSaveToRecentDir,   saveToListener);
+    fontOptions.getControlsFont().set(fileOpenFromRecentDir, fileSaveToRecentDir);
   }
 
   public Menus setFastUndos(boolean fast) {
@@ -264,7 +271,7 @@ public class Menus {
     for (int i=0; i<Math.min(easyLen, size); i++)
       menuX.add(mu.doMenuItem(startList.get(i), listener));
 
-    //Build second menu, a longer sorter list of all files you have open:
+    //Build second menu, a longer list of all files you have open:
     if (size>easyLen){
 
       // Build & sort list of names:
@@ -306,8 +313,9 @@ public class Menus {
     cleanMenu(menuX, menuP);
 
     // Add everything:
-    for (String s: startList)
+    for (String s: startList) {
       menuX.add(mu.doMenuItem(s, listener));
+    }
 
     // Put things back or enable/disable if empty:
     if (skipLast>0){
@@ -317,6 +325,9 @@ public class Menus {
     }
     else
       menuX.setEnabled(menuX.getItemCount()>0);
+
+    if (menuP!=null)
+      fontOptions.getControlsFont().set(menuP);
   }
 
   //////////////////
@@ -370,6 +381,10 @@ public class Menus {
           makeSwitchMenuItem(pswitcher, e, e==firstEditor, false, 2+count);
       }
     }
+
+    // Change fonts:
+    if (pswitcher!=null)
+      fontOptions.getControlsFont().set(pswitcher);
 
     //Build third menu, which swaps current for the other:
     if (editors.size()>1){
