@@ -653,17 +653,25 @@ public class Menus {
       mark,
       markSet=mu.doMenuItem(
         "Set mark",
-        markItemListener, KeyEvent.VK_S, KeyMapper.key(KeyEvent.VK_F4)
+        markItemListener, KeyEvent.VK_S,
+        currentOS.isOSX
+          ?KeyMapper.key(KeyEvent.VK_M, KeyMapper.shortcutByOS())
+          :KeyMapper.key(KeyEvent.VK_F4)
       )
       ,
       markGoToPrevious=mu.doMenuItem(
-        "Go to previous mark",
-        markItemListener, KeyEvent.VK_G, KeyMapper.key(KeyEvent.VK_F8)
+        "Go to previous mark", markItemListener, KeyEvent.VK_G,
+        currentOS.isOSX
+          ?KeyMapper.key(KeyEvent.VK_COMMA, KeyMapper.shortcutByOS())
+          :KeyMapper.key(KeyEvent.VK_F8)
       )
       ,
       markGoToNext=mu.doMenuItem(
         "Go to next mark",
-        markItemListener, KeyEvent.VK_O, KeyMapper.key(KeyEvent.VK_F9)
+        markItemListener, KeyEvent.VK_O,
+          currentOS.isOSX
+            ?KeyMapper.key(KeyEvent.VK_PERIOD, KeyMapper.shortcutByOS())
+            :KeyMapper.key(KeyEvent.VK_F9)
       )
       ,
       markClearCurrent=mu.doMenuItem(
