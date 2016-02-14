@@ -1,12 +1,9 @@
 -OSX
-  -The popup menus in Menus.java should get the font resizing call - hopefully it works
   -KeyMapping, fuh
     -SO what about F11 & F12? Oh gawd, not Command-Backquote, I so hate that...
   -Document all the changes
 
 -Current
-  -Indents, Font don't show message when ok is clicked.
-
   -Shell
     -Shows Ctrl-E on both windows and mac when it should command-e on mac
     -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.
