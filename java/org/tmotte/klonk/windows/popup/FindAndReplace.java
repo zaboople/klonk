@@ -50,7 +50,7 @@ public class FindAndReplace {
 
   public static String getFindAgainString(CurrentOS currentOS){
     return currentOS.isOSX
-      ?"Command-G"
+      ?"⌘-G"
       :"F3";
   }
   public static KeyStroke getFindAgainKey(CurrentOS currentOS){

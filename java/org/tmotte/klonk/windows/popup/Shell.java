@@ -294,7 +294,13 @@ public class Shell {
     jcbPrevious.setEditable(true);
     jcbPrevious.setMaximumRowCount(KPersist.maxFavorite);
 
-    btnRun   =new JButton(hStart+bStart+"Run "+bEnd+" (Ctrl-E)"+hEnd);
+    btnRun   =new JButton(
+      hStart+bStart
+      +"Run "+bEnd+" ("
+      +(pInfo.currentOS.isOSX ? "⌘" :"Ctrl")
+      +"-E)"
+      +hEnd
+    );
     btnRun.setMnemonic(KeyEvent.VK_R);
 
     btnStop   =new JButton("Stop");
