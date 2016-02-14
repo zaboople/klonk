@@ -1,11 +1,14 @@
 -OSX
-  -KeyMapping, fuh
-    -SO what about F11 & F12? Oh gawd, not Command-Backquote, I so hate that...
+  -SO what about F11 & F12? Oh gawd, not Command-Backquote, I so hate that...
+  -Unfortunately there's also undo - shift-ctrl-f9 and shift ctrl f12
   -Document all the changes
 
 -Current
+  -HOLY POO I can customize the caret! JTextArea.setCaret() and there's a DefaultCaret
+    https://docs.oracle.com/javase/8/docs/api/javax/swing/text/DefaultCaret.html
+  -What is this Ctrl-W thing in Editor.java? This is dumb
+
   -Shell
-    -Shows Ctrl-E on both windows and mac when it should command-e on mac
     -Losing your command because you forgot to shut down the previous command and when you do bam the current one is gone. Sucks.
     -We should be able to make the shell textbox act like our normal editor using our Selectable class.
 
@@ -30,7 +33,8 @@
     Alt-f-d doesn't work with ssh and needs to be disabled.
     Sudo
     Single quotes in the filename are a bit of a problem, and double quotes, and whatever else.
-    When we disconnect the network the ssh session doesn't know. We could do Session.sendKeepAliveMsg or Session.sendIgnore
+    When we disconnect the network the ssh session doesn't know.
+      We could do Session.sendKeepAliveMsg or Session.sendIgnore
     What about when a host key changes or is missing? Will we blow up?
 
   -Maybe a more sophisticated version of find/replace, where I break up the String? It is pretty slow on an 8MB file.
@@ -44,7 +48,9 @@
   -Indents & Tabs, Fonts should only enable ok button when something changes.
 
   -We ought to make it where you can pick between fixed-width and not fixed-width fonts in the picker.
-    FontRenderContext frc = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
+    FontRenderContext frc = new FontRenderContext(
+      null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT
+    );
     for (Font font : fonts) {
         Rectangle2D iBounds = font.getStringBounds("i", frc);
         Rectangle2D mBounds = font.getStringBounds("m", frc);

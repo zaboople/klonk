@@ -2,6 +2,7 @@ package org.tmotte.klonk.controller;
 import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.msg.Editors;
+import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.common.text.DelimitedString;
 import javax.swing.SwingUtilities;
 import java.util.LinkedList;
@@ -9,13 +10,16 @@ import java.util.LinkedList;
 public class CtrlMarks {
   private Editors editors;
   private StatusUpdate status;
-  public CtrlMarks(Editors editors, StatusUpdate status) {
+  private Setter<Boolean> markStateListener;
+
+  public CtrlMarks(Editors editors, StatusUpdate status, Setter<Boolean> markStateListener) {
     this.editors=editors;
     this.status=status;
+    this.markStateListener=markStateListener;
   }
 
-  
-  public boolean doMarkSet() {
+
+  public void doMarkSet() {
     Editor e=editors.getFirst();
     int i=e.doSetMark();
     if (i!=-1){
@@ -24,7 +28,8 @@ public class CtrlMarks {
     }
     else
       status.showBad("Mark already set at this position");
-    return i!=-1;
+    if (i!=-1)
+      markStateListener.set(true);
   }
   public void doMarkGoToPrevious() {
     Editor e=editors.getFirst();
@@ -42,17 +47,19 @@ public class CtrlMarks {
     else
       status.showBad("Cursor is after last mark.");
   }
-  public boolean doMarkClearCurrent() {
+  public void doMarkClearCurrent() {
     int i=editors.getFirst().doMarkClearCurrent();
     if (i==-1)
       status.showBad("Cursor is not on a set mark.");
-    else 
+    else
       status.show("Mark cleared; "+i+" marks left.");
-    return i==0;
+    if (i==0)
+      markStateListener.set(false);
   }
   public void doMarkClearAll() {
     editors.getFirst().doClearMarks();
     status.show("All marks cleared");
+    markStateListener.set(false);
   }
 
   // Had to create this because updates weren't showing up. Dunno.
@@ -69,5 +76,5 @@ public class CtrlMarks {
       status.show("Mark "+i+" of "+count+(set ?" set." :"."));
     }
   }
- 
+
 }

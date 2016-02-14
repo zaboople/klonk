@@ -269,7 +269,7 @@ public class BootContext {
       );
       menus.setControllers(
         ctrlMain
-        ,new CtrlMarks    (editors, statusBar)
+        ,new CtrlMarks    (editors, statusBar, menus.getMarkStateListener())
         ,new CtrlSelection(editors, statusBar, alerter)
         ,new CtrlUndo     (editors, statusBar, yesNo, persist)
         ,new CtrlSearch   (editors, statusBar, findAndReplace, goToLine)

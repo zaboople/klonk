@@ -52,6 +52,8 @@ public class Menus {
   private MenuUtils mu=new MenuUtils();
   private CurrentOS currentOS;
   private JPanel osxAttachPopupsTo;
+  private Setter<Boolean> markStateListener=
+    b->showHasMarks(b);
 
   // Used when sorting the Switch menu & recent menus, respectively:
   private List<Editor> switchSortSource=new ArrayList<>(20);
@@ -173,6 +175,9 @@ public class Menus {
   }
   public Setter<FontOptions> getFontListener() {
     return fontListener;
+  }
+  public Setter<Boolean> getMarkStateListener(){
+    return markStateListener;
   }
 
 
@@ -652,8 +657,7 @@ public class Menus {
     mu.add(
       mark,
       markSet=mu.doMenuItem(
-        "Set mark",
-        markItemListener, KeyEvent.VK_S,
+        "Set mark", markItemListener, KeyEvent.VK_S,
         currentOS.isOSX
           ?KeyMapper.key(KeyEvent.VK_M, KeyMapper.shortcutByOS())
           :KeyMapper.key(KeyEvent.VK_F4)
@@ -667,8 +671,7 @@ public class Menus {
       )
       ,
       markGoToNext=mu.doMenuItem(
-        "Go to next mark",
-        markItemListener, KeyEvent.VK_O,
+        "Go to next mark", markItemListener, KeyEvent.VK_O,
           currentOS.isOSX
             ?KeyMapper.key(KeyEvent.VK_PERIOD, KeyMapper.shortcutByOS())
             :KeyMapper.key(KeyEvent.VK_F9)
@@ -677,7 +680,10 @@ public class Menus {
       markClearCurrent=mu.doMenuItem(
         "Clear current mark",
         markItemListener, KeyEvent.VK_C,
-        KeyMapper.key(KeyEvent.VK_F4, KeyEvent.SHIFT_DOWN_MASK)
+
+        currentOS.isOSX
+          ?KeyMapper.key(KeyEvent.VK_M, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
+          :KeyMapper.key(KeyEvent.VK_F4, KeyEvent.SHIFT_DOWN_MASK)
       )
       ,
       markClearAll=mu.doMenuItem(
@@ -1007,12 +1013,15 @@ public class Menus {
     }
     ,
     markItemListener=new AbstractAction() {
+      // Note that CtrlMarks will actually calls us back via our
+      // "markStateListener" instance to let us know when to disable/enable
+      // the marks menu items. (We also have a MenuListener further down
+      // that actually catches the user selecting the marks menu and updates the
+      // contents, but that doesn't enable/disable.)
       public void actionPerformed(ActionEvent event) {
         Object s=event.getSource();
-        if (s==markSet) {
-          if (ctrlMarks.doMarkSet())
-            showHasMarks(true);
-        }
+        if (s==markSet)
+          ctrlMarks.doMarkSet();
         else
         if (s==markGoToPrevious)
           ctrlMarks.doMarkGoToPrevious();
@@ -1020,15 +1029,11 @@ public class Menus {
         if (s==markGoToNext)
           ctrlMarks.doMarkGoToNext();
         else
-        if (s==markClearCurrent) {
-          if (ctrlMarks.doMarkClearCurrent())
-            showHasMarks(false);
-        }
+        if (s==markClearCurrent)
+          ctrlMarks.doMarkClearCurrent();
         else
-        if (s==markClearAll) {
+        if (s==markClearAll)
           ctrlMarks.doMarkClearAll();
-          showHasMarks(false);
-        }
         else
           throw new RuntimeException("What");
       }
