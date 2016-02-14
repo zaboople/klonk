@@ -629,14 +629,19 @@ public class Editor {
     //in case it changed when we weren't around. But we also need to check every time
     //you press a key, because... Sigh. And it still works halfway. And that depends on
     //operating system. So... sigh.
-    KeyMapper.accel(jta, "EditorCapsLock1", getCapsAction(), KeyEvent.VK_CAPS_LOCK);
-    KeyMapper.accel(jta, "EditorCapsLock2", getCapsAction(), KeyEvent.VK_CAPS_LOCK,
+    Action capsAction=new AbstractAction() {
+      public void actionPerformed(ActionEvent ae) {
+        checkCapsLock();
+      }
+    };
+    KeyMapper.accel(jta, "EditorCapsLock1", capsAction, KeyEvent.VK_CAPS_LOCK);
+    KeyMapper.accel(jta, "EditorCapsLock2", capsAction, KeyEvent.VK_CAPS_LOCK,
                     KeyEvent.SHIFT_DOWN_MASK);
-    KeyMapper.accel(jta, "EditorCapsLock3", getCapsAction(), KeyEvent.VK_CAPS_LOCK,
+    KeyMapper.accel(jta, "EditorCapsLock3", capsAction, KeyEvent.VK_CAPS_LOCK,
                     KeyEvent.CTRL_DOWN_MASK);
-    KeyMapper.accel(jta, "EditorCapsLock3", getCapsAction(), KeyEvent.VK_CAPS_LOCK,
+    KeyMapper.accel(jta, "EditorCapsLock3", capsAction, KeyEvent.VK_CAPS_LOCK,
                     KeyEvent.ALT_DOWN_MASK);
-    KeyMapper.accel(jta, "EditorCapsLock4", getCapsAction(), KeyEvent.VK_CAPS_LOCK,
+    KeyMapper.accel(jta, "EditorCapsLock4", capsAction, KeyEvent.VK_CAPS_LOCK,
                     KeyEvent.SHIFT_DOWN_MASK, KeyEvent.CTRL_DOWN_MASK);
     jta.addFocusListener(
       new FocusAdapter(){
@@ -645,23 +650,26 @@ public class Editor {
         }
       }
     );
-    jta.addKeyListener(new KeyAdapter() {
-      public void keyReleased(KeyEvent e){
-        checkCapsLock();
-      }
-    });
-  }
-  private Action getCapsAction() {
-    return new AbstractAction() {
-      public void actionPerformed(ActionEvent ae) {
-        checkCapsLock();
-      }
-    };
+    jta.addKeyListener(myKeyListener);
   }
   private void checkCapsLock() {
     boolean state=toolkit.getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
     editListener.doCapsLock(state);
   }
+  KeyAdapter myKeyListener=new KeyAdapter() {
+    public void keyReleased(KeyEvent e){
+      //No, doing this in keyPressed() doesn't work:
+      checkCapsLock();
+    }
+    public void keyPressed(KeyEvent e){
+      if (currentOS.isOSX) {
+        final int code=e.getKeyCode();
+        if (code==e.VK_F4) {
+          //
+        }
+      }
+    }
+  };
 
 
   private DropTarget myDropTarget=new DropTarget() {
