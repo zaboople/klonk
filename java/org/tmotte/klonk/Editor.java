@@ -123,6 +123,7 @@ public class Editor {
     jta.setForeground(options.getColor());
     jta.setBackground(options.getBackgroundColor());
     jta.setCaretColor(options.getCaretColor());
+    jta.setCaretWidth(options.getCaretWidth());
   }
   public void setLineBreaker(String lb) {
     this.lineBreaker=lb;
