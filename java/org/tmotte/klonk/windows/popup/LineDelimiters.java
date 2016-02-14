@@ -29,12 +29,14 @@ import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.msg.Setter;
 
 public class LineDelimiters {
 
   // DI:
   private PopupInfo pInfo;
   private FontOptions fontOptions;
+  private Setter<String> happened;
 
   // Controls:
   private JDialog win;
@@ -50,9 +52,10 @@ public class LineDelimiters {
   // INITIALIZATION: //
   /////////////////////
 
-  public LineDelimiters(PopupInfo pInfo, FontOptions fontOptions) {
+  public LineDelimiters(PopupInfo pInfo, FontOptions fontOptions, Setter<String> happened) {
     this.pInfo=pInfo;
     this.fontOptions=fontOptions;
+    this.happened=happened;
     pInfo.addFontListener(fo -> setFont(fo));
   }
 
@@ -92,12 +95,14 @@ public class LineDelimiters {
     jcbDefault.requestFocus();
     String sel=jcbDefault.getSelectedItem().toString();
     listener.setDefault(LineDelimiterOptions.translateFromReadable(sel));
+    happened.set("Default line delimiter set");
   }
   private void clickSetThis() {
     btnThis.setEnabled(false);
     jcbThis.requestFocus();
     String sel=jcbThis.getSelectedItem().toString();
     listener.setThis(LineDelimiterOptions.translateFromReadable(sel));
+    happened.set("Current line delimiter set");
   }
   private void clickClose() {
     win.setVisible(false);
@@ -260,7 +265,10 @@ public class LineDelimiters {
       public void run() {
         final LineDelimiterOptions kdo=new LineDelimiterOptions();
         PopupTestContext ptc=new PopupTestContext();
-        new LineDelimiters(ptc.getPopupInfo(), ptc.getFontOptions())
+        new LineDelimiters(
+            ptc.getPopupInfo(), ptc.getFontOptions(),
+            s -> System.out.println("Result: "+s)
+          )
           .show(
             kdo,
             new LineDelimiterListener(){
