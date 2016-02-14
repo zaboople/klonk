@@ -87,7 +87,10 @@ public class CtrlOptions {
         e.setTabAndIndentOptions(taio);
       persist.setTabAndIndentOptions(taio);
       persist.save();
+      statusBar.show("Changes to tabs & indents saved");
     }
+    else
+      statusBar.showBad("Changes to tabs & indents cancelled");
   }
 
   public void doFontBigger() {
@@ -104,8 +107,11 @@ public class CtrlOptions {
       statusBar.showBad("Cannot make font any smaller");
   }
   public void doFontAndColors() {
-    if (!fontPicker.show(fontOptions))
+    if (!fontPicker.show(fontOptions)){
+      statusBar.showBad("Changes to font & colors cancelled");
       return;
+    }
+    statusBar.show("Changes to font & colors saved");
     pushFont();
   }
   private void pushFont() {
@@ -141,8 +147,10 @@ public class CtrlOptions {
       for (String dis: hosts)
         sshConns.close(dis);
       sshConns.withOptions(sshOptions);
+      statusBar.show("SSH changes saved");
     }
     else
-      statusBar.show("Cancelled.");
+      statusBar.showBad("Changes to SSH cancelled");
+
   }
 }
