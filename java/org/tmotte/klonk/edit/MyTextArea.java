@@ -46,6 +46,7 @@ public class MyTextArea extends JTextArea {
   private JPopupMenu menu=new JPopupMenu();
   private JMenuItem mnuUndo, mnuRedo, mnuCut, mnuCopy, mnuPaste, mnuSelectAll;
   private JScrollPane jsp;
+  private MyCaret myCaret=new MyCaret();
 
   //Undo components:
   private String preUndoSelected=null;
@@ -80,6 +81,8 @@ public class MyTextArea extends JTextArea {
     getInputMap().put(KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.SHIFT_DOWN_MASK), "none");
     getInputMap().put(KeyMapper.key(KeyEvent.VK_DELETE,     KeyEvent.CTRL_DOWN_MASK), "none");
     setMargin(new java.awt.Insets(2,4,2,4));
+    myCaret.setMyWidth(2);
+    setCaret(myCaret);
   }
   public MyTextArea addUndoListener(UndoListener ul) {
     if (undoListeners==null)
@@ -92,6 +95,9 @@ public class MyTextArea extends JTextArea {
   // PUBLIC PROPERTIES AND METHODS: //
   ////////////////////////////////////
 
+  public void setCaretWidth(int w) {
+    myCaret.setMyWidth(w);
+  }
   public void undo(){
     suppressUndoRecord=true;
     startUndo();
