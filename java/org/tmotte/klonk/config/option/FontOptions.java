@@ -13,10 +13,14 @@ public class FontOptions {
   private Color caretColor=Color.BLACK;
   private Color backgroundColor=Color.WHITE;
   private MinimumFont minFont=new MinimumFont(fontSize);
+  private int caretWidth=2;
 
   // GETS: //
   public Color getCaretColor() {
     return caretColor;
+  }
+  public int getCaretWidth() {
+    return caretWidth;
   }
   public Color getBackgroundColor() {
     return backgroundColor;
@@ -70,16 +74,21 @@ public class FontOptions {
     this.caretColor=color;
     return this;
   }
+  public FontOptions setCaretWidth(int size) {
+    this.caretWidth=size;
+    return this;
+  }
   public FontOptions setControlsFont(int size) {
     this.minFont.setSize(size);
     return this;
   }
   public String toString() {
-    DelimitedString ds=new DelimitedString(", ");
+    DelimitedString ds=new DelimitedString("\n", "\n", "\n");
     ds.addEach(
       "Caret:"+getCaretColor(), "BG:"+getBackgroundColor(), "Color:"+getColor(),
       "Font: "+getFont(), "Name: "+getFontName(), "Size: "+getFontSize(),
-      "Minimum control size: "+getControlsFont().getSize()
+      "Control size: "+getControlsFont().getSize(),
+      "Caret width: "+caretWidth
     );
 
     return ds.toString();
