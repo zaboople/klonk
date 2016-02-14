@@ -461,11 +461,13 @@ public class FindAndReplace {
       mtaFind.setForeground(f.getColor());
       mtaFind.setBackground(f.getBackgroundColor());
       mtaFind.setCaretColor(f.getCaretColor());
+      mtaFind.setCaretWidth(f.getCaretWidth());
 
       mtaReplace.setFont(f.getFont());
       mtaReplace.setForeground(f.getColor());
       mtaReplace.setBackground(f.getBackgroundColor());
       mtaReplace.setCaretColor(f.getCaretColor());
+      mtaReplace.setCaretWidth(f.getCaretWidth());
 
       //Am doing this because otherwise it doesn't adjust to
       //our desired setting of rows elsewhere because we set
