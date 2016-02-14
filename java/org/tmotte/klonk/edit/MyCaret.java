@@ -20,7 +20,7 @@ class MyCaret extends DefaultCaret {
   }
   public MyCaret setMyWidth(int w) {
     betterWidth=w;
-    halfWidth=w/2;
+    halfWidth=betterWidth > 4 ?0 :w/2;
     return this;
   }
   protected synchronized void damage(Rectangle r) {
