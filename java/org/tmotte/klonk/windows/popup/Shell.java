@@ -121,6 +121,7 @@ public class Shell {
       mtaOutput.setForeground(f.getColor());
       mtaOutput.setBackground(f.getBackgroundColor());
       mtaOutput.setCaretColor(f.getCaretColor());
+      mtaOutput.setCaretWidth(f.getCaretWidth());
       win.pack();//To make rowcount work
     }
   }
