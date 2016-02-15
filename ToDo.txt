@@ -1,3 +1,10 @@
+-Immediate:
+  Fonts not resizing on windows:
+    Switch menu
+    File-Reopen
+    File-Favorite files
+      Changing fonts seems to make it behave. But if you start up without changing fonts, fuck.
+  FontPicker is ugly misbehaving and bad
 -OSX
   -SO what about F11 & F12? Oh gawd, not Command-Backquote, I so hate that...
   -Unfortunately there's also undo - shift-ctrl-f9 and shift ctrl f12

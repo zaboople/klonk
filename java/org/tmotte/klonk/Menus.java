@@ -188,7 +188,7 @@ public class Menus {
 
   public void setFavoriteFiles(Collection<String> startList) {
     setFavorites(startList, fileFave, pFavorite, reopenListener, 2);
-    fontOptions.getControlsFont().set(pFavorite);
+    fontOptions.getControlsFont().set(fileFave, pFavorite);
   }
   public void setFavoriteDirs(Collection<String> startList) {
     setFavorites(startList, fileOpenFromFave, openFromListener, 0);
@@ -197,7 +197,7 @@ public class Menus {
   }
   public void setRecentFiles(List<String> startList) {
     setRecent(startList, fileReopen, pReopen, reopenListener);
-    fontOptions.getControlsFont().set(pReopen);
+    fontOptions.getControlsFont().set(fileReopen, pReopen);
   }
   private void setRecentDirs(List<String> startList) {
     setRecent(startList, fileOpenFromRecentDir, openFromListener);
@@ -387,9 +387,6 @@ public class Menus {
       }
     }
 
-    // Change fonts:
-    if (pswitcher!=null)
-      fontOptions.getControlsFont().set(pswitcher);
 
     //Build third menu, which swaps current for the other:
     if (editors.size()>1){
@@ -398,6 +395,11 @@ public class Menus {
       switcher.add(switchBackToFront);
       switcher.add(switchNextUnsaved);
     }
+
+    // Change fonts:
+    if (pswitcher!=null)
+      fontOptions.getControlsFont().set(pswitcher);
+    fontOptions.getControlsFont().set(switcher);
 
     fileCloseOthers.setEnabled(editors.size()>1);
   }
