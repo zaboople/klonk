@@ -78,7 +78,7 @@ public class FontPicker {
   private JScrollPane jspMTA;
   private JRadioButton jrbForeground, jrbBackground, jrbCaret;
   private JCheckBox jcbBold, jcbItalic;
-  private JSpinner jspControlSize;
+  private JSpinner jspControlSize, jspCaretWidth;
   private JLabel jlCFO, jlEFO;
 
 
@@ -112,6 +112,7 @@ public class FontPicker {
         fontOptions.setColor(selectedForeground);
         fontOptions.setBackgroundColor(selectedBackground);
         fontOptions.setCaretColor(selectedCaret);
+        fontOptions.setCaretWidth(Integer.parseInt(jspCaretWidth.getValue().toString()));
         return true;
       }
     }
@@ -167,12 +168,16 @@ public class FontPicker {
     jcbBold.setSelected((fontOptions.getFontStyle() & Font.BOLD) > 0);
     jcbItalic.setSelected((fontOptions.getFontStyle() & Font.ITALIC) > 0);
 
+    //Caret width
+    jspCaretWidth.setValue(fontOptions.getCaretWidth());
+
     //Set up text area:
     mta.setFont(fontOptions.getFont());
     mta.setRows(4);
     mta.setForeground(fontOptions.getColor());
     mta.setBackground(fontOptions.getBackgroundColor());
     mta.setCaretColor(fontOptions.getCaretColor());
+    mta.setCaretWidth(fontOptions.getCaretWidth());
 
     Positioner.set(pInfo.parentFrame, win, false);
   }
@@ -196,6 +201,7 @@ public class FontPicker {
         getSelectedStyle(),
         jlFontSize.getSelectedValue())
       );
+    mta.setCaretWidth(Integer.parseInt(jspCaretWidth.getValue().toString()));
   }
 
   /////////////
@@ -252,6 +258,8 @@ public class FontPicker {
     jcbItalic=new JCheckBox("Italic");
     jcbItalic.setFont(jcbItalic.getFont().deriveFont(Font.ITALIC));
     jcbItalic.setMnemonic(KeyEvent.VK_I);
+
+    jspCaretWidth=new JSpinner(new SpinnerNumberModel(1,1,99,1));
 
     jrbForeground=new JRadioButton("Foreground");
     jrbForeground.setMnemonic(KeyEvent.VK_O);
@@ -325,14 +333,13 @@ public class FontPicker {
     GridBug gb=new GridBug(win);
     gb.gridXY(0);
     gb.weightXY(0);
-    gb.setInsets(10, 5, 0, 5);
+    gb.setInsets(5, 5, 0, 5);
     gb.fill=gb.BOTH;
     gb.anchor=gb.NORTHWEST;
 
     gb.addY(layoutTop());
 
-    makeSeparator(gb);
-
+    //makeSeparator(gb);
     gb.fill=gb.BOTH;
     gb.weightXY(1);
     gb.addY(layoutBottom());
@@ -355,6 +362,7 @@ public class FontPicker {
     gb.fill=gb.BOTH;
     gb.anchor=gb.NORTHWEST;
     gb.setInsets(5);
+    gb.insets.top=0;
 
     // Title:
     gb.gridwidth=2;
@@ -364,7 +372,8 @@ public class FontPicker {
     gb.gridwidth=1;
 
     // Spinner:
-    gb.insets.left=10;
+    gb.insets.top=0;
+    gb.insets.left=20;
     gb.setX(0).setY(1);
     gb.gridXY(0, 2);
     gb.weightXY(0, 1);
@@ -387,12 +396,14 @@ public class FontPicker {
     gb.anchor=gb.NORTHWEST;
 
     // Label:
+    gb.insets.top=0;
     gb.insets.left=5;
     gb.addY(jlEFO);
 
     // Font name, size< style:
     gb.fill=gb.BOTH;
-    gb.weightXY(1);
+    gb.insets.left=20;
+    gb.weightXY(0, 0.3);
     gb.addY(getEditorFontSelectionPanel());
 
     // Colors:
@@ -403,7 +414,7 @@ public class FontPicker {
 
     // Preview:
     gb.insets.top=0;
-    gb.weightXY(1);
+    gb.weightXY(1, 0.7);
     gb.fill=gb.BOTH;
     gb.addY(getPreviewPanel());
 
@@ -417,11 +428,14 @@ public class FontPicker {
   private JPanel getEditorFontSelectionPanel() {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
-    gb.weightXY(0.6, 1);
+    gb.anchor=gb.WEST;
+    gb.weightXY(0.1, 1);
     gb.fill=gb.BOTH;
     gb.add(getFontListPanel());
 
-    gb.weightx=0.2;
+    gb.insets.left=10;
+
+    gb.weightx=0;
     gb.addX(getFontSizePanel());
 
     gb.weightx=0;
@@ -483,18 +497,32 @@ public class FontPicker {
     gb.insets.left=5;
     gb.insets.right=5;
 
-    gb.weightXY(1,0);
-    JLabel label=new JLabel("Font Style:");
-    label.setFont(label.getFont().deriveFont(Font.BOLD));
-    gb.insets.top=10;
-    gb.add(label);
+    {
+      gb.weightXY(1,0);
+      JLabel label=new JLabel("Font Style:");
+      label.setFont(label.getFont().deriveFont(Font.BOLD));
+      gb.insets.top=10;
+      gb.add(label);
+    }
 
     gb.insets.top=0;
     gb.fill=gb.NONE;
     gb.addY(jcbBold);
-    gb.weightXY(1,1);
+    gb.weightXY(1,0);
     gb.addY(jcbItalic);
 
+    {
+      gb.weightXY(1,0);
+      JLabel label=new JLabel("Caret Width:");
+      label.setFont(label.getFont().deriveFont(Font.BOLD));
+      gb.insets.top=10;
+      gb.addY(label);
+    }
+
+    gb.insets.top=0;
+    gb.fill=gb.NONE;
+    gb.weightXY(1,1);
+    gb.addY(jspCaretWidth);
     return panel;
   }
   private JPanel getColorPanel() {
@@ -579,8 +607,7 @@ public class FontPicker {
     {
       ChangeListener styleListen=new ChangeListener(){
         public void stateChanged(ChangeEvent ce) {
-          new MinimumFont(Integer.parseInt(jspControlSize.getValue().toString()))
-            ;
+          new MinimumFont(Integer.parseInt(jspControlSize.getValue().toString()));
           changeFont();
         }
       };
@@ -607,6 +634,16 @@ public class FontPicker {
       };
       jcbBold.addChangeListener(styleListen);
       jcbItalic.addChangeListener(styleListen);
+    }
+
+    //Caret width change:
+    {
+      ChangeListener listen=new ChangeListener(){
+        public void stateChanged(ChangeEvent ce) {
+          changeFont();
+        }
+      };
+      jspCaretWidth.addChangeListener(listen);
     }
 
     //Color chooser radio button change:
