@@ -264,6 +264,7 @@ public class BootContext {
 
     //Used in two places:
     CtrlMarks ctrlMarks=new CtrlMarks(editors, statusBar, menus.getMarkStateListener());
+    CtrlSearch ctrlSearch=new CtrlSearch(editors, statusBar, findAndReplace, goToLine);
 
     //Menu controller settings:
     {
@@ -274,7 +275,7 @@ public class BootContext {
         ctrlMain, ctrlMarks
         ,new CtrlSelection(editors, statusBar, alerter)
         ,new CtrlUndo     (editors, statusBar, yesNo, persist)
-        ,new CtrlSearch   (editors, statusBar, findAndReplace, goToLine)
+        ,ctrlSearch
         ,new CtrlFileOther(editors, statusBar, ctrlFavorites, currentOS)
         ,new CtrlOther    (shell, help, about)
         ,new CtrlOptions  (
@@ -306,7 +307,7 @@ public class BootContext {
       menus.getEditorSwitchListener(),
       menus.getRecentFileListener(),
       menus.getRecentDirListener(),
-      ctrlMarks
+      ctrlMarks, ctrlSearch
     );
     return ctrlMain;
   }

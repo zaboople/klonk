@@ -37,6 +37,7 @@ import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.controller.CtrlMarks;
+import org.tmotte.klonk.controller.CtrlSearch;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.edit.Spaceable;
 import org.tmotte.klonk.edit.UndoEvent;
@@ -47,11 +48,13 @@ import org.tmotte.klonk.io.KFileIO;
 /** Enhances MyTextArea with secondary editing features. Also adds file-specific information. */
 public class Editor {
 
+
   //Dependencies:
   private EditorListener editListener;
   private Setter<Throwable> failHandler;
   private CurrentOS currentOS;
   private CtrlMarks ctrlMarks;
+  private CtrlSearch ctrlSearch;
 
   //Purely private:
   private MyTextArea jta;
@@ -74,13 +77,15 @@ public class Editor {
 
   public Editor(
       CurrentOS currentOS, Setter<Throwable> failHandler,
-      EditorListener editListener, UndoListener undoL, CtrlMarks ctrlMarks,
+      EditorListener editListener, UndoListener undoL,
+      CtrlMarks ctrlMarks, CtrlSearch ctrlSearch,
       String lineBreaker, boolean wordWrap, boolean autoTrim
     ) {
     this.currentOS=currentOS;
     this.failHandler=failHandler;
     this.editListener=editListener;
     this.ctrlMarks=ctrlMarks;
+    this.ctrlSearch=ctrlSearch;
 
     this.lineBreaker=lineBreaker;
     jta=new MyTextArea(currentOS);
@@ -672,6 +677,8 @@ public class Editor {
         //even though these functions are attached to other keystrokes.
         final int code=e.getKeyCode();
         final int modifiers=e.getModifiersEx();
+
+        // Marks:
         if (code==e.VK_F4) {
           ctrlMarks.doMarkSet();
           e.consume();
@@ -684,6 +691,16 @@ public class Editor {
         else
         if (code==e.VK_F9 && modifiers==0) {
           ctrlMarks.doMarkGoToNext();
+          e.consume();
+        }
+        else
+
+        //Find:
+        if (code==e.VK_F3) {
+          if (KeyMapper.shiftPressed(modifiers))
+            ctrlSearch.doSearchRepeatBackwards();
+          else
+            ctrlSearch.doSearchRepeat();
           e.consume();
         }
       }

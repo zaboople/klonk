@@ -60,6 +60,7 @@ public class CtrlMain  {
   private OpenFileList openFileList;
   private CurrentOS currentOS;
   private CtrlMarks ctrlMarks;
+  private CtrlSearch ctrlSearch;
 
   //Editors list:
   private LinkedList<Editor> editors=new LinkedList<>();
@@ -111,7 +112,7 @@ public class CtrlMain  {
       Doer editorSwitchListener,
       Setter<List<String>> recentFileListener,
       Setter<List<String>> recentDirListener,
-      CtrlMarks ctrlMarks
+      CtrlMarks ctrlMarks, CtrlSearch ctrlSearch
     ) {
     this.lockRemover=lockRemover;
     this.fileResolver=fileResolver;
@@ -119,6 +120,7 @@ public class CtrlMain  {
     this.recents.setFileListener(recentFileListener);
     this.recents.setDirListener(recentDirListener);
     this.ctrlMarks=ctrlMarks;
+    this.ctrlSearch=ctrlSearch;
   }
 
 
@@ -638,7 +640,7 @@ public class CtrlMain  {
       userNotify.getExceptionHandler(),
       editorListener,
       myUndoListener,
-      ctrlMarks,
+      ctrlMarks, ctrlSearch,
       persist.getDefaultLineDelimiter(),
       persist.getWordWrap(),
       persist.getAutoTrim()
