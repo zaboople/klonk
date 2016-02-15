@@ -198,6 +198,7 @@ public class KPersist {
     setColor("EditorText.Font.Color", fo.getColor());
     setColor("EditorText.Background", fo.getBackgroundColor());
     setColor("EditorText.Caret.Color", fo.getCaretColor());
+    setInt("EditorText.Caret.Width", fo.getCaretWidth());
     setInt("Window.Controls.Minimum.Font.Size", fo.getControlsFont().getSize());
 
     fontOptionsCache=null;
@@ -225,6 +226,9 @@ public class KPersist {
       );
       fo.setCaretColor(
         getColor("EditorText.Caret.Color", fo.getCaretColor())
+      );
+      fo.setCaretWidth(
+        getInt("EditorText.Caret.Width", fo.getCaretWidth())
       );
       fo.setControlsFont(
         getInt("Window.Controls.Minimum.Font.Size", 12)
