@@ -59,6 +59,7 @@ public class CtrlMain  {
   private SSHOpenFrom sshOpenFrom;
   private OpenFileList openFileList;
   private CurrentOS currentOS;
+  private CtrlMarks ctrlMarks;
 
   //Editors list:
   private LinkedList<Editor> editors=new LinkedList<>();
@@ -109,13 +110,15 @@ public class CtrlMain  {
       IFileGet fileResolver,
       Doer editorSwitchListener,
       Setter<List<String>> recentFileListener,
-      Setter<List<String>> recentDirListener
+      Setter<List<String>> recentDirListener,
+      CtrlMarks ctrlMarks
     ) {
     this.lockRemover=lockRemover;
     this.fileResolver=fileResolver;
     this.editorSwitchedListener=editorSwitchListener;
     this.recents.setFileListener(recentFileListener);
     this.recents.setDirListener(recentDirListener);
+    this.ctrlMarks=ctrlMarks;
   }
 
 
@@ -631,10 +634,11 @@ public class CtrlMain  {
   }
   private Editor newEditor(boolean updateUI){
     Editor e=new Editor(
+      currentOS,
       userNotify.getExceptionHandler(),
       editorListener,
       myUndoListener,
-      currentOS,
+      ctrlMarks,
       persist.getDefaultLineDelimiter(),
       persist.getWordWrap(),
       persist.getAutoTrim()

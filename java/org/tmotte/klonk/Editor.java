@@ -36,6 +36,7 @@ import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
+import org.tmotte.klonk.controller.CtrlMarks;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.edit.Spaceable;
 import org.tmotte.klonk.edit.UndoEvent;
@@ -50,6 +51,7 @@ public class Editor {
   private EditorListener editListener;
   private Setter<Throwable> failHandler;
   private CurrentOS currentOS;
+  private CtrlMarks ctrlMarks;
 
   //Purely private:
   private MyTextArea jta;
@@ -71,14 +73,16 @@ public class Editor {
   /////////////////////////
 
   public Editor(
-      Setter<Throwable> failHandler,
-      EditorListener editListener, UndoListener undoL, CurrentOS currentOS,
+      CurrentOS currentOS, Setter<Throwable> failHandler,
+      EditorListener editListener, UndoListener undoL, CtrlMarks ctrlMarks,
       String lineBreaker, boolean wordWrap, boolean autoTrim
     ) {
-    this.editListener=editListener;
-    this.failHandler=failHandler;
-    this.lineBreaker=lineBreaker;
     this.currentOS=currentOS;
+    this.failHandler=failHandler;
+    this.editListener=editListener;
+    this.ctrlMarks=ctrlMarks;
+
+    this.lineBreaker=lineBreaker;
     jta=new MyTextArea(currentOS);
     jta.setDragEnabled(false);
     JScrollPane jsp=jta.makeVerticalScrollable();
@@ -664,9 +668,23 @@ public class Editor {
     }
     public void keyPressed(KeyEvent e){
       if (currentOS.isOSX) {
+        //This is all so we can get MS Windows capabilities on OSX
+        //even though these functions are attached to other keystrokes.
         final int code=e.getKeyCode();
+        final int modifiers=e.getModifiersEx();
         if (code==e.VK_F4) {
-          //
+          ctrlMarks.doMarkSet();
+          e.consume();
+        }
+        else
+        if (code==e.VK_F8 && modifiers==0) {
+          ctrlMarks.doMarkGoToPrevious();
+          e.consume();
+        }
+        else
+        if (code==e.VK_F9 && modifiers==0) {
+          ctrlMarks.doMarkGoToNext();
+          e.consume();
         }
       }
     }
