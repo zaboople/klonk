@@ -680,7 +680,10 @@ public class Editor {
 
         // Marks:
         if (code==e.VK_F4) {
-          ctrlMarks.doMarkSet();
+          if (KeyMapper.shiftPressed(modifiers))
+            ctrlMarks.doMarkClearCurrent();
+          else
+            ctrlMarks.doMarkSet();
           e.consume();
         }
         else
