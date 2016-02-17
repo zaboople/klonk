@@ -16,6 +16,7 @@
   -Document all the changes
 
 -Current
+  -Get better performance by creating a NEW Document during load instead of using the one that's in the JTextArea. This apparently causes a lot of overhead otherwise.
   -What is this Ctrl-W thing in Editor.java? This is dumb
 
   -Shell
