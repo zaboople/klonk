@@ -262,20 +262,17 @@ public class BootContext {
     //Menu font options:
     popupInfo.addFontListener(menus.getFontListener());
 
-    //Used in two places:
-    CtrlMarks ctrlMarks=new CtrlMarks(editors, statusBar, menus.getMarkStateListener());
-    CtrlSearch ctrlSearch=new CtrlSearch(editors, statusBar, findAndReplace, goToLine);
-
     //Menu controller settings:
     {
       CtrlFavorites ctrlFavorites=new CtrlFavorites(
         persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
       );
       menus.setControllers(
-        ctrlMain, ctrlMarks
+        ctrlMain
+        ,new CtrlMarks(editors, statusBar, menus.getMarkStateListener())
         ,new CtrlSelection(editors, statusBar, alerter)
         ,new CtrlUndo     (editors, statusBar, yesNo, persist)
-        ,ctrlSearch
+        ,new CtrlSearch(editors, statusBar, findAndReplace, goToLine)
         ,new CtrlFileOther(editors, statusBar, ctrlFavorites, currentOS)
         ,new CtrlOther    (shell, help, about)
         ,new CtrlOptions  (
@@ -307,7 +304,7 @@ public class BootContext {
       menus.getEditorSwitchListener(),
       menus.getRecentFileListener(),
       menus.getRecentDirListener(),
-      ctrlMarks, ctrlSearch
+      menus.getExtraKeyListener()
     );
     return ctrlMain;
   }

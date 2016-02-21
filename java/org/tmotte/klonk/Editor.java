@@ -36,8 +36,6 @@ import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
-import org.tmotte.klonk.controller.CtrlMarks;
-import org.tmotte.klonk.controller.CtrlSearch;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.edit.Spaceable;
 import org.tmotte.klonk.edit.UndoEvent;
@@ -52,9 +50,8 @@ public class Editor {
   //Dependencies:
   private EditorListener editListener;
   private Setter<Throwable> failHandler;
+  private Setter<KeyEvent> externalKeyListener;
   private CurrentOS currentOS;
-  private CtrlMarks ctrlMarks;
-  private CtrlSearch ctrlSearch;
 
   //Purely private:
   private MyTextArea jta;
@@ -77,15 +74,13 @@ public class Editor {
 
   public Editor(
       CurrentOS currentOS, Setter<Throwable> failHandler,
-      EditorListener editListener, UndoListener undoL,
-      CtrlMarks ctrlMarks, CtrlSearch ctrlSearch,
+      EditorListener editListener, Setter<KeyEvent> keyListener, UndoListener undoL,
       String lineBreaker, boolean wordWrap, boolean autoTrim
     ) {
     this.currentOS=currentOS;
     this.failHandler=failHandler;
     this.editListener=editListener;
-    this.ctrlMarks=ctrlMarks;
-    this.ctrlSearch=ctrlSearch;
+    this.externalKeyListener=keyListener;
 
     this.lineBreaker=lineBreaker;
     jta=new MyTextArea(currentOS);
@@ -672,41 +667,7 @@ public class Editor {
       checkCapsLock();
     }
     public void keyPressed(KeyEvent e){
-      if (currentOS.isOSX) {
-        //This is all so we can get MS Windows capabilities on OSX
-        //even though these functions are attached to other keystrokes.
-        final int code=e.getKeyCode();
-        final int modifiers=e.getModifiersEx();
-
-        // Marks:
-        if (code==e.VK_F4) {
-          if (KeyMapper.shiftPressed(modifiers))
-            ctrlMarks.doMarkClearCurrent();
-          else
-            ctrlMarks.doMarkSet();
-          e.consume();
-        }
-        else
-        if (code==e.VK_F8 && modifiers==0) {
-          ctrlMarks.doMarkGoToPrevious();
-          e.consume();
-        }
-        else
-        if (code==e.VK_F9 && modifiers==0) {
-          ctrlMarks.doMarkGoToNext();
-          e.consume();
-        }
-        else
-
-        //Find:
-        if (code==e.VK_F3) {
-          if (KeyMapper.shiftPressed(modifiers))
-            ctrlSearch.doSearchRepeatBackwards();
-          else
-            ctrlSearch.doSearchRepeat();
-          e.consume();
-        }
-      }
+      externalKeyListener.set(e);
     }
   };
 
