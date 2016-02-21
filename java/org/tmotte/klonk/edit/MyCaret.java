@@ -23,7 +23,7 @@ class MyCaret extends DefaultCaret {
     halfWidth=betterWidth > 4 ?0 :w/2;
     return this;
   }
-  protected synchronized void damage(Rectangle r) {
+  protected @Override synchronized void damage(Rectangle r) {
     if (r==null)
       return;
 
@@ -42,7 +42,7 @@ class MyCaret extends DefaultCaret {
     repaint(); // calls getComponent().repaint(x, y, width, height)
   }
 
-  public void paint(Graphics g) {
+  public @Override void paint(Graphics g) {
     JTextComponent comp=getComponent();
     if (comp==null)
       return;
