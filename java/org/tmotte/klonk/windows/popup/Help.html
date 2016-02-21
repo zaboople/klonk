@@ -206,7 +206,7 @@ Such characters only display properly if you have selected a font that can handl
 <h2><a name="batch">External → Run Batch Program</a></h2>
 
 <p>
-This allows you to run a program and pipe the standard output/error back into Klonk. It is pretty good as a poor person's substitute for an IDE compiler (whatever that means). Warning: For some programs the "Stop" button is not very good at killing the program. The "Stop" button may not work, in which case you may have to end the program using the operating system's features (like Unix/Linux/OSx's "kill -9", etc.).
+This allows you to run a program and pipe the standard output/error back into Klonk. It is pretty good as a poor person's substitute for an IDE compiler (whatever that means). Warning: For some programs the "Stop" button is not very good at killing the program, in which case you may have to end the program using the operating system's features (like Unix/Linux/OSx's "kill -9", etc.).
 </p>
 
 <p>
@@ -233,9 +233,9 @@ or
 to execute it.
 </p>
 
-<h3>ALT-D</h3>
+<h3>ALT-D &amp; ALT-L</h3>
 <p>
-Similar to a web browser's address bar, this keystroke transfers focus to the dropdown list of commands.
+Similar to a web browser's address bar, this keystroke transfers focus to the dropdown list of commands. And as with the web browser, if varies by operating system.
 </p>
 
 
@@ -250,7 +250,7 @@ Configuration data and so on is stored in a directory named "klonk" in your home
 </p>
   <pre>  -home [directory name]</pre>
 <p>
-as a command-line option. Right now Klonk's home directory is set to:
+as a command-line option. This actually allows you to run multiple Klonks at the same time, by just running each with an alternate home. Right now Klonk's home directory is set to:
 </p>
   <pre>  $[Home]</pre>
 <p>
@@ -425,6 +425,7 @@ In the "Help" menu, Apple places a useless search box.
 <h3>Menu Shortcuts</h3>
 <p>Long story short, unlike Microsoft, Apple makes it really hard to access menu items via the keyboard. So we created the "MacOS shortcuts" menu, which lists a series of items that are already in <i>other</i> menus, but here they have designated keyboard shortcuts that instantly take you to a "popup" menu (as opposed to a sub-menu). This may sound confusing at first, but it's recommended for keyboard hogs who hate mousing thru menus.
 </p>
+<p>Also note that we ended up having to change a lot of keyboard shortcuts (all of which are visible in menus), which might bother someone used to the Windows ones. Some of the Windows shortcuts do actually work, however: F3, F4, F8, F9, F11, Ctrl-G, Ctrl-F, Ctrl-R, and maybe a few more.
 
 </body>
 </html>
