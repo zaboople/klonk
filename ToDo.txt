@@ -7,11 +7,11 @@
   FontPicker is ugly misbehaving and bad
   -HOLY POO I can customize the caret! JTextArea.setCaret() and there's a DefaultCaret
     https://docs.oracle.com/javase/8/docs/api/javax/swing/text/DefaultCaret.html
-
--OSX
   -SO what about F11 & F12? Oh gawd, not Command-Backquote, I so hate that...
     F11 and shift F11 will be quote/backquote, and F12 will remain its illustrious self, since
     it has no standard mac equivalent
+
+-OSX
   -Unfortunately there's also undo - shift-ctrl-f9 and shift ctrl f12
   -Document all the changes
 
