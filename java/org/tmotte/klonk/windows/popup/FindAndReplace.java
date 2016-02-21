@@ -56,12 +56,18 @@ public class FindAndReplace {
   public static KeyStroke getFindAgainKey(CurrentOS currentOS){
     return currentOS.isOSX
       ?KeyMapper.key(KeyEvent.VK_G, KeyEvent.META_DOWN_MASK)
-      :KeyMapper.key(KeyEvent.VK_F3);
+      :getFindAgainKeyMSWindows();
   }
   public static KeyStroke getFindAgainReverseKey(CurrentOS currentOS){
     return currentOS.isOSX
       ?KeyMapper.key(KeyEvent.VK_G, KeyEvent.META_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
-      :KeyMapper.key(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK);
+      :getFindAgainReverseKeyMSWindows();
+  }
+  public static KeyStroke getFindAgainKeyMSWindows(){
+    return KeyMapper.key(KeyEvent.VK_F3);
+  }
+  public static KeyStroke getFindAgainReverseKeyMSWindows(){
+    return KeyMapper.key(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK);
   }
 
 
@@ -127,7 +133,7 @@ public class FindAndReplace {
       }
     }
     else
-      doFind(mta, forwards);
+      doFind(mta, false);
   }
 
   //////////////////////
@@ -486,6 +492,11 @@ public class FindAndReplace {
     doButtonEvents(btnFind,     buttonListener, getFindAgainKey(pInfo.currentOS));
     doButtonEvents(btnFind,     buttonListener, KeyMapper.key(KeyEvent.VK_ENTER));
     doButtonEvents(btnReverse,  buttonListener, getFindAgainReverseKey(pInfo.currentOS));
+    if (pInfo.currentOS.isOSX) {
+      //Enabling ms windows behavior on OSX:
+      doButtonEvents(btnFind,     buttonListener, getFindAgainKeyMSWindows());
+      doButtonEvents(btnReverse,  buttonListener, getFindAgainReverseKeyMSWindows());
+    }
     pInfo.currentOS.fixEnterKey(btnFind, buttonListener);
     pInfo.currentOS.fixEnterKey(btnReverse, buttonListener);
     pInfo.currentOS.fixEnterKey(btnCancel, buttonListener);

@@ -3,6 +3,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Image;
 import java.awt.Window;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -52,6 +53,7 @@ public class CtrlMain  {
   private StatusUpdate statusBar;
   private UserNotify userNotify;
   private Doer lockRemover, editorSwitchedListener;
+  private Setter<KeyEvent> editorKeyListener;
   private IFileGet fileResolver;
   private FileDialogWrapper fileDialog;
   private YesNoCancel yesNo, yesNoCancel;
@@ -109,13 +111,15 @@ public class CtrlMain  {
       IFileGet fileResolver,
       Doer editorSwitchListener,
       Setter<List<String>> recentFileListener,
-      Setter<List<String>> recentDirListener
+      Setter<List<String>> recentDirListener,
+      Setter<KeyEvent> editorKeyListener
     ) {
     this.lockRemover=lockRemover;
     this.fileResolver=fileResolver;
     this.editorSwitchedListener=editorSwitchListener;
     this.recents.setFileListener(recentFileListener);
     this.recents.setDirListener(recentDirListener);
+    this.editorKeyListener=editorKeyListener;
   }
 
 
@@ -631,10 +635,11 @@ public class CtrlMain  {
   }
   private Editor newEditor(boolean updateUI){
     Editor e=new Editor(
+      currentOS,
       userNotify.getExceptionHandler(),
       editorListener,
+      editorKeyListener,
       myUndoListener,
-      currentOS,
       persist.getDefaultLineDelimiter(),
       persist.getWordWrap(),
       persist.getAutoTrim()

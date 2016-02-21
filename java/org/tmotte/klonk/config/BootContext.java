@@ -269,10 +269,10 @@ public class BootContext {
       );
       menus.setControllers(
         ctrlMain
-        ,new CtrlMarks    (editors, statusBar, menus.getMarkStateListener())
+        ,new CtrlMarks(editors, statusBar, menus.getMarkStateListener())
         ,new CtrlSelection(editors, statusBar, alerter)
         ,new CtrlUndo     (editors, statusBar, yesNo, persist)
-        ,new CtrlSearch   (editors, statusBar, findAndReplace, goToLine)
+        ,new CtrlSearch(editors, statusBar, findAndReplace, goToLine)
         ,new CtrlFileOther(editors, statusBar, ctrlFavorites, currentOS)
         ,new CtrlOther    (shell, help, about)
         ,new CtrlOptions  (
@@ -303,7 +303,8 @@ public class BootContext {
       sshConns.getFileResolver(),
       menus.getEditorSwitchListener(),
       menus.getRecentFileListener(),
-      menus.getRecentDirListener()
+      menus.getRecentDirListener(),
+      menus.getExtraKeyListener()
     );
     return ctrlMain;
   }

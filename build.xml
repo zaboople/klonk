@@ -114,6 +114,7 @@
           deprecation="on"
           srcdir="${java.dir}"
           includeantruntime="false">
+      <!--compilerarg value="-Xlint"/-->
       <classpath refid="classpath"/>
     </javac>
 

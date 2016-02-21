@@ -427,6 +427,7 @@ public class MyTextArea extends JTextArea {
             Caret c=getCaret();
             int start=c.getDot(), end=c.getMark();
             if (end<start) {
+              e.consume();
               setCaretPosition(start);
               moveCaretPosition(end);
             }
@@ -463,8 +464,8 @@ public class MyTextArea extends JTextArea {
           //CONTEXT MENU:
           Point p=getCaret().getMagicCaretPosition();
           if (p==null) p=new Point(10,10);
-          showMenu(p.x, p.y);
           e.consume();
+          showMenu(p.x, p.y);
 
         }
         else

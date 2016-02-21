@@ -20,7 +20,8 @@ class MyCaret extends DefaultCaret {
   }
   public MyCaret setMyWidth(int w) {
     betterWidth=w;
-    halfWidth=betterWidth > 4 ?0 :w/2;
+    //This caused problems because apparently it recursed repaints() adnauseum and jacked up cpu
+    //halfWidth=betterWidth > 4 ?0 :w/2;
     return this;
   }
   protected @Override synchronized void damage(Rectangle r) {

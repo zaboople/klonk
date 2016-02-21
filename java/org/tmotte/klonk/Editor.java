@@ -46,9 +46,11 @@ import org.tmotte.klonk.io.KFileIO;
 /** Enhances MyTextArea with secondary editing features. Also adds file-specific information. */
 public class Editor {
 
+
   //Dependencies:
   private EditorListener editListener;
   private Setter<Throwable> failHandler;
+  private Setter<KeyEvent> externalKeyListener;
   private CurrentOS currentOS;
 
   //Purely private:
@@ -71,14 +73,16 @@ public class Editor {
   /////////////////////////
 
   public Editor(
-      Setter<Throwable> failHandler,
-      EditorListener editListener, UndoListener undoL, CurrentOS currentOS,
+      CurrentOS currentOS, Setter<Throwable> failHandler,
+      EditorListener editListener, Setter<KeyEvent> keyListener, UndoListener undoL,
       String lineBreaker, boolean wordWrap, boolean autoTrim
     ) {
-    this.editListener=editListener;
-    this.failHandler=failHandler;
-    this.lineBreaker=lineBreaker;
     this.currentOS=currentOS;
+    this.failHandler=failHandler;
+    this.editListener=editListener;
+    this.externalKeyListener=keyListener;
+
+    this.lineBreaker=lineBreaker;
     jta=new MyTextArea(currentOS);
     jta.setDragEnabled(false);
     JScrollPane jsp=jta.makeVerticalScrollable();
@@ -663,12 +667,7 @@ public class Editor {
       checkCapsLock();
     }
     public void keyPressed(KeyEvent e){
-      if (currentOS.isOSX) {
-        final int code=e.getKeyCode();
-        if (code==e.VK_F4) {
-          //
-        }
-      }
+      externalKeyListener.set(e);
     }
   };
 

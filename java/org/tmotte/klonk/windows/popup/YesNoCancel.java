@@ -255,6 +255,11 @@ public class YesNoCancel {
     win.pack();
     KeyMapper.accel(btnYes, btnActions, FindAndReplace.getFindAgainKey(pInfo.currentOS));
     KeyMapper.accel(btnYes, btnActions, FindAndReplace.getFindAgainReverseKey(pInfo.currentOS));
+    if (pInfo.currentOS.isOSX) {
+      //This is to enable MS Windows behavior on OSX, F3 it is
+      KeyMapper.accel(btnYes, btnActions, FindAndReplace.getFindAgainKeyMSWindows());
+      KeyMapper.accel(btnYes, btnActions, FindAndReplace.getFindAgainReverseKeyMSWindows());
+    }
   }
   private void click(int result) {
     win.setVisible(false);

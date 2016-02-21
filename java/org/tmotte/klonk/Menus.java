@@ -173,6 +173,9 @@ public class Menus {
   public Setter<List<String>> getFavoriteDirListener() {
     return (List<String> dirs) -> setFavoriteDirs(dirs);
   }
+  public Setter<KeyEvent> getExtraKeyListener() {
+    return ke->listenToEditorKeys(ke);
+  }
   public Setter<FontOptions> getFontListener() {
     return fontListener;
   }
@@ -590,10 +593,16 @@ public class Menus {
     //SWITCH:
     switcher=mu.doMenu(bar, "Switch",     KeyEvent.VK_W);
     switchFrontToBack=mu.doMenuItem(
-      "Send front to back", switchListener, KeyEvent.VK_S, KeyMapper.key(KeyEvent.VK_F11)
+      "Send front to back", switchListener, KeyEvent.VK_S,
+      currentOS.isOSX
+        ?KeyMapper.key(KeyEvent.VK_BACK_QUOTE, KeyMapper.shortcutByOS())
+        :KeyMapper.key(KeyEvent.VK_F11)
     );
     switchBackToFront=mu.doMenuItem(
-      "Send back to front", switchListener, KeyEvent.VK_E, KeyMapper.key(KeyEvent.VK_F11, KeyEvent.SHIFT_DOWN_MASK)
+      "Send back to front", switchListener, KeyEvent.VK_E,
+      currentOS.isOSX
+        ?KeyMapper.key(KeyEvent.VK_BACK_QUOTE, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
+        :KeyMapper.key(KeyEvent.VK_F11, KeyEvent.SHIFT_DOWN_MASK)
     );
     switchNextUnsaved=mu.doMenuItem(
       "Next unsaved file", switchListener, KeyEvent.VK_X
@@ -615,16 +624,12 @@ public class Menus {
       ,
       searchFind=mu.doMenuItem(
         "Find", searchListener, KeyEvent.VK_F,
-        currentOS.isOSX
-          ?KeyMapper.key(KeyEvent.VK_F, KeyEvent.META_DOWN_MASK)
-          :KeyMapper.key(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK)
+        KeyMapper.key(KeyEvent.VK_F, KeyMapper.shortcutByOS())
       )
       ,
       searchReplace=mu.doMenuItem(
         "Replace", searchListener, KeyEvent.VK_R,
-        currentOS.isOSX
-          ?KeyMapper.key(KeyEvent.VK_R, KeyEvent.META_DOWN_MASK)
-          :KeyMapper.key(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK)
+        KeyMapper.key(KeyEvent.VK_R, KeyMapper.shortcutByOS())
       )
     );
     search.addSeparator();
@@ -1225,4 +1230,72 @@ public class Menus {
       }
     }
   ;
+
+  /**
+   * We hand this to editors and ask them to call it whenever keystrokes happen. This is how
+   * we get "alternate" / hidden keys to work, or really to enable Windows key combinations
+   * to work on OSX as well.
+   */
+  private void listenToEditorKeys(KeyEvent e) {
+    if (currentOS.isOSX) {
+      //This is all so we can get MS Windows capabilities on OSX
+      //even though the corresponding menu items are attached to other keystrokes.
+      final int code=e.getKeyCode();
+      final int modifiers=e.getModifiersEx();
+
+      // Marks:
+      if (code==e.VK_F4) {
+        if (KeyMapper.shiftPressed(modifiers))
+          ctrlMarks.doMarkClearCurrent();
+        else
+          ctrlMarks.doMarkSet();
+        e.consume();
+      }
+      else
+      if (code==e.VK_F8 && modifiers==0) {
+        ctrlMarks.doMarkGoToPrevious();
+        e.consume();
+      }
+      else
+      if (code==e.VK_F9 && modifiers==0) {
+        ctrlMarks.doMarkGoToNext();
+        e.consume();
+      }
+      else
+
+      //Find:
+      if (code==e.VK_F3) {
+        e.consume();
+        if (KeyMapper.shiftPressed(modifiers))
+          ctrlSearch.doSearchRepeatBackwards();
+        else
+          ctrlSearch.doSearchRepeat();
+      }
+      else
+      if (code==e.VK_F && KeyMapper.ctrlPressed(modifiers)){
+        e.consume();
+        ctrlSearch.doSearchFind();
+      }
+      else
+      if (code==e.VK_R && KeyMapper.ctrlPressed(modifiers)) {
+        e.consume();
+        ctrlSearch.doSearchReplace();
+      }
+      else
+      if (code==e.VK_G && KeyMapper.ctrlPressed(modifiers)) {
+        e.consume();
+        ctrlSearch.doSearchGoToLine();
+      }
+
+      //Switch:
+      else
+      if (code==e.VK_F11) {
+        e.consume();
+        if (KeyMapper.shiftPressed(modifiers))
+          ctrlMain.doSendBackToFront();
+        else
+          ctrlMain.doSendFrontToBack();
+      }
+    }
+  }
 }
