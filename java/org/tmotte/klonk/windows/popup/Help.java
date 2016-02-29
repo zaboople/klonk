@@ -127,6 +127,9 @@ public class Help {
     jsp=new JScrollPane(jtp);
     jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     jsp.getVerticalScrollBar().setUnitIncrement(16);
+    if (pInfo.currentOS.isOSX)
+      jsp.setHorizontalScrollBarPolicy(jsp.HORIZONTAL_SCROLLBAR_ALWAYS);
+
     //Force the stupid thing to scroll to top:
     jtp.setCaretPosition(0);
 

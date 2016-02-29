@@ -4,15 +4,14 @@
     File-Reopen
     File-Favorite files
       Changing fonts seems to make it behave. But if you start up without changing fonts, fuck.
+  FontPicker opens with text thing at bottom way to small. Why is that?
+  OSX HELP Window scrolls like crap, like edit window used to
+  OSX Update Help to indicate F11 alternatives
 
 -OSX
-  -Unfortunately there's also undo - shift-ctrl-f9 and shift ctrl f12
-
+  -Need alternate keys for shift-ctrl-f9 and shift ctrl f12? You could toss in an option keypress.
 
 -Current
-  -OSX FontPicker opens with text thing at bottom way to small. Why is that?
-  -OSX HELP Window scrolls like crap, like edit window used to
-  -OSX Update Help to indicate F11 alternatives
 
   -Get better performance by creating a NEW Document during load instead of using the one that's in the JTextArea. This apparently causes a lot of overhead otherwise.
     -It is also suggested that one add content to a list of ElementSpecs and then insert in one monster operation.

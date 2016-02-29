@@ -64,6 +64,7 @@ public class FontPicker {
   private Map<String,Font> goodFonts, badFonts;
   private Color selectedForeground, selectedBackground, selectedCaret;
   private boolean initialized=false;
+  private boolean shownBefore=false;
   private DefaultListModel<String> fontNameData;
   private DefaultListModel<Integer> fontSizeData;
   private JList<String> jlFonts;
@@ -179,6 +180,10 @@ public class FontPicker {
     mta.setCaretColor(fontOptions.getCaretColor());
     mta.setCaretWidth(fontOptions.getCaretWidth());
 
+    if (!shownBefore) {
+      win.pack();
+      shownBefore=true;
+    }
     Positioner.set(pInfo.parentFrame, win, false);
   }
   /** action=true means OK, false means Cancel */
