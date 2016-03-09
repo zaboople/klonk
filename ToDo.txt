@@ -1,3 +1,5 @@
+UGH TRIM EXTRA SPACES DOESN'T DO TABS SHIT
+
 -Fixed?
   Fonts not resizing on windows:
     Switch menu
