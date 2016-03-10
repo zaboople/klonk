@@ -759,11 +759,18 @@ public class Editor {
         if (line < lc-1)
           end-=1;
         String lineStr=jta.getText(start, end-start);
-        if (lineStr.endsWith(" ")) {
-          while (lineStr.endsWith(" "))
-            lineStr=lineStr.substring(0, lineStr.length()-1);
-          jta.betterReplaceRange(lineStr, start, end);
+        int count=0;
+        int lastCharIndex=lineStr.length()-1;
+        while (lastCharIndex>-1) {
+          char lastChar=lineStr.charAt(lastCharIndex);
+          if (lastChar==' ' || lastChar=='\t')
+            count++;
+          else
+            break;
+          lastCharIndex--;
         }
+        if (count > 0)
+          jta.betterReplaceRange("", end-count, end);
       }
     }
     used|=true;
