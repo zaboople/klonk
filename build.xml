@@ -80,10 +80,6 @@
     <delete dir="javadoc"/>
     <delete dir ="${build.dir}"/>
     <delete dir ="${dist.dir}"/>
-    <delete file="${appname}.jar"/>
-    <delete>
-      <fileset dir="." includes="*.pdf"/>
-    </delete>
   </target>
 
   <!--****************-->
