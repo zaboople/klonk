@@ -50,6 +50,10 @@
     Compiles and creates dist/${appname}.jar file from contents of ./build. This is an executable
     jar, so double-clicking it should start the application if your java environment is properly
     configured.
+  dist:
+    Creates source zip &amp; binaries zip in dist directory. This does not include native
+    executables, however.
+
   exe:
     Generates a windows executable using jsmoothgen. To use this target, you will need to download
     jsmoothgen, then set a JSMOOTH_HOME environment variable to point to the correct
@@ -59,10 +63,9 @@
     application startup a little more straightforward (especially mapping file types to the
     executable). Also consider using the jar target, however.
 
-  dist:
-    Creates source zip &amp; binaries zip in dist directory. This only works on ms windows.
 
-  NOTE: To make a macintosh distribution file, run the "jar" task and then lib/makedmg. This
+  Creating OSX/MacOS executables:
+    To make a macintosh distribution file, run the "jar" task and then lib/makedmg. This
     only works on Java 8 and above. You can also use lib/makewin.bat to make a windows installer,
     although this is not as clean as jsmooth.
 
@@ -77,10 +80,6 @@
     <delete dir="javadoc"/>
     <delete dir ="${build.dir}"/>
     <delete dir ="${dist.dir}"/>
-    <delete file="${appname}.jar"/>
-    <delete>
-      <fileset dir="." includes="*.pdf"/>
-    </delete>
   </target>
 
   <!--****************-->
@@ -181,10 +180,10 @@
     <copy file="build.properties" todir="${dist.dir}/site"/>
   </target>
 
-  <target name="_dist.bin" depends="config.prod,jar,exe">
+  <target name="_dist.bin" depends="config.prod,jar">
     <mkdir dir ="${dist.dir}/bin"/>
-    <copy file="${lib.dir}/Klonk.bat"    todir="${dist.dir}/bin"/>
-    <copy file="dist/klonk.jar"   tofile="${dist.dir}/bin/${appname.version}.jar"/>
+    <copy file="${lib.dir}/${appname}.bat"    todir="${dist.dir}/bin"/>
+    <copy file="dist/${appname}.jar"   tofile="${dist.dir}/bin/${appname.version}.jar"/>
     <zip destfile="${dist.dir}/${appname.version}.zip">
       <zipfileset dir="${dist.dir}/bin" prefix="${appname.version}"/>
     </zip>
