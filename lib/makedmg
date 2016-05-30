@@ -2,8 +2,10 @@
 # command-line until you put the correct directory in your path, i.e. something like:
 #    export PATH=$PATH:/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/bin/
 #
-# Also note: We are limiting to 192 megabytes heap space below because otherwise it grows continuously
+# Also note: We are limiting to 98 megabytes heap space below because otherwise it grows continuously
 # without garbage collection. Loading large files is so slow that it probably won't make sense to go much
-# larger.
+# larger. We are setting up for serial garbage collection as well, because by default we crash every
+# 2.5 days otherwise.
 ant jar
-javapackager -deploy -native dmg -srcfiles dist/klonk.jar -outdir dist/dmg -outfile klonk -appclass org.tmotte.klonk.config.Klonk -title "Klonk" -name Klonk -Bicon=lib/app.icns -BjvmOptions=-Xmx192m
+javapackager -deploy -native dmg -srcfiles dist/klonk.jar -outdir dist/dmg -outfile klonk -appclass org.tmotte.klonk.config.Klonk -title "Klonk" -name Klonk -Bicon=lib/app.icns -BjvmOptions=-Xmx128m -BjvmOptions=-XX:+UseSerialGC -BjvmOptions=-Xss1024k
+#-BjvmOptions=-XX:GCTimeRatio=9

@@ -1,3 +1,6 @@
+-OSX tabs at beginning of line screws with using mouse to place cursor. it lands to the left of target.
+-Is it possible our cursor is eating memory?
+
 -Fixed?
   Fonts not resizing on windows:
     Switch menu

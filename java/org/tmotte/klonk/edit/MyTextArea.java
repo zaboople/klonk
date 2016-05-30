@@ -402,18 +402,21 @@ public class MyTextArea extends JTextArea {
 
       try {
         final int code=e.getKeyCode();
+        int mods=e.getModifiersEx();
 
         // Intercept variations on backspace/delete one character:
-        setSelected(code==e.VK_DELETE,
-                    code==e.VK_BACK_SPACE ||
-                        (code==e.VK_H && KeyMapper.ctrlPressed(e.getModifiersEx()))
-                      );
+        setSelected(
+          code==e.VK_DELETE ||
+            (code==e.VK_D && KeyMapper.ctrlPressed(mods) && currentOS.isOSX)
+          ,
+          code==e.VK_BACK_SPACE ||
+            (code==e.VK_H && KeyMapper.ctrlPressed(mods))
+        );
 
-        //System.out.println("CODE "+code+" MODS "+e.getModifiersEx());
+        //System.out.println("CODE "+code+" MODS "+mods);
         if (code==e.VK_RIGHT) {
 
           //ARROW RIGHT:
-          int mods=e.getModifiersEx();
           if (KeyMapper.ctrlPressed(mods) || KeyMapper.optionPressed(mods, currentOS)){
             e.consume();
             doControlArrow(false, KeyMapper.shiftPressed(mods));
@@ -422,7 +425,6 @@ public class MyTextArea extends JTextArea {
         }
         else
         if (code==e.VK_UP) {
-          int mods=e.getModifiersEx();
           if (!KeyMapper.shiftPressed(mods) && !KeyMapper.ctrlPressed(mods)){
             Caret c=getCaret();
             int start=c.getDot(), end=c.getMark();
@@ -437,7 +439,6 @@ public class MyTextArea extends JTextArea {
         if (code==e.VK_LEFT) {
 
           //ARROW LEFT:
-          int mods=e.getModifiersEx();
           boolean shift=KeyMapper.shiftPressed(mods);
           if (KeyMapper.ctrlPressed(mods) || KeyMapper.optionPressed(mods, currentOS)){
             e.consume();
@@ -472,7 +473,6 @@ public class MyTextArea extends JTextArea {
         if (code==e.VK_Z) {
 
           //UNDO/REDO:
-          int mods=e.getModifiersEx();
           if (KeyMapper.ctrlPressed(mods) || KeyMapper.metaPressed(e, currentOS)){
             if (KeyMapper.shiftPressed(mods))
               redo();
@@ -501,7 +501,6 @@ public class MyTextArea extends JTextArea {
         if (code==e.VK_TAB && tabIndentsLine) {
 
           //Tab indent & tab insert:
-          int mods=e.getModifiersEx();
           if (KeyMapper.ctrlPressed(mods)){
             Caret c=getCaret();
             int start=c.getDot(), end=c.getMark();
