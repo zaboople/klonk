@@ -215,7 +215,7 @@ public class FindAndReplace {
         }
         statusBar.show("Found at file position: "+(pos));
         if (replaceOn)
-          if (!mustConfirmReplace  || confirmReplace(pos, endPos)) {
+          if (!mustConfirmReplace  || (findAgain=confirmReplace(pos, endPos))) {
             String replacement=finder.replaceResult;
             target.betterReplaceRange(replacement, pos, endPos);
             statusBar.show("Replaced");
