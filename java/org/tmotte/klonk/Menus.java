@@ -76,21 +76,22 @@ public class Menus {
                 search, mark, switcher, undo, select, align, external, options, osxShortcuts, help;
   private JMenuItem fileOpen, fileSave, fileNew, fileSaveAs, fileClose,
                     fileCloseOthers, fileCloseAll,
-                    filePrint,
-                    fileDocDirExplore, fileClipboardDoc, fileClipboardDocDir,
-                    fileOpenFromDocDir, fileOpenFromList, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
-                    fileFaveAddFile, fileFaveAddDir,
-                    fileExit,
+                      filePrint,
+                      fileDocDirExplore, fileClipboardDoc, fileClipboardDocDir,
+                      fileOpenFromDocDir, fileOpenFromList, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
+                      fileFaveAddFile, fileFaveAddDir,
+                      fileExit,
                     searchFind, searchReplace, searchRepeat, searchRepeatBackwards, searchGoToLine,
                     switchBackToFront, switchFrontToBack, switchNextUnsaved, pSwitchNextUnsaved,
                     markSet, markGoToPrevious, markGoToNext, markClearCurrent, markClearAll,
                     undoUndo, undoRedo,
-                    undoToBeginning, undoRedoToEnd, undoClearUndos, undoClearRedos, undoClearBoth,
+                      undoToBeginning, undoRedoToEnd, undoClearUndos, undoClearRedos, undoClearBoth,
                     selectUpperCase, selectLowerCase, selectSortLines, selectGetSelectionSize,  selectGetAsciiValues,
                     weirdInsertToAlign, weirdInsertToAlignBelow, weirdBackspaceToAlign, weirdBackspaceToAlignBelow,
+                      weirdAlignOneRight, weirdAlignOneLeft,
                     externalRunBatch,
                     optionTabsAndIndents, optionLineDelimiters, optionFont, optionFontBigger, optionFontSmaller,
-                    optionFavorites, optionSSH,
+                      optionFavorites, optionSSH,
                     osxSwitch, osxOpenFrom, osxSaveTo, osxSelect, osxFavorite, osxReopen,
                     helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
@@ -812,6 +813,18 @@ public class Menus {
         alignItemListener, KeyEvent.VK_C,
         KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
+      ,
+      weirdAlignOneRight=mu.doMenuItem(
+        "One space to the right",
+        alignItemListener, KeyEvent.VK_R,
+        KeyMapper.key(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK)
+      )
+      ,
+      weirdAlignOneLeft=mu.doMenuItem(
+        "One space to the left",
+        alignItemListener, KeyEvent.VK_L,
+        KeyMapper.key(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
+      )
     );
 
     //EXTERNAL:
@@ -1113,6 +1126,10 @@ public class Menus {
         if (s==weirdBackspaceToAlign)      editors.getFirst().doBackspaceToAlign(true);
         else
         if (s==weirdBackspaceToAlignBelow) editors.getFirst().doBackspaceToAlign(false);
+        else
+        if (s==weirdAlignOneRight)         editors.getFirst().moveRightOnce();
+        else
+        if (s==weirdAlignOneLeft)          editors.getFirst().moveLeftOnce();
       }
     }
     ,

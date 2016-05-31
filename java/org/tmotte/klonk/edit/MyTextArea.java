@@ -60,7 +60,7 @@ public class MyTextArea extends JTextArea {
 
   //Configuration:
   private boolean fastUndos=false;
-  private boolean tabsOrSpaces=false;
+  private boolean tabsNotSpaces=false;
   private boolean indentOnHardReturn=false;
   private boolean tabIndentsLine=false;
   private String indentSpaces="  ";
@@ -206,10 +206,10 @@ public class MyTextArea extends JTextArea {
   }
 
   public boolean getTabsOrSpaces() {
-    return tabsOrSpaces;
+    return tabsNotSpaces;
   }
   public void setTabsOrSpaces(boolean tabs) {
-    tabsOrSpaces=tabs;
+    tabsNotSpaces=tabs;
   }
   public void setIndentOnHardReturn(boolean t) {
     indentOnHardReturn=t;
@@ -244,6 +244,12 @@ public class MyTextArea extends JTextArea {
     } finally {
       forceDoubleUp=false;
     }
+  }
+  public void moveRightOnce() {
+    doIndent(false, 1);
+  }
+  public void moveLeftOnce() {
+    doIndent(true, 1);
   }
 
   /////////////
@@ -507,7 +513,7 @@ public class MyTextArea extends JTextArea {
             replaceRange("	", start<=end ?start :end, start<=end ?end :start);
           }
           else
-            doTabIndent(KeyMapper.shiftPressed(mods));
+            doIndent(KeyMapper.shiftPressed(mods), tabsNotSpaces ?1 :indentSpacesLen);
           e.consume();
 
         }
@@ -720,7 +726,7 @@ public class MyTextArea extends JTextArea {
   // TAB INDENTS: //
   //////////////////
 
-  private void doTabIndent(boolean remove) {
+  private void doIndent(boolean remove, int indentLen) {
     try {
       Caret caret=getCaret();
 
@@ -750,12 +756,16 @@ public class MyTextArea extends JTextArea {
 
 
       //Now build up buffer of changes:
-      String indentStr=tabsOrSpaces ?"\t" :indentSpaces;
-      int indentStrLen=tabsOrSpaces ?1    :indentSpacesLen;
+      String indentStr;
+      if (tabsNotSpaces) indentStr="\t";
+      else
+      if (indentLen==1) indentStr=" ";
+      else
+        indentStr=indentSpaces;
       StringBuilder sb=new StringBuilder(
         2+endPos-startPos+
         (
-          remove ?0 :(indentStrLen*(lastRow+1-firstRow))
+          remove ?0 :(indentLen*(lastRow+1-firstRow))
         )
       );
       boolean anyChange=false;
@@ -767,14 +777,14 @@ public class MyTextArea extends JTextArea {
         int eolFactor=(r==veryLastRow ?0 :1);
 
         //For partially indented lines, we need to know that:
-        int spaceCount=getSpaceCount(lineStr);
-        int actualLen=getTabOffBy(spaceCount);
-        boolean lenMismatch=actualLen!=indentStrLen;
+        int spaceCount=getIndentCount(lineStr, tabsNotSpaces);
+        int actualLen=tabsNotSpaces ?1 :getTabOffBy(spaceCount, indentLen);
+        boolean lenMismatch=actualLen!=indentLen;
 
         if (remove) {
           if (lineStr.startsWith(indentStr) || lenMismatch){
             if (lenMismatch)
-              actualLen=indentStrLen-actualLen;
+              actualLen=indentLen-actualLen;
             anyChange=true;
             lineStr=lineStr.substring(actualLen);
             if (r==firstRow && startSel!=sp) {
@@ -819,19 +829,17 @@ public class MyTextArea extends JTextArea {
       throw new RuntimeException(e);
     }
   }
-  private int getTabOffBy(int spaceCount) {
-    if (tabsOrSpaces)
-      return 1;
+  private static int getTabOffBy(int spaceCount, int increment) {
     if (spaceCount==0)
-      return indentSpacesLen;
-    if (spaceCount<indentSpacesLen)
-      return indentSpacesLen-spaceCount;
-    return indentSpacesLen-(spaceCount % indentSpacesLen);
+      return increment;
+    if (spaceCount<increment)
+      return increment-spaceCount;
+    return increment-(spaceCount % increment);
   }
-  private int getSpaceCount(String lineStr) {
+  private static int getIndentCount(String lineStr, boolean isTabs) {
     int len=lineStr.length();
     int spaceCount=0;
-    char check=tabsOrSpaces ?'\t' :' ';
+    char check=isTabs ?'\t' :' ';
     for (int i=0; i<len; i++)
       if (lineStr.charAt(i)!=check)
         break;
@@ -855,7 +863,7 @@ public class MyTextArea extends JTextArea {
       StringBuilder newText=new StringBuilder(rowText.length());
       newText.append("\n");
       int i=0;
-      char t=tabsOrSpaces ?'	' :' ';
+      char t=tabsNotSpaces ?'	' :' ';
       while (i<rowLen && rowText.charAt(i++)==t)
         newText.append(t);
       replaceRange(newText.toString(), start, end);

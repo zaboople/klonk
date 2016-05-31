@@ -284,6 +284,12 @@ public class Editor {
   public void doBackspaceToAlign(boolean above) {
     deleteToAlign(above);
   }
+  public void moveRightOnce() {
+    jta.moveRightOnce();
+  }
+  public void moveLeftOnce() {
+    jta.moveLeftOnce();
+  }
 
   //////////////////////
   //                  //
