@@ -500,6 +500,7 @@ public class FindAndReplace {
     pInfo.currentOS.fixEnterKey(btnFind, buttonListener);
     pInfo.currentOS.fixEnterKey(btnReverse, buttonListener);
     pInfo.currentOS.fixEnterKey(btnCancel, buttonListener);
+    btnCancel.addActionListener(buttonListener);
     KeyMapper.easyCancel(btnCancel, buttonListener);
     mtaFind.addFocusListener(new FocusAdapter(){
       public void focusGained(FocusEvent fe) {
