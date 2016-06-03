@@ -7,5 +7,5 @@
 # larger. We are setting up for serial garbage collection as well, because by default we crash every
 # 2.5 days otherwise.
 ant jar
-javapackager -deploy -native dmg -srcfiles dist/klonk.jar -outdir dist/dmg -outfile klonk -appclass org.tmotte.klonk.config.Klonk -title "Klonk" -name Klonk -Bicon=lib/app.icns -BjvmOptions=-Xmx128m -BjvmOptions=-XX:+UseSerialGC -BjvmOptions=-Xss1024k
+javapackager -deploy -native dmg -srcfiles dist/klonk.jar -outdir dist/dmg -outfile klonk -appclass org.tmotte.klonk.config.Klonk -title "Klonk" -name Klonk -Bicon=lib/app.icns -BjvmOptions=-Xmx128m -BjvmOptions=-XX:+UseSerialGC -BjvmOptions=-Xss1024k -Bruntime=
 #-BjvmOptions=-XX:GCTimeRatio=9

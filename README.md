@@ -13,5 +13,8 @@ Capabilities worth mentioning:
 * The usual things: Trailing-whitespace-trim, auto-indent with tabs or spaces, line wrap control, sorting, marking, alignment tricks and so forth
 
 # Building it
-Klonk requires Java 8 to run. To build, use a Java 8 JDK and a reasonably recent version of [Apache Ant](http://ant.apache.org/). To build a Windows Klonk.exe you will need [JSmooth](http://jsmooth.sourceforge.net/); OSX/MacOS executables are supported via Java's built-in `javapackager` utility. Type `ant help` in the git checkout directory for detailed instructions.
+Klonk requires Java 8 to run. To build, use a Java 8 JDK and a reasonably recent version of [Apache Ant](http://ant.apache.org/).
 
+To build a Windows Klonk.exe you will need [JSmooth](http://jsmooth.sourceforge.net/). Type `ant help` in the git checkout directory for detailed instructions.
+
+OSX/MacOS native executables are supported via Java's built-in `javapackager` utility. Refer to the script [lib/makedmg](lib/makedmg). Note that this script includes a `-Bruntime=` flag that tells javapackager not to put a java JRE into the install - this only works correctly when building for java 1.8.0_92 and above. You need to remove it for earlier versions of Java 8 (or just upgrade to the latest).
