@@ -359,6 +359,8 @@ public class Editor {
     return -1;
   }
   private int clearCurrentMark() {
+    if (marks==null)
+      return -1;
     int i=jta.getCaretPosition();
     for (ListIterator<Integer> iterNums=marks.listIterator(); iterNums.hasNext();){
       int n=iterNums.next();
