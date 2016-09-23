@@ -1,3 +1,5 @@
+-I had problems on windows with go-to-line not being resizeable and the textbox suddenly shrinking to unreadable.
+  It happens when window is maximized
 -OSX tabs at beginning of line screws with using mouse to place cursor. it lands to the left of target.
 -Is it possible our cursor is eating memory?
 
