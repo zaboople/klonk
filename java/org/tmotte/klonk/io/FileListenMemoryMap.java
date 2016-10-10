@@ -84,11 +84,7 @@ public class FileListenMemoryMap implements LockInterface {
     startListener(waitBetween, fileReceiver);
   }
   public Doer getLockRemover(){
-    return new Doer(){
-      public @Override void doIt() {
-        locker.unlock();
-      }
-    };
+    return () -> locker.unlock();
   }
 
   //////////////////////
@@ -241,13 +237,11 @@ public class FileListenMemoryMap implements LockInterface {
     FileListenMemoryMap reader=new FileListenMemoryMap(khome, klog);
     reader.startListener(
       1500,
-      new Setter<List<String>> () {
-        public void set(List<String> files) {
-          System.out.println();
-          for (String f : files)
-            System.out.println("RCV: "+f);
-          System.out.println();
-        }
+      (List<String> files) -> {
+        System.out.println();
+        for (String f : files)
+          System.out.println("RCV: "+f);
+        System.out.println();
       }
     );
     new Thread(){
