@@ -148,8 +148,15 @@ public class BootContext {
           currentOS.isMSWindows ?"klonk" :".klonk"
         )
     );
-    String pid=ManagementFactory.getRuntimeMXBean().getName();
-    String processID=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
+    String processID;
+    if (currentOS.isOSX) {
+      //The RuntimeMXBean trick is so slow on OSX that it's crippling. Stupid workaround:
+      processID=String.valueOf(new java.util.Random().nextInt());
+    }
+    else {
+      String pid=ManagementFactory.getRuntimeMXBean().getName();
+      processID=Pattern.compile("[^a-zA-Z0-9]").matcher(pid).replaceAll("");
+    }
     klog=argStdOut
       ?new KLog(System.out)
       :new KLog(home, processID);
