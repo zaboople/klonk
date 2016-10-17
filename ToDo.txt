@@ -1,3 +1,4 @@
+-OSX: Just found out RuntimeMXBean.getName() is KILLING us on startup. That specific function takes multiple seconds to run.
 -OSX: Option-backspace causes undo buffer failure
 -I had problems on windows with go-to-line not being resizeable and the textbox suddenly shrinking to unreadable.
   It happens when window is maximized
