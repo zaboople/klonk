@@ -357,7 +357,6 @@ public class MyTextArea extends JTextArea {
           if (specialOSXTemp!=null)
             specialOSXTemp=null;
         }
-        //if (isOSX && len==1 &&
         undos.doAdd(start, len, change, forceDoubleUp);
       } catch (Exception e) {
         throw new RuntimeException(e);
