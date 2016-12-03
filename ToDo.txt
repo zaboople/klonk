@@ -1,7 +1,10 @@
+-On windows, shell execute does not respond to Enter button anymore
+-OSX: Supposedly the java scrollbar jitter problem is fixed
+-OSX: Option-backspace causes undo buffer failure
 -I had problems on windows with go-to-line not being resizeable and the textbox suddenly shrinking to unreadable.
   It happens when window is maximized
+
 -OSX tabs at beginning of line screws with using mouse to place cursor. it lands to the left of target.
--On windows, shell execute does not respond to Enter button anymore
 
 -Fixed?
   Fonts not resizing on windows:
@@ -127,3 +130,4 @@
           at java.awt.EventQueue.dispatchEventImpl(Unknown Source)
           at java.awt.EventQueue.access$200(Unknown Source)
           at java.awt.EventQueue$3.run(Unknown Source)
+>>>>>>> 3919116e6350a4336305fbab4b034c1be560643b
