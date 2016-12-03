@@ -1,19 +1,10 @@
 -OSX: Supposedly the java scrollbar jitter problem is fixed
 -OSX: Option-backspace causes undo buffer failure
 -OSX: tabs at beginning of line screws with using mouse to place cursor. it lands to the left of target.
-
+-OSX: Need alternate keys for shift-ctrl-f9 and shift ctrl f12? You could toss in an option keypress.
 -Fixed?
-  Fonts not resizing on windows:
-    Switch menu
-    File-Reopen
-    File-Favorite files
-      Changing fonts seems to make it behave. But if you start up without changing fonts, fuck.
-  FontPicker opens with text thing at bottom way to small. Why is that?
   OSX HELP Window scrolls like crap, like edit window used to
   OSX Update Help to indicate F11 alternatives
-
--OSX
-  -Need alternate keys for shift-ctrl-f9 and shift ctrl f12? You could toss in an option keypress.
 
 -Current
 
