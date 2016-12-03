@@ -145,7 +145,7 @@ public class GoToLine {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
     gb.weightXY(0);
-    gb.fill=gb.NONE;
+    gb.fill=gb.HORIZONTAL;
     gb.anchor=gb.NORTHWEST;
     gb.add(getInputPanel());
     gb.fill=gb.HORIZONTAL;
@@ -167,7 +167,7 @@ public class GoToLine {
     gb.add(label);
     gb.insets.left=0;
     gb.insets.right=5;
-    gb.addX(jtfRow);
+    gb.weightXY(1, 0).setFill(gb.HORIZONTAL).addX(jtfRow);
 
     return jp;
   }

@@ -10,7 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Window;
 
-/** 
+/**
  * User gridwidth and gridheight to make a component span extra columns/rows
  */
 public class GridBug extends GridBagConstraints {
@@ -34,7 +34,7 @@ public class GridBug extends GridBagConstraints {
     container.add(c);
     return this;
   }
-  
+
   public GridBug setInsets(int i) {
     return setInsets(i, i, i, i);
   }
@@ -45,7 +45,7 @@ public class GridBug extends GridBagConstraints {
     insets.left=left;
     return this;
   }
-  
+
 
   public GridBug setY(int gridy){
     this.gridy=gridy;
@@ -76,7 +76,7 @@ public class GridBug extends GridBagConstraints {
       gridx++;
     return add(c);
   }
-  
+
   public GridBug weightXY(double x, double y) {
     weightx=x; weighty=y; return this;
   }
@@ -88,5 +88,9 @@ public class GridBug extends GridBagConstraints {
   }
   public GridBug gridXY(int xy) {
     return gridXY(xy, xy);
+  }
+  public GridBug setFill(int fill) {
+    this.fill = fill;
+    return this;
   }
 }
