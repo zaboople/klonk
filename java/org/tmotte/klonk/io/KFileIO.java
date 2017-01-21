@@ -18,7 +18,7 @@ import org.tmotte.klonk.ssh.SSHFile;
 public class KFileIO {
   private final static int bufSize=1024*64;
   private final static LineDelimiterOptions delimOpt=new LineDelimiterOptions();
-  private final static byte[] 
+  private final static byte[]
     utf8BOM   =makeByteArray(0xEF, 0xBB, 0xBF),
     utf16BEBOM=makeByteArray(0xFE, 0xFF),
     utf16LEBOM=makeByteArray(0xFF, 0xFE);
@@ -28,17 +28,17 @@ public class KFileIO {
       r[i]=(byte)vals[i];
     return r;
   }
-  
+
   ///////////
   // LOAD: //
   ///////////
-  
+
 
   public static FileMetaData load(JTextArea jta, final File file) throws Exception {
     return load(jta.getDocument(), file);
   }
 
-  public static FileMetaData load(Document doc, File file) throws Exception {  
+  public static FileMetaData load(Document doc, File file) throws Exception {
 
     //Initialize:
     doc.remove(0, doc.getLength());
@@ -50,14 +50,12 @@ public class KFileIO {
         docPos=0;
     boolean endsWithCR=false,
             isCRLF=false,
-            tabFound=false, 
+            tabFound=false,
             tabSearchOn=true;//because first line of file might start with tab
 
     //Read file and try to get delimiter:
     FileMetaData fmData=null;
-    try (
-      InputStream istr=getInputStream(file);
-      ) {
+    try (InputStream istr=getInputStream(file)) {
       fmData=getEncoding(istr);
     }
 
@@ -109,12 +107,12 @@ public class KFileIO {
         }
         tabSearchOn=!tabFound;
       }
-    }  
+    }
     //Technically could happen:
     if (buffBuffer.length()>0)
       doc.insertString(docPos, buffBuffer.toString(), null);
     fmData.delimiter=delimiter;
-    fmData.hasTabs=tabFound;  
+    fmData.hasTabs=tabFound;
     return fmData;
   }
   private static int insertString(Document doc, StringBuilder sb, int docPos, String str) throws Exception {
@@ -127,7 +125,7 @@ public class KFileIO {
     }
     return docPos;
   }
-  
+
   private static FileMetaData getEncoding(InputStream istrm) throws Exception {
     FileMetaData fmd=new FileMetaData();
     fmd.encodingNeedsBOM=true;//Default turned off at bottom
@@ -153,14 +151,14 @@ public class KFileIO {
       fmd.encodingNeedsBOM=false;
     }
     return fmd;
-  }  
+  }
   private static boolean checkBOM(byte[] input, byte[] check) {
     for (int i=0; i<check.length; i++)
       if (input[i]!=check[i])
         return false;
     return true;
   }
-  
+
   private static boolean checkUnsigned(byte[] b, int index, int val) {
     //Leaving this around because it's interesting. When you use values like 0xABCD etc.,
     //those are treated as signed integer. So we do this to make a byte value comparable to int.
@@ -170,10 +168,10 @@ public class KFileIO {
   ///////////
   // SAVE: //
   ///////////
-  
-    
+
+
   public static void save(
-      JTextArea jta, File file, 
+      JTextArea jta, File file,
       String lineBreaker, String encoding, boolean needsBOM
     ) throws Exception {
     save(jta.getDocument(), file, lineBreaker, encoding, needsBOM);
@@ -203,7 +201,7 @@ public class KFileIO {
           os.write(utf8BOM);
       }
 
-      int i=0; 
+      int i=0;
       boolean endsWithCR=false;
       while (i<docLen){
         int nexty=Math.min(docLen-i, bufSize);
@@ -212,11 +210,11 @@ public class KFileIO {
 
         //Take care of CRLF across buffer boundaries:
         if (isCRLF){
-          if (endsWithCR && s.startsWith(delimOpt.LFs)) 
+          if (endsWithCR && s.startsWith(delimOpt.LFs))
             s=s.substring(1);
           endsWithCR=s.endsWith(delimOpt.CRs);
         }
-        
+
         //Walk string from linebreak to linebreak and print in between:
         while (ch.find()){
           String upTo=ch.getUpTo();
@@ -227,16 +225,16 @@ public class KFileIO {
         if (!ch.finished())
           pw.append(ch.getRest());
         i+=nexty;
-        pw.flush();  
+        pw.flush();
         fw.flush();
       }
-    } 
+    }
   }
-  
+
   ////////////////////////
   // PRIVATE UTILITIES: //
   ////////////////////////
-  
+
   private static OutputStream getOutputStream(File file) throws Exception {
     SSHFile sshFile=SSHFile.cast(file);
     return sshFile==null
@@ -249,5 +247,5 @@ public class KFileIO {
       ?new FileInputStream(file)
       :ssh.getInputStream();
   }
-  
+
 }
