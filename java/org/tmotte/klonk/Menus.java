@@ -1304,6 +1304,13 @@ public class Menus {
         ctrlSearch.doSearchGoToLine();
       }
 
+      //Save:
+      else
+      if (code==e.VK_S && KeyMapper.ctrlPressed(modifiers)) {
+        e.consume();
+        ctrlMain.doSave();
+      }
+
       //Switch:
       else
       if (code==e.VK_F11) {

@@ -70,8 +70,6 @@ public class Shell {
   }
   public void show() {
     init();
-    if (!jcbPrevious.hasFocus() && !mtaOutput.hasFocus())
-      jcbPrevious.requestFocusInWindow();
     Positioner.set(pInfo.parentFrame, win, shownBefore || (win.getBounds().x>-1 && win.getBounds().y>-1));
     shownBefore=true;
     win.setVisible(true);
