@@ -11,7 +11,10 @@ import java.awt.Point;
 import java.awt.Window;
 
 /**
- * User gridwidth and gridheight to make a component span extra columns/rows
+ * Use gridwidth and gridheight to make a component span extra columns/rows
+ * Use gridx and gridy to control position; also addX() and addY()
+ * Use fill + weightx and weighty to control expansion; also setFill() and weightXY()
+ * Finally use insets to control padding; also setInsets()
  */
 public class GridBug extends GridBagConstraints {
 
@@ -23,6 +26,10 @@ public class GridBug extends GridBagConstraints {
     container.setLayout(gbl);
     gridx=1;
     gridy=1;
+  }
+
+  public Container getContainer() {
+    return container;
   }
   public GridBug add(Component... cs) {
     for (Component c: cs)
@@ -45,9 +52,18 @@ public class GridBug extends GridBagConstraints {
     insets.left=left;
     return this;
   }
-
+  public GridBug insets(int i) {
+    return setInsets(i, i, i, i);
+  }
+  public GridBug insets(int top, int right, int bottom, int left) {
+    return setInsets(top, right, bottom, left);
+  }
 
   public GridBug setY(int gridy){
+    this.gridy=gridy;
+    return this;
+  }
+  public GridBug y(int gridy){
     this.gridy=gridy;
     return this;
   }
@@ -63,6 +79,10 @@ public class GridBug extends GridBagConstraints {
   }
 
   public GridBug setX(int gridx){
+    this.gridx=gridx;
+    return this;
+  }
+  public GridBug x(int gridx){
     this.gridx=gridx;
     return this;
   }
@@ -83,14 +103,39 @@ public class GridBug extends GridBagConstraints {
   public GridBug weightXY(double xy) {
     return weightXY(xy, xy);
   }
+  public GridBug weightX(double x) {
+    weightx=x; return this;
+  }
+  public GridBug weightY(double y) {
+    weighty=y; return this;
+  }
   public GridBug gridXY(int x, int y) {
     gridx=x; gridy=y; return this;
   }
   public GridBug gridXY(int xy) {
     return gridXY(xy, xy);
   }
+  public GridBug gridX(int x) {
+    this.gridx=x; return this;
+  }
+  public GridBug gridY(int y) {
+    this.gridy=y; return this;
+  }
   public GridBug setFill(int fill) {
-    this.fill = fill;
+    this.fill=fill;
     return this;
   }
+  public GridBug fill(int fill) {
+    this.fill=fill; return this;
+  }
+  public GridBug anchor(int anchor) {
+    this.anchor=anchor; return this;
+  }
+  public GridBug gridWidth(int gridWidth) {
+    this.gridwidth=gridWidth; return this;
+  }
+  public GridBug gridHeight(int gridHeight) {
+    this.gridheight=gridHeight; return this;
+  }
+
 }
