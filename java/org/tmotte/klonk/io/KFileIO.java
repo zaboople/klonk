@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.regex.Matcher;
 import javax.swing.JTextArea;
 import javax.swing.text.Document;
@@ -188,7 +189,7 @@ public class KFileIO {
     try (
         OutputStream os=getOutputStream(file);
         OutputStreamWriter fw=new OutputStreamWriter(os, encoding);
-        PrintWriter pw=new PrintWriter(fw);
+        Writer pw=new PrintWriter(fw);
       ) {
       if (needsBOM) {
         if (encoding.equals(FileMetaData.UTF16BE))
