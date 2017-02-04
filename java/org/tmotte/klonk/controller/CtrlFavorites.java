@@ -17,7 +17,7 @@ public class CtrlFavorites {
 
   //Private data:
   private ArrayList<String> favoriteDirs, favoriteFiles;
-  
+
   public CtrlFavorites(
       KPersist persist,
       Setter<List<String>> favoriteFileListener,

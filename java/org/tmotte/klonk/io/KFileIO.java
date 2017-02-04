@@ -172,33 +172,32 @@ public class KFileIO {
 
 
   public static void save(
-      JTextArea jta, File file,
-      String lineBreaker, String encoding, boolean needsBOM
+      JTextArea jta, File file, FileMetaData fmd
     ) throws Exception {
-    save(jta.getDocument(), file, lineBreaker, encoding, needsBOM);
+    save(jta.getDocument(), file, fmd);
   }
   public static void save(
-      Document doc, File file, String lineBreaker, String encoding, boolean needsBOM
+      Document doc, File file, FileMetaData fmd
     ) throws Exception {
     //Note that we do a lot of silliness with linebreaks even though normally
     //the editor will have LF's everywhere. Not sure however what it will do in
     //copy/paste operation, so we're being extra careful, and anyhow, it's fast enough.
-    final boolean isCRLF=lineBreaker.equals(delimOpt.CRLFs);
+    final boolean isCRLF=fmd.delimiter.equals(delimOpt.CRLFs);
     int docLen=doc.getLength();
     StringChunker ch=new StringChunker().setRegex(delimOpt.pattern);
     try (
         OutputStream os=getOutputStream(file);
-        OutputStreamWriter fw=new OutputStreamWriter(os, encoding);
+        OutputStreamWriter fw=new OutputStreamWriter(os, fmd.encoding);
         Writer pw=new PrintWriter(fw);
       ) {
-      if (needsBOM) {
-        if (encoding.equals(FileMetaData.UTF16BE))
+      if (fmd.encodingNeedsBOM) {
+        if (fmd.encoding.equals(FileMetaData.UTF16BE))
           os.write(utf16BEBOM);
         else
-        if (encoding.equals(FileMetaData.UTF16LE))
+        if (fmd.encoding.equals(FileMetaData.UTF16LE))
           os.write(utf16LEBOM);
         else
-        if (encoding.equals(FileMetaData.UTF8))
+        if (fmd.encoding.equals(FileMetaData.UTF8))
           os.write(utf8BOM);
       }
 
@@ -221,7 +220,7 @@ public class KFileIO {
           String upTo=ch.getUpTo();
           if (upTo!=null)
             pw.append(upTo);
-          pw.append(lineBreaker);
+          pw.append(fmd.delimiter);
         }
         if (!ch.finished())
           pw.append(ch.getRest());
@@ -249,4 +248,7 @@ public class KFileIO {
       :ssh.getInputStream();
   }
 
+  public static void main(String[] args) {
+    Document doc=new javax.swing.text.PlainDocument();
+  }
 }

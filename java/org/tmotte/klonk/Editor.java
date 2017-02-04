@@ -57,8 +57,7 @@ public class Editor {
   private MyTextArea jta;
   private MyDocumentListener docListener=new MyDocumentListener();
   private List<Integer> marks;
-  private String encoding=FileMetaData.UTF8;
-  private boolean encodingNeedsBOM=false;
+  private FileMetaData fileMetaData=new FileMetaData();
   private String lineBreaker;
   private boolean autoTrimOnSave=false;
   private boolean used=false;
@@ -81,8 +80,8 @@ public class Editor {
     this.failHandler=failHandler;
     this.editListener=editListener;
     this.externalKeyListener=keyListener;
+    fileMetaData.delimiter=lineBreaker;
 
-    this.lineBreaker=lineBreaker;
     jta=new MyTextArea(currentOS);
     jta.setDragEnabled(false);
     JScrollPane jsp=jta.makeVerticalScrollable();
@@ -130,10 +129,10 @@ public class Editor {
     jta.setCaretWidth(options.getCaretWidth());
   }
   public void setLineBreaker(String lb) {
-    this.lineBreaker=lb;
+    this.fileMetaData.delimiter=lb;
   }
   public String getLineBreaker() {
-    return lineBreaker;
+    return fileMetaData.delimiter;
   }
   public String getTitle() {
     return title;
@@ -740,14 +739,14 @@ public class Editor {
     jta.setSuppressUndo(true);
     jta.getDocument().removeDocumentListener(docListener);
     try {
-      FileMetaData res=KFileIO.load(jta, file);
-      encoding=res.encoding;
-      encodingNeedsBOM=res.encodingNeedsBOM;
-      lineBreaker=res.delimiter;
-      if (lineBreaker==null)
-        lineBreaker=defaultLineBreaker;
-      setTabsOrSpaces(res.hasTabs ?TabAndIndentOptions.INDENT_TABS
-                                  :TabAndIndentOptions.INDENT_SPACES);
+      fileMetaData=KFileIO.load(jta, file);
+      if (fileMetaData.delimiter==null)
+        fileMetaData.delimiter=defaultLineBreaker;
+      setTabsOrSpaces(
+        fileMetaData.hasTabs
+          ?TabAndIndentOptions.INDENT_TABS
+          :TabAndIndentOptions.INDENT_SPACES
+        );
     } finally {
       jta.setSuppressUndo(false);
       jta.getDocument().addDocumentListener(docListener);
@@ -782,7 +781,7 @@ public class Editor {
       }
     }
     used|=true;
-    KFileIO.save(jta, saveToFile, lineBreaker, encoding, encodingNeedsBOM);
+    KFileIO.save(jta, saveToFile, fileMetaData);
     if (saveToFile!=file)
       setFile(saveToFile);
     unsavedChanges=false;

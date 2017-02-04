@@ -6,7 +6,7 @@ public class FileMetaData {
                        UTF16LE="UTF-16LE";
   public String delimiter;
   public boolean hasTabs;
-  public String encoding;
-  public boolean encodingNeedsBOM;
+  public String encoding=UTF8;
+  public boolean encodingNeedsBOM=false;
   public int readOffset;
 }
