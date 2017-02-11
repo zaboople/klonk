@@ -21,7 +21,7 @@ import javax.crypto.spec.PBEKeySpec;
  * Note that we only generate our salted key once, instead of once per buffer chunk. As
  * far as we know this is secure enough.
  */
-public class EncryptionStream implements AppendableFlushableCloseable {
+public class EncryptionStream implements LightweightWriter {
 
   /////////////////////
   // True constants: //
