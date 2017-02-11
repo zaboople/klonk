@@ -9,6 +9,7 @@ Capabilities worth mentioning:
 * Find & replace with multi-line & regex
 * Rapid file switching, opening, reopening, with "favorite" directories & files support
 * Open files over SSH
+* File encryption
 * Execute shell scripts without switching applications
 * The usual things: Trailing-whitespace-trim, auto-indent with tabs or spaces, line wrap control, sorting, marking, alignment tricks and so forth
 
