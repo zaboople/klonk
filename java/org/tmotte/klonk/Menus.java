@@ -76,7 +76,7 @@ public class Menus {
                 search, mark, switcher, undo, select, align, external, options, osxShortcuts, help;
   private JMenuItem fileOpen, fileSave, fileNew, fileSaveAs, fileClose,
                     fileCloseOthers, fileCloseAll,
-                      filePrint,
+                      fileEncrypt, filePrint,
                       fileDocDirExplore, fileClipboardDoc, fileClipboardDocDir,
                       fileOpenFromDocDir, fileOpenFromList, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
                       fileFaveAddFile, fileFaveAddDir,
@@ -484,7 +484,10 @@ public class Menus {
     file.addSeparator();
     mu.add(
        file
-      ,filePrint =mu.doMenuItem(
+      ,fileEncrypt=mu.doMenuItem(
+        "Encrypt", fileListener, KeyEvent.VK_T
+      )
+      ,filePrint=mu.doMenuItem(
         "Print", fileListener, KeyEvent.VK_P,
         KeyMapper.key(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)
       )
@@ -964,6 +967,8 @@ public class Menus {
         if (s==fileCloseAll)     ctrlMain.doFileCloseAll();
         else
         if (s==filePrint)            ctrlFileOther.doPrint();
+        else
+        if (s==fileEncrypt)          ctrlMain.doEncrypt();
         else
         if (s==fileDocDirExplore)    ctrlFileOther.doDocumentDirectoryExplore();
         else

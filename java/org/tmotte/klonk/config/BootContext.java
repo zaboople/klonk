@@ -33,6 +33,7 @@ import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.windows.MainLayout;
 import org.tmotte.klonk.windows.popup.About;
+import org.tmotte.klonk.windows.popup.EncryptionInput;
 import org.tmotte.klonk.windows.popup.Favorites;
 import org.tmotte.klonk.windows.popup.FindAndReplace;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
@@ -302,6 +303,7 @@ public class BootContext {
       fileDialogWrapper,
       new SSHOpenFrom(popupInfo, fontOptions),
       openFileList,
+      new EncryptionInput(popupInfo, fontOptions, persist),
       yesNoCancel,
       yesNo
     );

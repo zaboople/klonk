@@ -59,6 +59,7 @@ public class MainLayout {
                  pnlSaveThisAlert=new JPanel(),
                  pnlSaveAlert=new JPanel(),
                  pnlCapsLock=new JPanel(),
+                 pnlEncryption=new JPanel(),
                  pStatus=new JPanel();
   private GridBug editorGB=new GridBug(pnlEditor);
   private Color noChangeColor;
@@ -96,6 +97,7 @@ public class MainLayout {
         public void show(String s)                    {MainLayout.this.showStatus(s, false); }
         public void showBad(String s)                 {MainLayout.this.showStatus(s, true);}
         public void showCapsLock(boolean b)           {MainLayout.this.showCapsLock(b);}
+        public void showEncryption(boolean b)         {MainLayout.this.showEncryption(b);}
         public void showNoStatus()                    {MainLayout.this.showNoStatus();}
         public void showRowColumn(int row, int column){MainLayout.this.showRowColumn(row,column);}
         public void showChangeThis(boolean b)         {MainLayout.this.showChangeThis(b);}
@@ -175,6 +177,9 @@ public class MainLayout {
   private void showCapsLock(boolean visible) {
     pnlCapsLock.setVisible(visible);
   }
+  private void showEncryption(boolean visible) {
+    pnlEncryption.setVisible(visible);
+  }
   private void setFont(FontOptions fo) {
     this.fontOptions=fo;
     fontOptions.getControlsFont().set(frame, noFontChange);
@@ -195,6 +200,7 @@ public class MainLayout {
       }
     });
   }
+
   /**
    * @param rect The boundaries of the main window.
    */
@@ -270,60 +276,72 @@ public class MainLayout {
 
     GridBug gb=new GridBug(pStatus);
     pStatus.setVisible(true);
-    gb.gridXY(0).weightXY(0,0);
-    gb.insets.top=1;
-    gb.insets.bottom=1;
-    gb.anchor=gb.WEST;
+    gb.gridXY(0)
+      .weightXY(0,0)
 
-    gb.insets.left=3;
-    gb.addX(lblRowHi);
+      .insets(1, 0, 1, 3)
+      .anchor(gb.WEST)
+      .addX(lblRowHi)
 
-    gb.insets.left=2;
-    gb.addX(lblRow);
+      .insetLeft(2)
+      .addX(lblRow)
+      .insetLeft(3)
+      .addX(lblColHi)
 
-    gb.insets.left=3;
-    gb.addX(lblColHi);
+      .insetLeft(2)
+      .addX(lblCol)
 
-    gb.insets.left=2;
-    gb.addX(lblCol);
+      .insets(3,0,3,9)
+      .fill(gb.VERTICAL)
+      .addX(makeSeparator())
 
-    gb.insets.left=10;
-    gb.addX(makeSeparator());
+      .insets(0,0,0,8)
+      .addX(layoutCapsLock(font))
 
-    gb.insets.left=8;
-    gb.addX(layoutCapsLock(font));
+      .insetLeft(8)
+      .addX(layoutEncryption(font))
 
-    gb.weightx=1;
-    gb.insets.left=10;
-    gb.addX(makeMsgPanel());
-
+      .weightX(1)
+      .insetLeft(10)
+      .addX(makeMsgPanel())
+      ;
   }
   private Container layoutCapsLock(Font font) {
-    JLabel lblCapsLock=new JLabel();
-    lblCapsLock.setFont(font);
-    lblCapsLock.setText("CAPS LOCK");
-    lblCapsLock.setForeground(Color.RED);
-
+    JLabel lbl=new JLabel();
+    lbl.setFont(font);
+    lbl.setText("CAPS LOCK");
+    lbl.setForeground(Color.RED);
     GridBug gb=new GridBug(pnlCapsLock);
-    gb.gridXY(0).weightXY(0);
-
-    gb.addX(lblCapsLock);
-
-    gb.weightx=1;
-    gb.insets.left=9;
-    gb.addX(makeSeparator());
-
+    gb
+      .gridXY(0)
+      .weightXY(0)
+      .addX(lbl)
+      .weightX(1)
+      .insets(3,0,3,9)
+      .fill(gb.VERTICAL)
+      .addX(makeSeparator());
     return pnlCapsLock;
+  }
+  private Container layoutEncryption(Font font) {
+    JLabel lbl=new JLabel();
+    lbl.setFont(font);
+    lbl.setText("ENCRYPTED");
+    lbl.setForeground(Color.MAGENTA);
+    GridBug gb=new GridBug(pnlEncryption);
+    return gb.gridXY(0)
+      .weightXY(0)
+      .addX(lbl)
+      .weightX(1)
+      .insetLeft(9)
+      .insets(3,0,3,9)
+      .fill(gb.VERTICAL)
+      .addX(makeSeparator())
+      .getContainer();
   }
 
 
   private JSeparator makeSeparator() {
-    JSeparator sep=new JSeparator(SwingConstants.VERTICAL);
-    Dimension prefer=new Dimension(2,10);
-    sep.setPreferredSize(prefer);
-    sep.setMinimumSize(prefer);
-    sep.setMaximumSize(prefer);
-    return sep;
+    return new JSeparator(SwingConstants.VERTICAL);
   }
   private Container makeMsgPanel() {
     GridBug gb=new GridBug(new JPanel());

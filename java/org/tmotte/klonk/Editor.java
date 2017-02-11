@@ -40,6 +40,8 @@ import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.edit.Spaceable;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
+import org.tmotte.klonk.io.EncryptionParams;
+import org.tmotte.klonk.io.EncryptionDecryptionStream;
 import org.tmotte.klonk.io.FileMetaData;
 import org.tmotte.klonk.io.KFileIO;
 
@@ -139,6 +141,53 @@ public class Editor {
   }
   public void setTitle(String s) {
     title=s;
+  }
+  public void setEncryption(EncryptionParams ep) {
+    this.fileMetaData.encryption=ep;
+  }
+  public EncryptionParams getEncryption() {
+    return fileMetaData.encryption;
+  }
+  public String[] looksEncrypted(String encryptionFlag, int copyFirstLines) throws Exception{
+    final int firstLineLen=jta.getLineEndOffset(0);
+    if (Math.abs(firstLineLen-encryptionFlag.length())<=2) {
+      String firstLine=jta.getText(0, firstLineLen).trim();
+      if (firstLine.equals(encryptionFlag)) {
+        String[] firstLines=new String[copyFirstLines];
+        for (int i=0; i<Math.min(copyFirstLines, jta.getLineCount()); i++) {
+          int start=jta.getLineStartOffset(i), end=jta.betterLineEndOffset(i);
+          firstLines[i]=jta.getText(start, end-start).trim();
+        }
+        return firstLines;
+      }
+    }
+    return null;
+  }
+  public void decryptWith(int skip, EncryptionDecryptionStream eds) throws Exception {
+    jta.setSuppressUndo(true);
+    try {
+
+      // Decrypt backwards from end, because... because:
+      for (int i=jta.getLineCount()-1; i>skip-1; i--){
+        int start=jta.getLineStartOffset(i), end=jta.betterLineEndOffset(i);
+        String line=jta.getText(start, end-start);
+        if (!line.equals("")) {
+          String replacement=eds.decrypt(line.trim());
+          jta.betterReplaceRange(replacement, start, jta.getLineCount()-1==i ?end :end+1);
+        }
+      }
+
+      // Remove the metadata lines from the beginning:
+      for (int i=0; i<skip; i++){
+        int start=jta.getLineStartOffset(0), end=jta.getLineEndOffset(0);
+        jta.betterReplaceRange("", start, end);
+      }
+
+    } finally {
+      unsavedChanges=false;
+      editListener.doEditorChanged(Editor.this);
+      jta.setSuppressUndo(false);
+    }
   }
 
 

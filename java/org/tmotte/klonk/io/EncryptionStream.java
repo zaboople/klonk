@@ -11,10 +11,10 @@ import javax.crypto.spec.PBEKeySpec;
 
 /**
  * Writes
- * <p> 1) A plaintext flag indicating file encryption, plus newline
- * <p> 2) The key size
- * <p> 3) The cypher parameters, which includes a salt, plus newline
- * <p> 4) A series of lines: Each line is a buffered chunk of the file, no larger than
+ * <p> 0) A plaintext flag indicating file encryption, plus newline
+ * <p> 1) The key size
+ * <p> 2) The cypher parameters, which includes a salt, plus newline
+ * <p> 3) A series of lines: Each line is a buffered chunk of the file, no larger than
  *        our specified buffer length. The encryption bytes are base64-encoded.
  *        Thus each line should be decryptable by itself.
  * <p>

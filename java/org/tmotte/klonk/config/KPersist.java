@@ -247,14 +247,17 @@ public class KPersist {
     return getFiles(recentCommands, "File.Batch.", maxRecent);
   }
 
-  public void getFavorites(List<String> faveFiles,  List<String> faveDirs) {
-    getFiles(faveFiles,    "File.Favorite.Files.", maxFavorite);
-    getFiles(faveDirs,     "File.Favorite.Dirs." , maxFavorite);
-  }
   public void getRecent(List<String> recentFiles,  List<String> recentDirs) {
     getFiles(recentFiles,  "File.RecentFiles.",    maxRecent);
     getFiles(recentDirs,   "File.RecentDirs." ,    maxRecent);
   }
+  public void setRecentFiles(List<String> files) {
+    recentFilesCache=files;
+  }
+  public void setRecentDirs(List<String> dirs) {
+    recentDirsCache=dirs;
+  }
+
   public void getRecentSSH(List<UserServer> recent) {
     recent.clear();
     List<String> r=new ArrayList<>(maxRecent);
@@ -266,21 +269,38 @@ public class KPersist {
       recent.add(new UserServer(s[0], s[1]));
     }
   }
-
-  public void setRecentFiles(List<String> files) {
-    recentFilesCache=files;
-  }
-  public void setRecentDirs(List<String> dirs) {
-    recentDirsCache=dirs;
-  }
   public void setRecentSSH(List<UserServer> sshs) {
     recentSSHCache=sshs;
+  }
+
+  public void getFavorites(List<String> faveFiles,  List<String> faveDirs) {
+    getFiles(faveFiles,    "File.Favorite.Files.", maxFavorite);
+    getFiles(faveDirs,     "File.Favorite.Dirs." , maxFavorite);
   }
   public void setFavoriteFiles(List<String> files) {
     setFiles(files, "File.Favorite.Files.", maxFavorite);
   }
   public void setFavoriteDirs(List<String> dirs) {
     setFiles(dirs,  "File.Favorite.Dirs.",  maxFavorite);
+  }
+
+  public void setEncryptionShowPass(boolean yes) {
+    setBoolean("Encryption.Show.Pass", yes);
+  }
+  public boolean getEncryptionShowPass() {
+    return getBoolean("Encryption.Show.Pass", false);
+  }
+  public void setEncryptionPreservePass(boolean yes) {
+    setBoolean("Encryption.Preserve.Pass", yes);
+  }
+  public boolean getEncryptionPreservePass() {
+    return getBoolean("Encryption.Preserve.Pass", false);
+  }
+  public void setEncryptionBits(int bits) {
+    setInt("Encryption.Bits", bits);
+  }
+  public int getEncryptionBits() {
+    return getInt("Encryption.Bits", 128);
   }
 
   // SHORTCUTS: //

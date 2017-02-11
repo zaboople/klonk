@@ -1,4 +1,5 @@
 package org.tmotte.klonk.io;
+import java.io.Flushable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -28,6 +29,10 @@ public class KFileIO {
     for (int i=0; i<vals.length; i++)
       r[i]=(byte)vals[i];
     return r;
+  }
+  private static interface AppendableFlushable {
+    public void append(CharSequence cs) throws Exception;
+    public void flush() throws Exception;
   }
 
   ///////////
@@ -171,25 +176,21 @@ public class KFileIO {
   ///////////
 
 
-  public static void save(
-      JTextArea jta, File file, FileMetaData fmd
-    ) throws Exception {
+  public static void save(JTextArea jta, File file, FileMetaData fmd) throws Exception {
     save(jta.getDocument(), file, fmd);
   }
-  public static void save(
-      Document doc, File file, FileMetaData fmd
-    ) throws Exception {
-    //Note that we do a lot of silliness with linebreaks even though normally
-    //the editor will have LF's everywhere. Not sure however what it will do in
-    //copy/paste operation, so we're being extra careful, and anyhow, it's fast enough.
-    final boolean isCRLF=fmd.delimiter.equals(delimOpt.CRLFs);
-    int docLen=doc.getLength();
-    StringChunker ch=new StringChunker().setRegex(delimOpt.pattern);
+  public static void save(Document doc, File file, FileMetaData fmd) throws Exception {
     try (
         OutputStream os=getOutputStream(file);
         OutputStreamWriter fw=new OutputStreamWriter(os, fmd.encoding);
-        Writer pw=new PrintWriter(fw);
+        LightweightWriter afc=fmd.encryption!=null
+          ?new EncryptionStream(fw, fmd.encryption.bits, fmd.encryption.pass)
+          :new WriterAFC(fw);
       ) {
+      if (fmd.encryption!=null){
+        fmd.encodingNeedsBOM=false;
+        fmd.encoding=fmd.UTF8;
+      }
       if (fmd.encodingNeedsBOM) {
         if (fmd.encoding.equals(FileMetaData.UTF16BE))
           os.write(utf16BEBOM);
@@ -200,34 +201,54 @@ public class KFileIO {
         if (fmd.encoding.equals(FileMetaData.UTF8))
           os.write(utf8BOM);
       }
+      save(doc, afc, fmd);
+    }
+  }
 
-      int i=0;
-      boolean endsWithCR=false;
-      while (i<docLen){
-        int nexty=Math.min(docLen-i, bufSize);
-        String s=doc.getText(i, nexty);
-        ch.reset(s);
+  /** This is just a plain-vanilla pass-thru writer, as opposed to EncryptionStream */
+  private static class WriterAFC implements LightweightWriter {
+    Writer pw;
+    public WriterAFC(Writer pw) {
+      this.pw=pw;
+    }
+    public void flush() throws java.io.IOException {pw.flush();}
+    public void append(CharSequence cs) throws Exception {pw.append(cs);}
+    public void close() throws java.io.IOException {pw.close();}
+  }
 
-        //Take care of CRLF across buffer boundaries:
-        if (isCRLF){
-          if (endsWithCR && s.startsWith(delimOpt.LFs))
-            s=s.substring(1);
-          endsWithCR=s.endsWith(delimOpt.CRs);
-        }
+  public static void save(Document doc, LightweightWriter liteWriter, FileMetaData fmd) throws Exception {
+    //Note that we do a lot of silliness with linebreaks even though normally
+    //the editor will have LF's everywhere. Not sure however what it will do in
+    //copy/paste operation, so we're being extra careful, and anyhow, it's fast enough.
+    final boolean isCRLF=fmd.delimiter.equals(delimOpt.CRLFs);
+    int docLen=doc.getLength();
+    StringChunker ch=new StringChunker().setRegex(delimOpt.pattern);
 
-        //Walk string from linebreak to linebreak and print in between:
-        while (ch.find()){
-          String upTo=ch.getUpTo();
-          if (upTo!=null)
-            pw.append(upTo);
-          pw.append(fmd.delimiter);
-        }
-        if (!ch.finished())
-          pw.append(ch.getRest());
-        i+=nexty;
-        pw.flush();
-        fw.flush();
+    int i=0;
+    boolean endsWithCR=false;
+    while (i<docLen){
+      int nexty=Math.min(docLen-i, bufSize);
+      String s=doc.getText(i, nexty);
+      ch.reset(s);
+
+      //Take care of CRLF across buffer boundaries:
+      if (isCRLF){
+        if (endsWithCR && s.startsWith(delimOpt.LFs))
+          s=s.substring(1);
+        endsWithCR=s.endsWith(delimOpt.CRs);
       }
+
+      //Walk string from linebreak to linebreak and print in between:
+      while (ch.find()){
+        String upTo=ch.getUpTo();
+        if (upTo!=null)
+          liteWriter.append(upTo);
+        liteWriter.append(fmd.delimiter);
+      }
+      if (!ch.finished())
+        liteWriter.append(ch.getRest());
+      i+=nexty;
+      liteWriter.flush();
     }
   }
 
@@ -248,7 +269,31 @@ public class KFileIO {
       :ssh.getInputStream();
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     Document doc=new javax.swing.text.PlainDocument();
+    int pos=0;
+    for (int i=0; i<1000; i++){
+      String thing=(i>0 && i%10==0 ?"\n" :"")+"yo"+i;
+      doc.insertString(pos, thing, null);
+      pos+=thing.length();
+    }
+    FileMetaData fmd=new FileMetaData();
+    fmd.delimiter="\r\n";
+    fmd.encryption=new EncryptionParams();
+    fmd.encryption.bits=128;
+    fmd.encryption.pass="HIHelloWhateverBlingSplatBogFlamingDookieBomg".toCharArray();
+
+    File file=new File(args[0]);
+    save(doc, file, fmd);
+
+    doc=new javax.swing.text.PlainDocument();
+    load(doc, file);
+    System.out.println(doc.getText(0, doc.getLength()));
+
+    EncryptionDecryptionStream.decrypt(
+      java.nio.file.Files.newBufferedReader(file.toPath()),
+      fmd.encryption.pass,
+      System.out
+    );
   }
 }

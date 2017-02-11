@@ -10,6 +10,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.tmotte.common.swang.CurrentOS;
+import org.tmotte.klonk.io.EncryptionParams;
+import org.tmotte.klonk.io.EncryptionDecryptionStream;
+import org.tmotte.klonk.io.EncryptionStream;
 import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.EditorListener;
 import org.tmotte.klonk.config.KPersist;
@@ -29,6 +32,7 @@ import org.tmotte.klonk.ssh.IFileGet;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.OpenFileList;
+import org.tmotte.klonk.windows.popup.EncryptionInput;
 import org.tmotte.klonk.windows.popup.YesNoCancel;
 import org.tmotte.klonk.windows.popup.YesNoCancelAnswer;
 import org.tmotte.klonk.windows.popup.ssh.SSHOpenFrom;
@@ -60,6 +64,7 @@ public class CtrlMain  {
   private MainDisplay layout;
   private SSHOpenFrom sshOpenFrom;
   private OpenFileList openFileList;
+  private EncryptionInput encryptionInput;
   private CurrentOS currentOS;
 
   //Editors list:
@@ -95,6 +100,7 @@ public class CtrlMain  {
       FileDialogWrapper fileDialog,
       SSHOpenFrom sshOpenFrom,
       OpenFileList openFileList,
+      EncryptionInput encryptionInput,
       YesNoCancel yesNoCancel,
       YesNoCancel yesNo
     ) {
@@ -103,6 +109,7 @@ public class CtrlMain  {
     this.fileDialog=fileDialog;
     this.sshOpenFrom=sshOpenFrom;
     this.openFileList=openFileList;
+    this.encryptionInput=encryptionInput;
     this.yesNoCancel=yesNoCancel;
     this.yesNo=yesNo;
   }
@@ -236,6 +243,21 @@ public class CtrlMain  {
     File f=fileResolver.get(file);
     if (f!=null)
       loadFile(f);
+  }
+  public void doEncrypt() {
+    EncryptionParams ep=new EncryptionParams();
+    if (encryptionInput.show(ep, true, null)){
+      Editor editor=editorMgr.getFirst();
+      editor.setEncryption(ep);
+      if (editor.getFile()!=null) {
+        doSave();
+        statusBar.show("Encryption successful");
+      } else {
+        statusBar.show("Encryption parameters set; don't forget to save your changes.");
+      }
+    }
+    else
+      statusBar.showBad("Encryption cancelled");
   }
 
   // FILE OPEN FROM: //
@@ -528,7 +550,7 @@ public class CtrlMain  {
   ////////////////
 
   /**
-   * Called when the directory listener discovers other app isntances want files needs to be loaded by this one,
+   * Called when the directory listener discovers other app instances want files needs to be loaded by this one,
    * schedules this onto the event dispatch thread with invokeLater.
    */
   private void doLoadAsync(final List<String> fileNames) {
@@ -596,6 +618,8 @@ public class CtrlMain  {
       statusBar.show("Loading: "+file+"...");
       e.loadFile(file, persist.getDefaultLineDelimiter());
       fileIsLoaded(e, file);
+      checkDecryption(e);
+      statusBar.showEncryption(e.getEncryption()!=null);
     } catch (Exception ex) {
       checkIOError(ex);
       editorSwitched(e); //See loadFile(File), we need to force screen update
@@ -603,6 +627,34 @@ public class CtrlMain  {
       return false;
     }
     return true;
+  }
+
+  private void checkDecryption(Editor editor) throws Exception {
+    String[] firstLines=editor.looksEncrypted(EncryptionStream.encryptionFlag, 3);
+    if (firstLines==null)
+      return;
+    final String strBits=firstLines[1], strParams=firstLines[2];
+    EncryptionParams ep=new EncryptionParams();
+    try {ep.bits=Integer.parseInt(strBits);} catch (Exception ex) {userNotify.log(ex);}
+    boolean tryTo=true;
+    String fail=null;
+    while (tryTo && encryptionInput.show(ep, false, fail))
+      try {
+        editor.decryptWith(
+          firstLines.length,
+          new EncryptionDecryptionStream(ep.pass, ep.bits, strParams)
+        );
+        editor.setEncryption(ep);
+        statusBar.show("Decryption successful");
+        tryTo=false;
+      } catch (Exception ex) {
+        userNotify.log(ex);
+        fail=ex.toString();
+      }
+    if (editor.getEncryption()==null) {
+      ep.nullify();
+      statusBar.showBad("Decryption cancelled");
+    }
   }
 
   private void checkIOError(Exception ex) {
@@ -704,6 +756,7 @@ public class CtrlMain  {
     else
       stabilityChange(e);
     statusBar.show(newFile ?"File saved: "+file :"File saved");
+    statusBar.showEncryption(e.getEncryption()!=null);
   }
   private void fileIsLoaded(Editor e, File file) {
     recents.recentFileLoaded(file);
@@ -740,6 +793,7 @@ public class CtrlMain  {
     thisUnsaved=e.hasUnsavedChanges();
     showLights();
     statusBar.showTitle(e.getTitle());
+    statusBar.showEncryption(e.getEncryption()!=null);
     showCaretPos(e);
     editorSwitchedListener.doIt();
   }
