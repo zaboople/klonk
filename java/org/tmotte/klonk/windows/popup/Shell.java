@@ -149,7 +149,7 @@ public class Shell {
     return index;
   }
   private void save(DefaultComboBoxModel<String> lm, List<String> names) {
-    while (lm.getSize()>KPersist.maxFavorite)
+    while (lm.getSize()>KPersist.maxRecent)
       lm.removeElementAt(lm.getSize()-1);
     names.clear();
     int size=lm.getSize();
