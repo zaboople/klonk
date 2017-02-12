@@ -27,6 +27,7 @@
   <li><a href="#batch">External → Run Batch Program</a></li>
   <li><a href="#config">Command-Line Parameters, Configuration, Logging & Your Home Directory</a></li>
   <li><a href="#status">The Status Bar</a></li>
+  <li><a href="#encryption">Encryption</a></li>
   <li><a href="#ssh">SSH</a></li>
   <li><a href="#shutdown">Shutting Down Klonk</a></li>
   <li><a href="#keys">Other Shortcut Keys</a></li>
@@ -269,6 +270,15 @@ Popup windows are annoying. The status bar at the bottom of Klonk's main window 
 
 <p>
 Note that the status bar also has a red "CAPS LOCK" indicator. Thanks to a bug in the Java runtime, this may not immediately turn on/off when you switch to another application, press Caps Lock and then go back to Klonk. After the first keyboard action or mouse click it will "synchronize" and display correctly.
+</p>
+
+<h2><a name="encryption">Encryption</a></h2>
+
+<p>
+Klonk features Password-Based Encryption (PBE) via the Rinjdael cipher, also sort-of-known as AES. This is available via the File → Encrypt dialog. Per the AES specification, you can select 128, 192, or 256-bit encryption; more bits is better, but 128 (the default) is recognized as good enough until quantum computing becomes accessible. To use 192 or 256 bits, you need a Java Virtual Machine that allows larger keys (OpenJDK or install the Oracle Unlimited JCE).
+</p>
+<p>
+Encrypted files are stored as base64-encoded text, with a "flag" string at the top to identify them. Klonk will automatically prompt you for an encryption password upon recognizing an encrypted file.
 </p>
 
 
