@@ -204,7 +204,6 @@ public class FileListenMemoryMap implements LockInterface {
           if (checkBuffer[i]!=0)
             maybe=false;
         ready=maybe;
-        if (!ready) System.out.println("."+lines);
       }
 
       // Now write all the lines:
