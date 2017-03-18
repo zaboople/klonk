@@ -730,24 +730,18 @@ public class FontPicker {
   /////////////
 
   public static void main(final String[] args) throws Exception {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-      PopupTestContext ptc=new PopupTestContext();
-      public void run() {
-        try {
-          FontOptions fo=new FontOptions();
-          System.out.println("Before: "+fo);
-          new FontPicker(
-            ptc.getPopupInfo(),
-            new Setter<String>(){
-              public void set(String s) {
-                System.out.println("!!!!\n"+s+"\n!!!!");
-              }
-            }
-          ).show(fo);
-          System.out.println("After:  "+fo);
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+    javax.swing.SwingUtilities.invokeLater(()->{
+      try {
+        PopupTestContext ptc=new PopupTestContext();
+        FontOptions fo=new FontOptions();
+        System.out.println("Before: "+fo);
+        new FontPicker(
+          ptc.getPopupInfo(),
+          s->System.out.println("!!!!\n"+s+"\n!!!!")
+        ).show(fo);
+        System.out.println("After:  "+fo);
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     });
   }
