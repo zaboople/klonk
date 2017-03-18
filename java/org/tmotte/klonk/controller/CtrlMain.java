@@ -640,6 +640,7 @@ public class CtrlMain  {
     String fail=null;
     while (tryTo && encryptionInput.show(ep, false, fail))
       try {
+        statusBar.show("Decrypting...");
         editor.decryptWith(
           firstLines.length,
           new EncryptionDecryptionStream(ep.pass, ep.bits, strParams)

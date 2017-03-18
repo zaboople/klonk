@@ -210,7 +210,7 @@ public class EncryptionInput {
     jtfPass=new JTextField();
     jtfPass.setVisible(false);
     chkPreservePass=new JCheckBox(
-      "<html><body>Save password for this editing session</body></html>"
+      "<html><body>Preserve password for this editing session</body></html>"
     );
     chkShowPass=new JCheckBox(
       "<html><body>Show password</body></html>"

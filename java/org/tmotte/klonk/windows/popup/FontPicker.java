@@ -341,22 +341,13 @@ public class FontPicker {
     gb.setInsets(5, 5, 0, 5);
     gb.fill=gb.BOTH;
     gb.anchor=gb.NORTHWEST;
-
     gb.addY(layoutTop());
 
-    //makeSeparator(gb);
     gb.fill=gb.BOTH;
     gb.weightXY(1);
     gb.addY(layoutBottom());
-    win.pack();
-  }
 
-  private void makeSeparator(GridBug gb) {
-    int il=gb.insets.left, ir=gb.insets.right;
-    gb.insets.left=5; gb.insets.right=5;
-    JSeparator j=new JSeparator(JSeparator.HORIZONTAL);
-    gb.addY(j);
-    gb.insets.left=il; gb.insets.right=ir;
+    win.pack();
   }
 
   private JPanel layoutTop() {
