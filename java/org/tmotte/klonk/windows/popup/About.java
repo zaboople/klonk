@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.JWindow;
 import javax.swing.ScrollPaneConstants;
 import org.tmotte.common.io.Loader;
 import org.tmotte.common.swang.GridBug;

@@ -13,7 +13,6 @@ import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import javax.swing.JSpinner;
-import javax.swing.JWindow;
 import javax.swing.SpinnerNumberModel;
 import org.tmotte.common.swang.Radios;
 
@@ -26,14 +25,14 @@ public class SpinnerFix {
     Font font=jsp.getFont();
     Graphics2D gr=(Graphics2D)jsp.getGraphics();
     Rectangle rect=font.getStringBounds(
-      toFit.toCharArray(), 
-      0, 
-      toFit.length(), 
+      toFit.toCharArray(),
+      0,
+      toFit.length(),
       gr.getFontRenderContext()
     ).getBounds();
     jsp.getEditor().setPreferredSize(
       new Dimension(rect.width, rect.height)
     );
-  
-  } 
+
+  }
 }
