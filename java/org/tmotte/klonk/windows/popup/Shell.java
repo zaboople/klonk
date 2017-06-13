@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.*;
@@ -44,6 +45,7 @@ public class Shell {
   private MyTextArea mtaOutput;
   private JButton btnRun, btnClose, btnSwitch, btnSelectFile, btnForgetFile, btnStop;
   private JComboBox<String> jcbPrevious;
+  private JSpinner jspOutputLimit;
   private Font fontBold;
 
   // State:
@@ -180,7 +182,18 @@ public class Shell {
     btnStop.setEnabled(true);
     String command=getCommand();
     mtaOutput.reset();
-    runner=new Runner2(command);
+
+    // We're not going to bother telling you that you typed something wrong.
+    // We'll just make a best effort to use your output limit. The GUI will
+    // self-correct
+    try {
+      jspOutputLimit.commitEdit();
+    } catch (ParseException pe) {
+    }
+    int outputLimit=Integer.parseInt(jspOutputLimit.getValue().toString());
+
+    persist.setShellLimit(outputLimit);
+    runner=new Runner2(command, outputLimit);
     runner.execute();
   }
   private void die(){
@@ -194,8 +207,10 @@ public class Shell {
     private String input;
     private boolean kill=false, failed=false;
     private Process process;
-    public Runner2(String input) {
+    private int outputLimit;
+    public Runner2(String input, int outputLimit) {
       this.input=input;
+      this.outputLimit=outputLimit;
     }
     public void die() {
       //This only works so good. I noticed that starting a java program
@@ -224,10 +239,19 @@ public class Shell {
             InputStream istr=process.getInputStream();
             InputStreamReader isr=new InputStreamReader(istr);
           ){
-          int charsRead=0;
+          int charsRead=0, totalRead=0;
           char[] readBuffer=new char[1024 * 64];
-          while (!kill && (charsRead=isr.read(readBuffer, 0, readBuffer.length))>0)
-            publish(new String(readBuffer, 0, charsRead));
+          while (!kill && (charsRead=isr.read(readBuffer, 0, readBuffer.length))>0) {
+            if (totalRead+charsRead>outputLimit) {
+              publish(new String(readBuffer, 0, outputLimit-totalRead));
+              publish("\n* KLONK EXCEEDED OUTPUT LIMIT. PROCESS MAY STILL BE RUNNING. *");
+              kill=true;
+              die();
+            } else {
+              totalRead+=charsRead;
+              publish(new String(readBuffer, 0, charsRead));
+            }
+          }
         }
       } catch (Exception e) {
         failed=true;
@@ -237,9 +261,8 @@ public class Shell {
       return null;
     }
     @Override protected void process(List<String> lines){
-      if (!kill)
-        for (String s: lines)
-          mtaOutput.append(s);
+      for (String s: lines)
+        mtaOutput.append(s);
     }
     @Override protected void done() {
       btnRun.setEnabled(true);
@@ -306,6 +329,8 @@ public class Shell {
     btnStop.setMnemonic(KeyEvent.VK_S);
     btnStop.setFont(fontBold);
     btnStop.setEnabled(false);
+    int limit=persist.getShellLimit(1000000);
+    jspOutputLimit=new JSpinner(new SpinnerNumberModel(limit, 0, 1024*1024*1024, 1000));
 
     mtaOutput=getMTA();
 
@@ -374,6 +399,12 @@ public class Shell {
     gb.insets.right=10;
     gb.addX(btnRun);
     gb.addX(btnStop);
+    gb.insets.left=100;
+    gb.insets.right=0;
+    gb.addX(new JLabel("Output limit:"));
+    gb.insets.left=5;
+    gb.addX(jspOutputLimit);
+    gb.addX(new JLabel("characters"));
     return gb.container;
   }
   private Container getOutputPanel() {

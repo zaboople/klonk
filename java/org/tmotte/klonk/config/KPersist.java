@@ -88,6 +88,14 @@ public class KPersist {
     return getBoolean("AutoTrim", false);
   }
 
+  public KPersist setShellLimit(int limit) {
+    return setInt("Shell.Limit", limit);
+  }
+  public int getShellLimit(int defaultLimit) {
+    return getInt("Shell.Limit", defaultLimit);
+  }
+
+
   // WINDOW BOUNDS: //
 
   public KPersist setWindowBounds(Rectangle r) {
@@ -427,8 +435,9 @@ public class KPersist {
     }
   }
 
-  private void setInt(String name, int val) {
+  private KPersist setInt(String name, int val) {
     set(name, String.valueOf(val));
+    return this;
   }
   private int getInt(String name, int defaultTo) {
     String s=properties.getProperty(name);
