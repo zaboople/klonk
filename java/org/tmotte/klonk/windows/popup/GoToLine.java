@@ -211,16 +211,14 @@ public class GoToLine {
   /////////////
 
   public static void main(final String[] args) throws Exception {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        try {
-          PopupTestContext ptc=new PopupTestContext();
-          KAlert alerter=new KAlert(ptc.getPopupInfo(), ptc.getFontOptions());
-          GoToLine gtl=new GoToLine(ptc.getPopupInfo(), ptc.getFontOptions(), alerter);
-          System.out.println(gtl.show());
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+    javax.swing.SwingUtilities.invokeLater(()->{
+      try {
+        PopupTestContext ptc=new PopupTestContext();
+        KAlert alerter=new KAlert(ptc.getPopupInfo(), ptc.getFontOptions());
+        GoToLine gtl=new GoToLine(ptc.getPopupInfo(), ptc.getFontOptions(), alerter);
+        System.out.println(gtl.show());
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     });
   }
