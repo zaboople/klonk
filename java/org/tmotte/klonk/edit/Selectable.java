@@ -1,4 +1,4 @@
-package org.tmotte.klonk.edit; 
+package org.tmotte.klonk.edit;
 
 /** Not threadsafe, as it doesn't need to be. */
 class Selectable {
@@ -9,10 +9,10 @@ class Selectable {
   final static String
     strLetterCaps="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
    ,strLetterLow ="abcdefghijklmnopqrstuvwxyz"
-   ,strNum       ="0123456789"  
+   ,strNum       ="0123456789"
    //Note: I considered matching single quotes, but it interferes with use of same as an apostrophe (it's what's that's)
-   ,strStartSection="<{[(\"" 
-   ,strEndSection  =">}])\""
+   ,strStartSection="<{[\""
+   ,strEndSection  =">}]\""
    ,strWhite=new String(new char[]{TAB,SPACE})
    ;
   final static String strLetters=strLetterCaps+strLetterLow+strNum+strWhite+new String(new char[]{LINEFEED});
@@ -27,26 +27,26 @@ class Selectable {
     len=possible.length();
     shift=sh;
   }
-  
-  
-  ////////////////// 
+
+
+  //////////////////
   //              //
   //  GET RIGHT:  //
   //              //
   //////////////////
-  
-                    
+
+
   public static int getRight(String possible, boolean shift) {
     init(possible, shift);
     int i=getRight(0);
     return (i==1) ?getRight(1) :i;
   }
   private static int getRight(int startWith) {
-    
+
     //If we're at the next to last character, done, use it:
     if (startWith>=len-1) return len;
-      
-    //Get first char:  
+
+    //Get first char:
     char firstChar=possible.charAt(startWith++);
 
     //Skip over linefeed:
@@ -68,31 +68,31 @@ class Selectable {
     else
     if (strLetterCaps.indexOf(firstChar)>-1)
       return rightFindLastUpper(startWith);
-    else 
+    else
       return rightJumpSpecialChars(startWith);
-    
+
   }
   private static int rightFinishBrack(int startWith, char leftChar, char rightChar, int brackCount) {
     //Find end of bracket
     int nextRight=possible.indexOf(rightChar, startWith);
-    
+
     //Not found? Then just signal to jump special chars.
-    if (nextRight==-1) 
+    if (nextRight==-1)
       return rightJumpSpecialChars(1);
-    
+
     //For the " & ' characters, right & left are the same:
     if (rightChar==leftChar)
       return nextRight+1;
-      
-    //See if we have another left:  
+
+    //See if we have another left:
     //If we found a right bracket first, either it's the last, or we need
     //to search forwards from there:
     int nextLeft=possible.indexOf(leftChar, startWith);
     if (nextLeft==-1 || nextRight<nextLeft)
-      return --brackCount==0 
+      return --brackCount==0
         ?nextRight+1
         :rightFinishBrack(nextRight+1, leftChar, rightChar, brackCount);
-    
+
     //OK so we found a left that we need to account for, keep searching with count increased:
     return rightFinishBrack(nextLeft+1, leftChar, rightChar, brackCount+1);
   }
@@ -111,7 +111,7 @@ class Selectable {
     }
     return len;
   }
-  
+
   private static int rightFindLastUpper(int startWith) {
     //Looks for last uppercase, but if the first char we find is
     //lowercase, keep going. Yes this is a special case of the general
@@ -122,26 +122,26 @@ class Selectable {
       ?rightJump(i+1, strLetterLow)
       :i;
   }
-  
-  
+
+
   /////////////////
   //             //
   //  GET LEFT:  //
   //             //
   /////////////////
 
-  
+
   public static int getLeft(String possible, boolean shift) {
     init(possible, shift);
     int i=getLeft(len-1);
     return (i==len-1) ?getLeft(len-2) :i;
   }
   private static int getLeft(int startWith) {
- 
+
     //If we're at the next to last character, done, use it:
     if (startWith<=1) return 0;
 
-    //Get first char:  
+    //Get first char:
     char firstChar=possible.charAt(startWith--);
 
     //Skip over linefeed:
@@ -163,10 +163,10 @@ class Selectable {
     else
     if (strNum.indexOf(firstChar)!=-1)
       return leftJump(startWith, strNum);
-    else 
+    else
       return leftJumpSpecialChars(startWith);
   }
-  
+
   private static int leftFinishBrack(int startWith, char leftChar, char rightChar, int brackCount) {
     //Find left end of bracket, else just jump to end of special chars:
     int nextLeft=indexOfBack(startWith, leftChar);
@@ -176,14 +176,14 @@ class Selectable {
     //For the " & ' characters, right & left are the same:
     if (rightChar==leftChar)
       return nextLeft;
-      
-    //See if we have another right:  
+
+    //See if we have another right:
     //If next left precedes next right, then we may be done, or we keep searching from there.
     //else we up the right count and proceed searching from there, even if there is no left;
     //if there is no left, the prior statement will blow out.
     int nextRight=indexOfBack(startWith, rightChar);
     if (nextLeft>nextRight)
-      return --brackCount==0 
+      return --brackCount==0
         ?nextLeft
         :leftFinishBrack(nextLeft-1, leftChar, rightChar, brackCount);
     else
@@ -216,7 +216,7 @@ class Selectable {
     }
     return 0;
   }
-    
+
   private static int indexOfBack(int startWith, char lookFor) {
     for (int i=startWith; i>-1; i--)
       if (possible.charAt(i)==lookFor)
@@ -224,7 +224,7 @@ class Selectable {
     return -1;
   }
 
-  
+
 
   //////////////////
   //              //
@@ -242,7 +242,7 @@ class Selectable {
       );
       return;
     }
-    
+
     //Left or right or what?
     boolean right=false;
     if (args[0].equals("-right"))
@@ -253,22 +253,22 @@ class Selectable {
     else{
       System.err.println("Don't know what to do with: "+args[0]);
       return;
-    }  
-  
+    }
+
     //Shift:
     boolean sh=args.length==1
       ?false
       :args[1].equals("-shift");
-    
+
     //What is the string
     String s=args[args.length-1];
-      
-    //Now do the dirty work:  
+
+    //Now do the dirty work:
     if (right)  testRight(s, shift);
     else        testLeft(s, shift);
     System.out.flush();
   }
-  
+
   public static void testRight(String s, boolean shift) {
     int r=getRight(s, shift);
     System.out.println(""+r+">"+s.substring(0,r)+"<");
@@ -277,5 +277,5 @@ class Selectable {
     int l=getLeft(s, shift);
     System.out.println(""+l+" "+s.length()+">"+s.substring(l,s.length())+"<");
   }
-  
+
 }
