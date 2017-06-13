@@ -31,11 +31,6 @@ public class GridBug extends GridBagConstraints {
   public Container getContainer() {
     return container;
   }
-  public GridBug add(Component... cs) {
-    for (Component c: cs)
-      add(c);
-    return this;
-  }
   public GridBug add(Component c) {
     gbl.setConstraints(c, this);
     container.add(c);
