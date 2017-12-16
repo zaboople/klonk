@@ -50,7 +50,7 @@ public class FileListen implements LockInterface {
   //////////////////////////
 
   public boolean lockOrSignal(String[] fileNames){
-    log.log("FileListen.lockOrSignal()...");
+    //log.log("FileListen.lockOrSignal()...");
     locker=new Locker(seizeFile, log);
     return locker.lock() || handOff(fileNames);
   }
@@ -89,13 +89,13 @@ public class FileListen implements LockInterface {
       FileOutputStream os=new FileOutputStream(pidFile);
       FileLock flocker=os.getChannel().lock();
       if (flocker==null) {
-        log.log("FileListen.handOff(): Could not get lock");
+        //log.log("FileListen.handOff(): Could not get lock");
         return false;
       }
       PrintWriter pw=new PrintWriter(new OutputStreamWriter(os));
       for (String s: fileNames)
         if (s!=null) {
-          log.log("FileListen.handOff(): Making handoff for "+s);
+          //log.log("FileListen.handOff(): Making handoff for "+s);
           pw.println(new File(s).getAbsolutePath());
         }
       pw.flush();
@@ -125,7 +125,7 @@ public class FileListen implements LockInterface {
           for (WatchEvent we: key.pollEvents()){
             WatchEvent.Kind kind=we.kind();
             String fileName=we.context().toString();
-            log.log("FileListen: WatchEvent "+we.count()+": "+fileName+" kind:"+kind);
+            //log.log("FileListen: WatchEvent "+we.count()+": "+fileName+" kind:"+kind);
             if (we.count()>1)
               continue;
             if (kind==StandardWatchEventKinds.ENTRY_CREATE ||
@@ -133,13 +133,13 @@ public class FileListen implements LockInterface {
               try {
                 loadFiles(fileName);
               } catch (Exception e) {
-                log.log("Failed on reading, waiting for another chance: "+fileName+" Exception: "+e);
+                log.log(e, "FileListen failed on reading, waiting for another chance: "+fileName);
               }
             else
             if (kind==StandardWatchEventKinds.OVERFLOW)
               log.log("FileListen got OVERFLOWED...");
             else
-              log.log("FileListen got weird event");
+              log.log("FileListen got weird event: "+kind);
           }
           if (!key.reset())
             log.log("FileListen couldn't reset key");
