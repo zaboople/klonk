@@ -3,13 +3,17 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -44,8 +48,9 @@ public class KAlert implements Setter<String> {
   private JEditorPane sizer;
   private JButton ok;
   private Setter<Throwable> errorHandler;
-  int baseSizerHeight;
-  int baseLabelHeight;
+  private Dimension baseSizer;
+  private double msgMaxLineHeight, msgMaxLineWidth;
+
 
   // State:
   private boolean initialized=false;
@@ -74,27 +79,42 @@ public class KAlert implements Setter<String> {
   }
   public void show(String message) {
     init();
-    //Warning: JEditorPane does not wrap words properly, so this is STILL
-    //an approximation.
-    sizer.setPreferredSize(null);
-    sizer.setSize(new Dimension(300,1));
-    sizer.setText(message);
-    Dimension sized=sizer.getPreferredSize();
-    if (sized.height<baseSizerHeight) {
-      errorLabel.setPreferredSize(null);
-      errorLabel.setText(message);
+
+    // Set label boundaries based on message:
+    // (note: JEditorPane does not wrap words properly, so this is STILL an approximation)
+    String[] lines=message.split("\n");
+    Rectangle parentDim=pInfo.parentFrame.getBounds();
+    double
+      maxWidth=Math.min(parentDim.width-60, msgMaxLineWidth),
+      maxHeight=parentDim.height-60;
+    double width=0;
+    {
+      Graphics graphics=errorLabel.getGraphics();
+      FontMetrics fm=graphics.getFontMetrics();
+      for (String s: lines)
+        width+=fm.getStringBounds(s, graphics).getWidth();
+      width+=fm.getStringBounds("123", graphics).getWidth();
+      if (width==0) width=100;
+      else
+      if (width>maxWidth) width=maxWidth;
     }
-    else {
-      sizer.setSize(500, 10);
-      sizer.setText(message);
-      Dimension d=sizer.getPreferredSize();
-      d.height=d.height+(d.height/baseSizerHeight);
-      errorLabel.setPreferredSize(d);
-      errorLabel.setText(message);
+    double height=lines.length==1
+      ?msgMaxLineHeight * 1.2
+      :(lines.length + 1) * msgMaxLineHeight;
+    {
+      if (height==0) height=100;
+      else
+      if (height>maxHeight) height=maxHeight;
     }
+    errorLabel.setPreferredSize(new Dimension((int)width, (int)height));
+    errorLabel.setText(message);
+
+    //System.out.println("LineCount "+lines.length);
+    //System.out.println("Parent bounds: "+parentDim);
+    //System.out.println("Width "+width+" Height "+height);
+
     win.pack();
     ok.requestFocusInWindow();
-
     Point pt=pInfo.parentFrame.getLocation();
     win.setLocation(pt.x+20, pt.y+20);
     win.setVisible(true);
@@ -122,16 +142,14 @@ public class KAlert implements Setter<String> {
     win=new JDialog(pInfo.parentFrame, true);
 
     errorLabel=new JTextPane();
-    errorLabel.setEditable(false); // as before
+    errorLabel.setEditable(false);
     errorLabel.setBorder(null);
     errorLabel.setOpaque(false);
 
     sizer=new JEditorPane();
     errorLabel.setText("ABCDEFG\naaa\n\neee\neifif");
     sizer.setText(errorLabel.getText());
-    baseSizerHeight=sizer.getPreferredSize().height;
-    baseLabelHeight=errorLabel.getPreferredSize().height;
-
+    baseSizer=sizer.getPreferredSize();
     ok=new JButton("OK");
   }
   private void layout() {
@@ -147,6 +165,7 @@ public class KAlert implements Setter<String> {
     gb.insets.bottom=10;
     gb.addY(ok);
 
+    win.pack();
     setFont(fontOptions);
   }
   private void listen() {
@@ -171,9 +190,19 @@ public class KAlert implements Setter<String> {
   }
   private void setFont(FontOptions fo) {
     this.fontOptions=fo;
-    if (win!=null){
+    if (win!=null && errorLabel!=null && errorLabel.getGraphics()!=null){
       fontOptions.getControlsFont().set(win);
-      win.pack();
+      {
+        FontMetrics fm=errorLabel.getGraphics().getFontMetrics();
+        StringBuilder sb=new StringBuilder(" ");
+        for (char c='A'; c<='Z'; c++) sb.append(c);
+        for (char c='a'; c<='z'; c++) sb.append(c);
+        while (sb.length()<120)
+          for (char c='0'; c<='9'; c++) sb.append(c);
+        Rectangle2D rect=fm.getStringBounds(sb.toString(), errorLabel.getGraphics());
+        msgMaxLineHeight=rect.getHeight();
+        msgMaxLineWidth=rect.getWidth();
+      }
     }
   }
 
@@ -187,8 +216,11 @@ public class KAlert implements Setter<String> {
       public void run() {
         try {
           PopupTestContext ptc=new PopupTestContext();
+          ptc.getMainFrame().setBounds(new java.awt.Rectangle(200,200,1200,800));
+
           KAlert ka=new KAlert(ptc.getPopupInfo(), ptc.getFontOptions());
           ka.show("Small warning thing okay.");
+          System.out.println("Max line height "+ka.msgMaxLineHeight+" max line width "+ka.msgMaxLineWidth);
           ka.show("Small warning thing okay but larger.");
           ka.show("Small warning thing okay but it's just a bit larger than before.");
           try {throwTest();} catch (Exception f) {ka.fail(f);}
@@ -211,7 +243,6 @@ public class KAlert implements Setter<String> {
           );
           ka.show("I dislike you");
           ka.fail(new RuntimeException("I had a smoochy smooch"));
-          return;
         } catch (Exception e) {
           e.printStackTrace();
         }
