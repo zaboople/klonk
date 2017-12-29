@@ -45,10 +45,8 @@ public class KAlert implements Setter<String> {
   // Controls:
   private JDialog win;
   private JTextPane errorLabel;
-  private JEditorPane sizer;
   private JButton ok;
   private Setter<Throwable> errorHandler;
-  private Dimension baseSizer;
   private double msgMaxLineHeight, msgMaxLineWidth;
 
 
@@ -145,11 +143,7 @@ public class KAlert implements Setter<String> {
     errorLabel.setEditable(false);
     errorLabel.setBorder(null);
     errorLabel.setOpaque(false);
-
-    sizer=new JEditorPane();
     errorLabel.setText("ABCDEFG\naaa\n\neee\neifif");
-    sizer.setText(errorLabel.getText());
-    baseSizer=sizer.getPreferredSize();
     ok=new JButton("OK");
   }
   private void layout() {
