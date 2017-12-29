@@ -22,12 +22,13 @@ Klonk requires Java 8 to run. To build, use a Java 8 JDK and a reasonably recent
 To build a Windows Klonk.exe you will need [JSmooth](http://jsmooth.sourceforge.net/). Type `ant help` in the git checkout directory for detailed instructions. Note that because the executable does not contain a Java virtual machine of its own, it needs to find one on your computer. You can go to:
   - Desktop
   - Right click "My Computer" (or whatever it's named)
-  - Properties
+  - Click "Properties
   - Select the "Advanced" tab
-  - Environment Variables
-  - Under "System variables" click "New" and
-  - For Variable Name, enter "JAVA_HOME";
-  - For Variable Value, enter the path of your computer's java install, e.g. "c:\Program Files\Java\jre-9.0.1"
+  - Click "Environment Variables"
+  - Under "System variables" click "New"
+    - For Variable Name, enter "JAVA_HOME";
+    - For Variable Value, enter the path of your computer's java install, e.g. "c:\Program Files\Java\jre-9.0.1"
+    - And click "Apply" or "Save"
 
 ## Macintosh
 OSX/MacOS native executables are supported via Java's built-in `javapackager` utility. Refer to the script [lib/makedmg](lib/makedmg). Note that this script includes a `-Bruntime=` flag that tells javapackager not to put a java JRE into the install - this only works correctly when building for java 1.8.0_92 and above. You need to remove it for earlier versions of Java 8 (or just upgrade to the latest).
