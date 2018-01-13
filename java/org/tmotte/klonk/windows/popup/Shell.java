@@ -235,9 +235,11 @@ public class Shell {
         ProcessBuilder pb=new ProcessBuilder(commands);
         pb.redirectErrorStream(true);
         process=pb.start();
+
+        // I'm using UTF-8 as the only option for now, because almost everything complies:
         try (
             InputStream istr=process.getInputStream();
-            InputStreamReader isr=new InputStreamReader(istr);
+            InputStreamReader isr=new InputStreamReader(istr, java.nio.charset.StandardCharsets.UTF_8);
           ){
           int charsRead=0, totalRead=0;
           char[] readBuffer=new char[1024 * 64];
@@ -256,7 +258,6 @@ public class Shell {
       } catch (Exception e) {
         failed=true;
         publish(StackTracer.getStackTrace(e).replaceAll("\t", "    "));
-      } finally {
       }
       return null;
     }
