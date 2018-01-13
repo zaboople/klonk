@@ -38,6 +38,7 @@ public class Shell {
   private FileDialogWrapper fdw;
   private KPersist persist;
   private Getter<String> currFileGetter;
+  private boolean fastUndos;
   private Image icon;
 
   // Controls:
@@ -68,7 +69,9 @@ public class Shell {
     this.persist=persist;
     this.icon=icon;
     this.currFileGetter=currFileGetter;
+    this.fastUndos=persist.getFastUndos();
     pInfo.addFontListener(fo -> setFont(fo));
+    pInfo.addFastUndoListener(tf -> setFastUndos(tf));
   }
   public void show() {
     init();
@@ -124,6 +127,11 @@ public class Shell {
       mtaOutput.setCaretWidth(f.getCaretWidth());
       win.pack();//To make rowcount work
     }
+  }
+  private void setFastUndos(boolean tf) {
+    this.fastUndos=tf;
+    if (win!=null)
+      mtaOutput.setFastUndos(tf);
   }
 
   ///////////////////////////////

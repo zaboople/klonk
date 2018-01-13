@@ -31,12 +31,12 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
+import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.MainDisplay;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.config.PopupInfo;
 
 public class MainLayout {
 
@@ -79,7 +79,7 @@ public class MainLayout {
     doEvents();
     layout();
     noFontChange.add(pnlEditor);
-    pInfo.addFontListener(fo -> setFont(fo));
+    pInfo.addFontListener((FontOptions fo) -> setFont(fo));
   }
 
   /////////////////////

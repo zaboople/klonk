@@ -73,6 +73,7 @@ public class FindAndReplace {
   private FontOptions fontOptions;
   private Setter<String> alerter;
   private StatusUpdate statusBar;
+  boolean fastUndos;
 
   //Display components:
   private JDialog win;
@@ -104,6 +105,7 @@ public class FindAndReplace {
   public FindAndReplace(
       PopupInfo pInfo,
       FontOptions fontOptions,
+      boolean fastUndos,
       Setter<String> alerter,
       StatusUpdate statusBar
     ) {
@@ -111,7 +113,9 @@ public class FindAndReplace {
     this.fontOptions=fontOptions;
     this.statusBar=statusBar;
     this.alerter=alerter;
+    this.fastUndos=fastUndos;
     pInfo.addFontListener(fo -> setFont(fo));
+    pInfo.addFastUndoListener(tf -> setFastUndos(tf));
   }
   public void doFind(MyTextArea target)    {doFind(target, false);}
   public void doReplace(MyTextArea target) {doFind(target, true);}
@@ -324,10 +328,10 @@ public class FindAndReplace {
     btnFind.setMnemonic(          KeyEvent.VK_F);
     btnReverse.setMnemonic(       KeyEvent.VK_V);
     btnCancel.setMnemonic(        KeyEvent.VK_C);
-
   }
   private MyTextArea makeTextArea() {
     MyTextArea mta=new MyTextArea(pInfo.currentOS);
+    mta.setFastUndos(true);
     mta.setRows(3);//This doesn't work right because we set the font different.
     mta.setLineWrap(false);
     mta.setWrapStyleWord(false);
@@ -476,6 +480,13 @@ public class FindAndReplace {
       //our desired setting of rows elsewhere because we set
       //font AFTER instantiation.
       win.pack();
+    }
+  }
+  private void setFastUndos(boolean tf) {
+    this.fastUndos=tf;
+    if (initialized) {
+      mtaFind.setFastUndos(tf);
+      mtaReplace.setFastUndos(tf);
     }
   }
 

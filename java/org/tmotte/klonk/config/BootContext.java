@@ -2,7 +2,6 @@ package org.tmotte.klonk.config;
 import java.awt.Image;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
@@ -239,7 +238,7 @@ public class BootContext {
 
     //Search popups:
     FindAndReplace findAndReplace=
-      new FindAndReplace(popupInfo, fontOptions, alerter, statusBar);
+      new FindAndReplace(popupInfo, fontOptions, persist.getFastUndos(), alerter, statusBar);
     GoToLine goToLine=new GoToLine(popupInfo, fontOptions, alerter);
 
     //Shell:
@@ -279,7 +278,7 @@ public class BootContext {
         ctrlMain
         ,new CtrlMarks(editors, statusBar, menus.getMarkStateListener())
         ,new CtrlSelection(editors, statusBar, alerter)
-        ,new CtrlUndo     (editors, statusBar, yesNo, persist)
+        ,new CtrlUndo     (editors, popupInfo.getFastUndoListeners(), statusBar, yesNo, persist)
         ,new CtrlSearch(editors, statusBar, findAndReplace, goToLine)
         ,new CtrlFileOther(editors, statusBar, ctrlFavorites, currentOS)
         ,new CtrlOther    (shell, help, about)

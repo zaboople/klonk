@@ -1,10 +1,12 @@
 package org.tmotte.klonk.controller;
+import java.util.List;
 import org.tmotte.klonk.Editor;
-import org.tmotte.klonk.config.msg.StatusUpdate;
-import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.KPersist;
+import org.tmotte.klonk.config.msg.Editors;
+import org.tmotte.klonk.config.msg.Setter;
+import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.windows.popup.YesNoCancel;
-import java.util.LinkedList;
+
 
 public class CtrlUndo {
   private Editors editors;
@@ -12,15 +14,17 @@ public class CtrlUndo {
   private KPersist persist;
   private boolean fastUndos=false;
   private YesNoCancel yesNo;
-  
-  public CtrlUndo(Editors editors, StatusUpdate status, YesNoCancel yesNo, KPersist persist) {
+  private List<Setter<Boolean>> fastUndoListeners;
+
+  public CtrlUndo(Editors editors, List<Setter<Boolean>> fastUndoListeners, StatusUpdate status, YesNoCancel yesNo, KPersist persist) {
     this.editors=editors;
     this.yesNo=yesNo;
     this.status=status;
     this.persist=persist;
+    this.fastUndoListeners=fastUndoListeners;
     fastUndos=persist.getFastUndos();
   }
-  
+
   public void doUndo(){
     editors.getFirst().undo();
   }
@@ -40,6 +44,7 @@ public class CtrlUndo {
     persist.save();
     for (Editor e: editors.forEach())
       e.setFastUndos(fastUndos);
+    fastUndoListeners.stream().forEach(f -> f.set(fastUndos));
   }
   public void doClearUndos() {
     if (yesNo.show("Clear undos?").isYes()){
@@ -66,7 +71,7 @@ public class CtrlUndo {
     else
       status.showBad("Action cancelled");
   }
-  
 
-  
+
+
 }
