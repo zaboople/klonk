@@ -1,8 +1,9 @@
 #!/bin/bash -e
 repo="klonk"
+ant_command='clean config.prod exe dist'
 
 cd $(dirname $0)/..
-ant clean dist
+ant $ant_command
 
 cd ../zaboople.github.generate/lib/external-$repo
 echo

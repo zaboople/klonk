@@ -165,11 +165,11 @@
   <!-- TARGETS: DISTRIBUTION -->
   <!-- ********************* -->
 
-  <target name="dist" depends="_dist.src,_dist.bin,_dist.site"/>
+  <target name="dist" depends="_dist.site"/>
 
 
 
-  <target name="_dist.site" depends="_dist.src,_dist.bin">
+  <target name="_dist.site" depends="_dist.bin">
     <mkdir dir ="${dist.dir}/site"/>
     <copy todir="${dist.dir}/site">
       <fileset dir="${dist.dir}">
