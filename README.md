@@ -34,4 +34,4 @@ To build a Windows Klonk.exe you will need [JSmooth](http://jsmooth.sourceforge.
     - And click "Apply" or "Save"
 
 ## Macintosh
-OSX/MacOS native executables are supported via Java's built-in `javapackager` utility. Refer to the script [lib/makedmg](lib/makedmg). Note that this script includes a `-Bruntime=` flag that tells javapackager not to put a java JRE into the install - this only works correctly when building for java 1.8.0_92 and above. You need to remove it for earlier versions of Java 8 (or just upgrade to the latest).
+OSX/MacOS native executables are supported via Java's built-in `javapackager` utility. Refer to the script [lib/makedmg](lib/makedmg). Note that this script includes a `-Bruntime=` flag that tells javapackager not to put a java JRE into the install, and this only works correctly when building for java 1.8.0_92 and above. You need to remove it for earlier versions of Java 8 (or just upgrade to the latest).
