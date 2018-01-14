@@ -14,7 +14,7 @@ Capabilities worth mentioning:
 * The usual things: Trailing-whitespace-trim, auto-indent with tabs or spaces, line wrap control, sorting, marking, alignment tricks and so forth
 
 # Download
-[Download zip file here](http://zaboople.github.io/downloads/klonk.2.4.zip). Includes jar & windows .exe files (for MacOS installation refer to "Building it" below).
+[Download zip file here](http://zaboople.github.io/downloads/klonk.2.4.zip). Includes jar & Windows .exe files (for MacOS installation refer to "Building it" below). Note that the Windows .exe does not include the required Java 8 installation on your computer.
 
 # Building it
 Klonk requires Java 8 to run. To build, use a Java 8 JDK and a reasonably recent version of [Apache Ant](http://ant.apache.org/).
