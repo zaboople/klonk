@@ -97,6 +97,9 @@ public class CtrlOptions {
     fontOptions.setFontSize(fontOptions.getFontSize()+1);
     pushFont();
   }
+  public Runnable getFontBiggerLambda() {
+    return ()->doFontBigger();
+  }
   public void doFontSmaller() {
     int i=fontOptions.getFontSize()-1;
     if (i>0) {
@@ -105,6 +108,9 @@ public class CtrlOptions {
     }
     else
       statusBar.showBad("Cannot make font any smaller");
+  }
+  public Runnable getFontSmallerLambda() {
+    return ()->doFontSmaller();
   }
   public void doFontAndColors() {
     if (!fontPicker.show(fontOptions)){

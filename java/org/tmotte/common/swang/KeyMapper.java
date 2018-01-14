@@ -112,6 +112,9 @@ public class KeyMapper {
   // CREATE KeyStroke OBJECTS: //
   ///////////////////////////////
 
+  /**
+   * Gives us the menu shortcut key - ALT or COMMAND or whatever.
+   */
   public static int shortcutByOS(){
     return toolkit.getMenuShortcutKeyMask();
   }

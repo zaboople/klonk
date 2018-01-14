@@ -73,7 +73,9 @@ public class FindAndReplace {
   private FontOptions fontOptions;
   private Setter<String> alerter;
   private StatusUpdate statusBar;
-  boolean fastUndos;
+  private boolean fastUndos;
+  private Runnable fontSmallerLambda, fontBiggerLambda;
+  private CurrentOS currentOS;
 
   //Display components:
   private JDialog win;
@@ -114,8 +116,13 @@ public class FindAndReplace {
     this.statusBar=statusBar;
     this.alerter=alerter;
     this.fastUndos=fastUndos;
+    this.currentOS=pInfo.currentOS;
     pInfo.addFontListener(fo -> setFont(fo));
     pInfo.addFastUndoListener(tf -> setFastUndos(tf));
+  }
+  public void setFontListeners(Runnable fontSmallerLambda, Runnable fontBiggerLambda) {
+    this.fontSmallerLambda=fontSmallerLambda;
+    this.fontBiggerLambda=fontBiggerLambda;
   }
   public void doFind(MyTextArea target)    {doFind(target, false);}
   public void doReplace(MyTextArea target) {doFind(target, true);}
@@ -572,9 +579,11 @@ public class FindAndReplace {
   /** Listening to the textareas for tab & enter keys: */
   private KeyAdapter textAreaListener=new KeyAdapter() {
     public void keyPressed(KeyEvent e){
-      final int code=e.getKeyCode();
+      final
+        int code=e.getKeyCode(),
+        mods=e.getModifiersEx();
+      System.out.println("FUCK "+code+" "+mods+" ");
       if (code==e.VK_TAB) {
-        int mods=e.getModifiersEx();
         if (KeyMapper.ctrlPressed(mods))
           ((MyTextArea)e.getSource()).replaceSelection("	");
         else
@@ -593,11 +602,20 @@ public class FindAndReplace {
       }
       else
       if (code==KeyEvent.VK_ENTER) {
-        int mods=e.getModifiersEx();
         if (KeyMapper.ctrlPressed(mods) || KeyMapper.shiftPressed(mods) || KeyMapper.altPressed(mods))
           ((MyTextArea)e.getSource()).replaceSelection("\n");
         else
           find(true);
+        e.consume();
+      }
+      else
+      if (code==e.VK_EQUALS && KeyMapper.modifierPressed(mods, currentOS)) {
+        fontBiggerLambda.run();
+        e.consume();
+      }
+      else
+      if (code==e.VK_MINUS && KeyMapper.modifierPressed(mods, currentOS)) {
+        fontSmallerLambda.run();
         e.consume();
       }
     }

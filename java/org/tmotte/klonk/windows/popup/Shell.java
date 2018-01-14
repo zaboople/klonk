@@ -40,6 +40,8 @@ public class Shell {
   private Getter<String> currFileGetter;
   private boolean fastUndos;
   private Image icon;
+  private Runnable fontSmallerLambda, fontBiggerLambda;
+  private CurrentOS currentOS;
 
   // Controls:
   private JFrame win;
@@ -70,8 +72,13 @@ public class Shell {
     this.icon=icon;
     this.currFileGetter=currFileGetter;
     this.fastUndos=persist.getFastUndos();
+    this.currentOS=pInfo.currentOS;
     pInfo.addFontListener(fo -> setFont(fo));
     pInfo.addFastUndoListener(tf -> setFastUndos(tf));
+  }
+  public void setFontListeners(Runnable fontSmallerLambda, Runnable fontBiggerLambda) {
+    this.fontSmallerLambda=fontSmallerLambda;
+    this.fontBiggerLambda=fontBiggerLambda;
   }
   public void show() {
     init();
@@ -516,7 +523,7 @@ public class Shell {
       }
     });
 
-    //Switch back:
+    //Switch back (FIXME WHO KNEW?):
     Action switchAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {switchBack();}
     };
@@ -526,15 +533,25 @@ public class Shell {
     btnSwitch.addActionListener(switchAction);
     pInfo.currentOS.fixEnterKey(btnSwitch, switchAction);
   }
+
   private KeyAdapter textAreaListener=new KeyAdapter() {
     public void keyPressed(KeyEvent e){
-      final int code=e.getKeyCode();
+      final int code=e.getKeyCode(), mods=e.getModifiersEx();
       if (code==e.VK_TAB) {
-        int mods=e.getModifiersEx();
         if (KeyMapper.shiftPressed(mods))
           btnRun.requestFocusInWindow();
         else
           btnClose.requestFocusInWindow();
+        e.consume();
+      }
+      else
+      if (code==e.VK_EQUALS && KeyMapper.modifierPressed(mods, currentOS)) {
+        fontBiggerLambda.run();
+        e.consume();
+      }
+      else
+      if (code==e.VK_MINUS && KeyMapper.modifierPressed(mods, currentOS)) {
+        fontSmallerLambda.run();
         e.consume();
       }
     }

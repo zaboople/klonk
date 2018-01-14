@@ -274,6 +274,11 @@ public class BootContext {
       CtrlFavorites ctrlFavorites=new CtrlFavorites(
         persist, menus.getFavoriteFileListener(), menus.getFavoriteDirListener()
       );
+      CtrlOptions ctrlOptions=new CtrlOptions  (
+          editors, statusBar, persist, ctrlFavorites,
+          ctrlMain.getLineDelimiterListener(), popupInfo.getFontListeners(),
+          sshConns, sshOptionPicker, tabsAndIndents, favorites, fontPicker, kDelims
+        );
       menus.setControllers(
         ctrlMain
         ,new CtrlMarks(editors, statusBar, menus.getMarkStateListener())
@@ -282,12 +287,15 @@ public class BootContext {
         ,new CtrlSearch(editors, statusBar, findAndReplace, goToLine)
         ,new CtrlFileOther(editors, statusBar, ctrlFavorites, currentOS)
         ,new CtrlOther    (shell, help, about)
-        ,new CtrlOptions  (
-          editors, statusBar, persist, ctrlFavorites,
-          ctrlMain.getLineDelimiterListener(), popupInfo.getFontListeners(),
-          sshConns, sshOptionPicker, tabsAndIndents, favorites, fontPicker, kDelims
-        )
+        ,ctrlOptions
       );
+
+      // Some necessary post-constructor DI here:
+      Runnable
+        small=ctrlOptions.getFontSmallerLambda(),
+        big=ctrlOptions.getFontBiggerLambda();
+      shell.setFontListeners(small, big);
+      findAndReplace.setFontListeners(small, big);
     }
 
     //Attach osx popup items to main window, and assign menus to main window:
