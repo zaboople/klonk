@@ -57,7 +57,7 @@ public class TabsAndIndents {
   private JRadioButton jrbThisTabs, jrbThisSpaces, jrbDefTabs, jrbDefSpaces;
   private JSpinner jspSpacesSize;
   private JSpinner jspTabSize;
-  private JCheckBox chkIndentOnHardReturn;
+  private JCheckBox chkIndentOnHardReturn, chkInferTabIndents;
   private JRadioButton jrbTabIndentsLine, jrbTabIsTab;
   private JButton btnOK, btnCancel;
 
@@ -84,6 +84,7 @@ public class TabsAndIndents {
     jspSpacesSize.setValue(options.indentSpacesSize > 0 ?options.indentSpacesSize :1);
     jspTabSize.setValue(options.tabSize);
     chkIndentOnHardReturn.setSelected(options.indentOnHardReturn);
+    chkInferTabIndents.setSelected(options.inferTabIndents);
     jrbTabIndentsLine.setSelected(options.tabIndentsLine);
     jrbTabIsTab.setSelected(!jrbTabIndentsLine.isSelected());
 
@@ -116,6 +117,7 @@ public class TabsAndIndents {
     ok=action;
     if (action) {
       options.indentOnHardReturn=chkIndentOnHardReturn.isSelected();
+      options.inferTabIndents=chkInferTabIndents.isSelected();
       options.tabIndentsLine    =jrbTabIndentsLine.isSelected();
       options.tabSize         =Integer.parseInt(jspTabSize.getValue().toString());
       options.indentSpacesSize=Integer.parseInt(jspSpacesSize.getValue().toString());
@@ -151,6 +153,9 @@ public class TabsAndIndents {
 
     chkIndentOnHardReturn=new JCheckBox(
       "<html><body>Auto-indent when new line is entered</body></html>"
+    );
+    chkInferTabIndents=new JCheckBox(
+      "<html><body>Infer tab-indents from file</body></html>"
     );
     jrbTabIndentsLine=new JRadioButton(
       "<html><body><b>Tab</b> key indents line <br>(use <b>Ctrl</b> - <b>Tab</b> to insert tab)</body></html>"
@@ -216,15 +221,15 @@ public class TabsAndIndents {
   }
   private Container getIndentionRadiosPanel() {
     GridBug gb=new GridBug(new JPanel());
-    gb.anchor=gb.WEST;
+    gb.anchor=gb.NORTHWEST;
     gb.weightx=1.0;
     gb.gridy=gb.gridx=0;
-    gb.add(getIndentionRadiosPanel("This file:", jrbThisTabs, jrbThisSpaces));
+    gb.add(getIndentionRadiosPanel("This file:", jrbThisTabs, jrbThisSpaces, null));
     gb.insets.left=7;
-    gb.addX(getIndentionRadiosPanel("Default:" , jrbDefTabs,  jrbDefSpaces));
+    gb.addX(getIndentionRadiosPanel("Default:" , jrbDefTabs,  jrbDefSpaces, chkInferTabIndents));
     return gb.container;
   }
-  private Container getIndentionRadiosPanel(String label, JRadioButton one, JRadioButton two){
+  private Container getIndentionRadiosPanel(String label, JRadioButton one, JRadioButton two, JCheckBox three){
     GridBug gb=new GridBug(new JPanel());
     gb.anchor=gb.WEST;
     gb.weightx=1.0;
@@ -232,6 +237,8 @@ public class TabsAndIndents {
     gb.add(new JLabel(label));
     gb.addY(one);
     gb.addY(two);
+    if (three!=null)
+      gb.addY(three);
     return gb.container;
   }
   private JPanel getIndentionSpinPanel() {

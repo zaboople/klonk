@@ -126,6 +126,7 @@ public class KPersist {
     TabAndIndentOptions taio=new TabAndIndentOptions();
     taio.indentOnHardReturn=getBoolean("Indent.OnHardReturn", true);
     taio.tabIndentsLine    =getBoolean("Indent.TabIndentsLine", true);
+    taio.inferTabIndents   =getBoolean("Indent.InferTabs", true);
     String temp=get("Indent.DefaultMode", "SPACES");
     if ("TABS".equals(temp))
       taio.indentionModeDefault=taio.INDENT_TABS;
@@ -138,6 +139,7 @@ public class KPersist {
   public void setTabAndIndentOptions(TabAndIndentOptions taio){
     setBoolean("Indent.OnHardReturn", taio.indentOnHardReturn);
     setBoolean("Indent.TabIndentsLine", taio.tabIndentsLine);
+    setBoolean("Indent.InferTabs", taio.inferTabIndents);
     if (taio.indentionModeDefault==taio.INDENT_TABS)
       set("Indent.DefaultMode", "TABS");
     else

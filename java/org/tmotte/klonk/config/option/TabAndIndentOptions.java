@@ -13,18 +13,20 @@ public class TabAndIndentOptions {
       s+=" ";
     return s;
   }
-  
+
   public boolean indentOnHardReturn;
   public boolean tabIndentsLine;
-  public int indentionMode, 
+  public boolean inferTabIndents;
+  public int indentionMode,
              indentionModeDefault;
-  public int indentSpacesSize, 
+  public int indentSpacesSize,
              tabSize;
-             
+
   public String toString() {
-    return 
+    return
       "indentOnHardReturn: "+indentOnHardReturn
      +"\ntabIndentsLine: "+tabIndentsLine
+     +"\ninferTabIndents: "+inferTabIndents
      +"\nindentionMode: "+indentionMode
      +"\nindentionModeDefault: "+indentionModeDefault
      +"\nindentSpacesSize: "+indentSpacesSize
@@ -32,4 +34,3 @@ public class TabAndIndentOptions {
   }
 
 }
-  

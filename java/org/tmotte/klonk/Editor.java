@@ -317,8 +317,8 @@ public class Editor {
   public void doLowerCase(){
     replaceSelection(jta.getSelectedText().toLowerCase());
   }
-  public void loadFile(File file, String defaultLineBreaker) throws Exception {
-    doLoadFile(file, defaultLineBreaker);
+  public void loadFile(File file, String defaultLineBreaker, TabAndIndentOptions taio) throws Exception {
+    doLoadFile(file, defaultLineBreaker, taio);
   }
   public void saveFile(File file) throws Exception {
     doSaveFile(file);
@@ -783,7 +783,7 @@ public class Editor {
   ////////////////
 
 
-  private void doLoadFile(File file, String defaultLineBreaker) throws Exception {
+  private void doLoadFile(File file, String defaultLineBreaker, TabAndIndentOptions taio) throws Exception {
     jta.reset();
     jta.setSuppressUndo(true);
     jta.getDocument().removeDocumentListener(docListener);
@@ -791,11 +791,12 @@ public class Editor {
       fileMetaData=KFileIO.load(jta, file);
       if (fileMetaData.delimiter==null)
         fileMetaData.delimiter=defaultLineBreaker;
-      setTabsOrSpaces(
-        fileMetaData.hasTabs
-          ?TabAndIndentOptions.INDENT_TABS
-          :TabAndIndentOptions.INDENT_SPACES
-        );
+      if (taio.inferTabIndents)
+        setTabsOrSpaces(
+          fileMetaData.hasTabs
+            ?TabAndIndentOptions.INDENT_TABS
+            :TabAndIndentOptions.INDENT_SPACES
+          );
     } finally {
       jta.setSuppressUndo(false);
       jta.getDocument().addDocumentListener(docListener);

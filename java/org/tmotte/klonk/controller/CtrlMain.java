@@ -616,7 +616,7 @@ public class CtrlMain  {
   private boolean loadFile(Editor e, File file) {
     try {
       statusBar.show("Loading: "+file+"...");
-      e.loadFile(file, persist.getDefaultLineDelimiter());
+      e.loadFile(file, persist.getDefaultLineDelimiter(), persist.getTabAndIndentOptions());
       fileIsLoaded(e, file);
       checkDecryption(e);
       statusBar.showEncryption(e.getEncryption()!=null);
