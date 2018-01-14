@@ -1,5 +1,5 @@
 #!/bin/bash -e
-repo="argmatcher"
+repo="klonk"
 
 cd $(dirname $0)/..
 ant clean dist

@@ -523,7 +523,7 @@ public class Shell {
       }
     });
 
-    //Switch back (FIXME WHO KNEW?):
+    //Switch back (undocumented):
     Action switchAction=new AbstractAction() {
       public void actionPerformed(ActionEvent event) {switchBack();}
     };
