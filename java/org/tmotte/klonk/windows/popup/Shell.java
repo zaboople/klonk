@@ -27,8 +27,10 @@ import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
+
 
 public class Shell {
 
@@ -41,7 +43,7 @@ public class Shell {
   private boolean fastUndos;
   private Image icon;
   private Runnable fontSmallerLambda, fontBiggerLambda;
-  private CurrentOS currentOS;
+  private int tabSize;
 
   // Controls:
   private JFrame win;
@@ -63,6 +65,7 @@ public class Shell {
      KPersist persist,
      FileDialogWrapper fdw,
      Image icon,
+     int tabSize,
      Getter<String> currFileGetter
     ) {
     this.pInfo=pInfo;
@@ -72,14 +75,20 @@ public class Shell {
     this.icon=icon;
     this.currFileGetter=currFileGetter;
     this.fastUndos=persist.getFastUndos();
-    this.currentOS=pInfo.currentOS;
+    this.tabSize=tabSize;
     pInfo.addFontListener(fo -> setFont(fo));
-    pInfo.addFastUndoListener(tf -> setFastUndos(tf));
   }
   public void setFontListeners(Runnable fontSmallerLambda, Runnable fontBiggerLambda) {
     this.fontSmallerLambda=fontSmallerLambda;
     this.fontBiggerLambda=fontBiggerLambda;
   }
+  public Setter<TabAndIndentOptions> getTabIndentOptionListener() {
+    return (taio)->setTabs(taio.tabSize);
+  }
+  public Setter<Boolean> getFastUndoListener() {
+    return (tf)->setFastUndos(tf);
+  }
+
   public void show() {
     init();
     Positioner.set(pInfo.parentFrame, win, shownBefore || (win.getBounds().x>-1 && win.getBounds().y>-1));
@@ -127,6 +136,7 @@ public class Shell {
     this.fontOptions=f;
     if (win!=null) {
       f.getControlsFont().set(win);
+      mtaOutput.setFastUndos(fastUndos);
       mtaOutput.setFont(f.getFont());
       mtaOutput.setForeground(f.getColor());
       mtaOutput.setBackground(f.getBackgroundColor());
@@ -134,6 +144,11 @@ public class Shell {
       mtaOutput.setCaretWidth(f.getCaretWidth());
       win.pack();//To make rowcount work
     }
+  }
+  private void setTabs(int tabSize) {
+    this.tabSize=tabSize;
+    if (win!=null)
+      mtaOutput.setTabSize(tabSize);
   }
   private void setFastUndos(boolean tf) {
     this.fastUndos=tf;
@@ -345,18 +360,21 @@ public class Shell {
     btnStop.setMnemonic(KeyEvent.VK_S);
     btnStop.setFont(fontBold);
     btnStop.setEnabled(false);
-    int limit=persist.getShellLimit(1000000);
-    jspOutputLimit=new JSpinner(new SpinnerNumberModel(limit, 0, 1024*1024*1024, 1000));
 
-    mtaOutput=getMTA();
+    jspOutputLimit=new JSpinner(new SpinnerNumberModel(
+        persist.getShellLimit(1000000), 0, 1024*1024*1024, 1000
+      ));
+
+    mtaOutput=createMTA();
 
     btnClose    =new JButton(hStart+bStart+"Close"+bEnd+" (ESC)"+hEnd);
     btnClose.setMnemonic(KeyEvent.VK_C);
     btnSwitch   =new JButton(hStart+bStart+"Back to main window "+bEnd+"(Ctrl-B)"+hEnd);
     btnSwitch.setMnemonic(KeyEvent.VK_B);
   }
-  private MyTextArea getMTA(){
+  private MyTextArea createMTA(){
     MyTextArea mta=new MyTextArea(pInfo.currentOS);
+    mta.setTabSize(tabSize);
     mta.setLineWrap(true);
     mta.setWrapStyleWord(false);
     mta.setEditable(true);
@@ -545,12 +563,12 @@ public class Shell {
         e.consume();
       }
       else
-      if (code==e.VK_EQUALS && KeyMapper.modifierPressed(mods, currentOS)) {
+      if (code==e.VK_EQUALS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
         fontBiggerLambda.run();
         e.consume();
       }
       else
-      if (code==e.VK_MINUS && KeyMapper.modifierPressed(mods, currentOS)) {
+      if (code==e.VK_MINUS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
         fontSmallerLambda.run();
         e.consume();
       }
@@ -571,6 +589,7 @@ public class Shell {
           ptc.getPopupInfo(), ptc.getFontOptions(), ptc.getPersist(),
           new FileDialogWrapper(ptc.getPopupInfo()),
           ptc.getPopupIcon(),
+          4,
           new Getter<String>() {
             public String get() {return null;}
           }

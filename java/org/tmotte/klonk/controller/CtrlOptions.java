@@ -27,8 +27,6 @@ public class CtrlOptions {
   private TabAndIndentOptions taio;
   private FontOptions fontOptions;
   private SSHOptions sshOptions;
-  private LineDelimiterListener delimListener;
-  private List<Setter<FontOptions>> fontListeners;
   private LineDelimiters lineDelimiters;
   private SSHConnections sshConns;
 
@@ -37,9 +35,16 @@ public class CtrlOptions {
   private TabsAndIndents tabsAndIndents;
   private FontPicker fontPicker;
 
+  private LineDelimiterListener delimListener;
+  private List<Setter<FontOptions>> fontListeners;
+  private List<Setter<TabAndIndentOptions>> tabIndentOptionListeners;
+
   public CtrlOptions(
       Editors editors, StatusUpdate statusBar, KPersist persist, CtrlFavorites ctrlFavorites,
-      LineDelimiterListener delimListener, List<Setter<FontOptions>> fontListeners, SSHConnections sshConns,
+      LineDelimiterListener delimListener,
+      List<Setter<FontOptions>> fontListeners,
+      List<Setter<TabAndIndentOptions>> tabIndentOptionListeners,
+      SSHConnections sshConns,
       SSHOptionPicker sshOptionPicker, TabsAndIndents tabsAndIndents,
       Favorites favorites, FontPicker fontPicker, LineDelimiters lineDelimiters
     ) {
@@ -49,6 +54,7 @@ public class CtrlOptions {
     this.ctrlFavorites=ctrlFavorites;
     this.delimListener=delimListener;
     this.fontListeners=fontListeners;
+    this.tabIndentOptionListeners=tabIndentOptionListeners;
     this.sshConns=sshConns;
 
     this.sshOptionPicker=sshOptionPicker;
@@ -85,6 +91,8 @@ public class CtrlOptions {
       editors.getFirst().setTabsOrSpaces(taio.indentionMode);
       for (Editor e: editors.forEach())
         e.setTabAndIndentOptions(taio);
+      for (Setter<TabAndIndentOptions> setter: tabIndentOptionListeners)
+        setter.set(taio);
       persist.setTabAndIndentOptions(taio);
       persist.save();
       statusBar.show("Changes to tabs & indents saved");

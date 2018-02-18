@@ -36,10 +36,11 @@ import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
-import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
+import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.edit.MyTextArea;
 import org.tmotte.klonk.windows.Positioner;
 
@@ -70,12 +71,12 @@ public class FindAndReplace {
 
   //DI:
   private PopupInfo pInfo;
-  private FontOptions fontOptions;
   private Setter<String> alerter;
   private StatusUpdate statusBar;
-  private boolean fastUndos;
   private Runnable fontSmallerLambda, fontBiggerLambda;
-  private CurrentOS currentOS;
+  private boolean fastUndos;
+  private int tabSize;
+  private FontOptions fontOptions;
 
   //Display components:
   private JDialog win;
@@ -108,6 +109,7 @@ public class FindAndReplace {
       PopupInfo pInfo,
       FontOptions fontOptions,
       boolean fastUndos,
+      int tabSize,
       Setter<String> alerter,
       StatusUpdate statusBar
     ) {
@@ -116,14 +118,21 @@ public class FindAndReplace {
     this.statusBar=statusBar;
     this.alerter=alerter;
     this.fastUndos=fastUndos;
-    this.currentOS=pInfo.currentOS;
+    this.tabSize=tabSize;
     pInfo.addFontListener(fo -> setFont(fo));
-    pInfo.addFastUndoListener(tf -> setFastUndos(tf));
+  }
+  public Setter<TabAndIndentOptions> getTabIndentOptionListener() {
+    return (taio)->setTabs(taio.tabSize);
+  }
+  public Setter<Boolean> getFastUndoListener() {
+    return (tf)->setFastUndos(tf);
   }
   public void setFontListeners(Runnable fontSmallerLambda, Runnable fontBiggerLambda) {
     this.fontSmallerLambda=fontSmallerLambda;
     this.fontBiggerLambda=fontBiggerLambda;
   }
+
+
   public void doFind(MyTextArea target)    {doFind(target, false);}
   public void doReplace(MyTextArea target) {doFind(target, true);}
   public synchronized void repeatFindReplace(MyTextArea mta, boolean forwards) {
@@ -338,7 +347,8 @@ public class FindAndReplace {
   }
   private MyTextArea makeTextArea() {
     MyTextArea mta=new MyTextArea(pInfo.currentOS);
-    mta.setFastUndos(true);
+    mta.setTabSize(tabSize);
+    mta.setFastUndos(fastUndos);
     mta.setRows(3);//This doesn't work right because we set the font different.
     mta.setLineWrap(false);
     mta.setWrapStyleWord(false);
@@ -496,6 +506,13 @@ public class FindAndReplace {
       mtaReplace.setFastUndos(tf);
     }
   }
+  private void setTabs(int size) {
+    this.tabSize=size;
+    if (initialized) {
+      mtaFind.setTabSize(size);
+      mtaReplace.setTabSize(size);
+    }
+  }
 
 
   /////////////
@@ -582,7 +599,6 @@ public class FindAndReplace {
       final
         int code=e.getKeyCode(),
         mods=e.getModifiersEx();
-      System.out.println("FUCK "+code+" "+mods+" ");
       if (code==e.VK_TAB) {
         if (KeyMapper.ctrlPressed(mods))
           ((MyTextArea)e.getSource()).replaceSelection("	");
@@ -609,12 +625,12 @@ public class FindAndReplace {
         e.consume();
       }
       else
-      if (code==e.VK_EQUALS && KeyMapper.modifierPressed(mods, currentOS)) {
+      if (code==e.VK_EQUALS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
         fontBiggerLambda.run();
         e.consume();
       }
       else
-      if (code==e.VK_MINUS && KeyMapper.modifierPressed(mods, currentOS)) {
+      if (code==e.VK_MINUS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
         fontSmallerLambda.run();
         e.consume();
       }

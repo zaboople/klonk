@@ -237,14 +237,20 @@ public class BootContext {
     );
 
     //Search popups:
-    FindAndReplace findAndReplace=
-      new FindAndReplace(popupInfo, fontOptions, persist.getFastUndos(), alerter, statusBar);
+    FindAndReplace findAndReplace=new FindAndReplace(
+        popupInfo, fontOptions,
+        persist.getFastUndos(),
+        persist.getTabAndIndentOptions().tabSize,
+        alerter, statusBar
+      );
     GoToLine goToLine=new GoToLine(popupInfo, fontOptions, alerter);
 
     //Shell:
     Shell shell=new Shell(
       popupInfo, fontOptions, persist, fileDialogWrapper,
-      getPopupIcon(this), ctrlMain.getCurrFileNameGetter()
+      getPopupIcon(this),
+      persist.getTabAndIndentOptions().tabSize,
+      ctrlMain.getCurrFileNameGetter()
     );
 
     //Various option popups:
@@ -276,14 +282,23 @@ public class BootContext {
       );
       CtrlOptions ctrlOptions=new CtrlOptions  (
           editors, statusBar, persist, ctrlFavorites,
-          ctrlMain.getLineDelimiterListener(), popupInfo.getFontListeners(),
+          ctrlMain.getLineDelimiterListener(),
+          popupInfo.getFontListeners(),
+          java.util.Arrays.asList(
+            shell.getTabIndentOptionListener(),
+            findAndReplace.getTabIndentOptionListener()
+          ),
           sshConns, sshOptionPicker, tabsAndIndents, favorites, fontPicker, kDelims
         );
       menus.setControllers(
         ctrlMain
         ,new CtrlMarks(editors, statusBar, menus.getMarkStateListener())
         ,new CtrlSelection(editors, statusBar, alerter)
-        ,new CtrlUndo     (editors, popupInfo.getFastUndoListeners(), statusBar, yesNo, persist)
+        ,new CtrlUndo     (
+            editors,
+            java.util.Arrays.asList(shell.getFastUndoListener(), findAndReplace.getFastUndoListener()),
+            statusBar, yesNo, persist
+          )
         ,new CtrlSearch(editors, statusBar, findAndReplace, goToLine)
         ,new CtrlFileOther(editors, statusBar, ctrlFavorites, currentOS)
         ,new CtrlOther    (shell, help, about)
