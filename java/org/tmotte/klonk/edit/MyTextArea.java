@@ -843,23 +843,37 @@ public class MyTextArea extends JTextArea {
 
   private void doIndentOnHardReturn() {
     try {
-      Caret caret=getCaret();
-      int cpos=caret.getDot(), mark=caret.getMark();
-      int start=cpos<=mark ?cpos :mark,
-          end  =cpos<=mark ?mark :cpos;
-      if (start!=end)
-        setSelected(getText(start, end-start));
-      int row=getLineOfOffset(start);
-      int rowStart=getLineStartOffset(row);
-      String rowText=getText(rowStart, start-rowStart);
-      int rowLen=rowText.length();
-      StringBuilder newText=new StringBuilder(rowText.length());
-      newText.append("\n");
-      int i=0;
-      char t=tabsNotSpaces ?'	' :' ';
-      while (i<rowLen && rowText.charAt(i++)==t)
-        newText.append(t);
-      replaceRange(newText.toString(), start, end);
+
+      // Get start & end of selection; and get previous row's text:
+      final int startSel, endSel;
+      final String prevRowText;
+      {
+        Caret caret=getCaret();
+        int cpos=caret.getDot(), mark=caret.getMark();
+        startSel=cpos<=mark ?cpos :mark;
+        endSel  =cpos<=mark ?mark :cpos;
+        int rowStart=getLineStartOffset(getLineOfOffset(startSel));
+        prevRowText=getText(rowStart, startSel-rowStart);
+      }
+
+      // Selected text will be removed, so record it:
+      if (startSel!=endSel)
+        setSelected(getText(startSel, endSel-startSel));
+
+      // Build up indention text based on previous row's indent:
+      int prevLen=prevRowText.length();
+      StringBuilder newText=new StringBuilder(prevRowText.length());
+      for (int i=0; i<prevLen; i++) {
+        char c=prevRowText.charAt(i);
+        if (c=='\t' || c==' ')
+          newText.append(c);
+        else
+          break;
+      }
+
+      // New line goes at beginning; then we're done, replace:
+      newText.insert(0, "\n");
+      replaceRange(newText.toString(), startSel, endSel);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
