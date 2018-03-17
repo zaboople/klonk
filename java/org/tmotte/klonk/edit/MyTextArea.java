@@ -721,12 +721,12 @@ public class MyTextArea extends JTextArea {
 
   private void doIndent(boolean remove, int indentLen) {
     try {
-      Caret caret=getCaret();
 
       //Determine current selection, forwards or backwards:
       boolean forwards;
       int startSel, endSel;
       {
+        Caret caret=getCaret();
         final int cpos=caret.getDot(),
                   mark=caret.getMark();
         forwards=cpos>=mark;
