@@ -719,6 +719,8 @@ public class MyTextArea extends JTextArea {
   // TAB INDENTS: //
   //////////////////
 
+  private Indenter indenter=new Indenter();
+
   private void doIndent(boolean remove, int indentLen) {
     try {
 
