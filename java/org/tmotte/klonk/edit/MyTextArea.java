@@ -763,54 +763,49 @@ public class MyTextArea extends JTextArea {
       );
       boolean anyChange=false;
       int veryLastRow=getLineCount()-1;
+      boolean singleLine=firstRow==lastRow;
       for (int r=firstRow; r<=lastRow; r++){
         int sp=getLineStartOffset(r),
             ep=getLineEndOffset(r);//;
-        String lineStr=getText(sp, ep-sp);
-        int eolFactor=(r==veryLastRow ?0 :1);
+        final int eolFactor=(r==veryLastRow ?0 :1);
+        String originalLine=getText(sp, ep-sp);
+
 
         //For partially indented lines, we need to know that:
-        int spaceCount=getIndentCount(lineStr, tabsNotSpaces);
+        int spaceCount=getIndentCount(originalLine, tabsNotSpaces);
         int actualLen=tabsNotSpaces ?1 :getTabOffBy(spaceCount, indentLen);
         boolean lenMismatch=actualLen!=indentLen;
 
+        StringBuilder lineBuffer=new StringBuilder(originalLine);
         if (remove) {
-          if (lineStr.startsWith(indentStr) || lenMismatch){
+          if (originalLine.startsWith(indentStr) || lenMismatch){
             if (lenMismatch)
               actualLen=indentLen-actualLen;
             anyChange=true;
-            lineStr=lineStr.substring(actualLen);
-            if (r==firstRow && startSel!=sp) {
-              if (startSel<=sp+spaceCount)
-                startSel=sp+spaceCount-actualLen;
-              else
-                startSel-=actualLen;
-            }
-            endSel-=actualLen;
+            lineBuffer.delete(0, actualLen);
           }
         }
         else
-        if (!lenMismatch && firstRow==lastRow &&
-            spaceCount==lineStr.length()-eolFactor &&
-            startSel!=ep-eolFactor)
+        if (!lenMismatch && singleLine  && startSel!=ep-eolFactor && originalLine.trim().equals(""))
           //This catches the situation where it looks like you need to indent
           //but you actually have enough spaces already, just after the cursor.
           //So just move the cursor:
           setCaretPosition(ep-eolFactor);
         else {
           anyChange=true;
-          if (r==firstRow && (!anySel || startSel!=sp)) {
-            if (startSel<=sp+spaceCount)
-              //Moves cursor to end of indention area on single line indent
-              //where you're in the middle of the spaces:
-              startSel=sp+spaceCount+actualLen;
-            else
-              startSel+=actualLen;
-          }
-          endSel+=actualLen;
-          sb.append(lenMismatch ?indentStr.substring(0, actualLen) :indentStr);
+          lineBuffer.insert(0, lenMismatch ?indentStr.substring(0, actualLen) :indentStr);
         }
-        sb.append(lineStr);
+
+        int lenChange=lineBuffer.length()-originalLine.length();
+        endSel+=lenChange;
+        if (r==firstRow && (!anySel || startSel!=sp)) {
+          if (startSel<=sp+spaceCount)
+            //Moves cursor to end of indention area on single line indent
+            //where you're in the middle of the spaces:
+            startSel=sp+spaceCount;
+          startSel+=lenChange;
+        }
+        sb.append(lineBuffer);
       }
       if (anyChange) {
         betterReplaceRange(sb.toString(), startPos, endPos);
@@ -829,7 +824,7 @@ public class MyTextArea extends JTextArea {
       return increment-spaceCount;
     return increment-(spaceCount % increment);
   }
-  private static int getIndentCount(String lineStr, boolean isTabs) {
+  private static int getIndentCount(CharSequence lineStr, boolean isTabs) {
     int len=lineStr.length();
     int spaceCount=0;
     char check=isTabs ?'\t' :' ';
