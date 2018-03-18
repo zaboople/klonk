@@ -59,6 +59,7 @@ public class IndenterTest extends Indenter {
     tabSize=4;
     spaceIndentLen=2;
     testRepair("_TT_", "____----_");
+    testRepair("T___", "____---");
 
     if (true) return;
 

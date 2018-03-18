@@ -844,7 +844,7 @@ public class MyTextArea extends JTextArea {
 
       // New line goes at beginning; then we're done, replace:
       initIndenter(indentSpacesLen);
-      //indenter.repair(newText);
+      indenter.repair(newText);
       newText.insert(0, "\n");
       replaceRange(newText.toString(), startSel, endSel);
     } catch (Exception e) {
