@@ -1,9 +1,51 @@
 package org.tmotte.klonk.edit;
 public class IndenterTest extends Indenter {
+
   public static void main(String[] args) {
     IndenterTest test=new IndenterTest();
-    test.testRepair();
+    test.testIndent();
   }
+
+  private void testIndent() {
+    tabIndents=false;
+    tabSize=4;
+    spaceIndentLen=2;
+    testIndent("__T", "__----__", "____", false);
+    testIndent("____T", "____----__", "____--", false);
+    testIndent("_T", "____--", "__", false);
+    testIndent("", "__", "", false);
+    testIndent("_", "__", "", true);
+
+    tabSize=2;
+    spaceIndentLen=2;
+    testIndent("__T_*", "____--_*", "___*", false);//REALLY WRONG asterisk is gone
+
+  }
+
+  private void testIndent(String has, String expectIndent, String expectRemove, boolean fitToBlock) {
+    testIndent(has, expectIndent, false, fitToBlock);
+    testIndent(has, expectRemove, true, fitToBlock);
+  }
+
+  private void testIndent(String has, String expects, boolean remove, boolean fitToBlock) {
+    System.out.append("--------------\n")
+      .append("Had:  ").append(has).append("\n")
+      .append("Want: ").append(expects).append("\n");
+
+    has=toIndents(has);
+    expects=toIndents(expects);
+    init(has);
+    indent(remove, fitToBlock);
+    String indented=buffer.toString();
+
+    System.out.append("Got:->").append(indented).append("<-").append("\n");
+    if (anyChange==indented.equals(has))
+      throw new RuntimeException("Change mismatch: "+anyChange);
+    if (!indented.equals(expects))
+      throw new RuntimeException("Mismatch");
+  }
+
+
   private void testRepair() {
     tabIndents=false;
     tabSize=4;
@@ -38,10 +80,9 @@ public class IndenterTest extends Indenter {
       .append("Want: ").append(expects).append("\n");
     has=toIndents(has);
     expects=toIndents(expects);
-    String repaired=repair(has);
+    init(has);
+    String repaired=buffer.toString();
     System.out.append("Got:->").append(repaired).append("<-").append("\n");
-    if (viewLenExpect!= -1 && viewLen!=viewLenExpect)
-      throw new RuntimeException("View len mismatch; expect "+viewLenExpect+" got "+viewLen);
     if (anyChange==repaired.equals(has))
       throw new RuntimeException("Change mismatch: "+anyChange);
     if (!repaired.equals(expects))

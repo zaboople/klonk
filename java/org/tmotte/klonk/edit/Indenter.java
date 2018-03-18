@@ -7,63 +7,68 @@ public class Indenter {
   int spaceIndentLen=1;
 
   // State:
-  boolean anyChange=false;
-  int viewLen=0;
-  StringBuilder buffer;
-  int endPos;
-  int pastBlock;
+  private int startLen;
+
+  // Externally used state:
+  public StringBuilder buffer;
+  public boolean blank=true;
+  public boolean anyChange=false;
+  public int endPos;
+  public int pastBlock;
+  public int lenChange;
+
+
+  public void repair(StringBuilder lineStr) {
+    init(lineStr);
+  }
 
   public void init(String lineStr) {
+    init(new StringBuilder(lineStr));
+  }
+
+  public void init(StringBuilder buffer) {
+    this.buffer=buffer;
+    startLen=buffer.length();
+    blank=false;
     anyChange=false;
-    viewLen=0;
     endPos=-1;
     pastBlock=0;
+    lenChange=0;
 
     final int blockSize=tabIndents ?tabSize :spaceIndentLen;
-    buffer=new StringBuilder(lineStr);
     for (int i=0; i<buffer.length(); i++) {
       char c=buffer.charAt(i);
       if (c=='\t') {
-        if (pastBlock==0)
-          viewLen+=tabSize;
-        else
         if (tabIndents) {
-          anyChange=true;
-          buffer.delete(i-pastBlock, i);
-          i-=pastBlock;
-          viewLen=tabSize + viewLen - pastBlock;
-          pastBlock=0;
-        }
-        else {
+          if (pastBlock!=0) {
+            anyChange=true;
+            buffer.delete(i-pastBlock, i);
+            i-=pastBlock;
+            pastBlock=0;
+          }
+        } else {
           anyChange=true;
           buffer.deleteCharAt(i);
-          for (int j=0; j<blockSize-pastBlock; j++)
+          for (int j=0; j<tabSize-pastBlock; j++)
             buffer.insert(i, ' ');
-          viewLen++;
           pastBlock++;
         }
       }
       else
-      if (c==' ') {
-        viewLen++;
+      if (c==' ')
         pastBlock=(pastBlock==blockSize-1) ?0 :pastBlock+1;
-      }
       else {
         endPos=i;
         break;
       }
     }
-    if (endPos==-1)
+    if (endPos==-1) {
+      blank=true;
       endPos=buffer.length();
+    }
   }
 
-  public String repair(String lineStr) {
-    init(lineStr);
-    return buffer.toString();
-  }
-
-  public String indent(String lineStr, boolean remove, boolean fitToBlock) {
-    init(lineStr);
+  public void indent(boolean remove, boolean fitToBlock) {
     if (fitToBlock && pastBlock > 0) {
       if (remove)
         trimPastBlock();
@@ -74,23 +79,28 @@ public class Indenter {
           buffer.insert(endPos++, '\t');
         }
         else
-          while (pastBlock-- < blockSize)
+          while (pastBlock++ < blockSize)
             buffer.insert(endPos++, ' ');
       }
+      anyChange=true;
     }
     else
     if (remove) {
-      if (tabIndents) {
-        if (buffer.charAt(0)==' ')
-          deleteFirstChars(tabSize);
+      if (buffer.length()>0) {
+        if (tabIndents) {
+          if (buffer.charAt(0)==' ')
+            deleteFirstChars(tabSize);
+          else
+          if (buffer.charAt(0)=='\t')
+            deleteFirstChar();
+        }
         else
+        if (buffer.charAt(0)=='\t')
           deleteFirstChar();
+        else
+        if (buffer.charAt(0)==' ')
+          deleteFirstChars(spaceIndentLen);
       }
-      else
-      if (buffer.charAt(0)=='\t')
-        deleteFirstChar();
-      else
-        deleteFirstChars(spaceIndentLen);
     }
     else
     if (tabIndents)
@@ -98,23 +108,27 @@ public class Indenter {
     else
       for (int i=0; i<spaceIndentLen; i++)
         insertFirstChar(' ');
-    return buffer.toString();
+    lenChange=buffer.length()-startLen;
   }
 
   private void insertFirstChar(char c) {
     buffer.insert(0, c);
     endPos++;
+    anyChange=true;
   }
   private void deleteFirstChar() {
     buffer.deleteCharAt(0);
     endPos--;
+    anyChange=true;
   }
   private void deleteFirstChars(int len) {
     buffer.delete(0, len);
     endPos-=len;
+    anyChange=true;
   }
   private void trimPastBlock() {
     buffer.delete(endPos-pastBlock, endPos);
     endPos-=pastBlock;
+    anyChange=true;
   }
 }
