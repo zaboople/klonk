@@ -44,15 +44,16 @@ public class Indenter {
             anyChange=true;
             buffer.delete(i-pastBlock, i);
             i-=pastBlock;
-            pastBlock=0;
           }
         } else {
           anyChange=true;
           buffer.deleteCharAt(i);
-          for (int j=0; j<tabSize-pastBlock; j++)
+          final int need=tabSize-pastBlock;
+          for (int j=0; j<need; j++)
             buffer.insert(i, ' ');
-          pastBlock++;
+          i+=need-1;
         }
+        pastBlock=0;
       }
       else
       if (c==' ')

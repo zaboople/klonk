@@ -4,6 +4,7 @@ public class IndenterTest extends Indenter {
   public static void main(String[] args) {
     IndenterTest test=new IndenterTest();
     test.testIndent();
+    test.testRepair();
   }
 
   private void testIndent() {
@@ -48,10 +49,18 @@ public class IndenterTest extends Indenter {
 
   private void testRepair() {
     tabIndents=false;
+    tabSize=2;
+    spaceIndentLen=2;
+    testRepair("_TT_", "_____");
+    testRepair("T__T", "______");
+    testRepair("_T", "__");
+
+    tabIndents=false;
     tabSize=4;
     spaceIndentLen=2;
-    testRepair("__T", "__T", 6);
-    testRepair("_T", "__", 2);
+    testRepair("_TT_", "____----_");
+
+    if (true) return;
 
     tabIndents=false;
     tabSize=4;
