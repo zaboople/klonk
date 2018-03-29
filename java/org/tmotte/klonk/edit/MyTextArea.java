@@ -775,6 +775,8 @@ public class MyTextArea extends JTextArea {
             ep=getLineEndOffset(r);//;
         final int eolFactor=(r==veryLastRow ?0 :1);
 
+        //System.out.println("DEBUG startSel "+startSel+" endSel "+endSel+" sp "+sp+" ep "+ep
+        //  +" eolFactor "+eolFactor+" r "+r+" firstRow "+firstRow+" remove "+remove+" singleLine "+singleLine);
         {
           indenter.init(getText(sp, ep-sp));
           fitToBlock|= r==firstRow && indenter.pastBlock > 0;
@@ -787,8 +789,6 @@ public class MyTextArea extends JTextArea {
             indenter.indent(remove, fitToBlock);
         }
 
-        //System.out.println("DEBUG startSel "+startSel+" endSel "+endSel
-        //  +" sp "+sp+" ep "+ep+" endpos "+indenter.endPos+" eolFactor "+eolFactor);
         endSel+=indenter.lenChange;
         if (r==firstRow && (indenter.blank || !remove || startSel!=sp)) {
           if (startSel<sp + indenter.endPos)
@@ -875,7 +875,6 @@ public class MyTextArea extends JTextArea {
     }
   }
   private void setSelected(String text) {
-    //System.out.println("SELECTED: "+text+"<");
     preUndoSelected=text;
   }
 

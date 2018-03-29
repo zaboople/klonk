@@ -38,7 +38,6 @@ public class Indenter {
     final int blockSize=tabIndents ?tabSize :spaceIndentLen;
     for (int i=0; i<buffer.length(); i++) {
       char c=buffer.charAt(i);
-      System.out.println("CHAR ->"+c+"<-");
       if (c=='\t') {
         if (tabIndents) {
           if (pastBlock!=0) {
@@ -47,7 +46,6 @@ public class Indenter {
             i-=pastBlock;
           }
         } else {
-          System.out.println("YANK TAB");
           anyChange=true;
           buffer.deleteCharAt(i);
           final int need=tabSize-pastBlock;
@@ -61,6 +59,7 @@ public class Indenter {
       if (c==' ')
         pastBlock=(pastBlock==blockSize-1) ?0 :pastBlock+1;
       else {
+        blank=c == '\n';
         endPos=i;
         break;
       }
