@@ -2,7 +2,6 @@ package org.tmotte.klonk.ssh.test;
 import org.tmotte.klonk.ssh.SSHCommandLine;
 import org.tmotte.klonk.ssh.SSHFile;
 import org.tmotte.klonk.ssh.SSHConnections;
-import org.tmotte.common.text.ArgHandler;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -15,7 +14,7 @@ public class FileSave {
     SSHCommandLine cmd=new SSHCommandLine(args);
     SSHFile file=cmd.sshFile;
     try {
-      char[] readBuffer=new char[1024 * 20];   
+      char[] readBuffer=new char[1024 * 20];
       for (int limit=1; limit<10; limit++){
         try (
           OutputStream output=file.getOutputStream();
@@ -31,12 +30,12 @@ public class FileSave {
               outw.append("\n");
           }
         }
-        System.out.println("File written");    
-    
+        System.out.println("File written");
+
         try (
             InputStream istrm=file.getInputStream();
             InputStreamReader istr=new InputStreamReader(istrm, "utf-8");
-          ) {     
+          ) {
           int charsRead=0;
           while ((charsRead=istr.read(readBuffer, 0, readBuffer.length))>0){
             String s=new String(readBuffer, 0, charsRead);
@@ -49,7 +48,7 @@ public class FileSave {
       }
       file.delete();
     } finally {
-      cmd.connections.close();    
+      cmd.connections.close();
     }
   }
 }

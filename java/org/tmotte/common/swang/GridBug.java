@@ -1,5 +1,5 @@
 package org.tmotte.common.swang;
-import javax.swing.BorderFactory;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -8,7 +8,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
-import java.awt.Window;
 
 /**
  * Use gridwidth and gridheight to make a component span extra columns/rows

@@ -1,7 +1,6 @@
 package org.tmotte.klonk.ssh.test;
 import org.tmotte.klonk.ssh.SSHCommandLine;
 import org.tmotte.klonk.ssh.SSHConnections;
-import org.tmotte.common.text.ArgHandler;
 import java.io.File;
 
 public class FileListing {
@@ -12,21 +11,21 @@ public class FileListing {
       mylog(file);
       System.out.println("Children...");
       for (File f: file.listFiles())
-        mylog(f); 
+        mylog(f);
       /*
-      while ((file=file.getParentFile())!=null) {    
+      while ((file=file.getParentFile())!=null) {
         System.out.println("Parent:");
         mylog(file);
         for (File f: file.listFiles()){
           System.out.println("Child:");
-          mylog(f); 
+          mylog(f);
         }
       }
       */
     } finally {
       cmd.connections.close();
     }
-  }  
+  }
   private static void mylog(File f) {
     long last=f.lastModified();
     System.out.println(

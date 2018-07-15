@@ -13,13 +13,18 @@ import org.tmotte.common.text.ArgHandler;
 
 public class SSHCommandLine {
 
+  public interface ArgHandler {
+    /** Return a new index, or -1 to indicate nothing found */
+    public int handle(String[] args, int currIndex);
+    public String document();
+  }
   public SSH ssh;
   public SSHConnections connections;
   public SSHFile sshFile;
 
-  private ArgHandler argHandler; 
-  
-  public SSHCommandLine(String[] args) throws Exception {  
+  private ArgHandler argHandler;
+
+  public SSHCommandLine(String[] args) throws Exception {
     this(args, null);
   }
   public SSHCommandLine(String[] args, ArgHandler argHandler) throws Exception {
@@ -64,7 +69,7 @@ public class SSHCommandLine {
     SSHOptions opts=new SSHOptions();
     opts.setKnownHostsFilename(knownHosts);
     opts.setPrivateKeysFilename(privateKeys);
-    this.connections= 
+    this.connections=
       new SSHConnections(new UserNotify(System.out))
         .withOptions(opts)
         .withLogin(new Login(user, pass));
@@ -73,7 +78,7 @@ public class SSHCommandLine {
     if (fileName != null)
       sshFile=connections.getSSHFile(fileName);
   }//process()
-  
+
 
   private void usage(String error) {
     if (error!=null)
@@ -84,11 +89,11 @@ public class SSHCommandLine {
     );
     System.exit(1);
   }
-  
+
   ////////////////////////
   // INTERACTIVE LOGIN: //
   ////////////////////////
-  
+
   private static class Login implements IUserPass {
     String user, pass;
     public Login(String user, String pass) {
@@ -98,31 +103,31 @@ public class SSHCommandLine {
     final BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
     public boolean get(String u, String host, boolean authFail, boolean needsPassword) {
       user=u;
-      if (user!=null && pass !=null) 
+      if (user!=null && pass !=null)
         return true;
       try {
         System.out.println("Host: "+host);
-        
+
         System.out.print("User: ");
-        if (user!=null && !user.trim().equals("")) 
+        if (user!=null && !user.trim().equals(""))
           System.out.print("<"+user+"> press enter to keep or: ");
         u=br.readLine().trim();
         if (!u.trim().equals(""))
           this.user=u;
-        
+
         System.out.print("Pass: ");
         String p=br.readLine().trim();
         if (p!=null && !p.trim().equals(""))
           this.pass=p;
-        
-        return user!=null && !user.trim().equals("") && 
+
+        return user!=null && !user.trim().equals("") &&
                pass!=null && !pass.trim().equals("");
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     }
     public String getUser(){return user;}
-    public String getPass(){return pass;}  
+    public String getPass(){return pass;}
   }
 
 }
