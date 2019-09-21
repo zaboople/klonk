@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.LinkedList;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.msg.UserNotify;
-import org.tmotte.common.text.ArgHandler;
 
 public class SSHCommandLine {
 
