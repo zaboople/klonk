@@ -66,8 +66,12 @@ public class EncryptionStream implements LightweightWriter {
     this.cipher = Cipher.getInstance(algorithm);
     cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(pass, keySize, algorithm));
     byte[] params = cipher.getParameters().getEncoded();
-    if (params.length != paramsLength)
-      throw new Exception("Cannot encrypt because params are wrong "+params.length);
+    // Note: After JDK 10 this length changed, because the algorithm changed, and it's only
+    // half-backwards compatible:
+    //   - JDK 13 can read JDK 10-encrypted files
+    //   - JDK 10 cannot read JDK 13-encrypted files :(
+    //if (params.length != paramsLength)
+    //  throw new Exception("Cannot encrypt because params are wrong "+params.length);
     writer
       .append(encryptionFlag).append("\n")
       .append(String.valueOf(keySize)).append("\n")
