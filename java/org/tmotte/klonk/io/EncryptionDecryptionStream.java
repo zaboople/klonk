@@ -23,10 +23,6 @@ public class EncryptionDecryptionStream {
       byte[] params=EncryptionStream.base64Decoder.decode(
         paramsBase64.toString().getBytes(EncryptionStream.utf8)
       );
-      if (params.length != EncryptionStream.paramsLength)
-        throw new Exception(
-          "Cannot decrypt because params are wrong: "+params.length+" != "+EncryptionStream.paramsLength
-        );
       algParams.init(params);
     }
     cipher=Cipher.getInstance(algorithm);
