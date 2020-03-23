@@ -13,7 +13,7 @@ public class Positioner {
   public static void set(Window parent, Window popup) {
     set(parent, popup, false);
   }
-  
+
   public static void set(Window parent, Window popup, boolean unless) {
 
     //Align to top right of window:
@@ -28,26 +28,31 @@ public class Positioner {
     fix(p);
     popup.setBounds(p);
   }
-  
+
   public static void fix(Rectangle windowPos) {
     Rectangle w=windowPos;
     Rectangle screen=getScreenBounds();
-        
-    boolean badX=w.x<screen.x || w.x>screen.width,
-            badY=w.y<screen.y || w.y>screen.height;
-    if (badX) w.x=screen.x;
+
+    // Keep in mind, on a dual display, screen.x will be negative; 0 will be
+    // left edge of right-hand display.
+    int rightEdge=screen.x+screen.width,
+      bottomEdge=screen.y+screen.height;
+
+    boolean badX=w.x<screen.x || w.x>rightEdge,
+            badY=w.y<screen.y || w.y>bottomEdge;
+    if (badX) w.x=screen.x+120;
     if (badY) w.y=screen.y;
 
-    boolean tooWide=w.x+w.width -screen.width  > screen.x,
-            tooTall=w.y+w.height-screen.height > screen.y;
-    if (tooWide) w.width =screen.width -w.x;
-    if (tooTall) w.height=screen.height-w.y;
+    boolean tooWide=w.x+w.width  > rightEdge,
+            tooTall=w.y+w.height > bottomEdge;
+    if (tooWide) w.width =rightEdge  - w.x;
+    if (tooTall) w.height=bottomEdge - w.y;
   }
-  
+
   private static Rectangle getScreenBounds() {
     Rectangle bds = new Rectangle();
-    for (GraphicsDevice gd: GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()) 
-      for (GraphicsConfiguration gc: gd.getConfigurations()) 
+    for (GraphicsDevice gd: GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices())
+      for (GraphicsConfiguration gc: gd.getConfigurations())
         bds=bds.union(gc.getBounds());
     return bds;
   }

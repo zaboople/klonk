@@ -10,9 +10,12 @@ class Selectable {
     strLetterCaps="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
    ,strLetterLow ="abcdefghijklmnopqrstuvwxyz"
    ,strNum       ="0123456789"
-   //Note: I considered matching single quotes, but it interferes with use of same as an apostrophe (it's what's that's)
-   ,strStartSection="<{[\""
-   ,strEndSection  =">}]\""
+   //  Disabled because it annoys me. A better option would be to wait until we have hopped
+   //  a good ways, come to a block of special chars, and then can say, hey, you know, we start hopping
+   //  from a double-quote, let's finish on a double quote instead of finishing on the parentheses after it.
+   //  You know?
+   //  ,strStartSection="<{[(\""
+   //  ,strEndSection  =">}])\""
    ,strWhite=new String(new char[]{TAB,SPACE})
    ;
   final static String strLetters=strLetterCaps+strLetterLow+strNum+strWhite+new String(new char[]{LINEFEED});
@@ -53,10 +56,10 @@ class Selectable {
     if (firstChar==LINEFEED) return getRight(startWith);
 
     //Now flip thru the possibilities:
-    int brack;
-    if (shift && startWith==1 && (brack=strStartSection.indexOf(firstChar))>-1)
-      return rightFinishBrack(startWith, firstChar, strEndSection.charAt(brack), 1);
-    else
+    // int brack;
+    // if (shift && startWith==1 && (brack=strStartSection.indexOf(firstChar))>-1)
+    //   return rightFinishBrack(startWith, firstChar, strEndSection.charAt(brack), 1);
+    // else
     if (strWhite.indexOf(firstChar)>-1)
       return rightJump(startWith, strWhite);
     else
@@ -148,10 +151,10 @@ class Selectable {
     if (firstChar==LINEFEED) return getLeft(startWith);
 
     //Start a bracket, end a bracket:
-    int brack;
-    if (shift && startWith==len-2 && (brack=strEndSection.indexOf(firstChar))>-1)
-      return leftFinishBrack(startWith, strStartSection.charAt(brack), firstChar, 1);
-    else
+    // int brack;
+    // if (shift && startWith==len-2 && (brack=strEndSection.indexOf(firstChar))>-1)
+    //   return leftFinishBrack(startWith, strStartSection.charAt(brack), firstChar, 1);
+    // else
     if (strLetterLow.indexOf(firstChar)!=-1)
       return leftFindLastLower(startWith);
     else

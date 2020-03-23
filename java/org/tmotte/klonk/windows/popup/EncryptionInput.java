@@ -102,7 +102,7 @@ public class EncryptionInput {
     chkPreservePass.setSelected(persist.getEncryptionPreservePass());
     showPass(persist.getEncryptionShowPass(), false);
     win.pack();
-    Positioner.set(pInfo.parentFrame, win, true);
+    Positioner.set(pInfo.parentFrame, win, false);
     if (jtfPass.isVisible())
       jtfPass.requestFocusInWindow();
     else

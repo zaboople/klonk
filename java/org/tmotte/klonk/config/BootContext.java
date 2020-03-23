@@ -199,7 +199,7 @@ public class BootContext {
     MainLayout layout=new MainLayout(popupInfo, fontOptions, ctrlMain.getAppCloseListener());
     layout.show(
       persist.getWindowBounds(
-        new java.awt.Rectangle(10, 10, 300, 300)
+        new java.awt.Rectangle(200, 100, 400, 300)
       ),
       persist.getWindowMaximized()
     );
