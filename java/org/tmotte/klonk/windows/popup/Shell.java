@@ -248,7 +248,7 @@ public class Shell {
       kill=true;
       try {
         if (process!=null)
-          process.destroy();
+          process.destroyForcibly();
       } catch (Exception e) {e.printStackTrace();}
     }
     @Override public Void doInBackground() {
