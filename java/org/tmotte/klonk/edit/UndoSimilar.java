@@ -7,10 +7,10 @@ public class UndoSimilar {
     char a=ass.charAt(0), b=bss.charAt(0);
     if (a==b) return true;
     final String[] possible={
-      Selectable.strLetterCaps+Selectable.strLetterLow 
-     ,Selectable.strNum+"/-.+*"       
-     ,Selectable.strStartSection+Selectable.strEndSection  
-     ,Selectable.strWhite
+      Selectable.strLetterCaps+Selectable.strLetterLow
+      ,Selectable.strNum+"/-.+*"
+      ,"<{[(\">}])"
+      ,Selectable.strWhite
     };
     return matches(a, b, possible);
   }
@@ -35,10 +35,10 @@ public class UndoSimilar {
     if (ba  &&  bb) return 1;
     else            return 2;
   }
-  
+
   public static void main(String[] args) throws Exception {
     String[] maybe={"abcdef", "ABCDEF", "12345", ")(*&^"};
     char a1=(char)System.in.read(), a2=(char)System.in.read();
     System.out.println(matches(""+a1, ""+a2));
   }
-} 
+}
