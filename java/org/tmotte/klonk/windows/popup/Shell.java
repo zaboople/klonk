@@ -189,13 +189,15 @@ public class Shell {
       names.add(lm.getElementAt(i));
     persist.setCommands(names);
   }
-  private void saveCommand(String cmd) {
-    int index=getIndexOf(cmd);
+  private void saveCommand(String newCmd) {
+    String currentlyShowing=getCommand();
+    int index=getIndexOf(newCmd);
     if (index!=-1)
       jcbPreviousData.removeElementAt(index);
-    jcbPreviousData.insertElementAt(cmd, 0);
+    jcbPreviousData.insertElementAt(newCmd, 0);
     jcbPrevious.setSelectedIndex(0);
     save(jcbPreviousData, persistedFiles);
+    jcbPrevious.getEditor().setItem(currentlyShowing);
   }
   private String getCommand() {
     return jcbPrevious.getEditor().getItem().toString();
