@@ -29,6 +29,7 @@
   <li><a href="#status">The Status Bar</a></li>
   <li><a href="#encryption">Encryption</a></li>
   <li><a href="#ssh">SSH</a></li>
+  <li><a href="#filefind">Find Files</a></li>
   <li><a href="#shutdown">Shutting Down Klonk</a></li>
   <li><a href="#keys">Other Shortcut Keys</a></li>
   <li><a href="#macos">Macintosh Quirks</a></li>
@@ -346,6 +347,17 @@ Host *
 </p>
 
 <p>Finally, note that Klonk uses the JCraft JSCH SSH library to gain SSH connectivity, so when diagnosing problems with SSH you may find it helpful to look for similar issues others have had with that library. </p>
+
+
+<h2><a name="filefind">Find Files</a></h2>
+<p>File find is case-insensitive (because most of the time you won't care), and you can open more than one file.
+
+<p>The "Find" box expression has two rules:
+
+<p>1. The standard wildcard "*" character can be used, as in "PersonNamed*.txt"
+<p>2. Any white space designates multiple expressions, so "abc hello*money def" will match file names that contain each of "abc", "hello*money" and "def", in any order.
+
+<p>The "Exclude" box is almost exactly the same, except on rule 2 it's <i>any</i> instead of <i>all</i>, i.e. "/.git/ /build/" will skip files in both the ".git" and "build" directories.
 
 <h2><a name="shutdown">Shutting Down Klonk</a></h2>
 

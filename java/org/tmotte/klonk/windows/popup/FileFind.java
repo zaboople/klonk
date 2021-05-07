@@ -45,6 +45,7 @@ public class FileFind {
   private JList<String> jlFiles;
   private DefaultListModel<String> lmFiles;
   private JTextField jtfFind;
+  private JTextField jtfExclude;
   private JLabel lblError;
   private JComboBox<String> jcbDir;
 
@@ -182,24 +183,32 @@ public class FileFind {
     if (currentFileFinder!=null) {
       currentFileFinder.stop=true;
     }
-    currentFileFinder=new FileFinder(dir, jtfFind.getText());
+    currentFileFinder=new FileFinder(dir, jtfFind.getText(), jtfExclude.getText());
     currentFileFinder.execute();
   }
 
   private class FileFinder extends SwingWorker<List<String>, String> {
-    private String[][] parts;
+    private final String[][] findParts;
+    private final String[][] excludeParts;
+    private final File startDir;
+    private final boolean caseSensitive=false;
     private String basePath;
-    private File startDir;
-    private boolean caseSensitive=false;
     public volatile boolean stop=false;
-    public FileFinder(File startDir, String expr) {
-      if (!caseSensitive)
-        expr=expr.toLowerCase();
-      String[] pieces=expr.split(" ");
-      parts=new String[pieces.length][];
-      for (int i=0; i<pieces.length; i++)
-        parts[i]=pieces[i].split("\\*");
+    public FileFinder(File startDir, String expr, String exclude) {
+      if (!caseSensitive){
+        expr=expr.toLowerCase().trim();
+        exclude=exclude.toLowerCase().trim();
+      }
+      findParts=makeParts(expr);
+      excludeParts=exclude.equals("") ?null :makeParts(exclude);
       this.startDir=startDir;
+    }
+    private String[][] makeParts(String expr) {
+      String[] pieces=expr.split(" ");
+      String[][] result=new String[pieces.length][];
+      for (int i=0; i<pieces.length; i++)
+        result[i]=pieces[i].split("\\*");
+      return result;
     }
     public List<String> doInBackground() {
       try {
@@ -228,11 +237,15 @@ public class FileFind {
       String matchingDirName=caseSensitive ?dirName :dirName.toLowerCase();
       if (stop) return 0;
       for (File f: dir.listFiles())
-        if (f.isFile()){
+        if (f.isFile() && !stop){
           String matchingFileName=f.getName();
           if (!caseSensitive)
             matchingFileName=matchingFileName.toLowerCase();
-          if (matches(matchingDirName+matchingFileName)) {
+          final String toMatch=matchingDirName+matchingFileName;
+          final boolean matched=
+            matchesAll(toMatch, findParts) &&
+            (excludeParts==null || !matchesAny(toMatch, excludeParts));
+          if (matched) {
             String name=dirName+f.getName();
             publish(name);
             foundFileMap.put(name, f);
@@ -245,20 +258,29 @@ public class FileFind {
           return 0;
       return limit;
     }
-    private boolean matches(String filename) {
-      for (String[] sequence: parts) {
-        int index=0;
-        for (String name: sequence) {
-          index=filename.indexOf(name, index);
-          if (index==-1)
-            return false;
-          index+=name.length();
-        }
+    private boolean matchesAll(String filename, String[][] parts) {
+      for (String[] wildGroup: parts)
+        if (!matchInOrder(filename, wildGroup))
+          return false;
+      return true;
+    }
+    private boolean matchesAny(String filename, String[][] parts) {
+      for (String[] wildGroup: parts)
+        if (matchInOrder(filename, wildGroup))
+          return true;
+      return false;
+    }
+    private boolean matchInOrder(String filename, String[] pieces) {
+      int index=0;
+      for (String name: pieces) {
+        index=filename.indexOf(name, index);
+        if (index==-1)
+          return false;
+        index+=name.length();
       }
       return true;
     }
   }
-
 
 
   ///////////////////////////
@@ -289,6 +311,7 @@ public class FileFind {
     lblError=new JLabel("<html><b>Invalid directory</b></html>");
     lblError.setForeground(Color.RED);
     jtfFind=new JTextField();
+    jtfExclude=new JTextField();
     lmFiles=new DefaultListModel<>();
     jlFiles=new JList<>(lmFiles);
     jlFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -351,12 +374,26 @@ public class FileFind {
     gb.weightx=0.0;
     gb.insets.left=0;
     gb.insets.top=3;
-    gb.addY(new JLabel("Expression:"));
+    gb.addY(new JLabel("Find:"));
 
     gb.fill=gb.HORIZONTAL;
     gb.weightx=1;
     gb.insets.left=5;
     gb.addX(jtfFind);
+
+    // Exclude:
+    gb.gridx=1;
+    gb.fill=gb.NONE;
+    gb.gridwidth=1;
+    gb.weightx=0.0;
+    gb.insets.left=0;
+    gb.insets.top=3;
+    gb.addY(new JLabel("Exclude:"));
+
+    gb.fill=gb.HORIZONTAL;
+    gb.weightx=1;
+    gb.insets.left=5;
+    gb.addX(jtfExclude);
 
     return gb.container;
   }
@@ -386,15 +423,26 @@ public class FileFind {
   private void listen() {
 
     // Do search when file search box changes:
-    jtfFind.getDocument().addDocumentListener(new DocumentListener(){
+    DocumentListener docListen=new DocumentListener(){
       public void changedUpdate(DocumentEvent e){doSearch();}
       public void insertUpdate(DocumentEvent e){doSearch();}
       public void removeUpdate(DocumentEvent e){doSearch();}
-    });
+    };
+    jtfFind.getDocument().addDocumentListener(docListen);
+    jtfExclude.getDocument().addDocumentListener(docListen);
 
     // Down arrow from search box hops you to file-select;
     // Enter on search box clicks ok:
     jtfFind.addKeyListener(new KeyAdapter(){
+      public void keyReleased(KeyEvent k) {
+        if (k.getKeyCode()==KeyEvent.VK_DOWN)
+          jtfExclude.requestFocusInWindow();
+        else
+        if (k.getKeyCode()==KeyEvent.VK_ENTER && lmFiles.size()>0)
+          click(true);
+      }
+    });
+    jtfExclude.addKeyListener(new KeyAdapter(){
       public void keyReleased(KeyEvent k) {
         if (k.getKeyCode()==KeyEvent.VK_DOWN)
           jlFiles.requestFocusInWindow();

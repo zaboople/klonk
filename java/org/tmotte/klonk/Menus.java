@@ -467,7 +467,7 @@ public class Menus {
           :KeyMapper.key(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK)
       )
       ,fileCloseOthers=mu.doMenuItem(
-        "Close others",   fileListener, KeyEvent.VK_R
+        "Close others",   fileListener
       )
       ,fileCloseAll=mu.doMenuItem(
         "Close all",   fileListener, KeyEvent.VK_E
@@ -519,7 +519,7 @@ public class Menus {
     mu.add(
       file
       ,fileFind=mu.doMenuItem(
-          "Find file...", fileListener, KeyEvent.VK_L
+          "Find files...", fileListener, KeyEvent.VK_L
       )
       ,mu.add(
         fileOpenFrom
