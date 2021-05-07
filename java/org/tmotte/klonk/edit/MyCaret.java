@@ -2,6 +2,7 @@ package org.tmotte.klonk.edit;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -50,9 +51,15 @@ class MyCaret extends DefaultCaret {
 
     Rectangle r=null;
     try {
-      r=comp.modelToView(getDot());
-      if (r==null)
+      Rectangle2D r2=comp.modelToView2D(getDot());
+      if (r2==null)
         return;
+      r=new Rectangle(
+        (int)Math.round(r2.getX()),
+        (int)Math.round(r2.getY()),
+        (int)Math.round(r2.getWidth()),
+        (int)Math.round(r2.getHeight())
+      );
     } catch (BadLocationException e) {
       return;
     }

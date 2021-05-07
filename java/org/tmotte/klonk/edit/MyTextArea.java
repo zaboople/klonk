@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.util.HashSet;
@@ -114,9 +115,11 @@ public class MyTextArea extends JTextArea {
     //is an offset from the top of the text area, the other of course from top of the screen.
     //The latter, however, gets smaller (even negative) as you scroll down, whereas
     //the former gets larger.
-    java.awt.Rectangle caretPos=modelToView(getCaretPosition());
+    Rectangle2D caretPos=modelToView2D(getCaretPosition());
     Point mtaPos=getLocationOnScreen();
-    return new Point(caretPos.x+mtaPos.x, caretPos.y+mtaPos.y);
+    int cx=(int)caretPos.getX();
+    int cy=(int)caretPos.getY();
+    return new Point(cx+mtaPos.x, cy+mtaPos.y);
   }
   public void scrollCaretToMiddle(int caretPos) {
     doScrollIntoView(caretPos, caretPos);
@@ -631,8 +634,8 @@ public class MyTextArea extends JTextArea {
       int edgeLimit=editorHeight/3;
       int currTop=jsp.getViewport().getViewPosition().y;
       int currBottom=currTop+editorHeight;
-      int newCaretStartY=modelToView(newCaretStart).y,
-          newCaretEndY  =modelToView(newCaretEnd).y;
+      int newCaretStartY=(int)modelToView2D(newCaretStart).getY(),
+          newCaretEndY  =(int)modelToView2D(newCaretEnd).getY();
       int offFromBottom=currBottom-newCaretEndY,
           offFromTop   =newCaretStartY-currTop;
 

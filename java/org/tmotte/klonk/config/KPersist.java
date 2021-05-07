@@ -295,6 +295,12 @@ public class KPersist {
   public void setFavoriteDirs(List<String> dirs) {
     setFiles(dirs,  "File.Favorite.Dirs.",  maxFavorite);
   }
+  public void setSearchDirs(List<String> dirs) {
+    setFiles(dirs,  "File.Search.Dirs.",  maxRecent);
+  }
+  public void getSearchDirs(List<String> dirs) {
+    getFiles(dirs, "File.Search.Dirs.", maxRecent);
+  }
 
   public void setEncryptionShowPass(boolean yes) {
     setBoolean("Encryption.Show.Pass", yes);

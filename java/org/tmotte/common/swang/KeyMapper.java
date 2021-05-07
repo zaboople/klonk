@@ -1,6 +1,8 @@
 package org.tmotte.common.swang;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -17,6 +19,14 @@ public class KeyMapper {
   // ITSELF IS RETURNED FOR CONVENIENCE:                  //
   //////////////////////////////////////////////////////////
 
+  public static Action makeAction(ActionListener listener) {
+    return new AbstractAction() {
+      public void actionPerformed(ActionEvent event) {listener.actionPerformed(event);}
+    };
+  }
+  public static AbstractButton accel(AbstractButton jc, ActionListener listener, KeyStroke hotKey) {
+    return accel(jc, makeAction(listener), hotKey);
+  }
   public static AbstractButton accel(AbstractButton jc, Action action, KeyStroke hotKey) {
     String text=jc.getText();
     if (text.length()>20)
@@ -116,7 +126,7 @@ public class KeyMapper {
    * Gives us the menu shortcut key - ALT or COMMAND or whatever.
    */
   public static int shortcutByOS(){
-    return toolkit.getMenuShortcutKeyMask();
+    return toolkit.getMenuShortcutKeyMaskEx();
   }
   public static KeyStroke keyByOS(int hotKey) {
     return KeyStroke.getKeyStroke(hotKey, shortcutByOS());
@@ -139,7 +149,9 @@ public class KeyMapper {
       mod|=m;
     return key(hotKey, mod);
   }
-
+  public static void easyCancel(JButton btn, ActionListener action){
+    easyCancel(btn, makeAction(action));
+  }
   public static void easyCancel(JButton btn, Action action){
     KeyMapper.accel(btn, action, KeyMapper.key(KeyEvent.VK_ESCAPE));
     KeyMapper.accel(btn, action, KeyMapper.keyByOS(KeyEvent.VK_W));

@@ -48,13 +48,13 @@ public class MenuUtils {
   }
 
 
-  public static JMenuItem doMenuItem(String title, Action listener) {
+  public static JMenuItem doMenuItem(String title, ActionListener listener) {
     return doMenuItem(title, listener, -1, null);
   }
-  public static JMenuItem doMenuItem(String title, Action listener, int hotkey) {
+  public static JMenuItem doMenuItem(String title, ActionListener listener, int hotkey) {
     return doMenuItem(title, listener, hotkey, null);
   }
-  public static JMenuItem doMenuItem(String title, Action listener, int hotkey, KeyStroke ks) {
+  public static JMenuItem doMenuItem(String title, ActionListener listener, int hotkey, KeyStroke ks) {
     JMenuItem j=new JMenuItem(title);
     if (hotkey>-1)
       j.setMnemonic(hotkey);
@@ -72,10 +72,10 @@ public class MenuUtils {
   }
 
 
-  public static JCheckBoxMenuItem doMenuItemCheckbox(String title, Action listener) {
+  public static JCheckBoxMenuItem doMenuItemCheckbox(String title, ActionListener listener) {
     return doMenuItemCheckbox(title, listener, -1, true);
   }
-  public static JCheckBoxMenuItem doMenuItemCheckbox(String title, Action listener, int hotkey, boolean isOn) {
+  public static JCheckBoxMenuItem doMenuItemCheckbox(String title, ActionListener listener, int hotkey, boolean isOn) {
     JCheckBoxMenuItem j=new JCheckBoxMenuItem(title, true);
     if (hotkey>-1)
       j.setMnemonic(hotkey);

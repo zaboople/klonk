@@ -29,6 +29,7 @@ import org.tmotte.klonk.controller.Recents;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.ssh.IFileGet;
+import org.tmotte.klonk.windows.popup.FileFind;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.OpenFileList;
@@ -64,6 +65,7 @@ public class CtrlMain  {
   private MainDisplay layout;
   private SSHOpenFrom sshOpenFrom;
   private OpenFileList openFileList;
+  private FileFind pFileFind;
   private EncryptionInput encryptionInput;
   private CurrentOS currentOS;
 
@@ -100,6 +102,7 @@ public class CtrlMain  {
       FileDialogWrapper fileDialog,
       SSHOpenFrom sshOpenFrom,
       OpenFileList openFileList,
+      FileFind pFileFind,
       EncryptionInput encryptionInput,
       YesNoCancel yesNoCancel,
       YesNoCancel yesNo
@@ -109,6 +112,7 @@ public class CtrlMain  {
     this.fileDialog=fileDialog;
     this.sshOpenFrom=sshOpenFrom;
     this.openFileList=openFileList;
+    this.pFileFind=pFileFind;
     this.encryptionInput=encryptionInput;
     this.yesNoCancel=yesNoCancel;
     this.yesNo=yesNo;
@@ -258,6 +262,11 @@ public class CtrlMain  {
     }
     else
       statusBar.showBad("Encryption cancelled");
+  }
+  public void doFileFind() {
+    List<String> files=pFileFind.show();
+    if (files!=null)
+      loadFiles(files);
   }
 
   // FILE OPEN FROM: //

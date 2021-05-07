@@ -14,6 +14,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
+import javax.swing.event.ChangeEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -363,7 +364,7 @@ public class TabsAndIndents {
     btnCancel.addActionListener(cancelAction);
     KeyMapper.easyCancel(btnCancel, cancelAction);
 
-    jrbSpacesSizeCustom.addChangeListener((javax.swing.event.ChangeEvent e)->{
+    jrbSpacesSizeCustom.addChangeListener((ChangeEvent e)->{
         boolean custom=jrbSpacesSizeCustom.isSelected();
         jspSpacesSize.setEnabled(custom);
     });
@@ -387,8 +388,8 @@ public class TabsAndIndents {
         ti.indentionMode=ti.INDENT_TABS;
         ti.indentionModeDefault=ti.INDENT_SPACES;
         PopupTestContext ptc=new PopupTestContext();
-        new TabsAndIndents(ptc.getPopupInfo(), ptc.getFontOptions()).show(ti);
-        System.out.println(ti);
+        boolean ok=new TabsAndIndents(ptc.getPopupInfo(), ptc.getFontOptions()).show(ti);
+        System.out.println(ok+" "+ti);
       }
     });
   }
