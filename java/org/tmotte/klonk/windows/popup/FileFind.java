@@ -82,7 +82,6 @@ public class FileFind {
       currentFileFinder=null;
     }
     if (!ok) {
-      foundFileMap.clear();
       return null;
     }
     List<String> results=new ArrayList<>();
@@ -115,6 +114,7 @@ public class FileFind {
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
     ok=action;
+    persist.setFileFindExclude(jtfExclude.getText());
     persist.checkSave();
     win.setVisible(false);
   }
@@ -162,7 +162,7 @@ public class FileFind {
     int size=jcbDirData.getSize();
     for (int i=0; i<size; i++)
       persistedDirs.add(jcbDirData.getElementAt(i));
-    persist.setSearchDirs(persistedDirs);
+    persist.setFileFindDirs(persistedDirs);
   }
 
 
@@ -235,29 +235,27 @@ public class FileFind {
       if (!dirName.endsWith(File.separator))
         dirName+=File.separatorChar;
       String matchingDirName=caseSensitive ?dirName :dirName.toLowerCase();
-      if (stop) return 0;
-      for (File f: dir.listFiles())
-        if (f.isFile() && !stop){
-          String matchingFileName=f.getName();
-          if (!caseSensitive)
-            matchingFileName=matchingFileName.toLowerCase();
-          final String toMatch=matchingDirName+matchingFileName;
-          final boolean matched=
-            matchesAll(toMatch, findParts) &&
-            (excludeParts==null || !matchesAny(toMatch, excludeParts));
-          if (matched) {
-            String name=dirName+f.getName();
-            publish(name);
-            foundFileMap.put(name, f);
-            if (--limit == 0 || stop) return 0;
-          }
+      if (excludeParts!=null && matchesAny(matchingDirName, excludeParts))
+        return limit;
+      for (File f: dir.listFiles(File::isFile)) {
+        if (stop) return 0;
+        final String toMatch=matchingDirName+f.getName().toLowerCase();
+        final boolean matched=
+          matchesAll(toMatch, findParts) &&
+          (excludeParts==null || !matchesAny(toMatch, excludeParts));
+        if (matched) {
+          String name=dirName+f.getName();
+          publish(name);
+          foundFileMap.put(name, f);
+          if (--limit == 0) return 0;
         }
-      if (stop) return 0;
+      }
       for (File subdir: dir.listFiles(File::isDirectory))
         if (stop || (limit=find(subdir, limit))<=0)
           return 0;
       return limit;
     }
+
     private boolean matchesAll(String filename, String[][] parts) {
       for (String[] wildGroup: parts)
         if (!matchInOrder(filename, wildGroup))
@@ -299,7 +297,7 @@ public class FileFind {
     win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("Find file");
     persistedDirs=new ArrayList<>();
-    persist.getSearchDirs(persistedDirs);
+    persist.getFileFindDirs(persistedDirs);
     jcbDirData=new DefaultComboBoxModel<>();
     jcbDirData.removeAllElements();
     for (String f: persistedDirs)
@@ -312,6 +310,7 @@ public class FileFind {
     lblError.setForeground(Color.RED);
     jtfFind=new JTextField();
     jtfExclude=new JTextField();
+    jtfExclude.setText(persist.getFileFindExclude());
     lmFiles=new DefaultListModel<>();
     jlFiles=new JList<>(lmFiles);
     jlFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

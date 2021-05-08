@@ -295,11 +295,18 @@ public class KPersist {
   public void setFavoriteDirs(List<String> dirs) {
     setFiles(dirs,  "File.Favorite.Dirs.",  maxFavorite);
   }
-  public void setSearchDirs(List<String> dirs) {
-    setFiles(dirs,  "File.Search.Dirs.",  maxRecent);
+
+  public void setFileFindDirs(List<String> dirs) {
+    setFiles(dirs,  "File.Find.Dirs.",  maxRecent);
   }
-  public void getSearchDirs(List<String> dirs) {
-    getFiles(dirs, "File.Search.Dirs.", maxRecent);
+  public void getFileFindDirs(List<String> dirs) {
+    getFiles(dirs, "File.Find.Dirs.", maxRecent);
+  }
+  public void setFileFindExclude(String s) {
+    set("File.Find.Exclude", s);
+  }
+  public String getFileFindExclude() {
+    return get("File.Find.Exclude", "");
   }
 
   public void setEncryptionShowPass(boolean yes) {
