@@ -1,12 +1,7 @@
 - File delete
 - File rename/move
-- File save to / open from
-  -Find
-
-
 - Command window
   "find -help" gives java.lang.RuntimeException: You appear to be missing a trailing " character
-
 
 - File save as should that remove encryption?
 

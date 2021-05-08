@@ -73,6 +73,11 @@ public class FileFind {
 
     //Display:
     Point pt=pInfo.parentFrame.getLocation();
+    if (jcbDirData.getSize()>0) {
+      String dir=jcbDir.getEditor().getItem().toString();
+      if (dir!=null && !"".equals(dir))
+        doSearch();
+    }
     win.setLocation(pt.x+20, pt.y+20);//FIXME maintain position
     win.setVisible(true);
     win.paintAll(win.getGraphics());
@@ -420,6 +425,17 @@ public class FileFind {
 
 
   private void listen() {
+    // Trigger search when dir box changes:
+    jcbDir.addActionListener((ActionEvent event)-> dirBoxChanged());
+
+    // Show directory dialog:
+    btnDir.addActionListener((ActionEvent event)-> showDirDialog());
+    btnDir.addKeyListener(new KeyAdapter(){
+      public void keyReleased(KeyEvent k) {
+        if (k.getKeyCode()==KeyEvent.VK_DOWN)
+          jtfFind.requestFocusInWindow();
+      }
+    });
 
     // Do search when file search box changes:
     DocumentListener docListen=new DocumentListener(){
@@ -450,12 +466,6 @@ public class FileFind {
           click(true);
       }
     });
-
-    // Trigger search when dir box changes:
-    jcbDir.addActionListener((ActionEvent event)-> dirBoxChanged());
-
-    // Show directory dialog:
-    btnDir.addActionListener((ActionEvent event)-> showDirDialog());
 
     // Press enter in listbox clicks OK:
     jlFiles.addKeyListener(new KeyAdapter(){
