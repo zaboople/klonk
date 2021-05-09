@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -287,6 +287,9 @@ public class Shell {
             }
           }
         }
+      } catch (ShellCommandParser.Shex e) {
+        failed=true;
+        publish(e.getMessage());
       } catch (Exception e) {
         failed=true;
         publish(StackTracer.getStackTrace(e).replaceAll("\t", "    "));
@@ -324,7 +327,7 @@ public class Shell {
   private void create(){
     jcbPreviousData=new DefaultComboBoxModel<>();
     fontBold=new JLabel().getFont().deriveFont(Font.BOLD);
-    persistedFiles=new LinkedList<>();
+    persistedFiles=new ArrayList<>();
     persist.getCommands(persistedFiles);
 
     String hStart="<html><body>",

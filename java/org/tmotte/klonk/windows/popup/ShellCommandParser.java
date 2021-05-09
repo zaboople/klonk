@@ -1,7 +1,7 @@
 package org.tmotte.klonk.windows.popup;
 import java.util.List;
 import java.io.File;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 import org.tmotte.common.text.StringChunker;
 import org.tmotte.common.swang.CurrentOS;
@@ -9,11 +9,15 @@ import org.tmotte.common.swang.CurrentOS;
 class ShellCommandParser {
   static Pattern delimiterPattern=Pattern.compile("(\"|'|\\p{Blank})");
   static String currFileMarker="[$1]";
+
+  public static class Shex extends RuntimeException {
+    public Shex(String msg) {super(msg);}
+  }
   public static List<String> parse(String cmd) {
     return parse(cmd, null);
   }
   public static List<String> parse(String cmd, String currFileName) {
-    List<String> results=new LinkedList<>();
+    List<String> results=new ArrayList<>();
     if (referencesCurrFile(cmd) & currFileName!=null)
       cmd=cmd.replace(currFileMarker, currFileName);
 
@@ -24,8 +28,8 @@ class ShellCommandParser {
       return results;
     }
 
-    //See if we can parse out an actual command that has spaces in it, and parameters after that -
-    //because stupid people put programs in C:\Program Files:
+    //See if we can parse out an actual command that has spaces in it, and parameters
+    //after that - because stupid people put programs in C:\Program Files:
     StringChunker sc=new StringChunker(cmd);
     boolean foundProgram=false;
     String execute="";
@@ -45,8 +49,8 @@ class ShellCommandParser {
       return results;
     }
 
-    //OK then let's just assume the first blank ends the program, even the program doesn't seem to exist,
-    //like "ps -aux". Then everything else is an argument, isn't it:
+    //OK then let's just assume the first blank ends the program, even the program doesn't seem
+    //to exist, like "ps -aux". Then everything else is an argument, isn't it:
     sc.reset(cmd);
     results.add(sc.getUpTo(" "));
     return getProgramArguments(results, sc);
@@ -62,13 +66,13 @@ class ShellCommandParser {
       String found=sc.getFound();
       if (found.equals("\"")){
         if (!sc.find("\""))
-          throw new RuntimeException("You appear to be missing a trailing \" character");
+          throw new Shex("You appear to be missing a trailing \" character");
         results.add(sc.getUpTo());
       }
       else
       if (found.equals("'")){
         if (!sc.find("'"))
-          throw new RuntimeException("You appear to be missing a trailing ' character");
+          throw new Shex("You appear to be missing a trailing ' character");
         results.add(sc.getUpTo());
       }
       else {
