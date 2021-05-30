@@ -17,6 +17,7 @@ import org.tmotte.common.swang.Radios;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.option.FontOptions;
+import org.tmotte.klonk.windows.Positioner;
 
 public class FileFind {
   private final static int maxFiles=30;
@@ -68,17 +69,18 @@ public class FileFind {
   }
 
   public List<String> show() {
+    boolean needsPos=!initialized;
     init();
     ok=false;
 
     //Display:
-    Point pt=pInfo.parentFrame.getLocation();
     if (jcbDirData.getSize()>0) {
       String dir=jcbDir.getEditor().getItem().toString();
       if (dir!=null && !"".equals(dir))
         doSearch();
     }
-    win.setLocation(pt.x+20, pt.y+20);//FIXME maintain position
+    Point pt=pInfo.parentFrame.getLocation();
+    Positioner.set(pInfo.parentFrame, win, !needsPos);
     win.setVisible(true);
     win.paintAll(win.getGraphics());
     win.toFront();
@@ -89,6 +91,7 @@ public class FileFind {
     if (!ok) {
       return null;
     }
+    System.out.println("show() checking results: "+jlFiles.getSelectedValuesList());
     List<String> results=new ArrayList<>();
     for (String name: jlFiles.getSelectedValuesList()) {
       File file=foundFileMap.get(name);
@@ -99,6 +102,8 @@ public class FileFind {
           throw new RuntimeException("File exploded "+e, e);
         }
     }
+    saveDir();
+    persist.checkSave();
     return results;
   }
 
@@ -119,8 +124,8 @@ public class FileFind {
   /** action=true means OK, false means Cancel */
   private void click(boolean action) {
     ok=action;
+    System.out.println("Clicked: "+ok);
     persist.setFileFindExclude(jtfExclude.getText());
-    persist.checkSave();
     win.setVisible(false);
   }
 
@@ -137,26 +142,33 @@ public class FileFind {
         .setDirsOnly()
         .setApproveButton("Select")
     );
-    if (newDir!=null && newDir.exists() && newDir.isDirectory())
-      try {
-        saveDir(newDir.getCanonicalPath());
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+    if (newDir!=null && newDir.exists() && newDir.isDirectory()){
+      jcbDir.getEditor().setItem(newDir.toString());
+      saveDir();
+    }
   }
   private void dirBoxChanged() {
+    System.out.println("Dir box changed, kicking doSearch()");
     doSearch();
   }
-  private void saveDir(String newDir) {
-    if (newDir.trim().equals(""))
+  private void saveDir() {
+    String newDir=jcbDir.getEditor().getItem().toString();
+    System.out.println("\nSTARTING saveDir()"+newDir);
+    if (
+        newDir==null ||
+        newDir.trim().equals("") ||
+        !new File(newDir).exists()
+      )
       return;
     int index=-1;
     int len=jcbDirData.getSize();
-    for (int i=0; i<len && index==-1; i++)
-      if (jcbDirData.getElementAt(i).equals(newDir)){
+    for (int i=0; i<len && index==-1; i++){
+      System.out.println(jcbDirData.getElementAt(i));
+      if (jcbDirData.getElementAt(i).equals(newDir))
         index=i;
-        break;
-      }
+    }
+    if (index==0)
+      return;
     if (index!=-1)
       jcbDirData.removeElementAt(index);
     jcbDirData.insertElementAt(newDir, 0);
@@ -168,6 +180,7 @@ public class FileFind {
     for (int i=0; i<size; i++)
       persistedDirs.add(jcbDirData.getElementAt(i));
     persist.setFileFindDirs(persistedDirs);
+    newDir=null;
   }
 
 
@@ -176,12 +189,10 @@ public class FileFind {
     if (dirText.trim().equals(""))
       dirText=".";
     File dir=new File(dirText);
-    if (!dir.exists()) {
+    if (!dir.exists() || !dir.isDirectory()) {
       lblError.setVisible(true);
       return;
     }
-    if (!dirText.equals(".") && !persistedDirs.contains(dirText))
-      saveDir(dirText);
     lblError.setVisible(false);
     lmFiles.clear();
     foundFileMap.clear();
@@ -227,6 +238,7 @@ public class FileFind {
     public void process(List<String> names) {
       if (stop)
         return;
+      System.out.println("process search output: "+names);
       boolean wasEmpty=lmFiles.size()==0;
       for (String name: names)
         lmFiles.addElement(name);
@@ -431,7 +443,7 @@ public class FileFind {
     // Show directory dialog:
     btnDir.addActionListener((ActionEvent event)-> showDirDialog());
     btnDir.addKeyListener(new KeyAdapter(){
-      public void keyReleased(KeyEvent k) {
+      public @Override void keyReleased(KeyEvent k) {
         if (k.getKeyCode()==KeyEvent.VK_DOWN)
           jtfFind.requestFocusInWindow();
       }
@@ -439,9 +451,9 @@ public class FileFind {
 
     // Do search when file search box changes:
     DocumentListener docListen=new DocumentListener(){
-      public void changedUpdate(DocumentEvent e){doSearch();}
-      public void insertUpdate(DocumentEvent e){doSearch();}
-      public void removeUpdate(DocumentEvent e){doSearch();}
+      public @Override void changedUpdate(DocumentEvent e){doSearch();}
+      public @Override void insertUpdate(DocumentEvent e){doSearch();}
+      public @Override void removeUpdate(DocumentEvent e){doSearch();}
     };
     jtfFind.getDocument().addDocumentListener(docListen);
     jtfExclude.getDocument().addDocumentListener(docListen);
@@ -449,7 +461,7 @@ public class FileFind {
     // Down arrow from search box hops you to file-select;
     // Enter on search box clicks ok:
     jtfFind.addKeyListener(new KeyAdapter(){
-      public void keyReleased(KeyEvent k) {
+      public @Override void keyReleased(KeyEvent k) {
         if (k.getKeyCode()==KeyEvent.VK_DOWN)
           jtfExclude.requestFocusInWindow();
         else
@@ -458,7 +470,7 @@ public class FileFind {
       }
     });
     jtfExclude.addKeyListener(new KeyAdapter(){
-      public void keyReleased(KeyEvent k) {
+      public @Override void keyReleased(KeyEvent k) {
         if (k.getKeyCode()==KeyEvent.VK_DOWN)
           jlFiles.requestFocusInWindow();
         else
@@ -467,10 +479,16 @@ public class FileFind {
       }
     });
 
-    // Press enter in listbox clicks OK:
+    // Press enter in listbox or double-click signals OK:
     jlFiles.addKeyListener(new KeyAdapter(){
-      public void keyReleased(KeyEvent k) {
+      public @Override void keyReleased(KeyEvent k) {
         if (k.getKeyCode()==KeyEvent.VK_ENTER) click(true);
+      }
+    });
+    jlFiles.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+        if (e.getClickCount() == 2)
+          click(true);
       }
     });
 
