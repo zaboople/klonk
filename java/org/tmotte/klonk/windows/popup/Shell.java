@@ -13,8 +13,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
+import java.util.function.Supplier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import org.tmotte.common.swang.CurrentOS;
@@ -24,7 +26,6 @@ import org.tmotte.common.text.StackTracer;
 import org.tmotte.common.text.StringChunker;
 import org.tmotte.klonk.config.KPersist;
 import org.tmotte.klonk.config.PopupInfo;
-import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
@@ -39,7 +40,7 @@ public class Shell {
   private FontOptions fontOptions;
   private FileDialogWrapper fdw;
   private KPersist persist;
-  private Getter<String> currFileGetter;
+  private Supplier<String> currFileGetter;
   private boolean fastUndos;
   private Image icon;
   private Runnable fontSmallerLambda, fontBiggerLambda;
@@ -66,7 +67,7 @@ public class Shell {
      FileDialogWrapper fdw,
      Image icon,
      int tabSize,
-     Getter<String> currFileGetter
+     Supplier<String> currFileGetter
     ) {
     this.pInfo=pInfo;
     this.fontOptions=fontOptions;
@@ -595,9 +596,7 @@ public class Shell {
           new FileDialogWrapper(ptc.getPopupInfo()),
           ptc.getPopupIcon(),
           4,
-          new Getter<String>() {
-            public String get() {return null;}
-          }
+          ()->null
         );
         shell.show();
         //Won't work because previous command is not synchronous

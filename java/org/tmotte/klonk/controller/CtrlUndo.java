@@ -39,6 +39,14 @@ public class CtrlUndo {
     editors.getFirst().redoToEnd();
     status.show("Redone to end");
   }
+  public void undoToHistorySwitch() {
+    editors.getFirst().undoToHistorySwitch();
+    status.show("Undone to last history rewrite");
+  }
+  public void redoToHistorySwitch() {
+    editors.getFirst().redoToHistorySwitch();
+    status.show("Undone to last history rewrite");
+  }
   public void doUndoFast() {
     persist.setFastUndos(fastUndos=!fastUndos);
     persist.save();

@@ -11,16 +11,13 @@ public class UserNotify {
   private KLog klog;
   private Setter<String> alerter;
   private boolean ensureThreadSafeUI=false;
-  private Setter<Throwable> allPurposeExceptionHandler=new Setter<Throwable>(){
-    public void set(Throwable t) {
-      alert(t);
-    }      
-  };
+  private Setter<Throwable> allPurposeExceptionHandler=
+    (Throwable t) ->alert(t);
 
   ////////////////////////
   // CONSTRUCTION & DI: //
   ////////////////////////
-  
+
   public UserNotify(java.io.OutputStream out) {
     this(new KLog(out));
   }
@@ -38,11 +35,11 @@ public class UserNotify {
   public Setter<Throwable> getExceptionHandler(){
     return allPurposeExceptionHandler;
   }
-  
+
   //////////////
   // LOGGING: //
   //////////////
-  
+
   public void log(String s){
     klog.log(s);
   }
@@ -52,13 +49,13 @@ public class UserNotify {
   public void log(Throwable e, String s){
     klog.log(e, s);
   }
-  
+
   //////////////////
   // POPUP-ALERT: //
   //////////////////
-  
+
   public void alert(final String s) {
-    if (alerter==null) 
+    if (alerter==null)
       log("UserNotify: alerter is missing, message was: "+s);
     else
     if (ensureThreadSafeUI)
@@ -70,7 +67,7 @@ public class UserNotify {
     else
       alerter.set(s);
   }
-  public void alert(Throwable t, final String s) { 
+  public void alert(Throwable t, final String s) {
     log(t);
     alert(s+" (see log for details) "+t);
   }
@@ -78,5 +75,5 @@ public class UserNotify {
     log(e);
     alert("Internal error, see log for details: "+e.getMessage());
   }
-  
+
 }

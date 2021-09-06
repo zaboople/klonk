@@ -1,19 +1,17 @@
 package org.tmotte.klonk.edit;
-import java.util.Iterator;
-import java.util.List;
-import java.util.LinkedList;
+import java.util.*;
 
 
 final class Undo {
 
-  private LinkedList<UndoStep> undos=new LinkedList<UndoStep>(), 
-                               redos=new LinkedList<UndoStep>();
+  private ArrayDeque<UndoStep> undos=new ArrayDeque<UndoStep>(),
+                               redos=new ArrayDeque<UndoStep>();
   private UndoStep savedState;
 
   public Undo() {
     markSave();
   }
-  
+
   public void doAdd(int start, int len, String text, boolean doubleUp) {
     makeRedosUndos();
     undos.add(new UndoStep(UndoStep.ADD,    start, len, text, doubleUp, doubleUp));
@@ -27,15 +25,15 @@ final class Undo {
       //This will only be null when we invoke from the constructor.
       //This object is marked as "limbo" to indicate it means
       //nothing and is awaiting cleanup, which happens in getLast():
-      savedState.uType=savedState.LIMBO; 
+      savedState.uType=savedState.LIMBO;
     savedState=UndoStep.createSaveState();
     undos.add(savedState);
   }
-  
+
   public boolean isSavedState() {
     //Save state can be on either stack, doesn't matter.
     //If it's on either, we're at the saved state.
-    UndoStep us1=undos.size()==0 ?null :undos.getLast(), 
+    UndoStep us1=undos.size()==0 ?null :undos.getLast(),
              us2=redos.size()==0 ?null :redos.getLast();
     return (us1!=null && us1.uType==us1.MARK_SAVE)
            ||
@@ -56,7 +54,7 @@ final class Undo {
   ///////////
   // UNDO: //
   ///////////
-  
+
   public UndoStep doUndo() {
     return removeLast(undos, redos);
   }
@@ -69,7 +67,7 @@ final class Undo {
   public void clearUndos() {
     undos.clear();
   }
-  
+
 
   ///////////
   // REDO: //
@@ -91,8 +89,8 @@ final class Undo {
   ////////////////
   // INTERNALS: //
   ////////////////
-  
-  private static UndoStep removeLast(LinkedList<UndoStep> mainList, LinkedList<UndoStep> otherList) {
+
+  private static UndoStep removeLast(ArrayDeque<UndoStep> mainList, ArrayDeque<UndoStep> otherList) {
     if (mainList.size()==0)
       return null;
     UndoStep st=mainList.removeLast();
@@ -101,7 +99,7 @@ final class Undo {
     return st.isAddOrRemove() ?st :removeLast(mainList, otherList);
   }
 
-  private UndoStep getLast(LinkedList<UndoStep> mainList, LinkedList<UndoStep> otherList) {
+  private UndoStep getLast(ArrayDeque<UndoStep> mainList, ArrayDeque<UndoStep> otherList) {
 
     //Normal undos:
     if (mainList.size()==0)
@@ -109,7 +107,7 @@ final class Undo {
     UndoStep us=mainList.getLast();
     if (us.isAddOrRemove())
       return us;
-      
+
     //SAVE_STATE is pushed; skip LIMBO (by default).
     //Then recurse:
     mainList.removeLast();
@@ -127,7 +125,7 @@ final class Undo {
       undos.add(us);
     }
     UndoStep last=null, first=redos.size()==0 ?null :redos.getFirst();
-    if (first!=null) 
+    if (first!=null)
       first.doubleUpDone=true;
     for (Iterator<UndoStep> iter=redos.iterator(); iter.hasNext();){
       last=iter.next();

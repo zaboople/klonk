@@ -277,6 +277,12 @@ public class Editor {
   public void redoToEnd() {
     jta.redoToEnd();
   }
+  public void undoToHistorySwitch() {
+    jta.undoToHistorySwitch();
+  }
+  public void redoToHistorySwitch() {
+    jta.redoToHistorySwitch();
+  }
   public boolean hasUndos() {
     return jta.hasUndos();
   }
@@ -771,7 +777,7 @@ public class Editor {
         unsavedChanges=false;
         editListener.doEditorChanged(Editor.this);
       }
-      if ((ue.isNoMoreUndos || ue.isUndoSaveStable) && file==null && jta.getLineCount()==1 && "".equals(jta.getText())){
+      if ((ue.isNoMoreUndosError || ue.isUndoSaveStable) && file==null && jta.getLineCount()==1 && "".equals(jta.getText())){
         used=false;
       }
     }

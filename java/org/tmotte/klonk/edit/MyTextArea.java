@@ -99,16 +99,6 @@ public class MyTextArea extends JTextArea {
   public void setCaretWidth(int w) {
     myCaret.setMyWidth(w);
   }
-  public void undo(){
-    suppressUndoRecord=true;
-    startUndo();
-    suppressUndoRecord=false;
-  }
-  public void redo(){
-    suppressUndoRecord=true;
-    startRedo();
-    suppressUndoRecord=false;
-  }
 
   public Point getVisualCaretPosition() throws Exception {
     //Both of these offsets include the invisible part of the text area. The first
@@ -180,24 +170,36 @@ public class MyTextArea extends JTextArea {
   public void setSuppressUndo(boolean s) {
     suppressUndoRecord=s;
   }
+
+  public void undo(){
+    undoRedoOnce(true);
+  }
+  public void redo(){
+    undoRedoOnce(false);
+  }
   public boolean hasUndos() {
     return undos.hasUndos();
   }
   public boolean hasRedos() {
     return undos.hasRedos();
   }
-
   public void clearUndos() {
     undos.clearUndos();
   }
   public void clearRedos() {
     undos.clearRedos();
   }
+  public void undoToHistorySwitch() {
+    undoRedoToHistorySwitch(true);
+  }
+  public void redoToHistorySwitch() {
+    undoRedoToHistorySwitch(false);
+  }
   public void undoToBeginning() {
-    undoAll();
+    undoRedoAll(true);
   }
   public void redoToEnd() {
-    redoAll();
+    undoRedoAll(false);
   }
   public void reset() {
     setSuppressUndo(true);
@@ -407,7 +409,6 @@ public class MyTextArea extends JTextArea {
 
   private class MyKeyListener extends KeyAdapter {
     public void keyPressed(KeyEvent e){
-
       try {
         final int code=e.getKeyCode();
         int mods=e.getModifiersEx();
@@ -881,63 +882,69 @@ public class MyTextArea extends JTextArea {
     preUndoSelected=text;
   }
 
-  private void undoAll(){
+  private void undoRedoAll(boolean undoOrRedo) {
     suppressUndoRecord=true;
     UndoStep us;
-    while ((us=undos.doUndo())!=null)
-      while (!doUndoReplace(us, null, true)){}
-    suppressUndoRecord=false;
+    while ((
+            us=undoOrRedo ?undos.doUndo() :undos.doRedo()
+          )!=null)
+      while (!doUndoReplace(us, null, undoOrRedo)){}
     checkUnstable();
+    suppressUndoRecord=false;
   }
-  private void redoAll(){
+
+  private void undoRedoToHistorySwitch(boolean undoOrRedo) {
     suppressUndoRecord=true;
-    UndoStep us;
-    while ((us=undos.doRedo())!=null)
-      while (!doUndoReplace(us, null, false)){}
-    suppressUndoRecord=false;
+    boolean first=true;
+    boolean skipDoubleUp=false;
+    UndoStep step;
+    while ((
+            step=undoOrRedo ?undos.getUndo() :undos.getRedo()
+          )!=null) {
+      if (first) {
+        first=false;
+        skipDoubleUp=step.doubleUp;
+      }
+      if (step.doubleUp ^ skipDoubleUp)
+          break;
+      step=undoOrRedo ?undos.doUndo() :undos.doRedo();
+      while (!doUndoReplace(step, null, undoOrRedo)){}
+    }
     checkUnstable();
+    suppressUndoRecord=false;
   }
 
-
-  private void startUndo(){
+  private void undoRedoOnce(final boolean undoOrRedo) {
+    suppressUndoRecord=true;
     doubleUpCount=0;
     UndoStep st=null;
     do {
-      st=continueUndo(st);
-      if (st!=null)
-        undos.doUndo();
+      st=continueUndoRedoOnce(st, undoOrRedo);
+      if (st!=null) {
+        if (undoOrRedo)
+          undos.doUndo();
+        else
+          undos.doRedo();
+      }
     } while (st!=null && checkUnstableAndFast(st));
+    suppressUndoRecord=false;
   }
-  private UndoStep continueUndo(UndoStep old){
-    UndoStep st=undos.getUndo();
+  private UndoStep continueUndoRedoOnce(final UndoStep old, final boolean undoOrRedo){
+    UndoStep st=undoOrRedo ?undos.getUndo() :undos.getRedo();
     boolean did=false;
     if (st==null){
-      if (old==null) fireUndoEvent(new UndoEvent().setNoMoreUndos());
+      if (old==null)
+        fireUndoEvent(
+          undoOrRedo
+            ?new UndoEvent().setNoMoreUndosError()
+            :new UndoEvent().setNoMoreRedosError()
+        );
     }
     else
-      did=doUndoReplace(st, old, true);
+      did=doUndoReplace(st, old, undoOrRedo);
     return did ?st :null;
   }
 
-  private void startRedo(){
-    doubleUpCount=0;
-    UndoStep st=null;
-    do {
-      st=continueRedo(st);
-      if (st!=null)
-        undos.doRedo();
-    } while (st!=null && checkUnstableAndFast(st));
-  }
-  private UndoStep continueRedo(UndoStep old){
-    UndoStep st=undos.getRedo();
-    boolean did=false;
-    if (st==null){
-      if (old==null) fireUndoEvent(new UndoEvent().setNoMoreRedos());
-    }
-    else
-      did=doUndoReplace(st, old, false);
-    return did ?st :null;
-  }
 
 
   private boolean checkUnstableAndFast(UndoStep newStep) {
@@ -953,7 +960,7 @@ public class MyTextArea extends JTextArea {
     return true;
   }
 
-
+  /** The "old" parameter is so we can decide whether we've gone fast enough. */
   private boolean doUndoReplace(UndoStep st, UndoStep old, boolean undoOrRedo) {
     doubleUndo=st.doubleUp && old!=null && old.doubleUp && (!st.doubleUpDone || doubleUpCount<1);
     if (doubleUndo)

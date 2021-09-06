@@ -7,9 +7,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import org.tmotte.klonk.config.KHome;
-import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Setter;
-import org.tmotte.klonk.config.msg.Getter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
@@ -83,7 +81,7 @@ public class FileListenMemoryMap implements LockInterface {
   public void startListener(Setter<List<String>> fileReceiver) {
     startListener(waitBetween, fileReceiver);
   }
-  public Doer getLockRemover(){
+  public Runnable getLockRemover(){
     return () -> locker.unlock();
   }
 

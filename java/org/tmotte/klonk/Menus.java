@@ -23,7 +23,6 @@ import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.msg.Editors;
-import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.controller.CtrlMain;
@@ -78,7 +77,8 @@ public class Menus {
     switchBackToFront, switchFrontToBack, switchNextUnsaved, pSwitchNextUnsaved,
     markSet, markGoToPrevious, markGoToNext, markClearCurrent, markClearAll,
     undoUndo, undoRedo,
-      undoToBeginning, undoRedoToEnd, undoClearUndos, undoClearRedos, undoClearBoth,
+      undoToBeginning, undoRedoToEnd, undoToHistorySwitch, redoToHistorySwitch,
+      undoClearUndos, undoClearRedos, undoClearBoth,
     selectUpperCase, selectLowerCase, selectSortLines, selectGetSelectionSize,  selectGetAsciiValues,
     weirdInsertToAlign, weirdInsertToAlignBelow, weirdBackspaceToAlign, weirdBackspaceToAlignBelow,
       weirdAlignOneRight, weirdAlignOneLeft,
@@ -153,7 +153,7 @@ public class Menus {
     if (extraPopups)
       osxAttachPopupsTo=pnlEditor;
   }
-  public Doer getEditorSwitchListener() {
+  public Runnable getEditorSwitchListener() {
     return () -> editorChange();
   }
   public Setter<List<String>> getRecentFileListener() {
@@ -730,6 +730,14 @@ public class Menus {
         "Redo to end", undoItemListener, KeyEvent.VK_T,
         KeyMapper.key(KeyEvent.VK_F12, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
+      ,
+      undoToHistorySwitch=mu.doMenuItem(
+        "Undo to history switch", undoItemListener, KeyEvent.VK_H
+      )
+      ,
+      redoToHistorySwitch=mu.doMenuItem(
+        "Redo to history switch", undoItemListener, KeyEvent.VK_I
+      )
     );
     undo.addSeparator();
     undo.add(
@@ -1006,12 +1014,21 @@ public class Menus {
       .add(markClearCurrent, ()->ctrlMarks.doMarkClearCurrent())
       .add(markClearAll,     ()->ctrlMarks.doMarkClearAll())
       ;
+    undo.addMenuListener(new MenuListener(){
+      public void menuCanceled(MenuEvent e){}
+      public void menuDeselected(MenuEvent e){}
+      public void menuSelected(MenuEvent e){
+        enableDisableUndoRedo();
+      }
+    });
     undoListenerMap
       .add(undoUndo,        ()->ctrlUndo.doUndo())
       .add(undoRedo,        ()->ctrlUndo.doRedo())
       .add(undoFast,        ()->ctrlUndo.doUndoFast())
       .add(undoToBeginning, ()->ctrlUndo.doUndoToBeginning())
       .add(undoRedoToEnd,   ()->ctrlUndo.doRedoToEnd())
+      .add(undoToHistorySwitch, ()->ctrlUndo.undoToHistorySwitch())
+      .add(redoToHistorySwitch, ()->ctrlUndo.redoToHistorySwitch())
       .add(undoClearUndos,  ()->ctrlUndo.doClearUndos())
       .add(undoClearRedos,  ()->ctrlUndo.doClearRedos())
       .add(undoClearBoth,   ()->ctrlUndo.doClearUndosAndRedos())
@@ -1140,6 +1157,22 @@ public class Menus {
   //////////////////////////////////
   // REAL-TIME ON-SHOW LISTENERS: //
   //////////////////////////////////
+  private void enableDisableUndoRedo() {
+    final boolean
+      hasRedos=editors.getFirst().hasRedos(),
+      hasUndos=editors.getFirst().hasUndos();
+    undoUndo.setEnabled(hasUndos);
+    undoRedo.setEnabled(hasRedos);
+    //Without an actual listener watching undo/redo stacks this is just
+    //too hard to do.
+    //undoToBeginning.setEnabled(hasUndos);
+    //undoRedoToEnd.setEnabled(hasRedos);
+    undoToHistorySwitch.setEnabled(hasUndos);
+    redoToHistorySwitch.setEnabled(hasRedos);
+    undoClearUndos.setEnabled(hasUndos);
+    undoClearRedos.setEnabled(hasRedos);
+    undoClearBoth.setEnabled(hasRedos || hasUndos);
+  }
   private void enableSelectItems() {
     boolean selected=editors.getFirst().isAnythingSelected();
     selectUpperCase.setEnabled(selected);

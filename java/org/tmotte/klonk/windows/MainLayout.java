@@ -32,9 +32,7 @@ import javax.swing.SwingConstants;
 import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.klonk.config.PopupInfo;
-import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.MainDisplay;
-import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.option.FontOptions;
 
@@ -48,7 +46,7 @@ public class MainLayout {
   private JFrame frame;
   private FontOptions fontOptions;
   private CurrentOS currentOS;
-  private Doer appCloseListener;
+  private Runnable appCloseListener;
 
   // Main editor window components:
   private JLabel lblRow=new JLabel(),
@@ -70,7 +68,7 @@ public class MainLayout {
   private Set<Component> noFontChange=new HashSet<>();
 
   public MainLayout(
-      PopupInfo pInfo, FontOptions fontOptions, Doer appCloseListener
+      PopupInfo pInfo, FontOptions fontOptions, Runnable appCloseListener
     ) {
     this.frame=pInfo.parentFrame;
     this.currentOS=pInfo.currentOS;
@@ -195,8 +193,8 @@ public class MainLayout {
   private void doEvents() {
     frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     frame.addWindowListener(new WindowAdapter() {
-      public void windowClosing(WindowEvent e){
-        appCloseListener.doIt();
+      public @Override void windowClosing(WindowEvent e){
+        appCloseListener.run();
       }
     });
   }
