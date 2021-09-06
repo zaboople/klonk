@@ -277,11 +277,11 @@ public class Editor {
   public void redoToEnd() {
     jta.redoToEnd();
   }
-  public void undoToHistorySwitch() {
-    jta.undoToHistorySwitch();
+  public boolean undoToHistorySwitch() {
+    return jta.undoToHistorySwitch();
   }
-  public void redoToHistorySwitch() {
-    jta.redoToHistorySwitch();
+  public boolean redoToHistorySwitch() {
+    return jta.redoToHistorySwitch();
   }
   public boolean hasUndos() {
     return jta.hasUndos();

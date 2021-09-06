@@ -12,7 +12,7 @@ Capabilities worth mentioning:
 * The usual things: Trailing-whitespace-trim, auto-indent with tabs or spaces, line wrap control, sorting, marking, alignment tricks, multi-line find & replace with regex, and so forth
 
 # Download
-[Download zip file here](https://zaboople.github.io/pages/klonk/index.html). Includes jar & Windows .exe files (for MacOS installation refer to "Building it" below). Note that the Windows .exe does not include the required Java installation on your computer. We've been building for Java 13 lately.
+[Download zip file here](https://zaboople.github.io/pages/klonk/index.html). Includes jar & Windows .exe files (for MacOS installation refer to "Building it" below). Note that the Windows .exe does not include the required Java installation on your computer. We've been building for Java 16 lately.
 
 # Building it
 To build, use a Java 9+ JDK and a reasonably recent version of [Apache Ant](http://ant.apache.org/).

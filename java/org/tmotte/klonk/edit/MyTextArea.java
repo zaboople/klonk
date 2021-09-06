@@ -189,11 +189,11 @@ public class MyTextArea extends JTextArea {
   public void clearRedos() {
     undos.clearRedos();
   }
-  public void undoToHistorySwitch() {
-    undoRedoToHistorySwitch(true);
+  public boolean undoToHistorySwitch() {
+    return undoRedoToHistorySwitch(true);
   }
-  public void redoToHistorySwitch() {
-    undoRedoToHistorySwitch(false);
+  public boolean redoToHistorySwitch() {
+    return undoRedoToHistorySwitch(false);
   }
   public void undoToBeginning() {
     undoRedoAll(true);
@@ -893,7 +893,12 @@ public class MyTextArea extends JTextArea {
     suppressUndoRecord=false;
   }
 
-  private void undoRedoToHistorySwitch(boolean undoOrRedo) {
+  private boolean undoRedoToHistorySwitch(boolean undoOrRedo) {
+    if (!(
+        undoOrRedo
+          ?undos.hasHistorySwitchUndo() :undos.hasHistorySwitchRedo()
+      ))
+      return false;
     suppressUndoRecord=true;
     boolean first=true;
     boolean skipDoubleUp=false;
@@ -912,6 +917,7 @@ public class MyTextArea extends JTextArea {
     }
     checkUnstable();
     suppressUndoRecord=false;
+    return true;
   }
 
   private void undoRedoOnce(final boolean undoOrRedo) {

@@ -40,12 +40,16 @@ public class CtrlUndo {
     status.show("Redone to end");
   }
   public void undoToHistorySwitch() {
-    editors.getFirst().undoToHistorySwitch();
-    status.show("Undone to last history rewrite");
+    if (editors.getFirst().undoToHistorySwitch())
+      status.show("Undone to previous history rewrite");
+    else
+      status.showBad("No history rewrites found");
   }
   public void redoToHistorySwitch() {
-    editors.getFirst().redoToHistorySwitch();
-    status.show("Undone to last history rewrite");
+    if (editors.getFirst().redoToHistorySwitch())
+      status.show("Redone to next history rewrite");
+    else
+      status.showBad("No history rewrites found");
   }
   public void doUndoFast() {
     persist.setFastUndos(fastUndos=!fastUndos);

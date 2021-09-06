@@ -55,6 +55,12 @@ final class Undo {
   // UNDO: //
   ///////////
 
+  public boolean hasHistorySwitchUndo() {
+    return hasHistorySwitch(undos);
+  }
+  public boolean hasHistorySwitchRedo() {
+    return hasHistorySwitch(redos);
+  }
   public UndoStep doUndo() {
     return removeLast(undos, redos);
   }
@@ -89,6 +95,13 @@ final class Undo {
   ////////////////
   // INTERNALS: //
   ////////////////
+
+  private static boolean hasHistorySwitch(ArrayDeque<UndoStep> deq) {
+    for (UndoStep step: deq)
+      if (step.doubleUp)
+        return true;
+    return false;
+  }
 
   private static UndoStep removeLast(ArrayDeque<UndoStep> mainList, ArrayDeque<UndoStep> otherList) {
     if (mainList.size()==0)
