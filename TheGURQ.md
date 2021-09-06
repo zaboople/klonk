@@ -42,7 +42,7 @@ _Note: Klonk will not actually stab you, no matter how bad of a writer/historian
 
 Changes are changes, not time travel. We've been travelling _forwards_ in time all along (duh) and Klonk is just tracking the history of Crazy Things We Did Today, in the order we did them, which is completely linear.
 
-So you can undo this way and redo that way and every which way, and Klonk will hang in there right behind you, like a creepy hacker groupie. It might get _complicated_, depending on how indecisive/capricious/bloodthirsty you are about things, but that's your problem. If you've been running yourself in circles, there's no hiding it. Klonk knows what you've been up to, and if you undo back to the very beginning and redo to the end, you'll see the history of your day, minus the window-shopping and zags between zigs).
+So you can undo this way and redo that way and every which way, and Klonk will hang in there right behind you, like a creepy hacker groupie. It might get _complicated_, depending on how indecisive/capricious/bloodthirsty you are about things, but that's your problem. If you've been running yourself in circles, there's no hiding it. Klonk knows what you've been up to, and if you undo back to the very beginning and redo to the end, you'll see the history of your day, minus the window-shopping and zags between zigs.
 
 ## Theoreticalisms
 
