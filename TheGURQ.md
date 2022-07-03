@@ -8,7 +8,7 @@ Every so often a random programmer will announce: "I've solved the GURQ!" First 
 
 ## There Is a Better Way
 
-I learned how to resolve the GURQ "the right way" (opinion) back in the 1990's and use it in my own homemade editor(s). No, there is no undo "tree", nor any complicated graphical user interface to go with. In fact the user interface is the same as ever: You've got your undos, your redos, and that's it. The underlying data structure is strictly linear, but all edit states are preserved and reachable, so whatever you're getting back to, it's either thisaway or thataway (usually thisaway). There's no need for users to learn a new featureset for the sake of this "enhancement", and most won't notice the difference until... hey, how about that! All edit states are recoverable.
+I learned how to resolve the GURQ "the right way" (opinion) back in the 1990's and use it in my own homemade editor(s). No, there is no undo "tree", nor any complicated graphical user interface to go with. In fact the user interface is the same as ever: You've got your undos, your redos, and that's it. The underlying data structure is strictly linear, but all edit states are preserved and reachable, so whatever you're getting back to, it's either thisaway or thataway (usually thisaway). There's no need for users to learn a new featureset for the sake of this "enhancement", and most won't notice the difference until... hey, how about that!
 
 This might sound implausible at first.
 
