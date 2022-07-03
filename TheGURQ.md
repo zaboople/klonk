@@ -46,7 +46,7 @@ Third, although it isn't strictly necessary, we can add a slight shortcut becaus
 
 As a programmer, you might have to perform a tiny bit of mental gymnastics to get all this in place, but as a user, if you undo and redo backwards and forwards (remember, these are your only options) you will see the history of your efforts playing back and forth *as they happened*. The user's reference point is history itself, because the algorithm is NOT "time-travelling" in any sense of the phrase; it is simply making changes to get to a desired state with respect to a perfectly linear passage of time.
 
-A particularly capricious user might still be perplexed when walking back through their changing-their-mind-about-changing-their-mind actions, and even give up the hunt. Still, they aren't *losing* anything due to the GURQ-orithm; compared to the classical throw-history-away design, they are getting a bonus that they will eventually discover and muddle through as they like. There isn't a particular need to document it other than for completeness and bragging rights.
+A particularly capricious user might still be perplexed when walking back through their changing-their-mind-about-changing-their-mind-about-etc's, and even give up the hunt. Still, they aren't *losing* anything due to the GURQ-orithm; compared to the classical throw-history-away design, they are getting a bonus that they will eventually discover and muddle through as they like. There isn't a particular need to document it other than for completeness and bragging rights.
 
 ## Back to Memory Space Usage
 
