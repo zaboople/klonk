@@ -1,59 +1,61 @@
 # Resolving the Great Undo-Redo Quandary
 
-## First, Some History (technically a pun)
+## The History (technically a pun)
 
-The Great Undo-Redo Quandary - the GURQ - happens when you're editing something (like an article about undo-redo), undo a ways, make some changes, and your redos go {{poof!}} because the editor doesn't know what else to do with them, so if you change your mind about changing your mind, you're stuck. It's a classic science _fiction_ problem: If you go back in time and change the past, you lose the future and you can't get it back. That's annoying, and that's the GURQ.
+The Great Undo-Redo Quandary - the GURQ - happens when you're editing something (like an article about undo-redo), undo a ways, make some changes, and your redos go {{{poof!}}} because the editor doesn't know what else to do with them, so if you change your mind about changing your mind, you're stuck. It's a classic science _fiction_ problem: If you go back in time and change the past, you lose the future and can't get it back. That's annoying, and that's the GURQ.
 
-Every so often a random programmer will announce: "I've solved the GURQ!" First they decide that the problem happens because editors & word processors use a linear/stack-ish data structure for undo-redo when a _tree_ seems more appropriate. Of course that tree requires a navigation system for users to pick their way back through the undo-redo history, leading to all sorts of complicated user interface nonsense that nobody has time to deal with. Folks agree that it's a clever solution, just not worth bothering. So the problem goes back on the shelf for a few years until we rinse & repeat.
+Every so often a random programmer will announce: "I've solved the GURQ!" First they decide that the problem happens because editors & word processors use a linear/stack-ish data structure for undo-redo when a _tree_ seems more appropriate. Of course that tree requires a navigation system for users to pick their way back through the undo-redo history, leading to all sorts of complicated user interfacery that nobody has time to deal with. Folks agree that it's a clever solution, just not worth bothering. So the problem goes back on the shelf for a few years until someone re-discovers the same idea.
 
 ## There Is a Better Way
 
-I actually solved the GURQ "the right way" back in the 1990's, as part of my own homemade editor(s) that I've used ever since. No, there is no "tree", nor any complicated graphical user interface to go with. In fact the user interface is the same as ever: You got your undos, your redos, and that's it. It's strictly linear, but all edit states are preserved and reachable, so whatever you're getting back to, it's either thisaway or thataway. This might sound implausible at first, but it makes perfectly good sense once you understand it, which I'll get to in a moment.
+I learned how to resolve the GURQ "the right way" (opinion) back in the 1990's and use it in my own homemade editor(s). No, there is no undo "tree", nor any complicated graphical user interface to go with. In fact the user interface is the same as ever: You've got your undos, your redos, and that's it. The underlying data structure is strictly linear, but all edit states are preserved and reachable, so whatever you're getting back to, it's either thisaway or thataway. There's no need for users to learn a new featureset for the sake of this "enhancement", and most won't notice the difference until... hey, how about that! All edit states are recoverable.
 
-So as examples go, my current editor is named ["Klonk"](https://github.com/zaboople/klonk) (this page is hosted therein). It is kooky & homely as it should be, and you're welcome to download, build & run it so that you can see the GURQ-orithm in real time. Beyond that, you will despise Klonk for its kookiness and homeliness, but that's okay. (BTW, Klonk's predecessor was named "Severed Head in a Shopping Bag" - a strangely common phenomenon according to the internet - and "Klonk" is just paying homage to the fact that SHSB had bit-rotted its way through the bottom)
+This might sound implausible at first.
 
-Anyhow, I'll just refer to the GURQ-orithm as "Klonk" hereafter, mostly.
+As examples go, my current editor is named ["Klonk"](./..). It is kooky & homely as it should be, and you're welcome to download, build & run it so that you can see the GURQ-orithm in real time. Beyond that, you will despise Klonk for its kookiness and homeliness, but that's okay. (Klonk's predecessor was named "Severed Head in a Shopping Bag" - a strangely common phenomenon according to the internet - and "Klonk" is just paying homage to the fact that SHSB had bit-rotted its way through the bottom)
 
-## Well, How It Worky?
+## How Does It Work?
 
-With Klonk, when you try to go back in time and change the past, the future becomes... The past! Then if you change your mind and want to get "back to the future", you just start hitting that Undo button, and behold: You have your stuff back.
+Suppose that you've undone & redone yourself into a corner - the GURQ has struck again. But suppose again, that someone leans in - a "Clippy" sort of character - and says, "Don't worry! I quietly recorded everything you've done today!" But how to find the thing we want? Clippy shrugs and says, "All of your changes are just a perfectly linear history with respect to time." So you agree to "rewind" through the history of today back to a stopping point where you're happy. Ta-da: You've got what you wanted.
 
-Huh?
+Now suppose you've changed your mind about changing your mind: Clippy leans in again, and says, "Don't worry!" At this point you might protest, "But we already did that! We can't go back on going back!" But Clippy points out that even including the "rewind" you previously did, you *still* have a perfectly linear history with respect to time. So you simply rewind again, and there you go. Computers don't violate physics.
 
-Let me try again: If you just want to undo a ways, have a look-see, skedaddle like a bug and redo right back to "the present", that's okay, because you're just window-shopping the undo/redo stacks. Things only get weird if you undo a ways, then squarsh the butterfly or kill the baby hitler; those undo actions now count as _changes_, as if you un-did the hard way, by remembering exactly how we got from baby hitler to now, and banging out those changes in reverse - so they're just plain old changes. Therefore, all of that lands in the undo stack.
+So, we need only implement this Clippy-ish thing and we have a way out.
 
-So now "the present" looks just like 1889, and soon there you are, clutching dead baby hitler like some kind of psychotic freak with a bunch of Austrian nurses yelling at you - egads! You didn't think this through and now you are shocked and disgusted with yourself, so what to do? Start smacking that undo button, of course. You'll go a few steps "backwards" through the murder, then zigzag "forwards", eventually coming to "now" if you keep at it.
+## Making it simpler
 
-At that point, the shameful death of baby hitler is where? Turns out it's in your redo stack, of course, because you un-did your way back "here".
+First of all, there's no need for undo/redo as well as this "meta undo/redo". We can merge the two into one.
 
-So now you go on a drinking rampage, hoping to forget the horrors of what you've done, hoping even more that Klonk will forget, and... Zappo! Same thing: All that knifing/strangling/etc - as well as the act of traversing back to the opportunity - is instantly flung onto the undo stack at your first swig. Even after you wake up in a barf pizza on the bathroom floor the next morning, Klonk is still haunting you, because what happened, happened.
+Second of all, there's no need to include "window shopping" in our linear history; this is when you undo a ways, take a look around, then skedaddle out of there back to "the present" without changing anything.
 
-Just to be sure, you undo back through the binge, back to 1889 and doing the terrible deed, and indeed the deed is still done. Maybe now you just start hammering the undo button like mad, which will take you back to 20XX, then undoing some more through the original post-hitlered history of the 20th century until 9 months before baby hitler to try killing his father instead because in your hazy stupor that somehow sounds like an improvement. You'll get there eventually, and if you pay attention, you'll see that you're just going backwards in the order of... what actually happened.
+The act of undoing need only become part of our linear history IF we squash the proverbial butterfly and alter "the past"; in that case the act of undoing itself must instantly be recorded as a series of changes, by replaying the redo stack *onto* the undo stack *twice*: 1) Forwards, for the original changes 2) and then backwards, to record the history of our undoing (we'll come back to the memory space usage). So:
 
-You could even change your mind yet again, maybe go after teenage hitler, who is a more reasonably deserving jerk, but enough of a hapless and unpopular doofus to be relatively murderable. So, undo thru dad's murder, the binge, baby hitler's murder, back to 2021 and then one more walk back to teenage hitler. It's worth pointing out here that Klonk will actually stick to the zigs and skip over the zags so that you only have to watch yourself commit any previous crime only once, but maybe it shouldn't do that because you've become a crazed serial killer, now, haven't you?
+    A) ----> Original changes
+    B) <---- Undoing them
+    C) --->  New changes
 
-Anyhow, wouldn't you know it, the mortally wounded teenage hitler manages to turn the knife back on you, and ouchie! You are bleeding rather profusely now! Hurry to the undo button, before you...
+becomes linearly:
 
-----
+    A) ----> B) ----> C) --->
 
-_Note: Klonk will not actually stab you, no matter how bad of a writer/historian you are_
+After C) is done, this A->B->C progression is a perfectly linear history in its own right, so we can rinse and repeat the process ad nauseum. We can recover any previous state by stepping backwards carefully and then start on some new edits from there; a new A-B-C switcharoo happens again accordingly. Overall, the effect is that after making any change, all previous states are *somewhere* in the undo stack, i.e. our linear history, where they logically ought to be. Whatever you're typing right now, everything else is history.
 
-----
+Third, although it isn't strictly necessary, we can add a slight shortcut because of redundancies. In the A-B-C example above, B) is redundant with A), because one is just the other in reverse. When the butterfly is squashed and we create B, we mark its beginning and end as "instant"; whenever we later traverse onto *either* end of B), we proceed to the opposite end in one fell swoop to save the user some traversal time. All edit states are recoverable from A & C alone. Again, it's strictly optional, but less cumbersome.
 
-Changes are changes, not time travel. We've been travelling _forwards_ in time all along (duh) and Klonk is just tracking the history of Crazy Things We Did Today, in the order we did them, which is completely linear.
+## But Nobody Can Understand That!
 
-So you can undo this way and redo that way and every which way, and Klonk will hang in there right behind you, like a creepy hacker groupie. It might get _complicated_, depending on how indecisive/capricious/bloodthirsty you are about things, but that's your problem. If you've been running yourself in circles, there's no hiding it. Klonk knows what you've been up to, and if you undo back to the very beginning and redo to the end, you'll see the history of your day, minus the window-shopping and zags between zigs.
+As a programmer, you might have to perform a tiny bit of mental gymnastics to get all this in place, but as a user, if you undo and redo backwards and forwards (remember, these are your only options) you will see the history of your efforts playing back and forth *as they happened*. The user's reference point is history itself, because the algorithm is NOT "time-travelling" in any sense of the phrase; it is simply making changes to get to a desired state with respect to a perfectly linear passage of time.
 
-## Theoreticalisms
+A particularly capricious user might still be perplexed when walking back through their changing-their-mind-about-changing-their-mind actions, and even give up the hunt. Still, they aren't *losing* anything due to the GURQ-orithm; compared to the classical throw-history-away design, they are getting a bonus that they will eventually discover and muddle through as they like. There isn't a particular need to document it other than for completeness and bragging rights.
 
-If you read the source carefully, or just think it over real hard, you'll suspect potential theoretical exponential stack growth; yes, because when baby hitler gets the business, Klonk makes a copy of the redo stack and flips that copy over before pushing both copy & original onto the undo stack. So if you do it exactly right, you can blow clean through the RAM roof in < 64 single-character undo-redos, but this never becomes an issue in everyday editing unless you're a mentally ill genius.
+## Back to Memory Space Usage
 
-## Concluderies
+Again, the act of going back and squashing the proverbial butterfly in history has a "doubling" effect, where you dump two copies of the redo stack onto the undo stack, rather than 1. If you know exactly what you're doing, you can use up all available memory in approximately 64 quick steps. In practice, this is unlikely; I've never done it by accident in decades of everyday use, because I'm not *quite* so mentally unstable. But if you were inspired to use the GURQ-orithm at a larger scale - in databases, for example - you'd want to be careful about this.
 
-I know you think Klonk and even the GURQ-orithm is stupid, and you're a little annoyed with me for pulling off a tricky dance move that seems out of my league, but is it bad? Beyond the minor memory disclaimer, really, no. It's just the same old undo/redo with a hidden enhancement, nothing new to learn, and if anything, it might pleasantly surprise you when you're able to get back the thing that you didn't expect to get back.
+## Git already has this feature
 
-Again, I'm not trying to inculcate you into the Mystic Cult of Klonkism, nor am I even completely certain about first discovery of the GURQ-orithm. But maybe you could try teaching your own editor to do this lil' parlor trick and your users would be slightly happier for it.
+Git has a "revert" command that backs out individual commits by creating *new* commits that reverse them. Can you revert a revert? Of course! In fact Git allows you to skip over other commits and attempt to revert one further back in history (obviously this can cause a "merge conflict"). We won't recommend this kind of "skipping" in a text editor because it brings us back to overly complicated features that nobody has time for, and after all: We already have version control software. We're just trying to make undo/redo a little better.
 
-## A Footknot
+## Conclusion
 
-This is stupid, but... _Have_ I discovered time travel? Don't be silly! It's basic thermodynamics: There's no free lunch, and certainly not gazillions of lunch copies waiting for you to go re-eat each and every one until you come back and (this time for sure) explode into a diarrhea supernova of illegal lunches. The universe won't put up with it. So if you just wrote your hack science fiction comic book superhero plot into a corner, maybe just fix it instead of pulling out that time-travel nonsense again. Hopefully your word processor has decent undo/redo, like Klonk, because that part doesn't have to be bad science fiction.
+Again, all of this is built into Klonk, but Klonk is just for me. You can implement the GURQ-orithm in your own editor with minor effort, and your users will be slightly better off for it, while losing nothing. I only recommend that you consider making the small effort necessary.

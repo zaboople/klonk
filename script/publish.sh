@@ -17,7 +17,7 @@ fi
 echo
 cd ../../../$repo
 echo "Current directory: "$(pwd)
-echo -n "I am about to do a huge cp -r. Is that okay? "
+echo -n "I am about to cp -r from here to zaboople.github.generate... Is that okay? "
 read answer
 if [[ $answer == y* ]]; then
   cp -r dist/site/* ../zaboople.github.generate/lib/external-$repo
@@ -26,4 +26,5 @@ fi
 
 echo
 cd ../zaboople.github.generate
+echo "Current directory: "$(pwd)
 git status
