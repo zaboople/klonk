@@ -38,7 +38,7 @@ becomes linearly:
 
     A) ----> B) ----> C) --->
 
-After C) is done, this A->B->C progression is a perfectly linear history in its own right, so we can rinse and repeat the process ad nauseum. We can recover any previous state by stepping backwards carefully and then start on some new edits from there; a new A-B-C switcharoo happens again accordingly. Overall, the effect is that after making any change, all previous states are *somewhere* in the undo stack, i.e. our linear history, where they logically ought to be; the redo stack is empty until we start "window shopping" again. Whatever you're typing right now, everything else is history.
+After C) is done, this A->B->C progression is a perfectly linear history in its own right, so we can rinse and repeat the process ad nauseum. We can recover any previous state by stepping backwards carefully and then start on some new edits from there; a new A-B-C switcharoo happens again accordingly. Overall, the effect is that after making any change, all previous states are *somewhere* in the undo stack, i.e. our linear history, where they logically ought to be; the redo stack is empty until we start "window shopping" again. Whatever change you're making, everything else is history.
 
 Third, although it isn't strictly necessary, we can add a slight shortcut because of redundancies. In the A-B-C example above, B) is redundant with A), because one is just the other in reverse. When the butterfly is squashed and we create B, we mark its beginning and end as "instant"; whenever we later traverse onto *either* end of B), we proceed to the opposite end in one fell swoop to save the user some traversal time. All edit states are recoverable from A & C alone. Again, it's strictly optional, but less cumbersome.
 
