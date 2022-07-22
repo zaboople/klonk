@@ -12,7 +12,7 @@ I learned how to resolve the GURQ "the right way" (opinion) back in the 1990's a
 
 This might sound implausible at first.
 
-As examples go, my current editor is named ["Klonk"](./..). It is kooky & homely as it should be, and you're welcome to download, build & run it so that you can see the GURQ-orithm in real time. Beyond that, you will despise Klonk for its kookiness and homeliness, but that's okay.
+As examples go, my current editor is named ["Klonk"](./..). It is kooky & homely as it should be, and you're welcome to download, build & run it so that you can see the GURQ-orithm in real time. Beyond that, you might despise Klonk for its kookiness and homeliness, but that's okay.
 
 ## How Does It Work?
 
@@ -26,9 +26,9 @@ So, we need only implement this Clippy-ish thing and we have a way out of our qu
 
 First of all, there's no need for undo/redo as well as this "meta undo/redo". We can merge the two into one.
 
-Second of all, there's no need to include "window shopping" in our recorded history; this is when you undo a ways, take a look around, then skedaddle out of there back to "the present" without changing anything.
+Second of all, there's no need to include "window shopping" in our recorded history; this is when you undo a ways, take a look around, then skedaddle out of there back to "the present" without changing anything. This is just a matter of moving information back and forth from undo-stack to redo-stack.
 
-The act of undoing need only become part of our linear history IF we squash the proverbial butterfly and thus alter "the past"; in that case the act of undoing itself is instantly  recorded as a series of changes, by replaying the redo stack *onto* the undo stack *twice*: 1) Forwards, for the original changes 2) and then backwards, to record the history of our undoing. So:
+The act of undoing need only become part of our linear history *if* we squash the proverbial butterfly and thus alter "the past"; in that case the act of undoing itself is instantly recorded as a series of changes, by replaying the redo stack *onto* the undo stack *twice*: 1) Forwards, for the original changes 2) and then backwards, to record the history of our undoing. So:
 
     A) ----> Original changes
     B) <---- Undoing them
