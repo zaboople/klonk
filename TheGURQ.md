@@ -8,7 +8,7 @@ Every so often a random programmer will announce: "I've solved the GURQ!" First 
 
 ## There Is a Better Way
 
-I learned how to resolve the GURQ "the right way" (opinion) back in the 1990's and use it in my own homemade editor(s). No, there is no undo "tree", nor any complicated graphical user interface to go with. In fact the user interface is the same as ever: You've got your undos, your redos, and that's it. The underlying data structure is strictly linear, but all edit states are preserved and reachable, so whatever you're getting back to, it's either thisaway or thataway (usually thisaway). There's no need for users to learn a new featureset for the sake of this "enhancement", and most won't notice the difference until... hey, how about that.
+I learned how to resolve the GURQ "the right way" (opinion) back in the 1990's and use it in my own homemade editor(s). No, there is no undo "tree", nor any complicated graphical user interface to go with. In fact the user interface is the same as ever: You've got your undos, your redos, and that's it. The underlying data structure is strictly linear, but all edit states are preserved and reachable, so whatever you're getting back to, it's either thisaway or thataway (usually thisaway). There's no need for users to learn a new featureset for the sake of this enhancement, and most won't notice the difference until... hey, how about that.
 
 This might sound implausible at first.
 
@@ -18,13 +18,13 @@ As examples go, my current editor is named ["Klonk"](./..). It is kooky & homely
 
 Suppose that you've undone & redone yourself into a corner - the GURQ has struck again. But suppose again, that someone leans in - a "Clippy" sort of character - and says, "Don't worry! I've quietly recorded everything you've done today! All of your changes are just a perfectly linear history with respect to time." So you agree to "rewind" through the history of today back to a stopping point where you're happy. Ta-da: You've got what you wanted.
 
-Now suppose you've changed your mind about changing your mind about changing your mind: Clippy leans in again, and says, "Don't worry!" At this point you might protest, "But we already did that! We'll break something!" But Clippy points out that even including your previous "rewind", you *still* have a perfectly linear history with respect to time. So you simply rewind Clippy's "tape" again, and there you go. Computers don't violate physics.
+Now suppose you've changed your mind about changing your mind about changing your mind: Clippy leans in again, and says, "Don't worry!" At this point you might protest, "But we already did that! We'll break something!" But Clippy points out that even including your previous rewind, you *still* have a perfectly linear history with respect to time. So you simply rewind Clippy's tape again, and there you go. Computers don't violate physics.
 
 So, we need only implement this Clippy-ish thing and we have a way out of our quandary.
 
 ## Making it simpler
 
-First of all, there's no need for undo/redo as well as this "meta undo/redo". We can merge the two into one.
+First of all, there's no need for undo/redo as well as Clippy's "meta" undo/redo. We can merge the two into one.
 
 Second of all, there's no need to include "window shopping" in our recorded history; this is when you undo a ways, take a look around, then skedaddle out of there back to "the present" without changing anything. This is just a matter of moving information back and forth from undo-stack to redo-stack.
 
@@ -44,9 +44,9 @@ Third, although it isn't strictly necessary, we can add a slight shortcut becaus
 
 ## But Nobody Can Understand That!
 
-As a programmer, you'll have to perform a bit of mental gymnastics to get all this in place, but as a user, if you undo and redo backwards and forwards (remember, these are your only options) you will see the history of your efforts playing back and forth *as they happened*. The user's reference point is history itself, because the algorithm is NOT "time-travelling" in any sense of the phrase; it is simply making changes to get to a desired state with respect to a perfectly linear passage of time. The whole thing *is* intuitive, believe it or not.
+As a programmer, you'll have to perform a bit of mental gymnastics to get all this in place, but as a user, if you undo and redo backwards and forwards (remember, these are your only options) you will see the history of your efforts playing back and forth *as they happened*. The user's reference point is history itself, because the algorithm is *not* "time-travelling" in any sense of the phrase; it is simply making changes to get to a desired state with respect to a perfectly linear passage of time. The whole thing *is* intuitive, believe it or not.
 
-A particularly capricious user might still be perplexed when walking back through their changing-their-mind-about-changing-their-mind-about-etc's, and even give up the hunt. Still, they aren't *losing* anything due to the GURQ-orithm; compared to the classical throw-history-away design, they are getting a bonus that they will eventually discover and muddle through as they like. There isn't a particular need to document it other than for completeness and bragging rights.
+A particularly capricious user might still be perplexed when walking back through their changing-their-mind-about-changing-their-mind-about-etc's, and even give up the hunt. Still, they aren't losing anything due to the GURQ-orithm; compared to the classical throw-history-away design, they are getting a bonus that they will eventually discover and muddle through as they like. There isn't a particular need to document it other than for completeness and bragging rights.
 
 ## Memory Space Usage
 
@@ -64,7 +64,7 @@ This doubles the undo stack each time, creating exponential memory growth. In pr
 
 Git has a "revert" command that backs out individual commits by creating *new* commits that reverse them. Can you revert a revert? Of course! All of this just becomes linear history. It's an excellent way to bail out of a production failure resulting from your latest brilliant idea, and then set about to fixing the wrong parts of that idea.
 
-In fact Git allows you to skip over commits and attempt to revert others further back in history (obviously this can cause a "merge conflict"). We won't recommend this kind of "skipping" in a text editor because it brings us back to overly complicated features that nobody has time for, and after all: We already have version control software. We're just trying to make undo/redo a little better.
+In fact Git allows you to skip over commits and attempt to revert others further back in history (obviously this can cause a merge conflict). We won't recommend this kind of "skipping" in a text editor because it brings us back to overly complicated features that nobody has time for, and after all: We already have version control software. We're just trying to make undo/redo a little better.
 
 ## Conclusion
 
