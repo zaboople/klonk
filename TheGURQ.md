@@ -18,7 +18,7 @@ As examples go, my current editor is named ["Klonk"](./..). It is kooky & homely
 
 Suppose that you've undone & redone yourself into a corner - the GURQ has struck again. But suppose again, that someone leans in - a "Clippy" sort of character - and says, "Don't worry! I've quietly recorded everything you've done today! All of your changes are just a perfectly linear history with respect to time." So you agree to "rewind" through the history of today back to a stopping point where you're happy. Ta-da: You've got what you wanted.
 
-Now suppose you've changed your mind about changing your mind about changing your mind: Clippy leans in again, and says, "Don't worry!" At this point you might protest, "But we already did that! We'll break something!" But Clippy points out that even including your previous rewind, you *still* have a perfectly linear history with respect to time. So you simply rewind Clippy's tape again, and there you go. Computers don't violate physics.
+Now suppose you've changed your mind about changing your mind: Clippy leans in again, and says, "Don't worry!" At this point you might protest, "But we already did that! We'll break something!" But Clippy points out that even including your previous rewind, you *still* have a perfectly linear history with respect to time. So you simply rewind Clippy's tape again, and there you go. Computers don't violate physics.
 
 So, we need only implement this Clippy-ish thing and we have a way out of our quandary.
 
