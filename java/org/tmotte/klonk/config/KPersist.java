@@ -35,7 +35,6 @@ public class KPersist {
   private SSHOptions sshOptionsCache;
   private List<String> recentFilesCache, recentDirsCache;
   private List<UserServer> recentSSHCache;
-  private KeyConfig keyConfig;
 
   public KPersist(KHome home, Setter<Throwable> logFail, CurrentOS currentOS) {
     this.logFail=logFail;
@@ -50,7 +49,6 @@ public class KPersist {
       logFail.set(e);
     }
   }
-
 
 
   /////////////////
@@ -132,14 +130,18 @@ public class KPersist {
       taio.indentionModeDefault=taio.INDENT_TABS;
     else
       taio.indentionModeDefault=taio.INDENT_SPACES;
-    taio.indentSpacesSize=getInt("Indent.SpacesSize", 2);
     taio.tabSize=getInt("Tabs.Size", 4);
+    taio.indentSpacesSizeMatchTabs=getBoolean("Indent.SpacesSize.MatchTabs", true);
+    taio.indentSpacesSize=taio.indentSpacesSizeMatchTabs
+      ?taio.tabSize
+      :getInt("Indent.SpacesSize", 2);
     return taio;
   }
   public void setTabAndIndentOptions(TabAndIndentOptions taio){
     setBoolean("Indent.OnHardReturn", taio.indentOnHardReturn);
     setBoolean("Indent.TabIndentsLine", taio.tabIndentsLine);
     setBoolean("Indent.InferTabs", taio.inferTabIndents);
+    setBoolean("Indent.SpacesSize.MatchTabs", taio.indentSpacesSizeMatchTabs);
     if (taio.indentionModeDefault==taio.INDENT_TABS)
       set("Indent.DefaultMode", "TABS");
     else
@@ -294,6 +296,19 @@ public class KPersist {
     setFiles(dirs,  "File.Favorite.Dirs.",  maxFavorite);
   }
 
+  public void setFileFindDirs(List<String> dirs) {
+    setFiles(dirs,  "File.Find.Dirs.",  maxRecent);
+  }
+  public void getFileFindDirs(List<String> dirs) {
+    getFiles(dirs, "File.Find.Dirs.", maxRecent);
+  }
+  public void setFileFindExclude(String s) {
+    set("File.Find.Exclude", s);
+  }
+  public String getFileFindExclude() {
+    return get("File.Find.Exclude", "");
+  }
+
   public void setEncryptionShowPass(boolean yes) {
     setBoolean("Encryption.Show.Pass", yes);
   }
@@ -313,17 +328,6 @@ public class KPersist {
     return getInt("Encryption.Bits", 128);
   }
 
-  // SHORTCUTS: //
-
-  public KeyConfig getKeyConfig() {
-    if (keyConfig==null)
-      try {
-        keyConfig=new KeyConfig(properties);
-      } catch (Exception e) {
-        throw new RuntimeException("Key config failed to load: "+e.getMessage(), e);
-      }
-    return keyConfig;
-  }
 
   ///////////
   // SAVE: //

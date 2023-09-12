@@ -5,6 +5,7 @@ import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.function.Supplier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,9 +17,7 @@ import org.tmotte.klonk.io.EncryptionStream;
 import org.tmotte.klonk.Editor;
 import org.tmotte.klonk.EditorListener;
 import org.tmotte.klonk.config.KPersist;
-import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Editors;
-import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.MainDisplay;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
@@ -29,6 +28,7 @@ import org.tmotte.klonk.controller.Recents;
 import org.tmotte.klonk.edit.UndoEvent;
 import org.tmotte.klonk.edit.UndoListener;
 import org.tmotte.klonk.ssh.IFileGet;
+import org.tmotte.klonk.windows.popup.FileFind;
 import org.tmotte.klonk.windows.popup.FileDialogWrapper;
 import org.tmotte.klonk.windows.popup.LineDelimiterListener;
 import org.tmotte.klonk.windows.popup.OpenFileList;
@@ -56,7 +56,7 @@ public class CtrlMain  {
   private KPersist persist;
   private StatusUpdate statusBar;
   private UserNotify userNotify;
-  private Doer lockRemover, editorSwitchedListener;
+  private Runnable lockRemover, editorSwitchedListener;
   private Setter<KeyEvent> editorKeyListener;
   private IFileGet fileResolver;
   private FileDialogWrapper fileDialog;
@@ -64,6 +64,7 @@ public class CtrlMain  {
   private MainDisplay layout;
   private SSHOpenFrom sshOpenFrom;
   private OpenFileList openFileList;
+  private FileFind pFileFind;
   private EncryptionInput encryptionInput;
   private CurrentOS currentOS;
 
@@ -100,6 +101,7 @@ public class CtrlMain  {
       FileDialogWrapper fileDialog,
       SSHOpenFrom sshOpenFrom,
       OpenFileList openFileList,
+      FileFind pFileFind,
       EncryptionInput encryptionInput,
       YesNoCancel yesNoCancel,
       YesNoCancel yesNo
@@ -109,14 +111,15 @@ public class CtrlMain  {
     this.fileDialog=fileDialog;
     this.sshOpenFrom=sshOpenFrom;
     this.openFileList=openFileList;
+    this.pFileFind=pFileFind;
     this.encryptionInput=encryptionInput;
     this.yesNoCancel=yesNoCancel;
     this.yesNo=yesNo;
   }
   public void setListeners(
-      Doer lockRemover,
+      Runnable lockRemover,
       IFileGet fileResolver,
-      Doer editorSwitchListener,
+      Runnable editorSwitchListener,
       Setter<List<String>> recentFileListener,
       Setter<List<String>> recentDirListener,
       Setter<KeyEvent> editorKeyListener
@@ -136,23 +139,14 @@ public class CtrlMain  {
     return editorMgr;
   }
   public Setter<List<String>> getAsyncFileReceiver() {
-    return new Setter<List<String>>(){
-      public @Override void set(List<String> files)
-        {doLoadAsync(files);}
-    };
+    return (List<String> files) -> doLoadAsync(files);
   }
-  public Getter<String> getCurrFileNameGetter() {
-    return new Getter<String>() {
-      public @Override String get()
-        {return getCurrentFileName();}
-    };
+  public Supplier<String> getCurrFileNameGetter() {
+    return ()->getCurrentFileName();
   }
-  public Doer getAppCloseListener() {
-    return new Doer() {
-      //This is the application close listener:
-      public @Override void doIt()
-        {tryExit();}
-    };
+  public Runnable getAppCloseListener() {
+    //This is the application close listener:
+    return ()->tryExit();
   }
   public LineDelimiterListener getLineDelimiterListener() {
     return new LineDelimiterListener() {
@@ -258,6 +252,11 @@ public class CtrlMain  {
     }
     else
       statusBar.showBad("Encryption cancelled");
+  }
+  public void doFileFind() {
+    List<String> files=pFileFind.show();
+    if (files!=null)
+      loadFiles(files);
   }
 
   // FILE OPEN FROM: //
@@ -404,7 +403,7 @@ public class CtrlMain  {
       persist.save();
     }
     if (lockRemover!=null)
-      lockRemover.doIt();
+      lockRemover.run();
     System.exit(0);
   }
 
@@ -741,10 +740,10 @@ public class CtrlMain  {
 
   private UndoListener myUndoListener=new UndoListener() {
     public void happened(UndoEvent ue) {
-      if (ue.isNoMoreUndos)
+      if (ue.isNoMoreUndosError)
         statusBar.showBad("No more undos.");
       else
-      if (ue.isNoMoreRedos)
+      if (ue.isNoMoreRedosError)
         statusBar.showBad("No more redos.");
     }
   };
@@ -796,7 +795,7 @@ public class CtrlMain  {
     statusBar.showTitle(e.getTitle());
     statusBar.showEncryption(e.getEncryption()!=null);
     showCaretPos(e);
-    editorSwitchedListener.doIt();
+    editorSwitchedListener.run();
   }
 
 

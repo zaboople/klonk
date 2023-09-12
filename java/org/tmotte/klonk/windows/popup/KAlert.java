@@ -68,11 +68,7 @@ public class KAlert implements Setter<String> {
   }
   public Setter<Throwable> getErrorHandler(){
     if (errorHandler==null)
-      errorHandler=new Setter<Throwable>(){
-        public @Override void set(Throwable error) {
-          fail(error);
-        }
-      };
+      errorHandler=(Throwable error) -> fail(error);
     return errorHandler;
   }
   public void show(String message) {

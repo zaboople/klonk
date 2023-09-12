@@ -45,20 +45,47 @@ public class FileDialogWrapper {
     this(pInfo, null, null);
   }
 
+  public final static class DialogOpts {
+    boolean forSave;
+    File startFile;
+    File startDir;
+    boolean dirsOnly;
+    String approveButtonText;
+    public DialogOpts setForSave(boolean t){forSave=t;return this;}
+    public DialogOpts setStartFile(File f){startFile=f;return this;}
+    public DialogOpts setStartDir(File d){startDir=d;return this;}
+    public DialogOpts setDirsOnly(){dirsOnly=true;return this;}
+    public DialogOpts setApproveButton(String s){approveButtonText=s;return this;}
+  }
+
 
   public File show(boolean forSave) {
-    return show(forSave, null);
+    return show(
+      new DialogOpts().setForSave(forSave)
+    );
   }
   public File show(boolean forSave, File startFile) {
-    return show(forSave, startFile, null);
+    return show(
+      new DialogOpts().setForSave(forSave)
+        .setStartFile(startFile)
+    );
   }
   public File showForDir(boolean forSave, File startDir) {
-    return show(forSave, null, startDir);
+    return show(
+      new DialogOpts().setForSave(forSave)
+        .setStartDir(startDir)
+    );
+  }
+  public File show(boolean forSave, File startFile, File startDir) {
+    return show(
+      new DialogOpts().setForSave(forSave)
+        .setStartFile(startFile).setStartDir(startDir)
+    );
   }
 
-  public File show(boolean forSave, File startFile, File startDir) {
+  public File show(DialogOpts opts) {
     init();
-    if (pInfo.currentOS.isOSX && SSHFile.cast(startFile)==null && SSHFile.cast(startDir)==null)
+    if (pInfo.currentOS.isOSX && SSHFile.cast(opts.startFile)==null && SSHFile.cast(opts.startDir)==null)
       try {
         // Broken on MS Windows XP. If you do "save as" and the old file
         // name is longer than the new one, the last characters from the old
@@ -69,17 +96,17 @@ public class FileDialogWrapper {
         // So we make a new one every time, which doesn't seem to use that much
         // memory.
         FileDialog fd=new java.awt.FileDialog(pInfo.parentFrame);
-        if (startFile!=null) {
+        if (opts.startFile!=null) {
           //On OSX, passing the full filename screws up everything unlike
           //Windows. So we have to set the file name & dir name individually.
-          fd.setFile(startFile.getName());
-          if (startDir==null && startFile.getParentFile()!=null)
-            fd.setDirectory(startFile.getParentFile().getCanonicalPath());
+          fd.setFile(opts.startFile.getName());
+          if (opts.startDir==null && opts.startFile.getParentFile()!=null)
+            fd.setDirectory(opts.startFile.getParentFile().getCanonicalPath());
         }
-        if (startDir!=null)
-          fd.setDirectory(startDir.getCanonicalPath());
-        fd.setTitle(forSave ?"Save" :"Open");
-        fd.setMode(forSave ?fd.SAVE :fd.LOAD);
+        if (opts.startDir!=null)
+          fd.setDirectory(opts.startDir.getCanonicalPath());
+        fd.setTitle(opts.forSave ?"Save" :"Open");
+        fd.setMode(opts.forSave ?fd.SAVE :fd.LOAD);
         fd.setVisible(true);
 
         File[] f=fd.getFiles();
@@ -90,24 +117,34 @@ public class FileDialogWrapper {
         throw new RuntimeException(e);
       }
     else {
-      if (startFile!=null){
-        if (startFile.isDirectory()){
-          startDir=startFile;
+      fileChooser.setFileSelectionMode(
+        opts.dirsOnly
+          ?JFileChooser.DIRECTORIES_ONLY
+          :JFileChooser.FILES_ONLY
+      );
+      if (opts.startFile!=null){
+        if (opts.startFile.isDirectory()){
+          opts.startDir=opts.startFile;
         }
         else {
-          fileChooser.setSelectedFile(startFile);
+          fileChooser.setSelectedFile(opts.startFile);
           try {
-            startDir=startFile.getCanonicalFile().getParentFile();
+            opts.startDir=opts.startFile.getCanonicalFile().getParentFile();
           } catch (Exception e) {
             throw new RuntimeException(e);
           }
         }
       }
-      if (startDir!=null)
-        fileChooser.setCurrentDirectory(startDir);
-      int returnVal=forSave
-        ?fileChooser.showSaveDialog(pInfo.parentFrame)
-        :fileChooser.showOpenDialog(pInfo.parentFrame);
+      if (opts.startDir!=null)
+        fileChooser.setCurrentDirectory(opts.startDir);
+      int returnVal;
+      if (opts.approveButtonText!=null)
+        returnVal=fileChooser.showDialog(pInfo.parentFrame, opts.approveButtonText);
+      else
+      if (opts.forSave)
+        returnVal=fileChooser.showSaveDialog(pInfo.parentFrame);
+      else
+        returnVal=fileChooser.showOpenDialog(pInfo.parentFrame);
       if (returnVal==fileChooser.APPROVE_OPTION)
         return fileChooser.getSelectedFile();
       else

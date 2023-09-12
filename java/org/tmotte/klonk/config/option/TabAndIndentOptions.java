@@ -17,10 +17,11 @@ public class TabAndIndentOptions {
   public boolean indentOnHardReturn;
   public boolean tabIndentsLine;
   public boolean inferTabIndents;
-  public int indentionMode,
-             indentionModeDefault;
-  public int indentSpacesSize,
-             tabSize;
+  public int tabSize;
+  public int indentSpacesSize;
+  public boolean indentSpacesSizeMatchTabs;
+  public int indentionMode;
+  public int indentionModeDefault;
 
   public String toString() {
     return
@@ -30,6 +31,7 @@ public class TabAndIndentOptions {
      +"\nindentionMode: "+indentionMode
      +"\nindentionModeDefault: "+indentionModeDefault
      +"\nindentSpacesSize: "+indentSpacesSize
+     +"\nindentSpacesSizeMatchTabs: "+indentSpacesSizeMatchTabs
      +"\ntabSize: "+tabSize;
   }
 

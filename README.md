@@ -5,19 +5,17 @@ Capabilities worth mentioning:
 
 * 100% Java as well as convenient OSX/MacOS & Windows executables
 * Keyboard-friendly but equally menu-friendly
-* Simple undo/redo system that allows recovery of all edit states from beginning to end
-* Find & replace with multi-line & regex
-* Rapid file switching, opening, reopening, with "favorite" directories & files support
+* Dirt-simple undo/redo that allows [recovery of all edit states](./TheGURQ.md) from beginning to end
 * Open files over SSH
 * File encryption
 * Execute shell scripts without switching applications
-* The usual things: Trailing-whitespace-trim, auto-indent with tabs or spaces, line wrap control, sorting, marking, alignment tricks and so forth
+* The usual things: Trailing-whitespace-trim, auto-indent with tabs or spaces, line wrap control, sorting, marking, alignment tricks, multi-line find & replace with regex, and so forth
 
 # Download
-[Download zip file here](http://zaboople.github.io/downloads/klonk.2.5.3.zip). Includes jar & Windows .exe files (for MacOS installation refer to "Building it" below). Note that the Windows .exe does not include the required Java 8 installation on your computer.
+[Download zip file here](https://zaboople.github.io/pages/klonk/index.html). Includes jar & Windows .exe files (for MacOS installation refer to "Building it" below). Note that the Windows .exe does not include the required Java installation on your computer. We've been building for Java 16 lately.
 
 # Building it
-Klonk requires Java 8 to run. To build, use a Java 8 JDK and a reasonably recent version of [Apache Ant](http://ant.apache.org/).
+To build, use a Java 9+ JDK and a reasonably recent version of [Apache Ant](http://ant.apache.org/).
 
 # Building and running natively
 

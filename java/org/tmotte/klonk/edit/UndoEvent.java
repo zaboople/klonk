@@ -1,15 +1,15 @@
 package org.tmotte.klonk.edit;
 
 public class UndoEvent {
-  public boolean isNoMoreUndos=false, 
-                 isNoMoreRedos=false,
+  public boolean isNoMoreUndosError=false,
+                 isNoMoreRedosError=false,
                  isUndoSaveStable=false;
-  UndoEvent setNoMoreUndos() {
-    isNoMoreUndos=true;
+  UndoEvent setNoMoreUndosError() {
+    isNoMoreUndosError=true;
     return this;
   }
-  UndoEvent setNoMoreRedos() {
-    isNoMoreRedos=true;
+  UndoEvent setNoMoreRedosError() {
+    isNoMoreRedosError=true;
     return this;
   }
   UndoEvent setUndoSaveStable() {
@@ -17,6 +17,8 @@ public class UndoEvent {
     return this;
   }
   public String toString(){
-    return "No more undos: "+isNoMoreUndos+" No more redos: "+isNoMoreRedos+" Stable: "+isUndoSaveStable;
+    return "No more undos: "+isNoMoreUndosError+
+      " No more redos: "+isNoMoreRedosError
+      +" Stable: "+isUndoSaveStable;
   }
 }

@@ -52,7 +52,7 @@
     configured.
   dist:
     Creates source zip &amp; binaries zip in dist directory. This does not include native
-    executables, however.
+    executables, however, unless you first run the commands below.
 
   exe:
     Generates a windows executable using jsmoothgen. To use this target, you will need to download
@@ -182,7 +182,6 @@
 
   <target name="_dist.bin" depends="config.prod,jar">
     <mkdir dir ="${dist.dir}/bin"/>
-    <copy file="${lib.dir}/${appname}.bat"    todir="${dist.dir}/bin"/>
     <copy file="dist/${appname}.jar"   tofile="${dist.dir}/bin/${appname.version}.jar"/>
     <zip destfile="${dist.dir}/${appname.version}.zip">
       <zipfileset dir="${dist.dir}/bin" prefix="${appname.version}"/>

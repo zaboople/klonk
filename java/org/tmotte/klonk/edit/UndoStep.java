@@ -16,19 +16,20 @@ public final class UndoStep {
     this.text=text;
     this.doubleUp=doubleUp;
     this.doubleUpDone=doubleUpDone;
+    //if (doubleUp) System.out.println(this.toString());
   }
   public static UndoStep createSaveState() {
     return new UndoStep(MARK_SAVE, -1, -1, null, false, false);
   }
-  
-  
+
+
   public boolean isSaveState() {
     return uType==MARK_SAVE;
   }
   public boolean isAddOrRemove() {
     return uType<=2;
   }
-  
+
   public void debug(String yeah) {
     Appendable ap=new StringBuilder();
     debug(yeah, ap);

@@ -26,59 +26,59 @@ public class MenuUtils {
     return menu;
   }
 
-  public static JMenu doMenu(JMenuBar bar, String title, MenuListener listener, int hotkey) {
-    JMenu f=doMenu(title, listener, hotkey);
+  public static JMenu doMenu(JMenuBar bar, String title, MenuListener listener, int mnemon) {
+    JMenu f=doMenu(title, listener, mnemon);
     bar.add(f);
     return f;
   }
-  public static JMenu doMenu(JMenuBar bar, String title, int hotkey) {
-    return doMenu(bar, title, null, hotkey);
+  public static JMenu doMenu(JMenuBar bar, String title, int mnemon) {
+    return doMenu(bar, title, null, mnemon);
   }
 
-  public static JMenu doMenu(String title, MenuListener listener, int hotkey) {
+  public static JMenu doMenu(String title, MenuListener listener, int mnemon) {
     JMenu f=new JMenu(title);
-    if (hotkey>-1)
-      f.setMnemonic(hotkey);
+    if (mnemon>-1)
+      f.setMnemonic(mnemon);
     if (listener!=null)
       f.addMenuListener(listener);
     return f;
   }
-  public static JMenu doMenu(String title, int hotkey) {
-    return doMenu(title, null, hotkey);
+  public static JMenu doMenu(String title, int mnemon) {
+    return doMenu(title, null, mnemon);
   }
 
 
-  public static JMenuItem doMenuItem(String title, Action listener) {
+  public static JMenuItem doMenuItem(String title, ActionListener listener) {
     return doMenuItem(title, listener, -1, null);
   }
-  public static JMenuItem doMenuItem(String title, Action listener, int hotkey) {
-    return doMenuItem(title, listener, hotkey, null);
+  public static JMenuItem doMenuItem(String title, ActionListener listener, int mnemon) {
+    return doMenuItem(title, listener, mnemon, null);
   }
-  public static JMenuItem doMenuItem(String title, Action listener, int hotkey, KeyStroke ks) {
+  public static JMenuItem doMenuItem(String title, ActionListener listener, int mnemon, KeyStroke shortcut) {
     JMenuItem j=new JMenuItem(title);
-    if (hotkey>-1)
-      j.setMnemonic(hotkey);
+    if (mnemon>-1)
+      j.setMnemonic(mnemon);
     if (listener!=null)
       j.addActionListener(listener);
-    if (ks!=null){
+    if (shortcut!=null){
       //Both of the following *should* work alone, but each is flawed unless we use them together:
       //- Without the first the accelerator key won't show up in the menu;
       //- Without the second the response time will be much slower
       //  for heavily/repetitively used accelerators.
-      j.setAccelerator(ks);
-      KeyMapper.accel(j, listener, ks);
+      j.setAccelerator(shortcut);
+      KeyMapper.accel(j, listener, shortcut);
     }
     return j;
   }
 
 
-  public static JCheckBoxMenuItem doMenuItemCheckbox(String title, Action listener) {
+  public static JCheckBoxMenuItem doMenuItemCheckbox(String title, ActionListener listener) {
     return doMenuItemCheckbox(title, listener, -1, true);
   }
-  public static JCheckBoxMenuItem doMenuItemCheckbox(String title, Action listener, int hotkey, boolean isOn) {
+  public static JCheckBoxMenuItem doMenuItemCheckbox(String title, ActionListener listener, int mnemon, boolean isOn) {
     JCheckBoxMenuItem j=new JCheckBoxMenuItem(title, true);
-    if (hotkey>-1)
-      j.setMnemonic(hotkey);
+    if (mnemon>-1)
+      j.setMnemonic(mnemon);
     if (listener!=null)
       j.addActionListener(listener);
     j.setState(isOn);

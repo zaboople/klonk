@@ -14,6 +14,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
+import javax.swing.event.ChangeEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -44,7 +45,7 @@ public class TabsAndIndents {
   /////////////////////////
 
   // DI:
-  private PopupInfo pInfo;
+  private final PopupInfo pInfo;
   private FontOptions fontOptions;
 
   // State:
@@ -55,10 +56,12 @@ public class TabsAndIndents {
   // Controls:
   private JDialog win;
   private JRadioButton jrbThisTabs, jrbThisSpaces, jrbDefTabs, jrbDefSpaces;
-  private JSpinner jspSpacesSize;
-  private JSpinner jspTabSize;
   private JCheckBox chkIndentOnHardReturn, chkInferTabIndents;
+  private JSpinner jspTabSize;
   private JRadioButton jrbTabIndentsLine, jrbTabIsTab;
+  private JRadioButton jrbSpacesSizeCustom, jrbSpacesSizeMatch;
+  private JSpinner jspSpacesSize;
+  private JLabel lblSpacesSize2;
   private JButton btnOK, btnCancel;
 
   /////////////////////
@@ -77,12 +80,18 @@ public class TabsAndIndents {
     ok=false;
 
     //Set values from input:
+    jspTabSize.setValue(options.tabSize);
+
     jrbThisTabs.setSelected(options.indentionMode==options.INDENT_TABS);
     jrbThisSpaces.setSelected(options.indentionMode==options.INDENT_SPACES);
     jrbDefTabs.setSelected(options.indentionModeDefault==options.INDENT_TABS);
     jrbDefSpaces.setSelected(options.indentionModeDefault==options.INDENT_SPACES);
+
+    jrbSpacesSizeCustom.setSelected(!options.indentSpacesSizeMatchTabs);
+    jrbSpacesSizeMatch.setSelected(options.indentSpacesSizeMatchTabs);
     jspSpacesSize.setValue(options.indentSpacesSize > 0 ?options.indentSpacesSize :1);
-    jspTabSize.setValue(options.tabSize);
+    jspSpacesSize.setEnabled(!options.indentSpacesSizeMatchTabs);
+
     chkIndentOnHardReturn.setSelected(options.indentOnHardReturn);
     chkInferTabIndents.setSelected(options.inferTabIndents);
     jrbTabIndentsLine.setSelected(options.tabIndentsLine);
@@ -120,7 +129,10 @@ public class TabsAndIndents {
       options.inferTabIndents=chkInferTabIndents.isSelected();
       options.tabIndentsLine    =jrbTabIndentsLine.isSelected();
       options.tabSize         =Integer.parseInt(jspTabSize.getValue().toString());
-      options.indentSpacesSize=Integer.parseInt(jspSpacesSize.getValue().toString());
+      options.indentSpacesSizeMatchTabs=jrbSpacesSizeMatch.isSelected();
+      options.indentSpacesSize=options.indentSpacesSizeMatchTabs
+        ?options.tabSize
+        :Integer.parseInt(jspSpacesSize.getValue().toString());
       options.indentionMode=jrbThisTabs.isSelected()
         ?options.INDENT_TABS
         :options.INDENT_SPACES;
@@ -163,6 +175,8 @@ public class TabsAndIndents {
     jrbTabIsTab=new JRadioButton(
         "<html><body><b>Tab</b> key inserts tab character</body></html>"
     );
+    jrbSpacesSizeMatch=new JRadioButton("Match \"Tab Size\" (see above)");
+    jrbSpacesSizeCustom=new JRadioButton("Use ");
 
     win=new JDialog(pInfo.parentFrame, true);
     win.setTitle("Tabs & indents");
@@ -182,87 +196,13 @@ public class TabsAndIndents {
     gb.anchor=gb.NORTHWEST;
     gb.add(getTabSizePanel());
     makeSeparator(gb);
-    gb.addY(getIndentionModePanel());
+    gb.addY(getTabsOrSpacesPanel());
     makeSeparator(gb);
     gb.addY(getAutoIndentPanel());
     makeSeparator(gb);
     gb.addY(getButtonPanel());
 
     setFont(fontOptions);
-  }
-  private void makeSeparator(GridBug gb) {
-    gb.insets.left=5; gb.insets.right=5;
-    JSeparator j=new JSeparator(JSeparator.HORIZONTAL);
-    gb.addY(j);
-    gb.insets.left=0; gb.insets.right=0;
-  }
-  private JPanel getIndentionModePanel() {
-    JPanel jp=new JPanel();
-    GridBug gb=new GridBug(jp);
-    gb.weightx=1;
-    gb.anchor=gb.WEST;
-    gb.gridXY(0);
-
-    gb.insets.top=5;
-    gb.insets.bottom=2;
-    gb.insets.left=5;
-    gb.insets.right=5;
-
-    //Add label:
-    gb.gridwidth=2;
-    JLabel label=new JLabel("<html><b>Indention: Tabs or Spaces</b></html>");
-    gb.add(label);
-
-    //Add buttons:
-    gb.gridwidth=1;
-    gb.insets.top=2;
-    gb.addY(getIndentionRadiosPanel(), getIndentionSpinPanel());
-    return jp;
-  }
-  private Container getIndentionRadiosPanel() {
-    GridBug gb=new GridBug(new JPanel());
-    gb.anchor=gb.NORTHWEST;
-    gb.weightx=1.0;
-    gb.gridy=gb.gridx=0;
-    gb.add(getIndentionRadiosPanel("This file:", jrbThisTabs, jrbThisSpaces, null));
-    gb.insets.left=7;
-    gb.addX(getIndentionRadiosPanel("Default:" , jrbDefTabs,  jrbDefSpaces, chkInferTabIndents));
-    return gb.container;
-  }
-  private Container getIndentionRadiosPanel(String label, JRadioButton one, JRadioButton two, JCheckBox three){
-    GridBug gb=new GridBug(new JPanel());
-    gb.anchor=gb.WEST;
-    gb.weightx=1.0;
-    gb.gridy=gb.gridx=0;
-    gb.add(new JLabel(label));
-    gb.addY(one);
-    gb.addY(two);
-    if (three!=null)
-      gb.addY(three);
-    return gb.container;
-  }
-  private JPanel getIndentionSpinPanel() {
-    JPanel allPanel=new JPanel();
-    GridBug allBug=new GridBug(allPanel);
-    allBug.anchor=allBug.WEST;
-    allBug.weightx=1;
-    allBug.gridx=allBug.gridy=0;
-    allBug.insets.top=15;
-    allBug.insets.left=allBug.insets.right=5;
-    allBug.insets.bottom=5;
-    {
-      JPanel panel=new JPanel();
-      GridBug gb=new GridBug(panel);
-      gb.anchor=gb.WEST;
-      gb.weightx=1;
-      gb.gridx=0;
-      gb.gridy=0;
-      gb.add(new JLabel("Use "));
-      gb.addX(jspSpacesSize);
-      gb.addX(new JLabel(" spaces when indenting with spaces"));
-      allBug.add(panel);
-    }
-    return allPanel;
   }
   private JPanel getTabSizePanel() {
     JPanel jp=new JPanel();
@@ -287,6 +227,88 @@ public class TabsAndIndents {
     gb.addX(jspTabSize);
     gb.addX(new JLabel(" spaces"));
     return jp;
+  }
+
+  private void makeSeparator(GridBug gb) {
+    gb.insets.left=5; gb.insets.right=5;
+    JSeparator j=new JSeparator(JSeparator.HORIZONTAL);
+    gb.addY(j);
+    gb.insets.left=0; gb.insets.right=0;
+  }
+
+  private JPanel getTabsOrSpacesPanel() {
+    JPanel jp=new JPanel();
+    GridBug gb=new GridBug(jp);
+    gb.weightx=1;
+    gb.anchor=gb.WEST;
+    gb.gridXY(0);
+
+    gb.insets.top=5;
+    gb.insets.bottom=2;
+    gb.insets.left=5;
+    gb.insets.right=5;
+
+    //Add label:
+    gb.gridwidth=2;
+    JLabel label=new JLabel("<html><b>Indention: Tabs or Spaces</b></html>");
+    gb.add(label);
+
+    //Add inputs:
+    gb.gridwidth=1;
+    gb.insets.top=2;
+    gb.addY(getTabsOrSpacesRadiosPanel());
+    gb.insets.top=2;
+    gb.addY(
+      new JLabel("<html><b>Indenting with spaces:</b></html>"),
+      getSpacesSizePanel()
+    );
+    return jp;
+  }
+  private Container getTabsOrSpacesRadiosPanel() {
+    GridBug gb=new GridBug(new JPanel());
+    gb.anchor=gb.NORTHWEST;
+    gb.weightx=1.0;
+    gb.gridy=gb.gridx=0;
+    gb.add(getTabsOrSpacesRadiosPanel("This file:", jrbThisTabs, jrbThisSpaces, new JPanel()));
+    gb.insets.left=7;
+    gb.addX(getTabsOrSpacesRadiosPanel("Default:" , jrbDefTabs,  jrbDefSpaces, chkInferTabIndents));
+    return gb.container;
+  }
+  private Container getTabsOrSpacesRadiosPanel(String label, JRadioButton one, JRadioButton two, JComponent three){
+    GridBug gb=new GridBug(new JPanel());
+    gb.anchor=gb.NORTHWEST;
+    gb.weightx=1.0;
+    gb.gridy=gb.gridx=0;
+    gb.add(new JLabel(label));
+    gb.addY(one);
+    gb.addY(two);
+    gb.addY(three);
+    return gb.container;
+  }
+  private JPanel getSpacesSizePanel() {
+    JPanel allPanel=new JPanel();
+    GridBug allBug=new GridBug(allPanel);
+    allBug.anchor=allBug.NORTHWEST;
+    allBug.weightx=1;
+    allBug.gridx=allBug.gridy=0;
+    allBug.insets.top=0;
+    allBug.insets.left=allBug.insets.right=5;
+    allBug.insets.bottom=0;
+
+    allBug.addY(jrbSpacesSizeMatch);
+    {
+      JPanel panel=new JPanel();
+      GridBug gb=new GridBug(panel);
+      gb.anchor=gb.WEST;
+      gb.weightx=1;
+      gb.gridx=0;
+      gb.gridy=0;
+      gb.add(jrbSpacesSizeCustom);
+      gb.addX(jspSpacesSize);
+      gb.addX(lblSpacesSize2=new JLabel(" spaces when indenting with spaces"));
+      allBug.addY(panel);
+    }
+    return allPanel;
   }
   private Container getAutoIndentPanel() {
     GridBug gb=new GridBug(new JPanel());
@@ -342,10 +364,16 @@ public class TabsAndIndents {
     btnCancel.addActionListener(cancelAction);
     KeyMapper.easyCancel(btnCancel, cancelAction);
 
+    jrbSpacesSizeCustom.addChangeListener((ChangeEvent e)->{
+        boolean custom=jrbSpacesSizeCustom.isSelected();
+        jspSpacesSize.setEnabled(custom);
+    });
+
     Radios.doUpDownArrows(
       Radios.create(jrbThisTabs,        jrbThisSpaces),
       Radios.create(jrbDefTabs,         jrbDefSpaces),
-      Radios.create(jrbTabIndentsLine,  jrbTabIsTab)
+      Radios.create(jrbTabIndentsLine,  jrbTabIsTab),
+      Radios.create(jrbSpacesSizeMatch, jrbSpacesSizeCustom)
     );
   }
 
@@ -360,8 +388,8 @@ public class TabsAndIndents {
         ti.indentionMode=ti.INDENT_TABS;
         ti.indentionModeDefault=ti.INDENT_SPACES;
         PopupTestContext ptc=new PopupTestContext();
-        new TabsAndIndents(ptc.getPopupInfo(), ptc.getFontOptions()).show(ti);
-        System.out.println(ti);
+        boolean ok=new TabsAndIndents(ptc.getPopupInfo(), ptc.getFontOptions()).show(ti);
+        System.out.println(ok+" "+ti);
       }
     });
   }

@@ -31,21 +31,7 @@ import org.tmotte.klonk.io.LockInterface;
 import org.tmotte.klonk.ssh.IUserPass;
 import org.tmotte.klonk.ssh.SSHConnections;
 import org.tmotte.klonk.windows.MainLayout;
-import org.tmotte.klonk.windows.popup.About;
-import org.tmotte.klonk.windows.popup.EncryptionInput;
-import org.tmotte.klonk.windows.popup.Favorites;
-import org.tmotte.klonk.windows.popup.FindAndReplace;
-import org.tmotte.klonk.windows.popup.FileDialogWrapper;
-import org.tmotte.klonk.windows.popup.FontPicker;
-import org.tmotte.klonk.windows.popup.GoToLine;
-import org.tmotte.klonk.windows.popup.KAlert;
-import org.tmotte.klonk.windows.popup.LineDelimiters;
-import org.tmotte.klonk.windows.popup.LineDelimiterListener;
-import org.tmotte.klonk.windows.popup.OpenFileList;
-import org.tmotte.klonk.windows.popup.Help;
-import org.tmotte.klonk.windows.popup.Shell;
-import org.tmotte.klonk.windows.popup.TabsAndIndents;
-import org.tmotte.klonk.windows.popup.YesNoCancel;
+import org.tmotte.klonk.windows.popup.*;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileDialogNoFileException;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileSystemView;
 import org.tmotte.klonk.windows.popup.ssh.SSHFileView;
@@ -235,6 +221,7 @@ public class BootContext {
       new SSHFileSystemView(sshConns, sshUN),
       new SSHFileView()
     );
+    FileFind pFileFind=new FileFind(popupInfo, fontOptions, persist, fileDialogWrapper);
 
     //Search popups:
     FindAndReplace findAndReplace=new FindAndReplace(
@@ -325,6 +312,7 @@ public class BootContext {
       fileDialogWrapper,
       new SSHOpenFrom(popupInfo, fontOptions),
       openFileList,
+      pFileFind,
       new EncryptionInput(popupInfo, fontOptions, persist),
       yesNoCancel,
       yesNo

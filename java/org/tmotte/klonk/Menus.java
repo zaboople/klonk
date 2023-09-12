@@ -4,15 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
@@ -31,7 +23,6 @@ import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.msg.Editors;
-import org.tmotte.klonk.config.msg.Doer;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.controller.CtrlMain;
@@ -71,29 +62,31 @@ public class Menus {
 
   //Visual component instances:
   private JMenuBar bar=new JMenuBar();
-  private JMenu file, fileReopen, fileOpenFromRecentDir, fileSaveToRecentDir,
-                fileFave, fileOpenFromFave, fileSaveToFave,
-                search, mark, switcher, undo, select, align, external, options, osxShortcuts, help;
-  private JMenuItem fileOpen, fileSave, fileNew, fileSaveAs, fileClose,
-                    fileCloseOthers, fileCloseAll,
-                      fileEncrypt, filePrint,
-                      fileDocDirExplore, fileClipboardDoc, fileClipboardDocDir,
-                      fileOpenFromDocDir, fileOpenFromList, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
-                      fileFaveAddFile, fileFaveAddDir,
-                      fileExit,
-                    searchFind, searchReplace, searchRepeat, searchRepeatBackwards, searchGoToLine,
-                    switchBackToFront, switchFrontToBack, switchNextUnsaved, pSwitchNextUnsaved,
-                    markSet, markGoToPrevious, markGoToNext, markClearCurrent, markClearAll,
-                    undoUndo, undoRedo,
-                      undoToBeginning, undoRedoToEnd, undoClearUndos, undoClearRedos, undoClearBoth,
-                    selectUpperCase, selectLowerCase, selectSortLines, selectGetSelectionSize,  selectGetAsciiValues,
-                    weirdInsertToAlign, weirdInsertToAlignBelow, weirdBackspaceToAlign, weirdBackspaceToAlignBelow,
-                      weirdAlignOneRight, weirdAlignOneLeft,
-                    externalRunBatch,
-                    optionTabsAndIndents, optionLineDelimiters, optionFont, optionFontBigger, optionFontSmaller,
-                      optionFavorites, optionSSH,
-                    osxSwitch, osxOpenFrom, osxSaveTo, osxSelect, osxFavorite, osxReopen,
-                    helpAbout, helpShortcut;
+  private JMenu
+    file, fileReopen, fileOpenFromRecentDir, fileSaveToRecentDir,
+    fileFave, fileOpenFromFave, fileSaveToFave,
+    search, mark, switcher, undo, select, align, external, options, osxShortcuts, help;
+  private JMenuItem
+    fileOpen, fileSave, fileNew, fileSaveAs, fileClose, fileCloseOthers, fileCloseAll,
+      fileEncrypt, filePrint,
+      fileDocDirExplore, fileClipboardDoc, fileClipboardDocDir,
+      fileFind, fileOpenFromDocDir, fileOpenFromList, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
+      fileFaveAddFile, fileFaveAddDir,
+      fileExit,
+    searchFind, searchReplace, searchRepeat, searchRepeatBackwards, searchGoToLine,
+    switchBackToFront, switchFrontToBack, switchNextUnsaved, pSwitchNextUnsaved,
+    markSet, markGoToPrevious, markGoToNext, markClearCurrent, markClearAll,
+    undoUndo, undoRedo,
+      undoToBeginning, undoRedoToEnd, undoToHistorySwitch, redoToHistorySwitch,
+      undoClearUndos, undoClearRedos, undoClearBoth,
+    selectUpperCase, selectLowerCase, selectSortLines, selectGetSelectionSize,  selectGetAsciiValues,
+    weirdInsertToAlign, weirdInsertToAlignBelow, weirdBackspaceToAlign, weirdBackspaceToAlignBelow,
+      weirdAlignOneRight, weirdAlignOneLeft,
+    externalRunBatch,
+    optionTabsAndIndents, optionLineDelimiters, optionFont, optionFontBigger, optionFontSmaller,
+      optionFavorites, optionSSH,
+    osxSwitch, osxOpenFrom, osxSaveTo, osxSelect, osxFavorite, osxReopen,
+    helpAbout, helpShortcut;
   private JCheckBoxMenuItem undoFast, optionAutoTrim, optionWordWrap;
 
   // These popup menus are for osx only. All but pswitcher are "hard linked" to
@@ -130,6 +123,7 @@ public class Menus {
 
     extraPopups=currentOS.isOSX;
     create();
+    listen();
     fontListener.set(initialFontOptions);
   }
   public void setControllers(
@@ -159,7 +153,7 @@ public class Menus {
     if (extraPopups)
       osxAttachPopupsTo=pnlEditor;
   }
-  public Doer getEditorSwitchListener() {
+  public Runnable getEditorSwitchListener() {
     return () -> editorChange();
   }
   public Setter<List<String>> getRecentFileListener() {
@@ -267,10 +261,10 @@ public class Menus {
       for (int i=0; i<cs.length && i<2; i++)
         menuP.add(cs[i]);
   }
-  private void setRecent(List<String> startList, JMenu menuX, Action listener) {
+  private void setRecent(List<String> startList, JMenu menuX, ActionListener listener) {
     setRecent(startList, menuX, null, listener);
   }
-  private void setRecent(List<String> startList, JMenu menuX, JPopupMenu menuP, Action listener) {
+  private void setRecent(List<String> startList, JMenu menuX, JPopupMenu menuP, ActionListener listener) {
     int size=startList.size();
     cleanMenu(menuX, menuP);
     menuX.setEnabled(size>0);
@@ -301,12 +295,12 @@ public class Menus {
     }
   }
   private void setFavorites(
-      Collection<String> startList, JMenu menuX, Action listener, int skipLast
+      Collection<String> startList, JMenu menuX, ActionListener listener, int skipLast
     ) {
     setFavorites(startList, menuX, null, listener, skipLast);
   }
   private void setFavorites(
-      Collection<String> startList, JMenu menuX, JPopupMenu menuP, Action listener, int skipLast
+      Collection<String> startList, JMenu menuX, JPopupMenu menuP, ActionListener listener, int skipLast
     ) {
 
     // Collect a list of items to put back:
@@ -473,7 +467,7 @@ public class Menus {
           :KeyMapper.key(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK)
       )
       ,fileCloseOthers=mu.doMenuItem(
-        "Close others",   fileListener, KeyEvent.VK_L
+        "Close others",   fileListener
       )
       ,fileCloseAll=mu.doMenuItem(
         "Close all",   fileListener, KeyEvent.VK_E
@@ -524,6 +518,9 @@ public class Menus {
       fileSaveTo=mu.doMenu("Save to", KeyEvent.VK_V);
     mu.add(
       file
+      ,fileFind=mu.doMenuItem(
+          "Find files...", fileListener, KeyEvent.VK_L
+      )
       ,mu.add(
         fileOpenFrom
         ,fileOpenFromDocDir   =mu.doMenuItem(
@@ -732,6 +729,14 @@ public class Menus {
       undoRedoToEnd=mu.doMenuItem(
         "Redo to end", undoItemListener, KeyEvent.VK_T,
         KeyMapper.key(KeyEvent.VK_F12, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
+      )
+      ,
+      undoToHistorySwitch=mu.doMenuItem(
+        "Undo to history switch", undoItemListener, KeyEvent.VK_H
+      )
+      ,
+      redoToHistorySwitch=mu.doMenuItem(
+        "Redo to history switch", undoItemListener, KeyEvent.VK_I
       )
     );
     undo.addSeparator();
@@ -948,264 +953,226 @@ public class Menus {
   // EVENT LISTENERS: //
   //////////////////////
 
-  private Action
-    fileListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        Object s=event.getSource();
-        if (s==fileOpen)         ctrlMain.doFileOpenDialog();
-        else
-        if (s==fileNew)          ctrlMain.doNew();
-        else
-        if (s==fileSave)         ctrlMain.doSave();
-        else
-        if (s==fileSaveAs)       ctrlMain.doSave(true);
-        else
-        if (s==fileClose)        ctrlMain.doFileClose();
-        else
-        if (s==fileCloseOthers)  ctrlMain.doFileCloseOthers();
-        else
-        if (s==fileCloseAll)     ctrlMain.doFileCloseAll();
-        else
-        if (s==filePrint)            ctrlFileOther.doPrint();
-        else
-        if (s==fileEncrypt)          ctrlMain.doEncrypt();
-        else
-        if (s==fileDocDirExplore)    ctrlFileOther.doDocumentDirectoryExplore();
-        else
-        if (s==fileClipboardDoc)     ctrlFileOther.doClipboardDoc();
-        else
-        if (s==fileClipboardDocDir)  ctrlFileOther.doClipboardDocDir();
-        else
-        if (s==fileOpenFromDocDir)   ctrlMain.doOpenFromDocDir();
-        else
-        if (s==fileOpenFromList)     ctrlMain.doOpenFromList();
-        else
-        if (s==fileOpenFromSSH)      ctrlMain.doOpenFromSSH();
-        else
-        if (s==fileSaveToDocDir)     ctrlMain.doSaveToDocDir();
-        else
-        if (s==fileSaveToSSH)        ctrlMain.doSaveToSSH();
-        else
-        if (s==fileFaveAddDir)       ctrlFileOther.doAddCurrentToFaveDirs();
-        else
-        if (s==fileFaveAddFile)      ctrlFileOther.doAddCurrentToFaveFiles();
-        else
-        if (s==fileExit)             ctrlMain.doFileExit();
-        else
-          throw new RuntimeException("Invalid file event "+event);
-      }
+  // Listener maps map menu items to runnable listeners. Not used
+  // for everything, but where convenient:
+  private static class ListenerMap {
+    private Map<Object, Runnable> map=new HashMap<>();
+    public ListenerMap add(Object x, Runnable r) {
+      map.put(x, r);
+      return this;
     }
+    public void run(Object x) {
+      Runnable r=map.get(x);
+      if (r==null) throw new RuntimeException("No mapping for menu: "+x);
+      r.run();
+    }
+  }
+  private final ListenerMap
+    fileListenerMap=new ListenerMap(),
+    markListenerMap=new ListenerMap(),
+    searchListenerMap=new ListenerMap(),
+    undoListenerMap=new ListenerMap(),
+    optionListenerMap=new ListenerMap(),
+    selectionListenerMap=new ListenerMap(),
+    alignListenerMap=new ListenerMap();
+
+  private void listen() {
+    fileListenerMap
+      .add(fileOpen,         ()->ctrlMain.doFileOpenDialog())
+      .add(fileNew,          ()->ctrlMain.doNew())
+      .add(fileSave,         ()->ctrlMain.doSave())
+      .add(fileSaveAs,       ()->ctrlMain.doSave(true))
+      .add(fileClose,        ()->ctrlMain.doFileClose())
+      .add(fileCloseOthers,  ()->ctrlMain.doFileCloseOthers())
+      .add(fileCloseAll,     ()->ctrlMain.doFileCloseAll())
+      .add(filePrint,            ()->ctrlFileOther.doPrint())
+      .add(fileEncrypt,          ()->ctrlMain.doEncrypt())
+      .add(fileDocDirExplore,    ()->ctrlFileOther.doDocumentDirectoryExplore())
+      .add(fileClipboardDoc,     ()->ctrlFileOther.doClipboardDoc())
+      .add(fileClipboardDocDir,  ()->ctrlFileOther.doClipboardDocDir())
+      .add(fileFind,             ()->ctrlMain.doFileFind())
+      .add(fileOpenFromDocDir,   ()->ctrlMain.doOpenFromDocDir())
+      .add(fileOpenFromList,     ()->ctrlMain.doOpenFromList())
+      .add(fileOpenFromSSH,      ()->ctrlMain.doOpenFromSSH())
+      .add(fileSaveToDocDir,     ()->ctrlMain.doSaveToDocDir())
+      .add(fileSaveToSSH,        ()->ctrlMain.doSaveToSSH())
+      .add(fileFaveAddDir,       ()->ctrlFileOther.doAddCurrentToFaveDirs())
+      .add(fileFaveAddFile,      ()->ctrlFileOther.doAddCurrentToFaveFiles())
+      .add(fileExit,             ()->ctrlMain.doFileExit())
+      ;
+    searchListenerMap
+      .add(searchRepeat,          ()->ctrlSearch.doSearchRepeat())
+      .add(searchFind,            ()->ctrlSearch.doSearchFind())
+      .add(searchReplace,         ()->ctrlSearch.doSearchReplace())
+      .add(searchRepeatBackwards, ()->ctrlSearch.doSearchRepeatBackwards())
+      .add(searchGoToLine,        ()->ctrlSearch.doSearchGoToLine())
+      ;
+    markListenerMap
+      .add(markSet,          ()->ctrlMarks.doMarkSet())
+      .add(markGoToPrevious, ()->ctrlMarks.doMarkGoToPrevious())
+      .add(markGoToNext,     ()->ctrlMarks.doMarkGoToNext())
+      .add(markClearCurrent, ()->ctrlMarks.doMarkClearCurrent())
+      .add(markClearAll,     ()->ctrlMarks.doMarkClearAll())
+      ;
+    undo.addMenuListener(new MenuListener(){
+      public void menuCanceled(MenuEvent e){}
+      public void menuDeselected(MenuEvent e){}
+      public void menuSelected(MenuEvent e){
+        enableDisableUndoRedo();
+      }
+    });
+    undoListenerMap
+      .add(undoUndo,        ()->ctrlUndo.doUndo())
+      .add(undoRedo,        ()->ctrlUndo.doRedo())
+      .add(undoFast,        ()->ctrlUndo.doUndoFast())
+      .add(undoToBeginning, ()->ctrlUndo.doUndoToBeginning())
+      .add(undoRedoToEnd,   ()->ctrlUndo.doRedoToEnd())
+      .add(undoToHistorySwitch, ()->ctrlUndo.undoToHistorySwitch())
+      .add(redoToHistorySwitch, ()->ctrlUndo.redoToHistorySwitch())
+      .add(undoClearUndos,  ()->ctrlUndo.doClearUndos())
+      .add(undoClearRedos,  ()->ctrlUndo.doClearRedos())
+      .add(undoClearBoth,   ()->ctrlUndo.doClearUndosAndRedos())
+      ;
+    optionListenerMap
+      .add(optionWordWrap,        ()->ctrlOptions.doWordWrap())
+      .add(optionAutoTrim,        ()->ctrlOptions.doAutoTrim())
+      .add(optionTabsAndIndents,  ()->ctrlOptions.doTabsAndIndents())
+      .add(optionLineDelimiters,  ()->ctrlOptions.doLineDelimiters())
+      .add(optionFont,            ()->ctrlOptions.doFontAndColors())
+      .add(optionFontBigger,      ()->ctrlOptions.doFontBigger())
+      .add(optionFontSmaller,     ()->ctrlOptions.doFontSmaller())
+      .add(optionFavorites,       ()->ctrlOptions.doFavorites())
+      .add(optionSSH,             ()->ctrlOptions.doSSH())
+      ;
+    selectionListenerMap
+      .add(selectUpperCase,             ()->ctrlSelection.doWeirdUpperCase())
+      .add(selectLowerCase,             ()->ctrlSelection.doWeirdLowerCase())
+      .add(selectSortLines,             ()->ctrlSelection.doWeirdSortLines())
+      .add(selectGetSelectionSize,      ()->ctrlSelection.doWeirdSelectionSize())
+      .add(selectGetAsciiValues,        ()->ctrlSelection.doWeirdAsciiValues())
+      ;
+    alignListenerMap
+      .add(weirdInsertToAlign,         ()->editors.getFirst().doInsertToAlign(true))
+      .add(weirdInsertToAlignBelow,    ()->editors.getFirst().doInsertToAlign(false))
+      .add(weirdBackspaceToAlign,      ()->editors.getFirst().doBackspaceToAlign(true))
+      .add(weirdBackspaceToAlignBelow, ()->editors.getFirst().doBackspaceToAlign(false))
+      .add(weirdAlignOneRight,         ()->editors.getFirst().moveRightOnce())
+      .add(weirdAlignOneLeft,          ()->editors.getFirst().moveLeftOnce())
+      ;
+  }
+  private ActionListener
+    fileListener=(ActionEvent event) -> fileListenerMap.run(event.getSource())
     ,
     //These have to be individualized because they require the text of the
     //item that fired them, can't detect which.
-    reopenListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        JMenuItem s=(JMenuItem) event.getSource();
-        ctrlMain.doLoadFile(s.getText());
-      }
+    reopenListener=(ActionEvent event)-> {
+      JMenuItem s=(JMenuItem) event.getSource();
+      ctrlMain.doLoadFile(s.getText());
     }
     ,
-    openFromListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        JMenuItem s=(JMenuItem) event.getSource();
-        ctrlMain.doOpenFrom(s.getText());
-      }
+    openFromListener=(ActionEvent event)-> {
+      JMenuItem s=(JMenuItem) event.getSource();
+      ctrlMain.doOpenFrom(s.getText());
     }
     ,
-    saveToListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        JMenuItem s=(JMenuItem) event.getSource();
-        ctrlMain.doSaveTo(s.getText());
-      }
+    saveToListener=(ActionEvent event)-> {
+      JMenuItem s=(JMenuItem) event.getSource();
+      ctrlMain.doSaveTo(s.getText());
     }
     ,
 
-    searchListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        Object s=event.getSource();
-        if (s==searchRepeat)          ctrlSearch.doSearchRepeat();
-        else
-        if (s==searchFind)            ctrlSearch.doSearchFind();
-        else
-        if (s==searchReplace)         ctrlSearch.doSearchReplace();
-        else
-        if (s==searchRepeatBackwards) ctrlSearch.doSearchRepeatBackwards();
-        else
-        if (s==searchGoToLine)        ctrlSearch.doSearchGoToLine();
-        else
-          throw new RuntimeException("What");
-      }
-    }
+    searchListener=(ActionEvent event)->searchListenerMap.run(event.getSource())
     ,
-    markItemListener=new AbstractAction() {
+    markItemListener=
       // Note that CtrlMarks will actually calls us back via our
       // "markStateListener" instance to let us know when to disable/enable
       // the marks menu items. (We also have a MenuListener further down
       // that actually catches the user selecting the marks menu and updates the
       // contents, but that doesn't enable/disable.)
-      public void actionPerformed(ActionEvent event) {
-        Object s=event.getSource();
-        if (s==markSet)
-          ctrlMarks.doMarkSet();
-        else
-        if (s==markGoToPrevious)
-          ctrlMarks.doMarkGoToPrevious();
-        else
-        if (s==markGoToNext)
-          ctrlMarks.doMarkGoToNext();
-        else
-        if (s==markClearCurrent)
-          ctrlMarks.doMarkClearCurrent();
-        else
-        if (s==markClearAll)
-          ctrlMarks.doMarkClearAll();
-        else
-          throw new RuntimeException("What");
+      (ActionEvent event) -> markListenerMap.run(event.getSource())
+    ,
+    switchListener=(ActionEvent event) -> {
+      JMenuItem s=(JMenuItem) event.getSource();
+      //Two things can happen, send go back or pick a file:
+      if (s==switchBackToFront)
+        ctrlMain.doSendBackToFront();
+      else
+      if (s==switchFrontToBack)
+        ctrlMain.doSendFrontToBack();
+      else
+      if (s==switchNextUnsaved || s==pSwitchNextUnsaved)
+        ctrlMain.doSwitchToNextUnsaved();
+      else {
+        Editor e=switchMenuToEditor.get(s);
+        if (e==null)
+          throw new RuntimeException("Menus.switchListener(): Null editor in hash");
+        ctrlMain.doSwitch(e);
       }
     }
     ,
-    switchListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        JMenuItem s=(JMenuItem) event.getSource();
-        //Two things can happen, send go back or pick a file:
-        if (s==switchBackToFront)
-          ctrlMain.doSendBackToFront();
-        else
-        if (s==switchFrontToBack)
-          ctrlMain.doSendFrontToBack();
-        else
-        if (s==switchNextUnsaved || s==pSwitchNextUnsaved)
-          ctrlMain.doSwitchToNextUnsaved();
-        else {
-          Editor e=switchMenuToEditor.get(s);
-          if (e==null)
-            throw new RuntimeException("Menus.switchListener(): Null editor in hash");
-          ctrlMain.doSwitch(e);
-        }
-      }
+    undoItemListener=(ActionEvent event)-> undoListenerMap.run(event.getSource())
+    ,
+    selectionItemListener=(ActionEvent event)->selectionListenerMap.run(event.getSource())
+    ,
+    alignItemListener=(ActionEvent event)->alignListenerMap.run(event.getSource())
+    ,
+    externalItemListener=(ActionEvent event)-> {
+      Object s=event.getSource();
+      if (s==externalRunBatch)        ctrlOther.doShell();
+      else
+        throw new RuntimeException("Unexpected "+s);
     }
     ,
-    undoItemListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        Object s=event.getSource();
-        if (s==undoUndo)        ctrlUndo.doUndo();
-        else
-        if (s==undoRedo)        ctrlUndo.doRedo();
-        else
-        if (s==undoFast)        ctrlUndo.doUndoFast();
-        else
-        if (s==undoToBeginning) ctrlUndo.doUndoToBeginning();
-        else
-        if (s==undoRedoToEnd)   ctrlUndo.doRedoToEnd();
-        else
-        if (s==undoClearUndos)  ctrlUndo.doClearUndos();
-        else
-        if (s==undoClearRedos)  ctrlUndo.doClearRedos();
-        else
-        if (s==undoClearBoth)   ctrlUndo.doClearUndosAndRedos();
-      }
+    optionListener=(ActionEvent event)->optionListenerMap.run(event.getSource())
+    ,
+    osxShortcutListener=(ActionEvent event)-> {
+      Object o=event.getSource();
+      JPopupMenu jpm;
+      if (o==osxOpenFrom) jpm=pOpenFrom;
+      else
+      if (o==osxSaveTo)   jpm=pSaveTo;
+      else
+      if (o==osxFavorite) jpm=pFavorite;
+      else
+      if (o==osxReopen)   jpm=pReopen;
+      else
+      if (o==osxSelect)   jpm=pSelect;
+      else
+      if (o==osxSwitch)   jpm=pswitcher;
+      else
+        throw new RuntimeException("No popup menu matched: "+o);
+      jpm.show(osxAttachPopupsTo, 0, 0);
     }
     ,
-    selectionItemListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        Object s=event.getSource();
-        if (s==selectUpperCase)             ctrlSelection.doWeirdUpperCase();
-        else
-        if (s==selectLowerCase)             ctrlSelection.doWeirdLowerCase();
-        else
-        if (s==selectSortLines)             ctrlSelection.doWeirdSortLines();
-        else
-        if (s==selectGetSelectionSize)      ctrlSelection.doWeirdSelectionSize();
-        else
-        if (s==selectGetAsciiValues)        ctrlSelection.doWeirdAsciiValues();
-      }
-    }
-    ,
-    alignItemListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        Object s=event.getSource();
-        if (s==weirdInsertToAlign)         editors.getFirst().doInsertToAlign(true);
-        else
-        if (s==weirdInsertToAlignBelow)    editors.getFirst().doInsertToAlign(false);
-        else
-        if (s==weirdBackspaceToAlign)      editors.getFirst().doBackspaceToAlign(true);
-        else
-        if (s==weirdBackspaceToAlignBelow) editors.getFirst().doBackspaceToAlign(false);
-        else
-        if (s==weirdAlignOneRight)         editors.getFirst().moveRightOnce();
-        else
-        if (s==weirdAlignOneLeft)          editors.getFirst().moveLeftOnce();
-      }
-    }
-    ,
-    externalItemListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        Object s=event.getSource();
-        if (s==externalRunBatch)        ctrlOther.doShell();
-        else
-          throw new RuntimeException("Unexpected "+s);
-      }
-    }
-    ,
-    optionListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        Object s=event.getSource();
-        if (s==optionWordWrap)        ctrlOptions.doWordWrap();
-        else
-        if (s==optionAutoTrim)        ctrlOptions.doAutoTrim();
-        else
-        if (s==optionTabsAndIndents)  ctrlOptions.doTabsAndIndents();
-        else
-        if (s==optionLineDelimiters)  ctrlOptions.doLineDelimiters();
-        else
-        if (s==optionFont)            ctrlOptions.doFontAndColors();
-        else
-        if (s==optionFontBigger)      ctrlOptions.doFontBigger();
-        else
-        if (s==optionFontSmaller)     ctrlOptions.doFontSmaller();
-        else
-        if (s==optionFavorites)       ctrlOptions.doFavorites();
-        else
-        if (s==optionSSH)             ctrlOptions.doSSH();
-      }
-    }
-    ,
-    osxShortcutListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        Object o=event.getSource();
-        JPopupMenu jpm;
-        if (o==osxOpenFrom) jpm=pOpenFrom;
-        else
-        if (o==osxSaveTo)   jpm=pSaveTo;
-        else
-        if (o==osxFavorite) jpm=pFavorite;
-        else
-        if (o==osxReopen)   jpm=pReopen;
-        else
-        if (o==osxSelect)   jpm=pSelect;
-        else
-        if (o==osxSwitch)   jpm=pswitcher;
-        else
-          throw new RuntimeException("No popup menu matched: "+o);
-        jpm.show(osxAttachPopupsTo, 0, 0);
-      }
-    }
-    ,
-    helpListener=new AbstractAction() {
-      public void actionPerformed(ActionEvent event) {
-        Object s=event.getSource();
-        if (s==helpShortcut)
-          ctrlOther.doHelpShortcuts();
-        else
-        if (s==helpAbout)
-          ctrlOther.doHelpAbout();
-      }
+    helpListener=(ActionEvent event)-> {
+      Object s=event.getSource();
+      if (s==helpShortcut)
+        ctrlOther.doHelpShortcuts();
+      else
+      if (s==helpAbout)
+        ctrlOther.doHelpAbout();
     }
     ;
 
   //////////////////////////////////
   // REAL-TIME ON-SHOW LISTENERS: //
   //////////////////////////////////
+  private void enableDisableUndoRedo() {
+    final boolean
+      hasRedos=editors.getFirst().hasRedos(),
+      hasUndos=editors.getFirst().hasUndos();
+    undoUndo.setEnabled(hasUndos);
+    undoRedo.setEnabled(hasRedos);
+    //Without an actual listener watching undo/redo stacks this is just
+    //too hard to do.
+    //undoToBeginning.setEnabled(hasUndos);
+    //undoRedoToEnd.setEnabled(hasRedos);
+    undoToHistorySwitch.setEnabled(hasUndos);
+    redoToHistorySwitch.setEnabled(hasRedos);
+    undoClearUndos.setEnabled(hasUndos);
+    undoClearRedos.setEnabled(hasRedos);
+    undoClearBoth.setEnabled(hasRedos || hasUndos);
+  }
   private void enableSelectItems() {
     boolean selected=editors.getFirst().isAnythingSelected();
     selectUpperCase.setEnabled(selected);

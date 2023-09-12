@@ -8,9 +8,9 @@ public class UndoSimilar {
     if (a==b) return true;
     final String[] possible={
       Selectable.strLetterCaps+Selectable.strLetterLow
-     ,Selectable.strNum+"/-.+*"
-     //,Selectable.strStartSection+Selectable.strEndSection
-     ,Selectable.strWhite
+      ,Selectable.strNum+"/-.+*"
+      //,"<{[(\">}])"
+      ,Selectable.strWhite
     };
     return matches(a, b, possible);
   }

@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.tmotte.klonk.config.KHome;
 import org.tmotte.klonk.config.msg.Setter;
-import org.tmotte.klonk.config.msg.Doer;
 
 public class FileListen implements LockInterface {
 
@@ -54,10 +53,8 @@ public class FileListen implements LockInterface {
     locker=new Locker(seizeFile, log);
     return locker.lock() || handOff(fileNames);
   }
-  public Doer getLockRemover() {
-    return new Doer(){
-      public @Override void doIt() {removeLock();}
-    };
+  public Runnable getLockRemover() {
+    return ()-> removeLock();
   }
   public void startListener(Setter<List<String>> fileReceiver){
     this.fileReceiver=fileReceiver;

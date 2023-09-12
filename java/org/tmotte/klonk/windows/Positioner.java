@@ -23,13 +23,12 @@ public class Positioner {
     }
 
     //Just make sure it fits:
-    Rectangle screen=getScreenBounds();
     Rectangle p=popup.getBounds();
     fix(p);
     popup.setBounds(p);
   }
 
-  public static void fix(Rectangle windowPos) {
+  public static Rectangle fix(Rectangle windowPos) {
     Rectangle w=windowPos;
     Rectangle screen=getScreenBounds();
 
@@ -47,6 +46,7 @@ public class Positioner {
             tooTall=w.y+w.height > bottomEdge;
     if (tooWide) w.width =rightEdge  - w.x;
     if (tooTall) w.height=bottomEdge - w.y;
+    return w;
   }
 
   private static Rectangle getScreenBounds() {

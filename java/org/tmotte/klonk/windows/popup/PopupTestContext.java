@@ -9,7 +9,6 @@ import java.awt.event.WindowListener;
 import java.util.List;
 import javax.swing.JFrame;
 import org.tmotte.common.swang.CurrentOS;
-import org.tmotte.klonk.config.msg.Getter;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.option.FontOptions;
@@ -67,11 +66,7 @@ public class PopupTestContext  {
   }
   public Setter<Throwable> getFail() {
     if (fail==null)
-      fail=new Setter<Throwable>() {
-        public void set(Throwable t){
-          t.printStackTrace(System.err);
-        }
-      };
+      fail=(Throwable t)->t.printStackTrace(System.err);
     return fail;
   }
   public Image getPopupIcon() {
