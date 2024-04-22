@@ -209,6 +209,9 @@ public class CtrlMain  {
   public boolean doSave() {
     return doSave(false);
   }
+  public void doDelete() {
+    fileDelete();
+  }
   public boolean doSave(boolean forceNewFile) {
     return fileSave(forceNewFile);
   }
@@ -305,12 +308,7 @@ public class CtrlMain  {
   }
 
   // FILE SAVE TO: //
-  public void doSaveToDocDir() {
-    File file;
-    Editor ed=editorMgr.getFirst();
-    if ((file=showFileDialogForSave(null, ed.getFile().getParentFile()))!=null)
-      fileSave(ed, file, true);
-  }
+
   public void doSaveTo(String dir) {
     File file=fileResolver.get(dir);
     if (file==null)
@@ -498,6 +496,26 @@ public class CtrlMain  {
     return file;
   }
 
+  //////////////////
+  // FILE DELETE: //
+  //////////////////
+
+  private boolean fileDelete() {
+    Editor e = editorMgr.getFirst();
+    File dfile = e.getFile();
+    if (!dfile.exists()) {
+      userNotify.alert("File does not exist: "+e.getTitle());
+      return false;
+    }
+    if (!yesNo.show("Delete "+dfile.getAbsolutePath()+"?").isYes()) {
+      statusBar.showBad("Delete cancelled");
+      return false;
+    }
+    dfile.delete();
+    statusBar.show("File deleted: "+e.getTitle());
+    return true;
+  }
+
   /////////////////
   // FILE CLOSE: //
   /////////////////
@@ -529,7 +547,8 @@ public class CtrlMain  {
         return false;
       //"No" means "keep going"
     }
-    if (e.getFile()!=null)
+    File thisFile = e.getFile();
+    if (thisFile!=null && thisFile.exists())
       recents.recentFileClosed(e.getFile());
     editors.remove(0);
     statusBar.show("Closed: "+e.getTitle());

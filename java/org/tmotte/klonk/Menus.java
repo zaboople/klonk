@@ -67,10 +67,11 @@ public class Menus {
     fileFave, fileOpenFromFave, fileSaveToFave,
     search, mark, switcher, undo, select, align, external, options, osxShortcuts, help;
   private JMenuItem
-    fileOpen, fileSave, fileNew, fileSaveAs, fileClose, fileCloseOthers, fileCloseAll,
+    fileOpen, fileSave, fileNew, fileSaveAs, fileDelete,
+      fileClose, fileCloseOthers, fileCloseAll,
       fileEncrypt, filePrint,
       fileDocDirExplore, fileClipboardDoc, fileClipboardDocDir,
-      fileFind, fileOpenFromDocDir, fileOpenFromList, fileOpenFromSSH, fileSaveToDocDir, fileSaveToSSH,
+      fileFind, fileOpenFromDocDir, fileOpenFromList, fileOpenFromSSH, fileSaveToSSH,
       fileFaveAddFile, fileFaveAddDir,
       fileExit,
     searchFind, searchReplace, searchRepeat, searchRepeatBackwards, searchGoToLine,
@@ -237,7 +238,7 @@ public class Menus {
     fileClipboardDoc.setEnabled(has);
     fileClipboardDocDir.setEnabled(has);
     fileOpenFromDocDir.setEnabled(has);
-    fileSaveToDocDir.setEnabled(has);
+    fileDelete.setEnabled(has);
   }
 
   private void showHasMarks(boolean has) {
@@ -460,6 +461,9 @@ public class Menus {
           ?KeyMapper.key(KeyEvent.VK_S, InputEvent.META_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)
           :null
       )
+      ,fileDelete = mu.doMenuItem(
+        "Delete", fileListener
+      )
       ,fileClose =mu.doMenuItem(
         "Close",   fileListener, KeyEvent.VK_C,
         currentOS.isOSX
@@ -546,9 +550,6 @@ public class Menus {
       )
       ,mu.add(
         fileSaveTo
-        ,fileSaveToDocDir=mu.doMenuItem(
-          "Current document directory", fileListener, KeyEvent.VK_C
-        )
         ,fileSaveToRecentDir=mu.doMenu(
           "Recent directory", KeyEvent.VK_R
         )
@@ -980,6 +981,7 @@ public class Menus {
     fileListenerMap
       .add(fileOpen,         ()->ctrlMain.doFileOpenDialog())
       .add(fileNew,          ()->ctrlMain.doNew())
+      .add(fileDelete,       ()->ctrlMain.doDelete())
       .add(fileSave,         ()->ctrlMain.doSave())
       .add(fileSaveAs,       ()->ctrlMain.doSave(true))
       .add(fileClose,        ()->ctrlMain.doFileClose())
@@ -994,7 +996,6 @@ public class Menus {
       .add(fileOpenFromDocDir,   ()->ctrlMain.doOpenFromDocDir())
       .add(fileOpenFromList,     ()->ctrlMain.doOpenFromList())
       .add(fileOpenFromSSH,      ()->ctrlMain.doOpenFromSSH())
-      .add(fileSaveToDocDir,     ()->ctrlMain.doSaveToDocDir())
       .add(fileSaveToSSH,        ()->ctrlMain.doSaveToSSH())
       .add(fileFaveAddDir,       ()->ctrlFileOther.doAddCurrentToFaveDirs())
       .add(fileFaveAddFile,      ()->ctrlFileOther.doAddCurrentToFaveFiles())
