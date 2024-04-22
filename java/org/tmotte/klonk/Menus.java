@@ -462,7 +462,7 @@ public class Menus {
           :null
       )
       ,fileDelete = mu.doMenuItem(
-        "Delete", fileListener
+        "Delete", fileListener, KeyEvent.VK_E
       )
       ,fileClose =mu.doMenuItem(
         "Close",   fileListener, KeyEvent.VK_C,
@@ -474,7 +474,7 @@ public class Menus {
         "Close others",   fileListener
       )
       ,fileCloseAll=mu.doMenuItem(
-        "Close all",   fileListener, KeyEvent.VK_E
+        "Close all",   fileListener
       )
     );
 

@@ -310,12 +310,17 @@ public class CtrlMain  {
   // FILE SAVE TO: //
 
   public void doSaveTo(String dir) {
-    File file=fileResolver.get(dir);
-    if (file==null)
+    final Editor editor = editorMgr.getFirst();
+    final File fileDir = fileResolver.get(dir);
+    if (fileDir == null)
       return;
-    file=showFileDialogForSave(null, file);
-    if (file!=null)
-      fileSave(editorMgr.getFirst(), file, true);
+    final File oldfile = editor.getFile();
+    File newfile = oldfile == null
+      ?null
+      :new File(fileDir, oldfile.getName());
+    newfile = showFileDialogForSave(newfile, fileDir);
+    if (newfile != null)
+      fileSave(editor, newfile, true);
   }
   public void doSaveToSSH() {
     File file=getSSHRecent(true);
