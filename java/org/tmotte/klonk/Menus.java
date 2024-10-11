@@ -526,7 +526,10 @@ public class Menus {
     MenuUtils.add(
       file
       ,fileFind=doMenuItem(
-          "Find files...", fileListener, KeyEvent.VK_L
+          "Find files...", fileListener, KeyEvent.VK_L,
+          currentOS.isOSX
+            ?KeyMapper.key(KeyEvent.VK_F, InputEvent.META_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)
+            :null
       )
       ,MenuUtils.add(
         fileOpenFrom

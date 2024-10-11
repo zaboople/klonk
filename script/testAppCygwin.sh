@@ -5,7 +5,7 @@ ant config.test compile || exit 1
 java \
     -Xshare:off \
     -Xms6m \
-    -classpath 'build:lib\vngx-jsch-0.10.jar' org.tmotte.klonk.config.BootContext \
+    -classpath 'build;lib\vngx-jsch-0.10.jar' org.tmotte.klonk.config.BootContext \
     -home test/home "$@"
 
 
