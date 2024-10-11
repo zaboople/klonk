@@ -169,9 +169,9 @@ public class SSHOpenFrom {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
     gb.weightXY(0);
-    gb.fill=gb.NONE;
-    gb.anchor=gb.NORTHWEST;
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.NONE;
+    gb.anchor=GridBug.NORTHWEST;
+    gb.fill=GridBug.HORIZONTAL;
     gb.weightXY(1,0);
     gb.insets.right=5;
     gb.add(getInputPanel());
@@ -187,7 +187,7 @@ public class SSHOpenFrom {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
 
     gb.insets.top=5;
     gb.insets.bottom=2;
@@ -204,7 +204,7 @@ public class SSHOpenFrom {
     gb.addY(new JLabel("ssh:"));
 
     gb.insets.left=1;
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.weightXY(0.3, 0);
     gb.addX(jcbPrevious);
 
@@ -224,7 +224,7 @@ public class SSHOpenFrom {
     gb.setInsets(5);
     gb.insets.top=0;
     gb.weightXY(1, 0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.add(lblError);
     return panel;
   }

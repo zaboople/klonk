@@ -16,7 +16,7 @@ import java.awt.Point;
  * Finally use insets to control padding; also setInsets()
  */
 public class GridBug extends GridBagConstraints {
-
+  private static final long serialVersionUID = 1L;
   public GridBagLayout gbl=new GridBagLayout();
   public Container container;
 

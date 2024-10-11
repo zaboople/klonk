@@ -140,7 +140,7 @@ public class About {
     gb.insets.top=10;
     gb.insets.bottom=10;
     gb.weightx=1;
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.add(jtpVersion);
 
     gb.insets.top=0;
@@ -148,11 +148,11 @@ public class About {
 
     gb.insets.top=0;
     gb.weightXY(1);
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.addY(jspLicense);
 
     gb.weightXY(0);
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.insets.top=5;
     gb.insets.bottom=10;
     gb.addY(btnOK);

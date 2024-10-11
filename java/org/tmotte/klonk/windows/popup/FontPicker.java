@@ -296,6 +296,7 @@ public class FontPicker {
 
   }
   private class MyFontRenderer extends JLabel implements ListCellRenderer<String> {
+    private static final long serialVersionUID = 1L;
     private Font defaultFont;
     Color badColor=new Color(230, 100, 100);
     public MyFontRenderer(Font defaultFont) {
@@ -339,11 +340,11 @@ public class FontPicker {
     gb.gridXY(0);
     gb.weightXY(0);
     gb.setInsets(5, 5, 0, 5);
-    gb.fill=gb.BOTH;
-    gb.anchor=gb.NORTHWEST;
+    gb.fill=GridBug.BOTH;
+    gb.anchor=GridBug.NORTHWEST;
     gb.addY(layoutTop());
 
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.weightXY(1);
     gb.addY(layoutBottom());
 
@@ -355,8 +356,8 @@ public class FontPicker {
     GridBug gb=new GridBug(jp);
     gb.gridXY(0);
     gb.weightXY(0);
-    gb.fill=gb.BOTH;
-    gb.anchor=gb.NORTHWEST;
+    gb.fill=GridBug.BOTH;
+    gb.anchor=GridBug.NORTHWEST;
     gb.setInsets(5);
     gb.insets.top=0;
 
@@ -373,12 +374,12 @@ public class FontPicker {
     gb.setX(0).setY(1);
     gb.gridXY(0, 2);
     gb.weightXY(0, 1);
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.add(jspControlSize);
 
     // Spinner label;
     gb.insets.left=4;
-    gb.fill=gb.VERTICAL;
+    gb.fill=GridBug.VERTICAL;
     gb.weightXY(1, 0);
     gb.addX(new JLabel("Minimum font size for various controls"));
     return jp;
@@ -389,7 +390,7 @@ public class FontPicker {
     GridBug gb=new GridBug(jp);
     gb.gridXY(0);
     gb.weightXY(0);
-    gb.anchor=gb.NORTHWEST;
+    gb.anchor=GridBug.NORTHWEST;
 
     // Label:
     gb.insets.top=0;
@@ -397,7 +398,7 @@ public class FontPicker {
     gb.addY(jlEFO);
 
     // Font name, size< style:
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.insets.left=20;
     gb.weightXY(0, 0.3);
     gb.addY(getEditorFontSelectionPanel());
@@ -405,18 +406,18 @@ public class FontPicker {
     // Colors:
     gb.insets.top=5;
     gb.weightXY(1, 0);
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.addY(getColorPanel());
 
     // Preview:
     gb.insets.top=0;
     gb.weightXY(1, 0.7);
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.addY(getPreviewPanel());
 
     // Buttons:
     gb.weightXY(1, 0);
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.addY(getButtonPanel());
 
     return jp;
@@ -424,9 +425,9 @@ public class FontPicker {
   private JPanel getEditorFontSelectionPanel() {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.weightXY(0.1, 1);
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.add(getFontListPanel());
 
     gb.insets.left=10;
@@ -435,7 +436,7 @@ public class FontPicker {
     gb.addX(getFontSizePanel());
 
     gb.weightx=0;
-    gb.fill=gb.VERTICAL;
+    gb.fill=GridBug.VERTICAL;
     gb.addX(getFontStylePanel());
     return jp;
   }
@@ -443,7 +444,7 @@ public class FontPicker {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
 
     JLabel label=new JLabel("Font:");
     label.setDisplayedMnemonic(KeyEvent.VK_F);
@@ -457,7 +458,7 @@ public class FontPicker {
 
     gb.weightXY(1);
     gb.insets.top=0;
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.addY(jspFonts);
 
     return jp;
@@ -466,7 +467,7 @@ public class FontPicker {
     JPanel panel=new JPanel();
     GridBug gb=new GridBug(panel);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.NORTHWEST;
+    gb.anchor=GridBug.NORTHWEST;
     gb.insets.left=5;
     gb.insets.right=5;
 
@@ -480,7 +481,7 @@ public class FontPicker {
 
     gb.weightXY(1);
     gb.insets.top=0;
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.addY(jspFontSize);
 
     return panel;
@@ -489,7 +490,7 @@ public class FontPicker {
     JPanel panel=new JPanel();
     GridBug gb=new GridBug(panel);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.NORTHWEST;
+    gb.anchor=GridBug.NORTHWEST;
     gb.insets.left=5;
     gb.insets.right=5;
 
@@ -502,7 +503,7 @@ public class FontPicker {
     }
 
     gb.insets.top=0;
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.addY(jcbBold);
     gb.weightXY(1,0);
     gb.addY(jcbItalic);
@@ -516,7 +517,7 @@ public class FontPicker {
     }
 
     gb.insets.top=0;
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.weightXY(1,1);
     gb.addY(jspCaretWidth);
     return panel;
@@ -525,14 +526,14 @@ public class FontPicker {
     JPanel panel=new JPanel();
     GridBug gb=new GridBug(panel);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.NORTHWEST;
+    gb.anchor=GridBug.NORTHWEST;
     gb.insets.left=5;
     gb.insets.right=5;
 
     gb.weightXY(1, 0);
     gb.insets.top=5;
-    gb.fill=gb.HORIZONTAL;
-    gb.anchor=gb.WEST;
+    gb.fill=GridBug.HORIZONTAL;
+    gb.anchor=GridBug.WEST;
     gb.add(getColorTopPanel());
 
     gb.insets.top=0;
@@ -543,7 +544,7 @@ public class FontPicker {
     JPanel panel=new JPanel();
     GridBug gb=new GridBug(panel);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
 
     JLabel label=new JLabel("Color:");
     label.setFont(label.getFont().deriveFont(Font.BOLD));
@@ -560,7 +561,7 @@ public class FontPicker {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
 
     JLabel label=new JLabel("Preview:");
     label.setFont(label.getFont().deriveFont(Font.BOLD));
@@ -573,7 +574,7 @@ public class FontPicker {
 
     gb.weightXY(1);
     gb.insets.top=0;
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.addY(jspMTA);
 
     return jp;
@@ -713,7 +714,7 @@ public class FontPicker {
   private KeyAdapter textAreaListener=new KeyAdapter() {
     public void keyPressed(KeyEvent e){
       final int code=e.getKeyCode();
-      if (code==e.VK_TAB) {
+      if (code==KeyEvent.VK_TAB) {
         int mods=e.getModifiersEx();
         if (KeyMapper.shiftPressed(mods))
           colorChooser.requestFocusInWindow();

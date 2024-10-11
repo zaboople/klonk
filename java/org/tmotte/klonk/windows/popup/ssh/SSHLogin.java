@@ -170,9 +170,9 @@ public class SSHLogin implements IUserPass {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.CENTER;
-    gb.fill=gb.HORIZONTAL;
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.CENTER;
+    gb.fill=GridBug.HORIZONTAL;
+    gb.anchor=GridBug.WEST;
     gb.setX(0).setY(0);
 
     gb.insets.top=5;

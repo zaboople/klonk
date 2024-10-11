@@ -376,13 +376,13 @@ public class FindAndReplace {
 
   private void layout() {
     GridBug gb=new GridBug(win);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.insets.right=2;
     gb.insets.top=5;
 
     //Find label:
     gb.insets.left=4;
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.gridXY(0);
     gb.weightXY(1, 0);
     gb.add(lblFind);
@@ -391,7 +391,7 @@ public class FindAndReplace {
     gb.insets.left=0;
     gb.insets.right=0;
     gb.insets.top=0;
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.weightXY(1, 0.5);
     gb.addY(contFind);
 
@@ -399,7 +399,7 @@ public class FindAndReplace {
     gb.insets.left=0;
     gb.insets.right=2;
     gb.insets.top=10;
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.weightXY(0);
     gb.addY(chkReplace);
 
@@ -407,7 +407,7 @@ public class FindAndReplace {
     gb.insets.left=0;
     gb.insets.right=0;
     gb.insets.top=0;
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.weightXY(1, 0.5);
     gb.addY(contReplace);
 
@@ -431,21 +431,21 @@ public class FindAndReplace {
     //Separator:
     JSeparator sep=new JSeparator(SwingConstants.VERTICAL);
     sep.setMinimumSize(new Dimension(2,10));
-    gb.fill=gb.VERTICAL;
+    gb.fill=GridBug.VERTICAL;
     gb.weighty=1;
     gb.addX(sep);
 
     //Buttons:
     gb.weighty=0;
     gb.weightx=1;
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.addX(getButtonPanel());
     return gb.container;
   }
   private Container getOptionsPanel() {
     GridBug gb=new GridBug(new JPanel());
     gb.insets.left=5; gb.insets.right=5;
-    gb.anchor=gb.NORTHWEST;
+    gb.anchor=GridBug.NORTHWEST;
     gb.gridXY(0).weightXY(0);
     gb.add(chkCase);
     gb.insets.top=-3;
@@ -461,7 +461,7 @@ public class FindAndReplace {
   private Container getButtonPanel() {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.gridXY(0).weightXY(0);
     gb.insets.left=10;
     gb.add(btnFind);
@@ -599,7 +599,7 @@ public class FindAndReplace {
       final
         int code=e.getKeyCode(),
         mods=e.getModifiersEx();
-      if (code==e.VK_TAB) {
+      if (code==KeyEvent.VK_TAB) {
         if (KeyMapper.ctrlPressed(mods))
           ((MyTextArea)e.getSource()).replaceSelection("	");
         else
@@ -625,12 +625,12 @@ public class FindAndReplace {
         e.consume();
       }
       else
-      if (code==e.VK_EQUALS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
+      if (code==KeyEvent.VK_EQUALS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
         fontBiggerLambda.run();
         e.consume();
       }
       else
-      if (code==e.VK_MINUS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
+      if (code==KeyEvent.VK_MINUS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
         fontSmallerLambda.run();
         e.consume();
       }

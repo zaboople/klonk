@@ -11,6 +11,7 @@ class ShellCommandParser {
   static String currFileMarker="[$1]";
 
   public static class Shex extends RuntimeException {
+    private static final long serialVersionUID = 1L;
     public Shex(String msg) {super(msg);}
   }
   public static List<String> parse(String cmd) {

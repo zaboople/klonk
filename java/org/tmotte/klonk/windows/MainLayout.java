@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -110,7 +111,7 @@ public class MainLayout {
         return frame.getBounds();
       }
       public boolean isMaximized() {
-        return (frame.getExtendedState() & frame.MAXIMIZED_BOTH) == frame.MAXIMIZED_BOTH;
+        return (frame.getExtendedState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
       }
       public void setEditor(Component c) {
         setCurrentEditor(c);
@@ -122,7 +123,7 @@ public class MainLayout {
     Positioner.fix(rect);
     frame.setBounds(rect);
     if (maximized)
-      frame.setExtendedState(frame.MAXIMIZED_BOTH);
+      frame.setExtendedState(Frame.MAXIMIZED_BOTH);
     frame.setVisible(true);
   }
 
@@ -206,7 +207,7 @@ public class MainLayout {
 
     //Set up editor panel:
     editorGB.gridXY(0).weightXY(1);
-    editorGB.fill=editorGB.BOTH;
+    editorGB.fill=GridBug.BOTH;
 
     //Set up rest of layout:
     GridBug gb=new GridBug(frame.getContentPane());
@@ -214,16 +215,16 @@ public class MainLayout {
     //Top panel:
     gb.gridXY(0)
       .weightXY(1, 0);
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.addY(makeTopPanel());
 
     //Editor panel:
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.weightXY(1)
       .addY(pnlEditor);
 
     //Status panel:
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.weightXY(1,0);
     layoutStatusPanel();
     gb.addY(pStatus);
@@ -246,9 +247,9 @@ public class MainLayout {
     pnlSaveAlert.setMinimumSize(prefer);
 
     GridBug gb=new GridBug(blah);
-    gb.fill=gb.VERTICAL;
+    gb.fill=GridBug.VERTICAL;
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.add(pnlSaveThisAlert);
     gb.weightx=1; //Last in line gets the 1 always
     gb.gridx++;
@@ -278,7 +279,7 @@ public class MainLayout {
       .weightXY(0,0)
 
       .insets(1, 0, 1, 3)
-      .anchor(gb.WEST)
+      .anchor(GridBug.WEST)
       .addX(lblRowHi)
 
       .insetLeft(2)
@@ -290,7 +291,7 @@ public class MainLayout {
       .addX(lblCol)
 
       .insets(3,0,3,9)
-      .fill(gb.VERTICAL)
+      .fill(GridBug.VERTICAL)
       .addX(makeSeparator())
 
       .insets(0,0,0,8)
@@ -316,7 +317,7 @@ public class MainLayout {
       .addX(lbl)
       .weightX(1)
       .insets(3,0,3,9)
-      .fill(gb.VERTICAL)
+      .fill(GridBug.VERTICAL)
       .addX(makeSeparator());
     return pnlCapsLock;
   }
@@ -332,7 +333,7 @@ public class MainLayout {
       .weightX(1)
       .insetLeft(9)
       .insets(3,0,3,9)
-      .fill(gb.VERTICAL)
+      .fill(GridBug.VERTICAL)
       .addX(makeSeparator())
       .getContainer();
   }

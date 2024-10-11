@@ -276,7 +276,7 @@ public class YesNoCancel {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         PopupTestContext ptc=new PopupTestContext();
-        JFrame m=ptc.makeMainFrame();
+        JFrame m=PopupTestContext.makeMainFrame();
         YesNoCancel ky=new YesNoCancel(
           ptc.getPopupInfo(), ptc.getFontOptions(), doCancel
         );

@@ -172,11 +172,11 @@ public class OpenFileList {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
     gb.weightXY(1);
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.add(getInputPanel());
 
     gb.weightXY(1,0);
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.addY(getButtons());
     win.pack();
   }
@@ -185,7 +185,7 @@ public class OpenFileList {
     gb.gridXY(0);
     gb.weightXY(0);
 
-    gb.anchor=gb.CENTER;
+    gb.anchor=GridBug.CENTER;
     gb.insets.top=5;
     gb.insets.bottom=5;
     gb.insets.left=5;
@@ -198,14 +198,14 @@ public class OpenFileList {
       gb.addY(j);
     }
 
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
 
     gb.insets.top=0;
     gb.insets.left=0;
     gb.insets.right=0;
     gb.weightXY(1);
-    gb.fill=gb.BOTH;
-    gb.anchor=gb.NORTH;
+    gb.fill=GridBug.BOTH;
+    gb.anchor=GridBug.NORTH;
     gb.addY(mtaFiles.makeVerticalScrollable());
 
     return gb.container;
@@ -251,7 +251,7 @@ public class OpenFileList {
     }
     public void keyPressed(KeyEvent e){
       final int code=e.getKeyCode();
-      if (code==e.VK_TAB) {
+      if (code==KeyEvent.VK_TAB) {
         int mods=e.getModifiersEx();
         if (KeyMapper.ctrlPressed(mods))
           mta.replaceSelection("	");

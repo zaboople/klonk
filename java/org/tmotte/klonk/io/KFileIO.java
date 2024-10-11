@@ -138,21 +138,21 @@ public class KFileIO {
     byte[] bom=new byte[4];
     istrm.read(bom);
     if (checkBOM(bom, utf8BOM)) {
-      fmd.encoding=fmd.UTF8;
+      fmd.encoding=FileMetaData.UTF8;
       fmd.readOffset=3;
     }
     else
     if (checkBOM(bom, utf16BEBOM)) {
-      fmd.encoding=fmd.UTF16BE;
+      fmd.encoding=FileMetaData.UTF16BE;
       fmd.readOffset=2;
     }
     else
     if (checkBOM(bom, utf16LEBOM)) {
-      fmd.encoding=fmd.UTF16LE;
+      fmd.encoding=FileMetaData.UTF16LE;
       fmd.readOffset=2;
     }
     else {
-      fmd.encoding=fmd.UTF8;
+      fmd.encoding=FileMetaData.UTF8;
       fmd.readOffset=0;
       fmd.encodingNeedsBOM=false;
     }
@@ -189,7 +189,7 @@ public class KFileIO {
       ) {
       if (fmd.encryption!=null){
         fmd.encodingNeedsBOM=false;
-        fmd.encoding=fmd.UTF8;
+        fmd.encoding=FileMetaData.UTF8;
       }
       if (fmd.encodingNeedsBOM) {
         if (fmd.encoding.equals(FileMetaData.UTF16BE))

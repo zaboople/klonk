@@ -145,10 +145,10 @@ public class GoToLine {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
     gb.weightXY(0);
-    gb.fill=gb.HORIZONTAL;
-    gb.anchor=gb.NORTHWEST;
+    gb.fill=GridBug.HORIZONTAL;
+    gb.anchor=GridBug.NORTHWEST;
     gb.add(getInputPanel());
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.weightXY(1);
     gb.addY(getButtons());
     setFont(fontOptions);
@@ -157,7 +157,7 @@ public class GoToLine {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
 
     gb.insets.top=2;
     gb.insets.bottom=2;
@@ -167,7 +167,7 @@ public class GoToLine {
     gb.add(label);
     gb.insets.left=0;
     gb.insets.right=5;
-    gb.weightXY(1, 0).setFill(gb.HORIZONTAL).addX(jtfRow);
+    gb.weightXY(1, 0).setFill(GridBug.HORIZONTAL).addX(jtfRow);
 
     return jp;
   }

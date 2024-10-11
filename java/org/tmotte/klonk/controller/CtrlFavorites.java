@@ -26,8 +26,8 @@ public class CtrlFavorites {
     this.persist=persist;
     this.favoriteFileListener=favoriteFileListener;
     this.favoriteDirListener=favoriteDirListener;
-    favoriteDirs    =new ArrayList<>(persist.maxFavorite);
-    favoriteFiles   =new ArrayList<>(persist.maxFavorite);
+    favoriteDirs    =new ArrayList<>(KPersist.maxFavorite);
+    favoriteFiles   =new ArrayList<>(KPersist.maxFavorite);
     persist.getFavorites(favoriteFiles, favoriteDirs);
     favoriteFileListener.set(favoriteFiles);
     favoriteDirListener.set(favoriteDirs);

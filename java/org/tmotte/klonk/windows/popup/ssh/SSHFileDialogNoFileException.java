@@ -5,6 +5,7 @@ package org.tmotte.klonk.windows.popup.ssh;
  * instead of barking.
  */
 public class SSHFileDialogNoFileException extends RuntimeException {
+  private static final long serialVersionUID = 1L;
   public SSHFileDialogNoFileException() {
     super();
   }

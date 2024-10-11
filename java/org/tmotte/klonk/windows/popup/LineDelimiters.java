@@ -134,7 +134,7 @@ public class LineDelimiters {
   private void layout() {
     GridBug gb=new GridBug(win.getContentPane());
     gb.gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
 
     Insets insets=gb.insets;
     insets.right=10;
@@ -162,7 +162,7 @@ public class LineDelimiters {
 
     //Button for close:
     insets.top=10;
-    gb.anchor=gb.CENTER;
+    gb.anchor=GridBug.CENTER;
     gb.addY(btnClose);
 
     setFont(fontOptions);
@@ -189,7 +189,7 @@ public class LineDelimiters {
     gb.gridXY(0);
     gb.weightx=1.0;
     gb.insets.top=2;
-    gb.anchor=gb.SOUTH;
+    gb.anchor=GridBug.SOUTH;
     gb.add(jcb);
     gb.insets.left=8;
     gb.addX(btn);

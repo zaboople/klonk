@@ -36,7 +36,9 @@ import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.common.swang.KeyMapper;
 
+@SuppressWarnings("this-escape")
 public class MyTextArea extends JTextArea {
+  private static final long serialVersionUID = 1L;
 
   ////////////////////
   // INSTANCE DATA: //
@@ -47,11 +49,11 @@ public class MyTextArea extends JTextArea {
   private JPopupMenu menu=new JPopupMenu();
   private JMenuItem mnuUndo, mnuRedo, mnuCut, mnuCopy, mnuPaste, mnuSelectAll;
   private JScrollPane jsp;
-  private MyCaret myCaret=new MyCaret();
+  private transient MyCaret myCaret=new MyCaret();
 
   //Undo components:
   private String preUndoSelected=null;
-  private Undo undos=new Undo();
+  private transient Undo undos=new Undo();
   private boolean suppressUndoRecord=false;
   private boolean forceDoubleUp=false;
   private boolean doubleUndo=false;
@@ -66,7 +68,7 @@ public class MyTextArea extends JTextArea {
   private boolean tabIndentsLine=false;
   private String indentSpaces="  ";
   private int indentSpacesLen=indentSpaces.length();
-  private CurrentOS currentOS;
+  private transient CurrentOS currentOS;
 
   ///////////////////
   // CONSTRUCTORS: //
@@ -150,7 +152,7 @@ public class MyTextArea extends JTextArea {
 
     // Default scroll mode is the "BLIT" scroll mode, which doesn't seem to be as fast.
     JViewport jvp=jsp.getViewport();
-    jvp.setScrollMode(jvp.SIMPLE_SCROLL_MODE);
+    jvp.setScrollMode(JViewport.SIMPLE_SCROLL_MODE);
 
     return jsp;
   }
@@ -311,7 +313,7 @@ public class MyTextArea extends JTextArea {
   //////////////////
 
 
-  private void addListeners() {
+  private final void addListeners() {
     addKeyListener(new MyKeyListener());
     getDocument().addDocumentListener(new MyDocumentListener());
     addMouseListener(
@@ -415,15 +417,15 @@ public class MyTextArea extends JTextArea {
 
         // Intercept variations on backspace/delete one character:
         setSelected(
-          code==e.VK_DELETE ||
-            (code==e.VK_D && KeyMapper.ctrlPressed(mods) && currentOS.isOSX)
+          code==KeyEvent.VK_DELETE ||
+            (code==KeyEvent.VK_D && KeyMapper.ctrlPressed(mods) && currentOS.isOSX)
           ,
-          code==e.VK_BACK_SPACE ||
-            (code==e.VK_H && KeyMapper.ctrlPressed(mods))
+          code==KeyEvent.VK_BACK_SPACE ||
+            (code==KeyEvent.VK_H && KeyMapper.ctrlPressed(mods))
         );
 
         //System.out.println("CODE "+code+" MODS "+mods);
-        if (code==e.VK_RIGHT) {
+        if (code==KeyEvent.VK_RIGHT) {
 
           //ARROW RIGHT:
           if (KeyMapper.ctrlPressed(mods) || KeyMapper.optionPressed(mods, currentOS)){
@@ -433,7 +435,7 @@ public class MyTextArea extends JTextArea {
 
         }
         else
-        if (code==e.VK_UP) {
+        if (code==KeyEvent.VK_UP) {
           if (!KeyMapper.shiftPressed(mods) && !KeyMapper.ctrlPressed(mods)){
             Caret c=getCaret();
             int start=c.getDot(), end=c.getMark();
@@ -445,7 +447,7 @@ public class MyTextArea extends JTextArea {
           }
         }
         else
-        if (code==e.VK_LEFT) {
+        if (code==KeyEvent.VK_LEFT) {
 
           //ARROW LEFT:
           boolean shift=KeyMapper.shiftPressed(mods);
@@ -467,8 +469,8 @@ public class MyTextArea extends JTextArea {
 
         }
         else
-        if (code==e.VK_CONTEXT_MENU || (
-              code==e.VK_F10 && KeyMapper.shiftPressed(e)
+        if (code==KeyEvent.VK_CONTEXT_MENU || (
+              code==KeyEvent.VK_F10 && KeyMapper.shiftPressed(e)
             )) {
 
           //CONTEXT MENU:
@@ -479,7 +481,7 @@ public class MyTextArea extends JTextArea {
 
         }
         else
-        if (code==e.VK_Z) {
+        if (code==KeyEvent.VK_Z) {
 
           //UNDO/REDO:
           if (KeyMapper.ctrlPressed(mods) || KeyMapper.metaPressed(e, currentOS)){
@@ -492,7 +494,7 @@ public class MyTextArea extends JTextArea {
 
         }
         else
-        if (code==e.VK_Y && KeyMapper.ctrlPressed(e)) {
+        if (code==KeyEvent.VK_Y && KeyMapper.ctrlPressed(e)) {
 
           //Another way to REDO:
           redo();
@@ -500,14 +502,14 @@ public class MyTextArea extends JTextArea {
 
         }
         else
-        if (code==e.VK_ENTER && indentOnHardReturn) {
+        if (code==KeyEvent.VK_ENTER && indentOnHardReturn) {
 
            doIndentOnHardReturn();
            e.consume();
 
         }
         else
-        if (code==e.VK_TAB && tabIndentsLine) {
+        if (code==KeyEvent.VK_TAB && tabIndentsLine) {
 
           //Tab indent & tab insert:
           if (KeyMapper.ctrlPressed(mods)){
@@ -521,36 +523,36 @@ public class MyTextArea extends JTextArea {
 
         }
         else
-        if (code==e.VK_W && KeyMapper.ctrlPressed(e) && currentOS.isOSX)
+        if (code==KeyEvent.VK_W && KeyMapper.ctrlPressed(e) && currentOS.isOSX)
           // Normally this gives a delete-to-beginning-of-line that
           // nobody knows about
           e.consume();
         else
-        if (code==e.VK_V && KeyMapper.ctrlPressed(e) && currentOS.isOSX){
+        if (code==KeyEvent.VK_V && KeyMapper.ctrlPressed(e) && currentOS.isOSX){
           // Pressing ctrl-v on macintosh should paste:
           paste();
           e.consume();
         }
         else
-        if (code==e.VK_C && KeyMapper.ctrlPressed(e) && currentOS.isOSX){
+        if (code==KeyEvent.VK_C && KeyMapper.ctrlPressed(e) && currentOS.isOSX){
           // Pressing ctrl-c on macintosh should copy:
           copy();
           e.consume();
         }
         else
-        if (code==e.VK_X && KeyMapper.ctrlPressed(e) && currentOS.isOSX){
+        if (code==KeyEvent.VK_X && KeyMapper.ctrlPressed(e) && currentOS.isOSX){
           // Pressing ctrl-x on macintosh should cut:
           cut();
           e.consume();
         }
         else
-        if (code==e.VK_HOME && currentOS.isOSX){
+        if (code==KeyEvent.VK_HOME && currentOS.isOSX){
           // Pressing home on OSX should go to beginning of line
           doHomeEnd(true, KeyMapper.shiftPressed(e), KeyMapper.ctrlPressed(e));
           e.consume();
         }
         else
-        if (code==e.VK_END && currentOS.isOSX){
+        if (code==KeyEvent.VK_END && currentOS.isOSX){
           // Pressing end on OSX should go to end of line
           doHomeEnd(false, KeyMapper.shiftPressed(e), KeyMapper.ctrlPressed(e));
           e.consume();
@@ -576,7 +578,7 @@ public class MyTextArea extends JTextArea {
     mnuRedo.setEnabled(undos.hasRedos());
     menu.show(MyTextArea.this, x, y);
   }
-  private Action myRightClickListener=new AbstractAction(){
+  private transient Action myRightClickListener=new AbstractAction(){
     public void actionPerformed(ActionEvent event) {
       Object s=event.getSource();
       if (s==mnuUndo)  undo();
@@ -723,7 +725,7 @@ public class MyTextArea extends JTextArea {
   // TAB INDENTS: //
   //////////////////
 
-  private Indenter indenter=new Indenter();
+  private final transient Indenter indenter=new Indenter();
   private void initIndenter(int indentLen) {
     indenter.tabIndents=tabsNotSpaces;
     indenter.tabSize=getTabSize();
@@ -981,7 +983,7 @@ public class MyTextArea extends JTextArea {
     }
     //Now take it a step further. This may still return false
     //because the position change is too far, fast or not:
-    return (undoOrRedo ^ st.uType==st.ADD)             //XOR trickiness
+    return (undoOrRedo ^ st.uType==UndoStep.ADD)             //XOR trickiness
       ?doUndoReplace(old!=null, st.text, st.start, st.start)      //Add text back if undo/remove redo/add
       :doUndoReplace(old!=null, null, st.start, st.start+st.len); //Rip text out  if redo/remove undo/add
   }

@@ -345,22 +345,22 @@ public class FileFind {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
     gb.weightx=1;
-    gb.fill=gb.HORIZONTAL;
-    gb.anchor=gb.NORTHWEST;
+    gb.fill=GridBug.HORIZONTAL;
+    gb.anchor=GridBug.NORTHWEST;
     gb.setInsets(5);
     gb.add(new JLabel("<html><b>Find files</b></html>"));
 
 
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.weighty=0.1;
     gb.addY(getDirFilePanel());
 
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.weighty=1;
     gb.addY(new JScrollPane(jlFiles));
 
     gb.weightXY(0.0);
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.addY(getButtonPanel());
 
     setFont(fontOptions);
@@ -370,10 +370,10 @@ public class FileFind {
     GridBug gb=new GridBug(new JPanel());
 
     // Directory part:
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.add(new JLabel("Directory:"));
 
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.weighty=0.0;
     gb.weightx=1.0;
     gb.insets.left=5;
@@ -385,28 +385,28 @@ public class FileFind {
     lblError.setVisible(false);
 
     // Expression part:
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.gridwidth=1;
     gb.weightx=0.0;
     gb.insets.left=0;
     gb.insets.top=3;
     gb.addY(new JLabel("Find:"));
 
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.weightx=1;
     gb.insets.left=5;
     gb.addX(jtfFind);
 
     // Exclude:
     gb.gridx=1;
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.gridwidth=1;
     gb.weightx=0.0;
     gb.insets.left=0;
     gb.insets.top=3;
     gb.addY(new JLabel("Exclude:"));
 
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.weightx=1;
     gb.insets.left=5;
     gb.addX(jtfExclude);
@@ -416,11 +416,11 @@ public class FileFind {
 
   private Container getDirectoryPanel()  {
     GridBug gb=new GridBug(new JPanel());
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.weightx=1.0;
     gb.add(jcbDir);
     gb.insets.left=3;
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.weightx=0.0;
     gb.addX(btnDir);
     return gb.container;

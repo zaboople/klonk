@@ -10,15 +10,16 @@ import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 public class SSHFile extends File {
+  private static final long serialVersionUID = 1L;
 
   ///////////////////////
   // STATIC UTILITIES: //
   ///////////////////////
-  
+
   public static SSHFile cast(File f) {
     if (f instanceof SSHFile)
       return (SSHFile)f;
-    return null;    
+    return null;
   }
   private static Pattern blankPattern=Pattern.compile(" ");
 
@@ -27,17 +28,17 @@ public class SSHFile extends File {
   ///////////////////////////////////////
 
   protected SSHFile parent;
-  private final SSH ssh;
-  private String name;  
-  private SSHFileAttr attributes=null;
-  
+  private final transient SSH ssh;
+  private String name;
+  private transient SSHFileAttr attributes=null;
+
   public SSHFile(SSH ssh, SSHFile parent, String filename) {
-    super(parent, filename); 
+    super(parent, filename);
     this.name=filename;
     this.ssh=ssh;
     this.parent=parent;
   }
-  
+
 
   public SSH getSSH(){
     return ssh;
@@ -46,17 +47,17 @@ public class SSHFile extends File {
     return ssh.getInputStream(getTildeFixPath());
   }
   public OutputStream getOutputStream() throws Exception {
-    if (!exists()) 
+    if (!exists())
       ssh.makeFile(getQuotedPath());
     return ssh.getOutputStream(getTildeFixPath());
   }
-  
+
   public @Override String getName() {
     return name;
   }
-  
-  
-  
+
+
+
   /*Tests whether this abstract pathname is absolute. */
   public @Override boolean isAbsolute() {
     return true;
@@ -64,12 +65,12 @@ public class SSHFile extends File {
   /*Tests whether the file named by this abstract pathname is a hidden file.*/
   public @Override boolean isHidden(){
     return false;
-  }  
-  
+  }
+
   ///////////////////////////
   // LAZY LOAD ATTRIBUTES: //
   ///////////////////////////
-  
+
   public @Override boolean isFile() {
     refresh();
     return attributes!=null && attributes.exists && !attributes.isDirectory;
@@ -89,7 +90,7 @@ public class SSHFile extends File {
   //////////////
   // LISTING: //
   //////////////
-  
+
   /*Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.*/
   public @Override String[] list(){
     return ssh.list(getTildeFixPath());
@@ -100,20 +101,20 @@ public class SSHFile extends File {
     File[] files=new File[fs.length];
     for (int i=0; i<fs.length; i++){
       String f=fs[i];
-      boolean endsWithSlash=f.endsWith("/");      
+      boolean endsWithSlash=f.endsWith("/");
       files[i]=new SSHFile(
-        ssh, 
-        this, 
+        ssh,
+        this,
         f
       );
     }
     return files;
   }
-  
+
   /////////////////
   // PATH STUFF: //
   /////////////////
-  
+
   public @Override String getAbsolutePath(){
     return getNetworkPath();
   }
@@ -133,11 +134,11 @@ public class SSHFile extends File {
   }
   /*Returns the canonical form of this abstract pathname.*/
   public @Override File	getCanonicalFile(){
-    return this;  
+    return this;
   }
 
   // PRIVATE: //
-  
+
   /** Includes the ssh://name@host: in the path */
   private String getNetworkPath() {
     String user=getUser(), host=getHost();
@@ -151,7 +152,7 @@ public class SSHFile extends File {
   private void getSystemPath(StringBuilder sb) {
     if (parent!=null){
       parent.getSystemPath(sb);
-      if (!parent.name.equals("/")) 
+      if (!parent.name.equals("/"))
         sb.append("/");
     }
     sb.append(getName());
@@ -168,17 +169,17 @@ public class SSHFile extends File {
       s=blankPattern.matcher(s).replaceAll("\\\\ ");
     return s;
   }
-  
+
   //////////////
   // COMPARE: //
   //////////////
 
   /*Compares two abstract pathnames lexicographically.*/
   public @Override int compareTo(File other){
-    return getAbsolutePath().compareTo(other.getAbsolutePath()); 
+    return getAbsolutePath().compareTo(other.getAbsolutePath());
   }
   private static boolean cmp(Object a, Object b) {
-    if (a==null) 
+    if (a==null)
       return b==null;
     else
     if (b==null)
@@ -189,11 +190,11 @@ public class SSHFile extends File {
   /*Tests this abstract pathname for equality with the given object.*/
   public @Override boolean equals(Object obj){
     if (obj==null || !(obj instanceof SSHFile))
-      return false;     
+      return false;
     SSHFile other=(SSHFile)obj;
     if (!cmp(this.getName(), other.getName()))
       return false;
-    if (this.parent==null && other.parent==null) 
+    if (this.parent==null && other.parent==null)
       return cmp(this.getUser(), other.getUser())
         &&   cmp(this.getHost(), other.getHost());
     return cmp(this.parent, other.parent);
@@ -201,7 +202,7 @@ public class SSHFile extends File {
   /*Computes a hash code for this abstract pathname.*/
   public @Override int hashCode(){
     return getNetworkPath().hashCode();
-  }  
+  }
   public @Override String toString() {
     return getNetworkPath();
   }
@@ -216,12 +217,12 @@ public class SSHFile extends File {
   private void mylog(String s) {
     ssh.userNotify.log(s);
   }
-  
+
   ///////////////////////////
   // FILE MODIFICATION:    //
   // mkdir, rename, delete //
-  /////////////////////////// 
-  
+  ///////////////////////////
+
   /*Creates the directory named by this abstract pathname. */
   public @Override boolean mkdir(){
     ssh.uncache(getTildeFixPath());
@@ -233,12 +234,12 @@ public class SSHFile extends File {
     String otherName=sshFile==null
       ?dest.getAbsolutePath()
       :sshFile.getQuotedPath();
-    boolean success=ssh.rename(getQuotedPath(), otherName); 
+    boolean success=ssh.rename(getQuotedPath(), otherName);
     ssh.uncache(getTildeFixPath());
-    if (success) 
+    if (success)
       this.name=dest.getName();
     return success;
-  }  
+  }
   /*Deletes the file or directory denoted by this abstract pathname.*/
   public @Override boolean delete(){
     ssh.uncache(getTildeFixPath());
@@ -260,13 +261,13 @@ public class SSHFile extends File {
   public @Override long	lastModified() {
     return attributes==null ?1 :attributes.getLastModified();
   }
-  
-  
+
+
   ///////////////////////////////
   // NOT PROPERLY IMPLEMENTED: //
   ///////////////////////////////
 
-  
+
   /**
    * Returns a java.nio.file.Path object constructed from the this abstract path.
    * This is a little bit of a problem as Editor uses it to check for "sameness".
@@ -275,18 +276,18 @@ public class SSHFile extends File {
   public @Override Path toPath() {
     mylog(getSystemPath()+"toPath");
     return super.toPath();
-  }  
+  }
   /*Tests whether the application can execute the file denoted by this abstract pathname.*/
   public @Override boolean canExecute() {
     mylog("canExecute");
     return super.canExecute();
-  }  
+  }
   /*Tests whether the application can read the file denoted by this abstract pathname.*/
   public @Override boolean canRead() {
     mylog("canRead");
     return true;
     //return super.canRead();
-  }  
+  }
   /*Tests whether the application can modify the file denoted by this abstract pathname.*/
   public @Override boolean canWrite() {
     mylog("canWrite");
@@ -295,11 +296,11 @@ public class SSHFile extends File {
   /*Returns the absolute form of this abstract pathname.*/
   public @Override File	getAbsoluteFile(){
     mylog("getAbsoluteFile: "+getName());
-    return this;  
+    return this;
   }
-  
-  
-   
+
+
+
   ////////////////////
   //  UNSUPPORTED:  //
   ////////////////////
@@ -328,22 +329,22 @@ public class SSHFile extends File {
   public @Override long	getUsableSpace(){
     throw new UnsupportedOperationException();
   }
-  /** 
-   * Returns an array of strings naming the files and directories in the directory denoted by this 
+  /**
+   * Returns an array of strings naming the files and directories in the directory denoted by this
    * abstract pathname that satisfy the specified filter.
    */
   public @Override String[] list(FilenameFilter filter){
     throw new UnsupportedOperationException();
   }
-  /** 
-   *  Returns an array of abstract pathnames denoting the files and directories in the directory denoted by this 
+  /**
+   *  Returns an array of abstract pathnames denoting the files and directories in the directory denoted by this
    *  abstract pathname that satisfy the specified filter.
    */
   public @Override File[] listFiles(FileFilter filter){
     throw new UnsupportedOperationException();
   }
   /**
-   *  Returns an array of abstract pathnames denoting the files and directories in the directory denoted by this 
+   *  Returns an array of abstract pathnames denoting the files and directories in the directory denoted by this
    *  abstract pathname that satisfy the specified filter.
    */
   public @Override File[] listFiles(FilenameFilter filter){

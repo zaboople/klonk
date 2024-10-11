@@ -11,6 +11,7 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.JTextComponent;
 
 class MyCaret extends DefaultCaret {
+  private static final long serialVersionUID = 1L;
 
   int betterWidth=1;
   int halfWidth=0;
