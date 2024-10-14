@@ -22,7 +22,6 @@ import org.tmotte.klonk.config.msg.MainDisplay;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.msg.UserNotify;
-import org.tmotte.klonk.config.option.LineDelimiterOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.controller.Recents;
 import org.tmotte.klonk.edit.UndoEvent;

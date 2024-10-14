@@ -18,7 +18,7 @@ import org.tmotte.klonk.config.msg.UserServer;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
-import org.tmotte.klonk.config.option.LineDelimiterOptions;
+import org.tmotte.klonk.config.option.DelimiterOpts;
 
 public class KPersist {
   public final static int maxRecent=15;
@@ -127,9 +127,9 @@ public class KPersist {
     taio.inferTabIndents   =getBoolean("Indent.InferTabs", true);
     String temp=get("Indent.DefaultMode", "SPACES");
     if ("TABS".equals(temp))
-      taio.indentionModeDefault=taio.INDENT_TABS;
+      taio.indentionModeDefault=TabAndIndentOptions.INDENT_TABS;
     else
-      taio.indentionModeDefault=taio.INDENT_SPACES;
+      taio.indentionModeDefault=TabAndIndentOptions.INDENT_SPACES;
     taio.tabSize=getInt("Tabs.Size", 4);
     taio.indentSpacesSizeMatchTabs=getBoolean("Indent.SpacesSize.MatchTabs", true);
     taio.indentSpacesSize=taio.indentSpacesSizeMatchTabs
@@ -142,7 +142,7 @@ public class KPersist {
     setBoolean("Indent.TabIndentsLine", taio.tabIndentsLine);
     setBoolean("Indent.InferTabs", taio.inferTabIndents);
     setBoolean("Indent.SpacesSize.MatchTabs", taio.indentSpacesSizeMatchTabs);
-    if (taio.indentionModeDefault==taio.INDENT_TABS)
+    if (taio.indentionModeDefault==TabAndIndentOptions.INDENT_TABS)
       set("Indent.DefaultMode", "TABS");
     else
       set("Indent.DefaultMode", "SPACES");
@@ -191,13 +191,13 @@ public class KPersist {
     if (s==null)
       return
         currentOS.isMSWindows
-          ?LineDelimiterOptions.CRLFs
-          :LineDelimiterOptions.LFs;
+          ?DelimiterOpts.CRLFs
+          :DelimiterOpts.LFs;
     else
-      return LineDelimiterOptions.translateFromReadable(s);
+      return DelimiterOpts.translateFromReadable(s);
   }
   public KPersist setDefaultLineDelimiter(String option) {
-    String s=LineDelimiterOptions.translateToReadable(option);
+    String s=DelimiterOpts.translateToReadable(option);
     set("DefaultLineDelimiter", s);
     return this;
   }
