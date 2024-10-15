@@ -109,6 +109,12 @@ public class FileDialogWrapper {
         fd.setMode(opts.forSave ?FileDialog.SAVE :FileDialog.LOAD);
         fd.setVisible(true);
 
+        if (opts.dirsOnly) {
+          final String d = fd.getDirectory();
+          return d==null
+            ?null
+            :new File(fd.getDirectory());
+        }
         File[] f=fd.getFiles();
         if (f==null || f.length==0)
           return null;
@@ -145,6 +151,7 @@ public class FileDialogWrapper {
         returnVal=fileChooser.showSaveDialog(pInfo.parentFrame);
       else
         returnVal=fileChooser.showOpenDialog(pInfo.parentFrame);
+
       if (returnVal==JFileChooser.APPROVE_OPTION)
         return fileChooser.getSelectedFile();
       else

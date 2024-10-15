@@ -528,7 +528,7 @@ public class Menus {
       ,fileFind=doMenuItem(
           "Find files...", fileListener, KeyEvent.VK_L,
           currentOS.isOSX
-            ?KeyMapper.key(KeyEvent.VK_F, InputEvent.META_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)
+            ?KeyMapper.key(KeyEvent.VK_L, InputEvent.META_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)
             :null
       )
       ,MenuUtils.add(
@@ -1288,6 +1288,13 @@ public class Menus {
       if (code==KeyEvent.VK_S && KeyMapper.ctrlPressed(modifiers)) {
         e.consume();
         ctrlMain.doSave();
+      }
+
+      //Close window
+      else
+      if (code==KeyEvent.VK_W && KeyMapper.ctrlPressed(modifiers)) {
+        e.consume();
+        ctrlMain.doFileClose();
       }
 
       //Switch:
