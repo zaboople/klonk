@@ -7,7 +7,7 @@ import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.msg.StatusUpdate;
 import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.config.option.LineDelimiterOptions;
+import org.tmotte.klonk.config.option.DelimiterOpts;
 import org.tmotte.klonk.config.option.SSHOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 import org.tmotte.klonk.ssh.SSHConnections;
@@ -147,7 +147,7 @@ public class CtrlOptions {
   }
 
   public void doLineDelimiters(){
-    LineDelimiterOptions k=new LineDelimiterOptions();
+    DelimiterOpts k=new DelimiterOpts();
     k.defaultOption=persist.getDefaultLineDelimiter();
     k.thisFile=editors.getFirst().getLineBreaker();
     lineDelimiters.show(k, delimListener);

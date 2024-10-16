@@ -92,7 +92,7 @@ public class Editor {
     // vertical scrollbar jitter.
     // https://bugs.openjdk.java.net/browse/JDK-8147994
     if (currentOS.isOSX)
-      jsp.setHorizontalScrollBarPolicy(jsp.HORIZONTAL_SCROLLBAR_ALWAYS);
+      jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
     jta.addUndoListener(undoL);
     jta.addUndoListener(myUndoListener);
@@ -116,14 +116,14 @@ public class Editor {
     jta.setTabIndentsLine(taio.tabIndentsLine);
     jta.setIndentSpaces(taio.buildIndentSpaces());
   }
-  public void setWordWrap(boolean wordWrap) {
+  public final void setWordWrap(boolean wordWrap) {
     jta.setLineWrap(wordWrap);
     jta.setWrapStyleWord(wordWrap);
   }
-  public void setAutoTrim(boolean b){
+  public final void setAutoTrim(boolean b){
     autoTrimOnSave=b;
   }
-  public void setFont(FontOptions options) {
+  public final void setFont(FontOptions options) {
     jta.setFont(options.getFont());
     jta.setForeground(options.getColor());
     jta.setBackground(options.getBackgroundColor());
@@ -738,7 +738,7 @@ public class Editor {
     public synchronized void drop(DropTargetDropEvent evt) {
       try {
         evt.acceptDrop(DnDConstants.ACTION_COPY);
-        List droppedFiles=(List)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+        List<?> droppedFiles=(List<?>)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
         for (Object file : droppedFiles)
           editListener.fileDropped((File)file);
       } catch (Exception ex) {

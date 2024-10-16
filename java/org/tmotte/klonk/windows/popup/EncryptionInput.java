@@ -232,8 +232,8 @@ public class EncryptionInput {
     gb
       .gridXY(0)
       .weightXY(0)
-      .fill(gb.HORIZONTAL)
-      .anchor(gb.NORTHWEST)
+      .fill(GridBug.HORIZONTAL)
+      .anchor(GridBug.NORTHWEST)
       .insets(5, 10, 5, 10)
       .add(getInputPanel())
       .addY(getButtons())
@@ -245,13 +245,13 @@ public class EncryptionInput {
     return
       gb.weightXY(1, 1)
         .gridXY(0)
-        .anchor(gb.CENTER)
+        .anchor(GridBug.CENTER)
         .insets(5, 5, 10, 5)
 
         .gridWidth(3)
         .addY(lblEncryptedWarning)
 
-        .fill(gb.HORIZONTAL)
+        .fill(GridBug.HORIZONTAL)
         .insets(2, 2, 2, 2)
         .weightX(0)
         .gridX(0)
@@ -271,7 +271,7 @@ public class EncryptionInput {
         .gridWidth(4)
         .addY(chkShowPass)
         .addY(chkPreservePass)
-        .fill(gb.NONE)
+        .fill(GridBug.NONE)
         .addY(lblError)
 
         .getContainer()

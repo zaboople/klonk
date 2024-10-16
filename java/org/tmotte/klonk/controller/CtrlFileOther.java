@@ -27,14 +27,14 @@ public class CtrlFileOther {
     try{
       String cmd=null;
       if (currentOS.isOSX)
-        cmd="open ";
+        cmd="open";
       else
       if (currentOS.isMSWindows)
-        cmd="explorer ";
+        cmd="explorer";
       else
         throw new RuntimeException("Unknown operating system");
       String filename=editors.getFirst().getFile().getParentFile().getCanonicalPath();
-      Runtime.getRuntime().exec(cmd+filename);
+      Runtime.getRuntime().exec(new String[]{cmd, filename});
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

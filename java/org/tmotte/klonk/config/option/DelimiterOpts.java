@@ -3,20 +3,20 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 
-public class LineDelimiterOptions {
+public class DelimiterOpts {
 
 
-  public final static String 
-    LFs=new String(new char[]{10}), 
-    CRs=new String(new char[]{13}); 
-  public final static String 
+  public final static String
+    LFs=new String(new char[]{10}),
+    CRs=new String(new char[]{13});
+  public final static String
     CRLFs=CRs+LFs;
   public final static Pattern pattern=Pattern.compile("([\\r][\\n]|[\\r]|[\\n])");
 
 
   public String defaultOption=CRLFs,
                 thisFile=CRLFs;
-  
+
   public static String detect(String s) {
     Matcher m=pattern.matcher(s);
     if (m.find())
@@ -24,15 +24,15 @@ public class LineDelimiterOptions {
     return null;
   }
   public String toString() {
-    return 
+    return
       "Default: "  +translateToReadable(defaultOption)+
       "\nThis file: "+translateToReadable(thisFile);
   }
-  
+
   ////////////////
   // TRANSLATE: //
   ////////////////
-  
+
   public static String translateFromReadable(String s) {
     if (s==null)            fail("Null input");
     else
@@ -57,21 +57,21 @@ public class LineDelimiterOptions {
       fail("Invalid translation from actual: "+s);
     return null;
   }
-  
+
   /////////////
   // ERRORS: //
   /////////////
-  
+
   private static void fail(String error) {
     throw new RuntimeException(error);
   }
-  
-  
+
+
   ///////////
   // TEST: //
   ///////////
-  
-  
+
+
   public static void main(String[] args) throws Exception {
     java.io.InputStreamReader br=new java.io.InputStreamReader(new java.io.FileInputStream(args[0]));
     int charsRead;
@@ -92,5 +92,5 @@ public class LineDelimiterOptions {
 
     }
   }
-  
+
 }

@@ -25,8 +25,8 @@ import org.tmotte.common.swang.MenuUtils;
 import org.tmotte.klonk.config.msg.Editors;
 import org.tmotte.klonk.config.msg.Setter;
 import org.tmotte.klonk.config.option.FontOptions;
-import org.tmotte.klonk.controller.CtrlMain;
 import org.tmotte.klonk.controller.CtrlFileOther;
+import org.tmotte.klonk.controller.CtrlMain;
 import org.tmotte.klonk.controller.CtrlMarks;
 import org.tmotte.klonk.controller.CtrlOptions;
 import org.tmotte.klonk.controller.CtrlOther;
@@ -35,12 +35,15 @@ import org.tmotte.klonk.controller.CtrlSelection;
 import org.tmotte.klonk.controller.CtrlUndo;
 import org.tmotte.klonk.windows.popup.FindAndReplace;
 
+import static org.tmotte.common.swang.MenuUtils.doMenu;
+import static org.tmotte.common.swang.MenuUtils.doMenuItem;
+import static org.tmotte.common.swang.MenuUtils.doMenuItemCheckbox;
+
 public class Menus {
 
   //Various instance variables:
   private Editors editors;
   private Map<JMenuItem,Editor> switchMenuToEditor=new Hashtable<>();
-  private MenuUtils mu=new MenuUtils();
   private CurrentOS currentOS;
   private JPanel osxAttachPopupsTo;
   private Setter<Boolean> markStateListener=
@@ -273,7 +276,7 @@ public class Menus {
 
     //Build first menu, a quick-list of recent files:
     for (int i=0; i<Math.min(easyLen, size); i++)
-      menuX.add(mu.doMenuItem(startList.get(i), listener));
+      menuX.add(doMenuItem(startList.get(i), listener));
 
     //Build second menu, a longer list of all files you have open:
     if (size>easyLen){
@@ -292,7 +295,7 @@ public class Menus {
       // Now add them:
       menuX.addSeparator();
       for (String s: list)
-        menuX.add(mu.doMenuItem(s, listener));
+        menuX.add(doMenuItem(s, listener));
     }
   }
   private void setFavorites(
@@ -318,7 +321,7 @@ public class Menus {
 
     // Add everything:
     for (String s: startList) {
-      menuX.add(mu.doMenuItem(s, listener));
+      menuX.add(doMenuItem(s, listener));
     }
 
     // Put things back or enable/disable if empty:
@@ -408,8 +411,8 @@ public class Menus {
     ) {
     JMenuItem jmi=
       checked
-        ?mu.doMenuItemCheckbox(e.getTitle(), switchListener)
-        :mu.doMenuItem(
+        ?doMenuItemCheckbox(e.getTitle(), switchListener)
+        :doMenuItem(
           e.getTitle(), switchListener, -1,
           f12
             ?KeyMapper.key(KeyEvent.VK_F12,0)
@@ -438,54 +441,54 @@ public class Menus {
   private void create() {
     bar.setBorderPainted(false);
 
-    file=mu.doMenu(bar, "File", KeyEvent.VK_F);
+    file=doMenu(bar, "File", KeyEvent.VK_F);
 
     //FILE MENU SECTION 1:
-    mu.add(
+    MenuUtils.add(
        file
-      ,fileOpen =mu.doMenuItem(
+      ,fileOpen =doMenuItem(
         "Open...", fileListener, KeyEvent.VK_O,
         KeyMapper.keyByOS(KeyEvent.VK_O)
       )
-      ,fileNew  =mu.doMenuItem(
+      ,fileNew  =doMenuItem(
         "New",     fileListener, KeyEvent.VK_N,
         KeyMapper.keyByOS(KeyEvent.VK_N)
       )
-      ,fileSave =mu.doMenuItem(
+      ,fileSave =doMenuItem(
         "Save",    fileListener, KeyEvent.VK_S,
         KeyMapper.keyByOS(KeyEvent.VK_S)
       )
-      ,fileSaveAs=mu.doMenuItem(
+      ,fileSaveAs=doMenuItem(
         "Save as...",   fileListener, KeyEvent.VK_A,
         currentOS.isOSX
           ?KeyMapper.key(KeyEvent.VK_S, InputEvent.META_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)
           :null
       )
-      ,fileDelete = mu.doMenuItem(
+      ,fileDelete = doMenuItem(
         "Delete", fileListener, KeyEvent.VK_E
       )
-      ,fileClose =mu.doMenuItem(
+      ,fileClose =doMenuItem(
         "Close",   fileListener, KeyEvent.VK_C,
         currentOS.isOSX
           ?KeyMapper.key(KeyEvent.VK_W, InputEvent.META_DOWN_MASK)
           :KeyMapper.key(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK)
       )
-      ,fileCloseOthers=mu.doMenuItem(
+      ,fileCloseOthers=doMenuItem(
         "Close others",   fileListener
       )
-      ,fileCloseAll=mu.doMenuItem(
+      ,fileCloseAll=doMenuItem(
         "Close all",   fileListener
       )
     );
 
     //FILE MENU SECTION 2 (PRINT):
     file.addSeparator();
-    mu.add(
+    MenuUtils.add(
        file
-      ,fileEncrypt=mu.doMenuItem(
+      ,fileEncrypt=doMenuItem(
         "Encrypt", fileListener, KeyEvent.VK_T
       )
-      ,filePrint=mu.doMenuItem(
+      ,filePrint=doMenuItem(
         "Print", fileListener, KeyEvent.VK_P,
         KeyMapper.key(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)
       )
@@ -494,18 +497,18 @@ public class Menus {
     //FILE MENU SECTION 3:
     file.addSeparator();
     if (currentOS.isMSWindows || currentOS.isOSX)
-      file.add(fileDocDirExplore =mu.doMenuItem(
+      file.add(fileDocDirExplore =doMenuItem(
         "Open document's directory", fileListener, KeyEvent.VK_D
       ));
-    mu.add(
+    MenuUtils.add(
       file,
-      fileClipboardDoc=mu.doMenuItem(
+      fileClipboardDoc=doMenuItem(
         "Copy document name to clipboard", fileListener, KeyEvent.VK_Y,
         currentOS.isOSX
           ?KeyMapper.key(KeyEvent.VK_Y, InputEvent.META_DOWN_MASK)
           :null
       ),
-      fileClipboardDocDir=mu.doMenuItem(
+      fileClipboardDocDir=doMenuItem(
         "Copy document directory to clipboard", fileListener, KeyEvent.VK_U,
         currentOS.isOSX
           ?KeyMapper.key(KeyEvent.VK_Y, InputEvent.META_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)
@@ -518,62 +521,65 @@ public class Menus {
     file.addSeparator();
     //Used for popups:
     JMenu
-      fileOpenFrom=mu.doMenu("Open from", KeyEvent.VK_F),
-      fileSaveTo=mu.doMenu("Save to", KeyEvent.VK_V);
-    mu.add(
+      fileOpenFrom=doMenu("Open from", KeyEvent.VK_F),
+      fileSaveTo=doMenu("Save to", KeyEvent.VK_V);
+    MenuUtils.add(
       file
-      ,fileFind=mu.doMenuItem(
-          "Find files...", fileListener, KeyEvent.VK_L
+      ,fileFind=doMenuItem(
+          "Find files...", fileListener, KeyEvent.VK_L,
+          currentOS.isOSX
+            ?KeyMapper.key(KeyEvent.VK_L, InputEvent.META_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)
+            :null
       )
-      ,mu.add(
+      ,MenuUtils.add(
         fileOpenFrom
-        ,fileOpenFromDocDir   =mu.doMenuItem(
+        ,fileOpenFromDocDir   =doMenuItem(
           "Current document directory", fileListener, KeyEvent.VK_C
         )
-        ,fileOpenFromRecentDir=mu.doMenu(
+        ,fileOpenFromRecentDir=doMenu(
           "Recent directory", KeyEvent.VK_R
         )
-        ,fileOpenFromFave     =mu.doMenu(
+        ,fileOpenFromFave     =doMenu(
           "Favorite directory", KeyEvent.VK_F
         )
         ,fileOpenFromList     =
           currentOS.isOSX
-            ?mu.doMenuItem(
+            ?doMenuItem(
               "List...", fileListener, KeyEvent.VK_F,
               KeyMapper.key(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK)
             )
             :null
         ,null
-        ,fileOpenFromSSH      =mu.doMenuItem(
+        ,fileOpenFromSSH      =doMenuItem(
           "SSH...", fileListener, KeyEvent.VK_S
         )
       )
-      ,mu.add(
+      ,MenuUtils.add(
         fileSaveTo
-        ,fileSaveToRecentDir=mu.doMenu(
+        ,fileSaveToRecentDir=doMenu(
           "Recent directory", KeyEvent.VK_R
         )
-        ,fileSaveToFave=mu.doMenu(
+        ,fileSaveToFave=doMenu(
           "Favorite directory", KeyEvent.VK_F
         )
-        ,fileSaveToSSH=mu.doMenuItem(
+        ,fileSaveToSSH=doMenuItem(
           "SSH...", fileListener, KeyEvent.VK_S
         )
       )
       ,
-      mu.add(
-        fileFave  =mu.doMenu("Favorite files", KeyEvent.VK_I)
+      MenuUtils.add(
+        fileFave  =doMenu("Favorite files", KeyEvent.VK_I)
         ,
-        fileFaveAddFile=mu.doMenuItem(
+        fileFaveAddFile=doMenuItem(
           "Add current file to favorites", fileListener, KeyEvent.VK_A
         )
         ,
-        fileFaveAddDir=mu.doMenuItem(
+        fileFaveAddDir=doMenuItem(
           "Add current directory to favorites", fileListener, KeyEvent.VK_D
         )
       )
       ,
-      fileReopen=mu.doMenu("Re-open", KeyEvent.VK_R)
+      fileReopen=doMenu("Re-open", KeyEvent.VK_R)
     );
     if (extraPopups) {
       pOpenFrom=makePopup(fileOpenFrom, "Open from:");
@@ -584,7 +590,7 @@ public class Menus {
 
     //FILE MENU SECTION 5 (EXIT)
     file.addSeparator();
-    file.add(fileExit  =mu.doMenuItem(
+    file.add(fileExit  =doMenuItem(
       "Exit",    fileListener, KeyEvent.VK_X,
       currentOS.isOSX
         ?null
@@ -593,25 +599,25 @@ public class Menus {
 
 
     //SWITCH:
-    switcher=mu.doMenu(bar, "Switch",     KeyEvent.VK_W);
-    switchFrontToBack=mu.doMenuItem(
+    switcher=doMenu(bar, "Switch",     KeyEvent.VK_W);
+    switchFrontToBack=doMenuItem(
       "Send front to back", switchListener, KeyEvent.VK_S,
       currentOS.isOSX
         ?KeyMapper.key(KeyEvent.VK_BACK_QUOTE, KeyMapper.shortcutByOS())
         :KeyMapper.key(KeyEvent.VK_F11)
     );
-    switchBackToFront=mu.doMenuItem(
+    switchBackToFront=doMenuItem(
       "Send back to front", switchListener, KeyEvent.VK_E,
       currentOS.isOSX
         ?KeyMapper.key(KeyEvent.VK_BACK_QUOTE, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
         :KeyMapper.key(KeyEvent.VK_F11, KeyEvent.SHIFT_DOWN_MASK)
     );
-    switchNextUnsaved=mu.doMenuItem(
+    switchNextUnsaved=doMenuItem(
       "Next unsaved file", switchListener, KeyEvent.VK_X
     );
     if (extraPopups) {
       pswitcher=makeLabelledPopup("Switch:");
-      pSwitchNextUnsaved=mu.doMenuItem(
+      pSwitchNextUnsaved=doMenuItem(
         "Next unsaved file", switchListener
       );
       pswitcher.addSeparator();
@@ -620,39 +626,39 @@ public class Menus {
 
 
     //SEARCH:
-    search=mu.doMenu(bar, "Search", KeyEvent.VK_S);
-    mu.add(
+    search=doMenu(bar, "Search", KeyEvent.VK_S);
+    MenuUtils.add(
       search
       ,
-      searchFind=mu.doMenuItem(
+      searchFind=doMenuItem(
         "Find", searchListener, KeyEvent.VK_F,
         KeyMapper.key(KeyEvent.VK_F, KeyMapper.shortcutByOS())
       )
       ,
-      searchReplace=mu.doMenuItem(
+      searchReplace=doMenuItem(
         "Replace", searchListener, KeyEvent.VK_R,
         KeyMapper.key(KeyEvent.VK_R, KeyMapper.shortcutByOS())
       )
     );
     search.addSeparator();
-    mu.add(
+    MenuUtils.add(
       search
       ,
-      searchRepeat=mu.doMenuItem(
+      searchRepeat=doMenuItem(
         "Repeat find/replace", searchListener, KeyEvent.VK_P,
         FindAndReplace.getFindAgainKey(currentOS)
       )
       ,
-      searchRepeatBackwards=mu.doMenuItem(
+      searchRepeatBackwards=doMenuItem(
         "...Backwards", searchListener, KeyEvent.VK_B,
         FindAndReplace.getFindAgainReverseKey(currentOS)
       )
     );
     search.addSeparator();
-    mu.add(
+    MenuUtils.add(
       search
       ,
-      searchGoToLine=mu.doMenuItem(
+      searchGoToLine=doMenuItem(
         "Go to line number...", searchListener, KeyEvent.VK_O,
         currentOS.isOSX
           ?KeyMapper.key(KeyEvent.VK_T, KeyMapper.shortcutByOS())
@@ -662,31 +668,31 @@ public class Menus {
 
 
     //MARK:
-    mark=mu.doMenu(bar, "Mark", markListener, KeyEvent.VK_M);
-    mu.add(
+    mark=doMenu(bar, "Mark", markListener, KeyEvent.VK_M);
+    MenuUtils.add(
       mark,
-      markSet=mu.doMenuItem(
+      markSet=doMenuItem(
         "Set mark", markItemListener, KeyEvent.VK_S,
         currentOS.isOSX
           ?KeyMapper.key(KeyEvent.VK_M, KeyMapper.shortcutByOS())
           :KeyMapper.key(KeyEvent.VK_F4)
       )
       ,
-      markGoToPrevious=mu.doMenuItem(
+      markGoToPrevious=doMenuItem(
         "Go to previous mark", markItemListener, KeyEvent.VK_G,
         currentOS.isOSX
           ?KeyMapper.key(KeyEvent.VK_COMMA, KeyMapper.shortcutByOS())
           :KeyMapper.key(KeyEvent.VK_F8)
       )
       ,
-      markGoToNext=mu.doMenuItem(
+      markGoToNext=doMenuItem(
         "Go to next mark", markItemListener, KeyEvent.VK_O,
           currentOS.isOSX
             ?KeyMapper.key(KeyEvent.VK_PERIOD, KeyMapper.shortcutByOS())
             :KeyMapper.key(KeyEvent.VK_F9)
       )
       ,
-      markClearCurrent=mu.doMenuItem(
+      markClearCurrent=doMenuItem(
         "Clear current mark",
         markItemListener, KeyEvent.VK_C,
 
@@ -695,7 +701,7 @@ public class Menus {
           :KeyMapper.key(KeyEvent.VK_F4, KeyEvent.SHIFT_DOWN_MASK)
       )
       ,
-      markClearAll=mu.doMenuItem(
+      markClearAll=doMenuItem(
         "Clear all marks",
         markItemListener, KeyEvent.VK_L
       )
@@ -704,80 +710,80 @@ public class Menus {
 
 
     //UNDO:
-    undo=mu.doMenu(bar, "Undo", KeyEvent.VK_U);
-    mu.add(
+    undo=doMenu(bar, "Undo", KeyEvent.VK_U);
+    MenuUtils.add(
       undo
       ,
-      undoUndo=mu.doMenuItem(
+      undoUndo=doMenuItem(
         "Undo", undoItemListener, KeyEvent.VK_U,
         KeyMapper.keyByOS(KeyEvent.VK_Z)
       )
       ,
-      undoRedo=mu.doMenuItem(
+      undoRedo=doMenuItem(
         "Redo", undoItemListener, KeyEvent.VK_R,
         KeyMapper.keyByOS(KeyEvent.VK_Z, KeyEvent.SHIFT_DOWN_MASK)
       )
     );
     undo.addSeparator();
-    mu.add(
+    MenuUtils.add(
       undo
       ,
-      undoToBeginning=mu.doMenuItem(
+      undoToBeginning=doMenuItem(
         "Undo to beginning", undoItemListener, KeyEvent.VK_D,
         KeyMapper.key(KeyEvent.VK_F9, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
       ,
-      undoRedoToEnd=mu.doMenuItem(
+      undoRedoToEnd=doMenuItem(
         "Redo to end", undoItemListener, KeyEvent.VK_T,
         KeyMapper.key(KeyEvent.VK_F12, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
       ,
-      undoToHistorySwitch=mu.doMenuItem(
+      undoToHistorySwitch=doMenuItem(
         "Undo to history switch", undoItemListener, KeyEvent.VK_H
       )
       ,
-      redoToHistorySwitch=mu.doMenuItem(
+      redoToHistorySwitch=doMenuItem(
         "Redo to history switch", undoItemListener, KeyEvent.VK_I
       )
     );
     undo.addSeparator();
     undo.add(
-      undoFast=mu.doMenuItemCheckbox(
+      undoFast=doMenuItemCheckbox(
         "Use fast undos", undoItemListener, KeyEvent.VK_F, false
       )
     );
     undo.addSeparator();
-    mu.add(
+    MenuUtils.add(
       undo
       ,
-      undoClearUndos=mu.doMenuItem("Clear undo stack", undoItemListener)
+      undoClearUndos=doMenuItem("Clear undo stack", undoItemListener)
       ,
-      undoClearRedos=mu.doMenuItem("Clear redo stack", undoItemListener)
+      undoClearRedos=doMenuItem("Clear redo stack", undoItemListener)
       ,
-      undoClearBoth=mu.doMenuItem("Clear both", undoItemListener)
+      undoClearBoth=doMenuItem("Clear both", undoItemListener)
     );
 
 
     //SELECTION:
-    mu.add(
-      select=mu.doMenu(bar, "Selection",   selectListener, KeyEvent.VK_E)
-      ,selectUpperCase=mu.doMenuItem(
+    MenuUtils.add(
+      select=doMenu(bar, "Selection",   selectListener, KeyEvent.VK_E)
+      ,selectUpperCase=doMenuItem(
         "Uppercase selection",
         selectionItemListener, KeyEvent.VK_U
       )
-      ,selectLowerCase=mu.doMenuItem(
+      ,selectLowerCase=doMenuItem(
         "Lowercase selection",
         selectionItemListener, KeyEvent.VK_L
       )
-      ,selectSortLines=mu.doMenuItem(
+      ,selectSortLines=doMenuItem(
         "Sort selected lines",
         selectionItemListener, KeyEvent.VK_S
       )
-      ,selectGetSelectionSize=mu.doMenuItem(
+      ,selectGetSelectionSize=doMenuItem(
         "Get selection size",
         selectionItemListener, KeyEvent.VK_G
       )
-      ,selectGetAsciiValues=mu.doMenuItem(
+      ,selectGetAsciiValues=doMenuItem(
         "Get ASCII/Unicode value(s) of selection",
         selectionItemListener, KeyEvent.VK_A
       )
@@ -788,10 +794,10 @@ public class Menus {
     }
 
     //ALIGN:
-    mu.add(
-      align=mu.doMenu(bar, "Align", KeyEvent.VK_A)
+    MenuUtils.add(
+      align=doMenu(bar, "Align", KeyEvent.VK_A)
       ,
-      weirdInsertToAlign=mu.doMenuItem(
+      weirdInsertToAlign=doMenuItem(
         "Insert spaces to align cursor to above"+(
           currentOS.isOSX
             ?"  ( ^ space)"
@@ -801,7 +807,7 @@ public class Menus {
         KeyMapper.key(KeyEvent.VK_SPACE, KeyEvent.CTRL_DOWN_MASK)
       )
       ,
-      weirdInsertToAlignBelow=mu.doMenuItem(
+      weirdInsertToAlignBelow=doMenuItem(
         "Insert spaces to align cursor to below"+(
           currentOS.isOSX
             ?"  (^ ⇧ space)"
@@ -811,25 +817,25 @@ public class Menus {
         KeyMapper.key(KeyEvent.VK_SPACE, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
       ,
-      weirdBackspaceToAlign=mu.doMenuItem(
+      weirdBackspaceToAlign=doMenuItem(
         "Backspace to align cursor to above",
         alignItemListener, KeyEvent.VK_B,
         KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.CTRL_DOWN_MASK)
       )
       ,
-      weirdBackspaceToAlignBelow=mu.doMenuItem(
+      weirdBackspaceToAlignBelow=doMenuItem(
         "Backspace to align cursor to below",
         alignItemListener, KeyEvent.VK_C,
         KeyMapper.key(KeyEvent.VK_BACK_SPACE, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
       )
       ,
-      weirdAlignOneRight=mu.doMenuItem(
+      weirdAlignOneRight=doMenuItem(
         "One space to the right",
         alignItemListener, KeyEvent.VK_R,
         KeyMapper.key(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK)
       )
       ,
-      weirdAlignOneLeft=mu.doMenuItem(
+      weirdAlignOneLeft=doMenuItem(
         "One space to the left",
         alignItemListener, KeyEvent.VK_L,
         KeyMapper.key(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK, KeyEvent.SHIFT_DOWN_MASK)
@@ -837,9 +843,9 @@ public class Menus {
     );
 
     //EXTERNAL:
-    mu.add(
-      external=mu.doMenu(bar, "External", KeyEvent.VK_X)
-      ,externalRunBatch=mu.doMenuItem(
+    MenuUtils.add(
+      external=doMenu(bar, "External", KeyEvent.VK_X)
+      ,externalRunBatch=doMenuItem(
         "Run batch program",
         externalItemListener, KeyEvent.VK_R,
         KeyMapper.keyByOS(KeyEvent.VK_E)
@@ -848,33 +854,33 @@ public class Menus {
 
     //OSX SHORTCUTS:
     if (extraPopups){
-      mu.add(
-        osxShortcuts=mu.doMenu(bar, "MacOS Shortcuts", 0)
-        ,osxOpenFrom=mu.doMenuItem(
+      MenuUtils.add(
+        osxShortcuts=doMenu(bar, "MacOS Shortcuts", 0)
+        ,osxOpenFrom=doMenuItem(
           "Open from...", osxShortcutListener, 0,
           KeyMapper.key(KeyEvent.VK_O, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
         )
-        ,osxSaveTo=mu.doMenuItem(
+        ,osxSaveTo=doMenuItem(
           "Save to...", osxShortcutListener, 0,
           KeyMapper.key(KeyEvent.VK_T, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
         )
-        ,osxFavorite=mu.doMenuItem(
+        ,osxFavorite=doMenuItem(
           "Favorite files...", osxShortcutListener, 0,
           KeyMapper.key(KeyEvent.VK_I, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
         )
-        ,osxReopen=mu.doMenuItem(
+        ,osxReopen=doMenuItem(
           "Reopen file...", osxShortcutListener, 0,
           KeyMapper.key(KeyEvent.VK_R, KeyMapper.shortcutByOS(), KeyEvent.SHIFT_DOWN_MASK)
         )
       );
       osxShortcuts.addSeparator();
-      mu.add(
+      MenuUtils.add(
         osxShortcuts
-        ,osxSwitch=mu.doMenuItem(
+        ,osxSwitch=doMenuItem(
           "Switch menu...", osxShortcutListener, 0,
           KeyMapper.key(KeyEvent.VK_I, KeyMapper.shortcutByOS())
         )
-        ,osxSelect=mu.doMenuItem(
+        ,osxSelect=doMenuItem(
           "Selection menu...", osxShortcutListener, 0,
           KeyMapper.key(KeyEvent.VK_L, KeyMapper.shortcutByOS())
         )
@@ -883,42 +889,42 @@ public class Menus {
 
 
     //OPTIONS:
-    mu.add(
-      options=mu.doMenu(bar, "Options",   KeyEvent.VK_O)
-      ,optionWordWrap=mu.doMenuItemCheckbox(
+    MenuUtils.add(
+      options=doMenu(bar, "Options",   KeyEvent.VK_O)
+      ,optionWordWrap=doMenuItemCheckbox(
         "Word wrap", optionListener, KeyEvent.VK_W, false
       )
-      ,optionAutoTrim=mu.doMenuItemCheckbox(
+      ,optionAutoTrim=doMenuItemCheckbox(
         "Auto-trim trailing spaces on save", optionListener, KeyEvent.VK_A, false
       )
       ,
-      optionFontBigger=mu.doMenuItem(
+      optionFontBigger=doMenuItem(
         "Make font bigger", optionListener, KeyEvent.VK_B,
         KeyMapper.key(KeyEvent.VK_EQUALS, KeyMapper.shortcutByOS())
       )
       ,
-      optionFontSmaller=mu.doMenuItem(
+      optionFontSmaller=doMenuItem(
         "Make font smaller", optionListener, KeyEvent.VK_B,
         KeyMapper.key(KeyEvent.VK_MINUS, KeyMapper.shortcutByOS())
       )
     );
     options.addSeparator();
-    mu.add(
+    MenuUtils.add(
       options
-      ,optionTabsAndIndents=mu.doMenuItem("Tabs & Indents",               optionListener, KeyEvent.VK_T)
-      ,optionLineDelimiters=mu.doMenuItem("Line delimiters",              optionListener, KeyEvent.VK_L)
-      ,optionFont          =mu.doMenuItem("Font & colors",                optionListener, KeyEvent.VK_F)
-      ,optionFavorites     =mu.doMenuItem("Favorite files & directories", optionListener, KeyEvent.VK_V)
-      ,optionSSH           =mu.doMenuItem("SSH Options",                  optionListener, KeyEvent.VK_S)
+      ,optionTabsAndIndents=doMenuItem("Tabs & Indents",               optionListener, KeyEvent.VK_T)
+      ,optionLineDelimiters=doMenuItem("Line delimiters",              optionListener, KeyEvent.VK_L)
+      ,optionFont          =doMenuItem("Font & colors",                optionListener, KeyEvent.VK_F)
+      ,optionFavorites     =doMenuItem("Favorite files & directories", optionListener, KeyEvent.VK_V)
+      ,optionSSH           =doMenuItem("SSH Options",                  optionListener, KeyEvent.VK_S)
     );
 
     //HELP:
-    mu.add(
-      help=mu.doMenu(bar, "Help",   KeyEvent.VK_H)
-      ,helpAbout   =mu.doMenuItem(
+    MenuUtils.add(
+      help=doMenu(bar, "Help",   KeyEvent.VK_H)
+      ,helpAbout   =doMenuItem(
         "About Klonk",                   helpListener, KeyEvent.VK_A
       )
-      ,helpShortcut=mu.doMenuItem(
+      ,helpShortcut=doMenuItem(
         "Shortcuts and hidden features", helpListener, KeyEvent.VK_S, KeyMapper.key(KeyEvent.VK_F1)
       )
     );
@@ -1234,7 +1240,7 @@ public class Menus {
       final int modifiers=e.getModifiersEx();
 
       // Marks:
-      if (code==e.VK_F4) {
+      if (code==KeyEvent.VK_F4) {
         if (KeyMapper.shiftPressed(modifiers))
           ctrlMarks.doMarkClearCurrent();
         else
@@ -1242,19 +1248,19 @@ public class Menus {
         e.consume();
       }
       else
-      if (code==e.VK_F8 && modifiers==0) {
+      if (code==KeyEvent.VK_F8 && modifiers==0) {
         ctrlMarks.doMarkGoToPrevious();
         e.consume();
       }
       else
-      if (code==e.VK_F9 && modifiers==0) {
+      if (code==KeyEvent.VK_F9 && modifiers==0) {
         ctrlMarks.doMarkGoToNext();
         e.consume();
       }
       else
 
       //Find:
-      if (code==e.VK_F3) {
+      if (code==KeyEvent.VK_F3) {
         e.consume();
         if (KeyMapper.shiftPressed(modifiers))
           ctrlSearch.doSearchRepeatBackwards();
@@ -1262,31 +1268,38 @@ public class Menus {
           ctrlSearch.doSearchRepeat();
       }
       else
-      if (code==e.VK_F && KeyMapper.ctrlPressed(modifiers)){
+      if (code==KeyEvent.VK_F && KeyMapper.ctrlPressed(modifiers)){
         e.consume();
         ctrlSearch.doSearchFind();
       }
       else
-      if (code==e.VK_R && KeyMapper.ctrlPressed(modifiers)) {
+      if (code==KeyEvent.VK_R && KeyMapper.ctrlPressed(modifiers)) {
         e.consume();
         ctrlSearch.doSearchReplace();
       }
       else
-      if (code==e.VK_G && KeyMapper.ctrlPressed(modifiers)) {
+      if (code==KeyEvent.VK_G && KeyMapper.ctrlPressed(modifiers)) {
         e.consume();
         ctrlSearch.doSearchGoToLine();
       }
 
       //Save:
       else
-      if (code==e.VK_S && KeyMapper.ctrlPressed(modifiers)) {
+      if (code==KeyEvent.VK_S && KeyMapper.ctrlPressed(modifiers)) {
         e.consume();
         ctrlMain.doSave();
       }
 
+      //Close window
+      else
+      if (code==KeyEvent.VK_W && KeyMapper.ctrlPressed(modifiers)) {
+        e.consume();
+        ctrlMain.doFileClose();
+      }
+
       //Switch:
       else
-      if (code==e.VK_F11) {
+      if (code==KeyEvent.VK_F11) {
         e.consume();
         if (KeyMapper.shiftPressed(modifiers))
           ctrlMain.doSendBackToFront();

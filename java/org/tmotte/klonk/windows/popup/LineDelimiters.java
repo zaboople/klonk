@@ -26,7 +26,7 @@ import org.tmotte.common.swang.CurrentOS;
 import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.swang.KeyMapper;
 import org.tmotte.klonk.config.PopupInfo;
-import org.tmotte.klonk.config.option.LineDelimiterOptions;
+import org.tmotte.klonk.config.option.DelimiterOpts;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.msg.Setter;
 
@@ -59,7 +59,7 @@ public class LineDelimiters {
   }
 
 
-  public void show(LineDelimiterOptions current, LineDelimiterListener listener) {
+  public void show(DelimiterOpts current, LineDelimiterListener listener) {
     init();
     this.listener=listener;
     //These have to come before the other crap or it won't render. Which is stupid.
@@ -93,14 +93,14 @@ public class LineDelimiters {
     btnDefault.setEnabled(false);
     jcbDefault.requestFocus();
     String sel=jcbDefault.getSelectedItem().toString();
-    listener.setDefault(LineDelimiterOptions.translateFromReadable(sel));
+    listener.setDefault(DelimiterOpts.translateFromReadable(sel));
     happened.set("Default line delimiter set");
   }
   private void clickSetThis() {
     btnThis.setEnabled(false);
     jcbThis.requestFocus();
     String sel=jcbThis.getSelectedItem().toString();
-    listener.setThis(LineDelimiterOptions.translateFromReadable(sel));
+    listener.setThis(DelimiterOpts.translateFromReadable(sel));
     happened.set("Current line delimiter set");
   }
   private void clickClose() {
@@ -134,7 +134,7 @@ public class LineDelimiters {
   private void layout() {
     GridBug gb=new GridBug(win.getContentPane());
     gb.gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
 
     Insets insets=gb.insets;
     insets.right=10;
@@ -162,7 +162,7 @@ public class LineDelimiters {
 
     //Button for close:
     insets.top=10;
-    gb.anchor=gb.CENTER;
+    gb.anchor=GridBug.CENTER;
     gb.addY(btnClose);
 
     setFont(fontOptions);
@@ -189,7 +189,7 @@ public class LineDelimiters {
     gb.gridXY(0);
     gb.weightx=1.0;
     gb.insets.top=2;
-    gb.anchor=gb.SOUTH;
+    gb.anchor=GridBug.SOUTH;
     gb.add(jcb);
     gb.insets.left=8;
     gb.addX(btn);
@@ -236,21 +236,21 @@ public class LineDelimiters {
   ///////////////////////
 
   private static int getSelectedOption(String option) {
-    if (option.equals(LineDelimiterOptions.CRs))
+    if (option.equals(DelimiterOpts.CRs))
       return 0;
     else
-    if (option.equals(LineDelimiterOptions.LFs))
+    if (option.equals(DelimiterOpts.LFs))
       return 1;
     else
-    if (option.equals(LineDelimiterOptions.CRLFs))
+    if (option.equals(DelimiterOpts.CRLFs))
       return 2;
     throw new RuntimeException("I don't know what to do with: <"+option+">");
   }
   private static String[] getOptions() {
     return new String[]{
-      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.CRs),
-      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.LFs),
-      LineDelimiterOptions.translateToReadable(LineDelimiterOptions.CRLFs),
+      DelimiterOpts.translateToReadable(DelimiterOpts.CRs),
+      DelimiterOpts.translateToReadable(DelimiterOpts.LFs),
+      DelimiterOpts.translateToReadable(DelimiterOpts.CRLFs),
     };
   }
 
@@ -262,7 +262,7 @@ public class LineDelimiters {
   public static void main(final String[] args) throws Exception {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        final LineDelimiterOptions kdo=new LineDelimiterOptions();
+        final DelimiterOpts kdo=new DelimiterOpts();
         PopupTestContext ptc=new PopupTestContext();
         new LineDelimiters(
             ptc.getPopupInfo(), ptc.getFontOptions(),

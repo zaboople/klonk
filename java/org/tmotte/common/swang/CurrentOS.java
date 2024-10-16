@@ -23,7 +23,7 @@ public class CurrentOS {
       jb.addKeyListener(
         new KeyAdapter() {
           public void keyPressed(KeyEvent e){
-            if (e.getKeyCode()==e.VK_ENTER) {
+            if (e.getKeyCode()==KeyEvent.VK_ENTER) {
               e.consume();
               action.actionPerformed(new ActionEvent(jb, 1, "faked"));
             }

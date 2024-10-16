@@ -42,7 +42,6 @@ public class FileSave {
             System.out.print(s);
             System.out.flush();
           }
-          istr.close();
         }
         System.out.println("File read");
       }

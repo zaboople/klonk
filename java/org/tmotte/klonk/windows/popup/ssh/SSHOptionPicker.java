@@ -226,8 +226,8 @@ public class SSHOptionPicker {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
     gb.weightXY(0);
-    gb.fill=gb.HORIZONTAL;
-    gb.anchor=gb.NORTHWEST;
+    gb.fill=GridBug.HORIZONTAL;
+    gb.anchor=GridBug.NORTHWEST;
     gb.add(getKnownPrivatePanel());
 
     gb.insets.top=20;
@@ -269,7 +269,7 @@ public class SSHOptionPicker {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
 
     gb.insets.top=8;
     gb.insets.bottom=2;
@@ -286,9 +286,9 @@ public class SSHOptionPicker {
     gb.addY(jcbKnownHosts);
 
     gb.weightx=1;
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.addX(jtfKnownHosts);
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.weightx=0;
 
     gb.insets.right=4;
@@ -301,9 +301,9 @@ public class SSHOptionPicker {
     gb.addY(jcbPrivateKeys);
 
     gb.weightx=1;
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.addX(jtfPrivateKeys);
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.weightx=0;
 
     gb.insets.right=4;
@@ -315,9 +315,9 @@ public class SSHOptionPicker {
     gb.addY(jcbOpenSSHConfig);
 
     gb.weightx=1;
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.addX(jtfOpenSSHConfig);
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.weightx=0;
 
     gb.insets.right=4;
@@ -331,7 +331,7 @@ public class SSHOptionPicker {
 
     GridBug gb=new GridBug(jp);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.insets.top=4;
     gb.insets.bottom=2;
     gb.insets.left=0;
@@ -374,7 +374,7 @@ public class SSHOptionPicker {
 
     GridBug gb=new GridBug(jp);
     gb.weightXY(0).gridXY(0);
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.insets.top=4;
     gb.insets.bottom=2;
     gb.insets.left=2;
@@ -388,7 +388,7 @@ public class SSHOptionPicker {
     gb.addY(jpConns);
 
     gbConns.weightXY(1,0);
-    gbConns.anchor=gbConns.WEST;
+    gbConns.anchor=GridBug.WEST;
 
     return jp;
   }

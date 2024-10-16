@@ -113,7 +113,10 @@
           deprecation="on"
           srcdir="${java.dir}"
           includeantruntime="false">
-      <!--compilerarg value="-Xlint"/-->
+      <!-- -->
+      <compilerarg value="-Xlint"/>
+      <compilerarg value="-Xmaxwarns"/>
+      <compilerarg value="600"/>
       <classpath refid="classpath"/>
     </javac>
 

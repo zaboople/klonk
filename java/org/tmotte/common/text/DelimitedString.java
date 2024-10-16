@@ -24,7 +24,7 @@ public class DelimitedString implements Appender {
     this("",between,"");
   }
 
-  /** 
+  /**
    * Same as new <code>DelimitedString(initial, between, "", "", "");</code>
    *  @param initial Will go before first item.
    *  @param between Will go after each additional item except last.
@@ -32,7 +32,7 @@ public class DelimitedString implements Appender {
   public DelimitedString(String initial, String between){
     this(initial,between,"");
   }
-  /** 
+  /**
    * Same as new <code>DelimitedString(initial, between, last, "", "");</code>
    *  @param initial Will go before first item.
    *  @param between   Will go after each additional item except last.
@@ -41,23 +41,23 @@ public class DelimitedString implements Appender {
   public DelimitedString(String initial, String between, String last){
     this(initial, between, last, "", "");
   }
-  /** 
+  /**
    * Sets all the possible delimiters. When printed, the DelimitedString will
    * insert these delimiters around list members as they are concatenated together. Null parameters
    * for this constructor will be treated as blanks ("").
    * <br>
    * For example, the two-item list "a" "b" will be formatted as:<pre>
-   
+
       [initial][beforeEach]a[afterEach][between][beforeEach]b[afterEach][last]
       </pre>
    * As another example, to generate a comma-separated-values (CSV) record, the constructor would be invoked as:<br>
    * <pre>
-   
+
       new DelimitedString(null, ",", null, "\"", "\"");
-      </pre>   
+      </pre>
    *  @param initial Goes before first item.
    *  @param between Is only used if there is more than one
-   *                 item. Goes after each item except the last one. 
+   *                 item. Goes after each item except the last one.
    *  @param last    Goes after last item.
    *  @param beforeEach This goes immediately before each item; for the first item,
    *                    goes after <code>initial</code> but before the item.
@@ -90,8 +90,8 @@ public class DelimitedString implements Appender {
   // ADD: //
   //////////
 
-  /** 
-   * Adds <code>object</code> to the internal list. 
+  /**
+   * Adds <code>object</code> to the internal list.
    */
   public final DelimitedString add(Object object){
     if (object==null)
@@ -100,19 +100,19 @@ public class DelimitedString implements Appender {
     return this;
   }
   /** Adds each member of <code>list</code> individually. */
-  public DelimitedString addEach(Enumeration list){
+  public DelimitedString addEach(Enumeration<?> list){
     while (list.hasMoreElements())
       add(list.nextElement());
     return this;
   }
   /** Adds each member of <code>list</code> individually. */
-  public DelimitedString addEach(Iterator list){
+  public DelimitedString addEach(Iterator<?> list){
     while (list.hasNext())
       add(list.next());
     return this;
   }
   /** Adds each member of <code>list</code> individually. */
-  public DelimitedString addEach(List list){
+  public DelimitedString addEach(List<?> list){
     for (Object o: list)
       this.add(o);
     return this;
@@ -123,11 +123,11 @@ public class DelimitedString implements Appender {
       add(o);
     return this;
   }
-    
+
   /////////////////
   // Generation: //
   /////////////////
-  
+
   private void doString(Appendable a, String before1, String before2, Object middle, String after) throws IOException {
     if (middle instanceof DelimitedString && ((DelimitedString)middle).size()==0)
       return;
@@ -139,7 +139,7 @@ public class DelimitedString implements Appender {
       a.append(middle.toString());
     a.append(after);
   }
-  /** 
+  /**
    * Fulfills the Appender interface. Similar to toString(), but is more
    * efficient to use when you know what you want to write the DelimitedString
    * to, since it eliminates the need for an internal text buffer (e.g. StringBuilder/StringBuffer).
@@ -155,12 +155,12 @@ public class DelimitedString implements Appender {
         throw new RuntimeException(e);
       }
   }
-  /** 
+  /**
    * Converts the internal list to a String by toString()'ing list members and concatenating them
-   * together in order, delimited by the various delimiters passed to the constructor. 
+   * together in order, delimited by the various delimiters passed to the constructor.
    * @return "" if nothing has been added.
    */
-  public String toString() {  
+  public String toString() {
     StringBuilder result=new StringBuilder();
     appendTo(result);
     return result.toString();
@@ -182,6 +182,6 @@ public class DelimitedString implements Appender {
     ds.add(c);
     System.out.println(ds);
   }
-  
+
 }
 

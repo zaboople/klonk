@@ -184,11 +184,11 @@ public class Favorites {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
     gb.weightXY(1);
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.add(getInputPanel());
 
     gb.weightXY(1,0);
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.addY(getButtons());
 
     setFont(fontOptions);
@@ -198,7 +198,7 @@ public class Favorites {
     gb.gridXY(0);
     gb.weightXY(0);
 
-    gb.anchor=gb.CENTER;
+    gb.anchor=GridBug.CENTER;
     gb.insets.top=5;
     gb.insets.bottom=5;
     gb.insets.left=5;
@@ -207,7 +207,7 @@ public class Favorites {
       gb.addY(mainLabel);
     }
 
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.insets.top=2;
     gb.insets.bottom=0;
     {
@@ -222,12 +222,12 @@ public class Favorites {
     gb.insets.left=0;
     gb.insets.right=0;
     gb.weightXY(1);
-    gb.fill=gb.BOTH;
-    gb.anchor=gb.NORTH;
+    gb.fill=GridBug.BOTH;
+    gb.anchor=GridBug.NORTH;
     gb.addY(mtaFiles.makeVerticalScrollable());
 
     gb.weightXY(0);
-    gb.anchor=gb.NORTHWEST;
+    gb.anchor=GridBug.NORTHWEST;
     gb.insets.top=5;
     gb.insets.bottom=2;
     gb.insets.left=5;
@@ -243,8 +243,8 @@ public class Favorites {
     gb.insets.left=0;
     gb.insets.right=0;
     gb.weightXY(1);
-    gb.fill=gb.BOTH;
-    gb.anchor=gb.NORTH;
+    gb.fill=GridBug.BOTH;
+    gb.anchor=GridBug.NORTH;
     gb.addY(mtaDirs.makeVerticalScrollable());
 
     return gb.container;
@@ -291,7 +291,7 @@ public class Favorites {
     }
     public void keyPressed(KeyEvent e){
       final int code=e.getKeyCode();
-      if (code==e.VK_TAB) {
+      if (code==KeyEvent.VK_TAB) {
         int mods=e.getModifiersEx();
         if (KeyMapper.ctrlPressed(mods))
           mta.replaceSelection("	");

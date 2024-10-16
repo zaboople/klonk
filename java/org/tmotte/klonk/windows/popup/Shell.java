@@ -391,18 +391,18 @@ public class Shell {
     GridBug gb=new GridBug(win);
     gb.gridXY(0);
     gb.weightXY(1, 0);
-    gb.anchor=gb.WEST;
-    gb.fill=gb.HORIZONTAL;
+    gb.anchor=GridBug.WEST;
+    gb.fill=GridBug.HORIZONTAL;
     gb.addY(getFileSelectPanel());
 
     gb.addY(getButtonRunPanel());
 
     gb.weightXY(1, 1);
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.addY(getOutputPanel());
 
     gb.weightXY(1,0);
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.addY(getButtonClosePanel());
     Rectangle r=persist.getShellWindowBounds(
       new Rectangle(-1, -1, 450, 450)
@@ -418,12 +418,12 @@ public class Shell {
     gb.gridXY(0);
 
     gb.weightXY(1, 0);
-    gb.fill=gb.HORIZONTAL;
+    gb.fill=GridBug.HORIZONTAL;
     gb.addY(jcbPrevious);
 
     gb.weightXY(0, 0);
     gb.insets.left=5;
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.addX(btnSelectFile);
     gb.addX(btnForgetFile);
 
@@ -452,7 +452,7 @@ public class Shell {
     gb.gridXY(0);
     gb.weightXY(0);
     gb.weightXY(1);
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.add(mtaOutput.makeVerticalScrollable());
     return gb.container;
   }
@@ -515,7 +515,7 @@ public class Shell {
     jcbPrevious.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
       public void keyPressed(KeyEvent e){
         final int code=e.getKeyCode();
-        if (code==e.VK_ENTER && !jcbPrevious.isPopupVisible() && btnRun.isEnabled()) {
+        if (code==KeyEvent.VK_ENTER && !jcbPrevious.isPopupVisible() && btnRun.isEnabled()) {
           exec();
           e.consume();
         }
@@ -561,7 +561,7 @@ public class Shell {
   private KeyAdapter textAreaListener=new KeyAdapter() {
     public void keyPressed(KeyEvent e){
       final int code=e.getKeyCode(), mods=e.getModifiersEx();
-      if (code==e.VK_TAB) {
+      if (code==KeyEvent.VK_TAB) {
         if (KeyMapper.shiftPressed(mods))
           btnRun.requestFocusInWindow();
         else
@@ -569,12 +569,12 @@ public class Shell {
         e.consume();
       }
       else
-      if (code==e.VK_EQUALS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
+      if (code==KeyEvent.VK_EQUALS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
         fontBiggerLambda.run();
         e.consume();
       }
       else
-      if (code==e.VK_MINUS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
+      if (code==KeyEvent.VK_MINUS && KeyMapper.modifierPressed(mods, pInfo.currentOS)) {
         fontSmallerLambda.run();
         e.consume();
       }

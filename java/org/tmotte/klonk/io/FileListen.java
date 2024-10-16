@@ -119,8 +119,8 @@ public class FileListen implements LockInterface {
           loadFiles(name);
         while (true){
           WatchKey key=service.take();
-          for (WatchEvent we: key.pollEvents()){
-            WatchEvent.Kind kind=we.kind();
+          for (WatchEvent<?> we: key.pollEvents()){
+            WatchEvent.Kind<?> kind=we.kind();
             String fileName=we.context().toString();
             //log.log("FileListen: WatchEvent "+we.count()+": "+fileName+" kind:"+kind);
             if (we.count()>1)
@@ -187,7 +187,7 @@ public class FileListen implements LockInterface {
     }
   }
 
-  private WatchService makeWatcher(WatchEvent.Kind... kind) throws Exception {
+  private WatchService makeWatcher(WatchEvent.Kind<?>... kind) throws Exception {
     FileSystem fileSys=FileSystems.getDefault();
     WatchService watcher=fileSys.newWatchService();
     Path path=fileSys.getPath(homeWatch.dirName);

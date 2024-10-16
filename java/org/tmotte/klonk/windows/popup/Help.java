@@ -126,7 +126,7 @@ public class Help {
     jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     jsp.getVerticalScrollBar().setUnitIncrement(16);
     if (pInfo.currentOS.isOSX)
-      jsp.setHorizontalScrollBarPolicy(jsp.HORIZONTAL_SCROLLBAR_ALWAYS);
+      jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
     //Force the stupid thing to scroll to top:
     jtp.setCaretPosition(0);
@@ -137,13 +137,13 @@ public class Help {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
     gb.weightXY(1, 1);
-    gb.fill=gb.BOTH;
+    gb.fill=GridBug.BOTH;
     gb.add(jsp);
 
     gb.weighty=0.0;
     gb.insets.top=5;
     gb.insets.bottom=5;
-    gb.fill=gb.NONE;
+    gb.fill=GridBug.NONE;
     gb.addY(btnOK);
 
     setFont(fontOptions);

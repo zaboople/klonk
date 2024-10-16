@@ -38,6 +38,9 @@ import org.tmotte.klonk.config.PopupInfo;
 import org.tmotte.klonk.config.option.FontOptions;
 import org.tmotte.klonk.config.option.TabAndIndentOptions;
 
+import static org.tmotte.klonk.config.option.TabAndIndentOptions.INDENT_TABS;
+import static org.tmotte.klonk.config.option.TabAndIndentOptions.INDENT_SPACES;
+
 public class TabsAndIndents {
 
   /////////////////////////
@@ -82,10 +85,10 @@ public class TabsAndIndents {
     //Set values from input:
     jspTabSize.setValue(options.tabSize);
 
-    jrbThisTabs.setSelected(options.indentionMode==options.INDENT_TABS);
-    jrbThisSpaces.setSelected(options.indentionMode==options.INDENT_SPACES);
-    jrbDefTabs.setSelected(options.indentionModeDefault==options.INDENT_TABS);
-    jrbDefSpaces.setSelected(options.indentionModeDefault==options.INDENT_SPACES);
+    jrbThisTabs.setSelected(options.indentionMode==INDENT_TABS);
+    jrbThisSpaces.setSelected(options.indentionMode==INDENT_SPACES);
+    jrbDefTabs.setSelected(options.indentionModeDefault==INDENT_TABS);
+    jrbDefSpaces.setSelected(options.indentionModeDefault==INDENT_SPACES);
 
     jrbSpacesSizeCustom.setSelected(!options.indentSpacesSizeMatchTabs);
     jrbSpacesSizeMatch.setSelected(options.indentSpacesSizeMatchTabs);
@@ -134,11 +137,11 @@ public class TabsAndIndents {
         ?options.tabSize
         :Integer.parseInt(jspSpacesSize.getValue().toString());
       options.indentionMode=jrbThisTabs.isSelected()
-        ?options.INDENT_TABS
-        :options.INDENT_SPACES;
+        ?INDENT_TABS
+        :INDENT_SPACES;
       options.indentionModeDefault=jrbDefTabs.isSelected()
-        ?options.INDENT_TABS
-        :options.INDENT_SPACES;
+        ?INDENT_TABS
+        :INDENT_SPACES;
     }
     win.setVisible(false);
   }
@@ -192,8 +195,8 @@ public class TabsAndIndents {
     GridBug gb=new GridBug(win);
     gb.gridy=0;
     gb.weightXY(0);
-    gb.fill=gb.HORIZONTAL;
-    gb.anchor=gb.NORTHWEST;
+    gb.fill=GridBug.HORIZONTAL;
+    gb.anchor=GridBug.NORTHWEST;
     gb.add(getTabSizePanel());
     makeSeparator(gb);
     gb.addY(getTabsOrSpacesPanel());
@@ -210,7 +213,7 @@ public class TabsAndIndents {
     gb.insets.left=gb.insets.right=5;
     gb.insets.top=5;
     gb.weightx=1.0;
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.gridXY(0);
     gb.add(new JLabel("<html><b>Tab Size</b></html>"));
     gb.insets.bottom=5;
@@ -221,7 +224,7 @@ public class TabsAndIndents {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
     gb.weightx=1.0;
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.gridx=1;
     gb.add(new JLabel("Tabs appear as "));
     gb.addX(jspTabSize);
@@ -240,7 +243,7 @@ public class TabsAndIndents {
     JPanel jp=new JPanel();
     GridBug gb=new GridBug(jp);
     gb.weightx=1;
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.gridXY(0);
 
     gb.insets.top=5;
@@ -266,7 +269,7 @@ public class TabsAndIndents {
   }
   private Container getTabsOrSpacesRadiosPanel() {
     GridBug gb=new GridBug(new JPanel());
-    gb.anchor=gb.NORTHWEST;
+    gb.anchor=GridBug.NORTHWEST;
     gb.weightx=1.0;
     gb.gridy=gb.gridx=0;
     gb.add(getTabsOrSpacesRadiosPanel("This file:", jrbThisTabs, jrbThisSpaces, new JPanel()));
@@ -276,7 +279,7 @@ public class TabsAndIndents {
   }
   private Container getTabsOrSpacesRadiosPanel(String label, JRadioButton one, JRadioButton two, JComponent three){
     GridBug gb=new GridBug(new JPanel());
-    gb.anchor=gb.NORTHWEST;
+    gb.anchor=GridBug.NORTHWEST;
     gb.weightx=1.0;
     gb.gridy=gb.gridx=0;
     gb.add(new JLabel(label));
@@ -288,7 +291,7 @@ public class TabsAndIndents {
   private JPanel getSpacesSizePanel() {
     JPanel allPanel=new JPanel();
     GridBug allBug=new GridBug(allPanel);
-    allBug.anchor=allBug.NORTHWEST;
+    allBug.anchor=GridBug.NORTHWEST;
     allBug.weightx=1;
     allBug.gridx=allBug.gridy=0;
     allBug.insets.top=0;
@@ -299,7 +302,7 @@ public class TabsAndIndents {
     {
       JPanel panel=new JPanel();
       GridBug gb=new GridBug(panel);
-      gb.anchor=gb.WEST;
+      gb.anchor=GridBug.WEST;
       gb.weightx=1;
       gb.gridx=0;
       gb.gridy=0;
@@ -313,7 +316,7 @@ public class TabsAndIndents {
   private Container getAutoIndentPanel() {
     GridBug gb=new GridBug(new JPanel());
     gb.weightx=1.0;
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.gridXY(0);
     gb.insets.left=gb.insets.right=5;
 
@@ -322,13 +325,13 @@ public class TabsAndIndents {
     gb.add(new JLabel("<html><b>Automatic Indention</b></html>"));
     gb.gridwidth=1;
     gb.addY(chkIndentOnHardReturn);
-    gb.anchor=gb.NORTHWEST;
+    gb.anchor=GridBug.NORTHWEST;
     gb.insets.top=10;
     gb.setX(0)
       .addY(jrbTabIndentsLine);
     gb.insets.top=0;
     gb.insets.bottom=5;
-    gb.anchor=gb.WEST;
+    gb.anchor=GridBug.WEST;
     gb.setX(0)
       .addY(jrbTabIsTab);
     return gb.container;
@@ -385,8 +388,8 @@ public class TabsAndIndents {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         TabAndIndentOptions ti=new TabAndIndentOptions();
-        ti.indentionMode=ti.INDENT_TABS;
-        ti.indentionModeDefault=ti.INDENT_SPACES;
+        ti.indentionMode=INDENT_TABS;
+        ti.indentionModeDefault=INDENT_SPACES;
         PopupTestContext ptc=new PopupTestContext();
         boolean ok=new TabsAndIndents(ptc.getPopupInfo(), ptc.getFontOptions()).show(ti);
         System.out.println(ok+" "+ti);

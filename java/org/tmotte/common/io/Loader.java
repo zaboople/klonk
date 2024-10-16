@@ -7,24 +7,24 @@ import java.io.BufferedReader;
  * A convenience class for loading data from InputStreams.
  */
 public class Loader {
-  public static String loadUTF8String(java.lang.Class c, String fileName) {
+  public static String loadUTF8String(java.lang.Class<?> c, String fileName) {
     try {
-      java.io.InputStream is=c.getResourceAsStream(fileName);    
+      java.io.InputStream is=c.getResourceAsStream(fileName);
       return loadUTF8String(is);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
-  /** 
+  /**
    * Invokes loadString() with approxlen parameter of 512.
    */
   public static String loadUTF8String(java.io.InputStream ios) throws Exception{
     return loadString(ios, "utf-8", 512);
   }
 
-  /** 
+  /**
    * Loads a String from an input stream.
-   * @param approxlen The size of the byte buffer to use when loading. 
+   * @param approxlen The size of the byte buffer to use when loading.
    */
   public static String loadString(java.io.InputStream ios, String encoding, int approxlen) throws Exception{
     try {
@@ -37,14 +37,14 @@ public class Loader {
          buffer.append(readBuffer, 0, charsRead);
       } finally {
        ios.close();
-      }    
+      }
       return buffer.toString();
     } finally {
       ios.close();
     }
   }
 
-  /** 
+  /**
    * Creates a byte array of the specifed size and loads it from the given InputStream. The stream
    * will be closed at completion, even if there are more bytes to read.
    */
@@ -63,15 +63,15 @@ public class Loader {
       ios.close();
     }
   }
-  /** 
+  /**
    * A shortcut to loadBytes(InputStream, int) that uses URL.openStream() to get the InputStream.
    */
   public static byte[] loadBytes(java.net.URL url, int size) throws Exception{
     return loadBytes(url.openStream(), size);
   }
-  /** 
-   * A shortcut to loadBytes(InputStream, int) that uses URLConnection.getInputStream() to get the stream, 
-   * and URLConnection.getContentLength() to get the size of the byte array. 
+  /**
+   * A shortcut to loadBytes(InputStream, int) that uses URLConnection.getInputStream() to get the stream,
+   * and URLConnection.getContentLength() to get the size of the byte array.
    * @throws RuntimeException if URLConnection.getContentLength() returns 0, which happens with some
    * poorly supported URL types, depending on platform.
    */

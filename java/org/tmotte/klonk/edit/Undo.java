@@ -25,7 +25,7 @@ final class Undo {
       //This will only be null when we invoke from the constructor.
       //This object is marked as "limbo" to indicate it means
       //nothing and is awaiting cleanup, which happens in getLast():
-      savedState.uType=savedState.LIMBO;
+      savedState.uType=UndoStep.LIMBO;
     savedState=UndoStep.createSaveState();
     undos.add(savedState);
   }
@@ -35,9 +35,9 @@ final class Undo {
     //If it's on either, we're at the saved state.
     UndoStep us1=undos.size()==0 ?null :undos.getLast(),
              us2=redos.size()==0 ?null :redos.getLast();
-    return (us1!=null && us1.uType==us1.MARK_SAVE)
+    return (us1!=null && us1.uType==UndoStep.MARK_SAVE)
            ||
-           (us2!=null && us2.uType==us2.MARK_SAVE)
+           (us2!=null && us2.uType==UndoStep.MARK_SAVE)
             ;
   }
   public void debug(String yeah) {
@@ -107,7 +107,7 @@ final class Undo {
     if (mainList.size()==0)
       return null;
     UndoStep st=mainList.removeLast();
-    if (st.uType!=st.LIMBO)
+    if (st.uType!=UndoStep.LIMBO)
       otherList.add(st);
     return st.isAddOrRemove() ?st :removeLast(mainList, otherList);
   }
@@ -145,7 +145,7 @@ final class Undo {
       int uType;
       if (last.isAddOrRemove()){
         last=new UndoStep(
-           last.uType==last.REMOVE ?last.ADD :last.REMOVE
+           last.uType==UndoStep.REMOVE ?UndoStep.ADD :UndoStep.REMOVE
           ,last.start, last.len, last.text, true, false //last.doubleUp
         );
         undos.add(last);//Save state already added once
