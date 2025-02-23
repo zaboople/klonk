@@ -1,0 +1,5 @@
+# This is not working right now. Our historic method still does.
+ant clean config.prod jar
+jpackage --name Klonk --input dist --main-jar klonk.jar --icon lib/app.icns \
+    --type exe \
+    --main-class org.tmotte.klonk.config.Klonk
